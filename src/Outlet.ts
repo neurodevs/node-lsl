@@ -1,13 +1,13 @@
 interface OutletArgs {
-	numChannels?: number
-	sampleRate?: number
+	numChannels: number
+	sampleRate: number
 }
 
 class Outlet {
 	private numChannels: number
 	private sampleRate: number
 
-	public constructor({ numChannels = 1, sampleRate = 100 }: OutletArgs) {
+	public constructor({ numChannels, sampleRate }: OutletArgs) {
 		if (!isPositiveInteger(numChannels)) {
 			throw new Error('Invalid numChannels: must be a positive integer!')
 		}
