@@ -1,0 +1,68 @@
+{
+  "name": "node-lsl",
+  "version": "0.0.1",
+  "repository": "https://github.com/neurometa-labs/node-lsl.git",
+  "scripts": {
+    "build.ci": "yarn build.tsc && yarn build.resolve-paths && yarn lint",
+    "build.dev": "yarn build.tsc --sourceMap ; yarn resolve-paths.lint",
+    "build.copy-files": "mkdir -p build && rsync -avzq --exclude='*.ts' ./src/ ./build/",
+    "build.resolve-paths": "resolve-path-aliases --target build --patterns '**/*.js,**/*.d.ts'",
+    "build.tsc": "yarn build.copy-files && tsc",
+    "clean": "yarn clean.build",
+    "clean.all": "yarn clean.dependencies && yarn clean.build",
+    "clean.build": "rm -rf build/",
+    "clean.dependencies": "rm -rf node_modules/ package-lock.json yarn.lock",
+    "fix.lint": "eslint --fix --cache '**/*.ts'",
+    "lint": "eslint --cache '**/*.ts'",
+    "lint.tsc": "tsc -p . --noEmit",
+    "post.watch.build": "yarn build.copy-files && yarn build.resolve-paths",
+    "rebuild": "yarn clean.all && yarn && yarn build.dev",
+    "update.dependencies": "yarn clean.dependencies && yarn",
+    "resolve-paths.lint": "yarn build.resolve-paths ; yarn lint",
+    "test": "jest",
+    "watch.build.dev": "tsc-watch --sourceMap --onCompilationComplete 'yarn post.watch.build'",
+    "watch.lint": "concurrently 'yarn lint' \"chokidar 'src/**/*' -c 'yarn lint.tsc'\"",
+    "watch.rebuild": "yarn clean.all && yarn && yarn watch.build.dev",
+    "watch.tsc": "tsc -w"
+  },
+  "devDependencies": {
+    "@sprucelabs/jest-json-reporter": "^7.0.114",
+    "@sprucelabs/resolve-path-aliases": "^1.1.255",
+    "@sprucelabs/spruce-test-fixtures": "^60.1.16",
+    "@sprucelabs/test": "^8.0.23",
+    "@sprucelabs/test-utils": "^4.0.64",
+    "@types/node": "^20.8.10",
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.52.0",
+    "eslint-config-spruce": "^10.13.6",
+    "jest": "^29.7.0",
+    "jest-circus": "^29.7.0",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.2.2"
+  },
+  "description": "Lab Streaming Layer (LSL) on Node",
+  "skill": {
+    "namespace": "node-lsl"
+  },
+  "jest": {
+    "testRunner": "jest-circus/runner",
+    "maxWorkers": 4,
+    "testTimeout": 120000,
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "<rootDir>/tmp/",
+      "<rootDir>/src/",
+      "<rootDir>/node_modules/",
+      "<rootDir>/build/__tests__/testDirsAndFiles/"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.js?(x)"
+    ],
+    "moduleNameMapper": {
+      "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
+    }
+  }
+}
