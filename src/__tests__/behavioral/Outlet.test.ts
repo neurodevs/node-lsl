@@ -3,8 +3,9 @@ import Outlet from '../../Outlet'
 
 export default class OutletTest extends AbstractSpruceTest {
 	@test()
-	protected static async canCreateOutlet() {
-		const outlet = new Outlet()
-		assert.isTruthy(outlet)
+	protected static async outletThrowsWithInvalidNumChannels() {
+		assert.doesThrow(() => new Outlet({ numChannels: 0 }))
+		assert.doesThrow(() => new Outlet({ numChannels: -1 }))
+		assert.doesThrow(() => new Outlet({ numChannels: 2.5 }))
 	}
 }
