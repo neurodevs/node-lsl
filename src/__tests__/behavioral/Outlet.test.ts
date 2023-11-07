@@ -4,6 +4,7 @@ import Outlet from '../../Outlet'
 
 export default class OutletTest extends AbstractSpruceTest {
 	private static defaultOutlet: SpyOutlet
+
 	private static saneDefaults = {
 		name: 'Muse S (2nd gen) - EEG',
 		type: 'EEG',

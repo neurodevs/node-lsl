@@ -7,38 +7,6 @@ const xmlPtr = ref.refType(ref.types.void)
 const outletType = ref.refType(ref.types.void)
 const FloatArray = ArrayType(ref.types.float)
 
-export interface LiblslBindings {
-	[functionName: string]: any
-}
-
-export interface StreamInfoArgs {
-	name: string
-	type: string
-	channelCount: number
-	sampleRate: number
-	channelFormat: ChannelFormat
-	sourceId: string
-}
-
-export interface StreamInfoCaller {
-	name: string
-	type: string
-	channelCount: number
-	sampleRate: number
-	channelFormat: number
-	sourceId: string
-}
-
-export type ChannelFormat =
-	| 'undefined'
-	| 'float32'
-	| 'double64'
-	| 'string'
-	| 'int32'
-	| 'int16'
-	| 'int8'
-	| 'int64'
-
 export class Liblsl {
 	protected bindings: LiblslBindings
 
@@ -108,3 +76,35 @@ export class Liblsl {
 		)
 	}
 }
+
+export interface LiblslBindings {
+	[functionName: string]: any
+}
+
+export interface StreamInfoArgs {
+	name: string
+	type: string
+	channelCount: number
+	sampleRate: number
+	channelFormat: ChannelFormat
+	sourceId: string
+}
+
+export interface StreamInfoCaller {
+	name: string
+	type: string
+	channelCount: number
+	sampleRate: number
+	channelFormat: number
+	sourceId: string
+}
+
+export type ChannelFormat =
+	| 'undefined'
+	| 'float32'
+	| 'double64'
+	| 'string'
+	| 'int32'
+	| 'int16'
+	| 'int8'
+	| 'int64'

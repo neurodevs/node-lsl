@@ -1,18 +1,5 @@
 import { ChannelFormat, Liblsl } from './Liblsl'
 
-export interface OutletArgs {
-	name: string
-	type: string
-	channelCount: number
-	sampleRate: number
-	channelFormat: ChannelFormat
-	sourceId: string
-	manufacturer: string
-	unit: string
-	chunkSize: number
-	maxBuffered: number
-}
-
 export default class Outlet {
 	protected name: string
 	protected type: string
@@ -29,17 +16,6 @@ export default class Outlet {
 	protected streamInfo: any
 	protected desc: any
 	protected outlet: any
-
-	private channelFormats: { [key in ChannelFormat]: number } = {
-		undefined: 0,
-		float32: 1,
-		double64: 2,
-		string: 3,
-		int32: 4,
-		int16: 5,
-		int8: 6,
-		int64: 7,
-	}
 
 	public constructor({
 		name,
@@ -63,7 +39,7 @@ export default class Outlet {
 		this.type = type
 		this.channelCount = channelCount
 		this.sampleRate = sampleRate
-		this.channelFormat = this.channelFormats[channelFormat]
+		this.channelFormat = channelFormats[channelFormat]
 		this.sourceId = sourceId
 		this.manufacturer = manufacturer
 		this.unit = unit
@@ -108,8 +84,8 @@ export default class Outlet {
 	}
 
 	private validateChannelFormat(channelFormat: string) {
-		const validChannelFormats = Object.keys(this.channelFormats).join(', ')
-		if (!(channelFormat in this.channelFormats)) {
+		const validChannelFormats = Object.keys(channelFormats).join(', ')
+		if (!(channelFormat in channelFormats)) {
 			throw new Error(
 				`Invalid channelFormat: must be one of ${validChannelFormats}, not ${channelFormat}!`
 			)
@@ -131,6 +107,30 @@ export default class Outlet {
 			)
 		}
 	}
+}
+
+export interface OutletArgs {
+	name: string
+	type: string
+	channelCount: number
+	sampleRate: number
+	channelFormat: ChannelFormat
+	sourceId: string
+	manufacturer: string
+	unit: string
+	chunkSize: number
+	maxBuffered: number
+}
+
+const channelFormats: { [key in ChannelFormat]: number } = {
+	undefined: 0,
+	float32: 1,
+	double64: 2,
+	string: 3,
+	int32: 4,
+	int16: 5,
+	int8: 6,
+	int64: 7,
 }
 
 const isPositiveNumber = (value: number) => {
