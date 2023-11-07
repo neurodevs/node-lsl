@@ -1,7 +1,9 @@
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import Outlet, { ChannelFormat } from '../../Outlet'
+import { ChannelFormat } from '../../Liblsl'
+import Outlet from '../../Outlet'
 
 export default class OutletTest extends AbstractSpruceTest {
+	private static defaultOutlet: SpyOutlet
 	private static saneDefaults = {
 		name: 'Muse S (2nd gen) - EEG',
 		type: 'EEG',
@@ -26,13 +28,19 @@ export default class OutletTest extends AbstractSpruceTest {
 		'int64',
 	]
 
+	protected static async beforeEach() {
+		await super.beforeEach()
+		process.env.LIBLSL_PATH =
+			'/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib'
+		this.defaultOutlet = this.createOutletWithDefaults({})
+	}
+
 	@test()
 	protected static async outletHasRequiredProperties() {
-		const outlet = this.createOutletWithDefaults({})
 		const requiredProperties = Object.keys(this.saneDefaults)
 		for (let requiredProperty of requiredProperties) {
 			assert.isTrue(
-				requiredProperty in outlet,
+				requiredProperty in this.defaultOutlet,
 				`${requiredProperty} does not exist on Outlet instance`
 			)
 		}
@@ -93,6 +101,31 @@ export default class OutletTest extends AbstractSpruceTest {
 		)
 	}
 
+	@test()
+	protected static async outletCanInstantiateLiblsl() {
+		assert.isTruthy(this.defaultOutlet.getLiblsl())
+	}
+
+	@test()
+	protected static async outletHasStreamInfo() {
+		assert.isTruthy(this.defaultOutlet.getStreamInfo())
+	}
+
+	@test()
+	protected static async outletHasStreamInfoDescription() {
+		assert.isTruthy(this.defaultOutlet.getDesc())
+	}
+
+	@test()
+	protected static async outletCanCreateOutlet() {
+		assert.isTruthy(this.defaultOutlet.getOutlet())
+	}
+
+	@test()
+	protected static async outletCanPushSample() {
+		this.defaultOutlet.pushSample([])
+	}
+
 	private static assertInvalidInputThrows(
 		argName: string,
 		invalidValues: any[],
@@ -114,5 +147,21 @@ export default class OutletTest extends AbstractSpruceTest {
 class SpyOutlet extends Outlet {
 	public getChannelFormat() {
 		return this.channelFormat
+	}
+
+	public getLiblsl() {
+		return this.liblsl
+	}
+
+	public getStreamInfo() {
+		return this.streamInfo
+	}
+
+	public getDesc() {
+		return this.desc
+	}
+
+	public getOutlet() {
+		return this.outlet
 	}
 }

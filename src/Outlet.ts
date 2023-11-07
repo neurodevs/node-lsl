@@ -1,3 +1,5 @@
+import { ChannelFormat, Liblsl } from './Liblsl'
+
 export interface OutletArgs {
 	name: string
 	type: string
@@ -11,7 +13,7 @@ export interface OutletArgs {
 	maxBuffered: number
 }
 
-class Outlet {
+export default class Outlet {
 	protected name: string
 	protected type: string
 	protected channelCount: number
@@ -22,6 +24,11 @@ class Outlet {
 	protected unit: string
 	protected chunkSize: number
 	protected maxBuffered: number
+
+	protected liblsl: Liblsl
+	protected streamInfo: any
+	protected desc: any
+	protected outlet: any
 
 	private channelFormats: { [key in ChannelFormat]: number } = {
 		undefined: 0,
@@ -62,6 +69,26 @@ class Outlet {
 		this.unit = unit
 		this.chunkSize = chunkSize
 		this.maxBuffered = maxBuffered
+
+		this.liblsl = new Liblsl()
+		this.streamInfo = this.liblsl.createStreamInfo({
+			name: this.name,
+			type: this.type,
+			channelCount: this.channelCount,
+			sampleRate: this.sampleRate,
+			channelFormat: this.channelFormat,
+			sourceId: this.sourceId,
+		})
+		this.desc = this.liblsl.getDesc(this.streamInfo)
+		this.outlet = this.liblsl.createOutlet(
+			this.streamInfo,
+			chunkSize,
+			maxBuffered
+		)
+	}
+
+	public pushSample(samples: any) {
+		this.liblsl.pushSample(this.outlet, samples)
 	}
 
 	private validateChannelCount(channelCount: number) {
@@ -106,16 +133,6 @@ class Outlet {
 	}
 }
 
-export type ChannelFormat =
-	| 'undefined'
-	| 'float32'
-	| 'double64'
-	| 'string'
-	| 'int32'
-	| 'int16'
-	| 'int8'
-	| 'int64'
-
 const isPositiveNumber = (value: number) => {
 	return value > 0
 }
@@ -127,5 +144,3 @@ const isPositiveInteger = (value: number) => {
 const isPositiveIntegerOrZero = (value: number) => {
 	return value >= 0 && Number.isInteger(value)
 }
-
-export default Outlet

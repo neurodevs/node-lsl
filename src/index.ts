@@ -1,1 +1,3 @@
-//exports go here
+import Outlet from './Outlet'
+
+export default Outlet
