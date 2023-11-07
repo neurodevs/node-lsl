@@ -26,6 +26,10 @@ export default class OutletTest extends AbstractSpruceTest {
 		'int64',
 	]
 
+	// TAY 2.0 - this is going for the gold right away, this test should be the last
+	// one in here. Anytime you see see a test that "just does it" you can be certain
+	// the tests are not sound.
+
 	@test()
 	protected static async outletHasRequiredProperties() {
 		const outlet = this.createOutletWithDefaults({})
