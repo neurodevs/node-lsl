@@ -18,23 +18,27 @@ export class Liblsl {
 		}
 
 		try {
-			this.bindings = ffi.Library(process.env.LIBLSL_PATH, {
-				lsl_create_streaminfo: [
-					streamInfo,
-					['string', 'string', 'int', 'double', 'int', 'string'],
-				],
-				lsl_get_desc: [xmlPtr, [streamInfo]],
-				lsl_append_child_value: ['void', [xmlPtr, 'string', 'string']],
-				lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
-				lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
-				lsl_local_clock: ['double', []],
-				lsl_push_sample_ft: ['int', [outletType, FloatArray, 'double']],
-			})
+			this.bindings = this.loadBindings()
 		} catch {
 			throw new Error(
 				'Could not load dynamic library for liblsl, please ensure you have built it, set LIBLSL_PATH accordingly, and reloaded!'
 			)
 		}
+	}
+
+	private loadBindings() {
+		return ffi.Library(process.env.LIBLSL_PATH, {
+			lsl_create_streaminfo: [
+				streamInfo,
+				['string', 'string', 'int', 'double', 'int', 'string'],
+			],
+			lsl_get_desc: [xmlPtr, [streamInfo]],
+			lsl_append_child_value: ['void', [xmlPtr, 'string', 'string']],
+			lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
+			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
+			lsl_local_clock: ['double', []],
+			lsl_push_sample_ft: ['int', [outletType, FloatArray, 'double']],
+		})
 	}
 
 	public createStreamInfo(args: StreamInfoCaller) {
