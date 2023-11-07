@@ -26,6 +26,11 @@
     "watch.rebuild": "yarn clean.all && yarn && yarn watch.build.dev",
     "watch.tsc": "tsc -w"
   },
+  "dependencies": {
+    "ffi-napi": "^4.0.3",
+    "node-gyp": "^10.0.1",
+    "ref-array-napi": "^1.2.2"
+  },
   "devDependencies": {
     "@sprucelabs/jest-json-reporter": "^7.0.114",
     "@sprucelabs/resolve-path-aliases": "^1.1.255",
@@ -66,10 +71,5 @@
     "moduleNameMapper": {
       "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
     }
-  },
-  "dependencies": {
-    "ffi-napi": "^4.0.3",
-    "node-gyp": "^10.0.1",
-    "ref-array-napi": "^1.2.2"
   }
 }
