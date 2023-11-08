@@ -8,7 +8,8 @@ const outletType = ref.refType(ref.types.void)
 const FloatArray = ArrayType(ref.types.float)
 
 export class Liblsl {
-	protected bindings: LiblslBindings
+	protected bindings: LiblslBindings // TAY 3.0 Casing should be LibLslBindings (camel case even with acronyms and abbreviations, 100% predictable)
+	// protected static ffi: Ffi = ffi TAY 2.0 by putting a reference here we can spy on it from our tests to make sure the correct methods and parameters are being used
 
 	public constructor() {
 		if (!process.env.LIBLSL_PATH) {
@@ -28,6 +29,7 @@ export class Liblsl {
 
 	private loadBindings() {
 		return ffi.Library(process.env.LIBLSL_PATH, {
+			// TAY 2.1 this becomes Liblsl.ffi.Library(...) so we can test externally
 			lsl_create_streaminfo: [
 				streamInfo,
 				['string', 'string', 'int', 'double', 'int', 'string'],
@@ -82,7 +84,7 @@ export class Liblsl {
 }
 
 export interface LiblslBindings {
-	[functionName: string]: any
+	[functionName: string]: any // TAY 1.0 A good way to approach this is to add one lsl function at a time to the types while your implementing them. this dynamic key approach is not useful for people coming in to support the codebase without having to look up LSL docs directly
 }
 
 export interface StreamInfoArgs {
@@ -112,3 +114,11 @@ export type ChannelFormat =
 	| 'int16'
 	| 'int8'
 	| 'int64'
+
+// TAY 2.2 example of an interface to Spy on FFI.  In this case, because `functions` is actually
+// an object with any arbitrary key, you can use the dynamic key, or KeyOf<LibLslBindings> to
+/**
+ * interface Ffi {
+ * 	Library(path: string, functions: {[functionName: string]: any})
+ * }
+ */

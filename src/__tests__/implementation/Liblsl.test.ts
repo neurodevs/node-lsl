@@ -11,6 +11,9 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	protected static async beforeEach() {
 		await super.beforeEach()
+		// TAY 6.0 change to somethnig like
+		// assert.isTruthy(process.env.LIBLSL_PATH, 'Add LIBLSL_PATH="path/to/liblsl.dylib" in your environment')
+		// so we don't have to change this everytime we change machines or versions
 		process.env.LIBLSL_PATH =
 			'/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib'
 		this.liblsl = new SpyLiblsl()
@@ -25,6 +28,9 @@ export default class LiblslTest extends AbstractSpruceTest {
 		})
 		this.defaultDesc = this.liblsl.getDesc(this.defaultInfo)
 		this.defaultOutlet = this.liblsl.createOutlet(this.defaultInfo, 0, 360)
+		// TAY 2.2 to allow you to test the right things are passed to ffi
+		// LibLsl.ffi = fakeFfi
+		// you can yarn add -D @types/ffi-napi to get types to help you create the spy
 	}
 
 	@test()
@@ -32,6 +38,19 @@ export default class LiblslTest extends AbstractSpruceTest {
 		delete process.env.LIBLSL_PATH
 		assert.doesThrow(() => new Liblsl())
 	}
+
+	// TAY 2.3 this is how you could test the corret things are passed to ffi
+	/**
+	 * @test()
+	 * protected static async ffiSentExpectedParams() {
+	 * 		const spyFfi = {...}
+	 * 		this.libLsl.loadBindings()
+	 * 		assert.isEqualDeep(spyFfi.libraryArgs, {
+	 * 			path: process.env.LIBLSL_PATH,
+	 * 			functions: {...}
+	 * 		})
+	 * }
+	 */
 
 	@test()
 	protected static async liblslThrowsWithInvalidPath() {
@@ -89,17 +108,17 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async liblslCanCreateOutlet() {
-		return this.liblsl.createOutlet(this.defaultInfo, 0, 360)
+		return this.liblsl.createOutlet(this.defaultInfo, 0, 360) // TAY 5.0 no need to return in tests
 	}
 
 	@test()
 	protected static async liblslCanGetLocalClock() {
-		return this.liblsl.getLocalClock()
+		return this.liblsl.getLocalClock() // TAY 5.1 no need to return in tests
 	}
 
 	@test()
 	protected static async liblslCanPushSample() {
-		return this.liblsl.pushSample(this.defaultOutlet, [])
+		return this.liblsl.pushSample(this.defaultOutlet, []) // TAY 5.2 no need to return in tests
 	}
 }
 
