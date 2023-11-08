@@ -37,6 +37,7 @@
     "@sprucelabs/spruce-test-fixtures": "^60.1.16",
     "@sprucelabs/test": "^8.0.23",
     "@sprucelabs/test-utils": "^4.0.64",
+    "@types/ffi-napi": "^4.0.10",
     "@types/node": "^20.8.10",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^8.2.2",

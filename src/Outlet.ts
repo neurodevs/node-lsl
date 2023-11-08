@@ -39,7 +39,9 @@ export default class Outlet {
 		this.type = type
 		this.channelCount = channelCount
 		this.sampleRate = sampleRate
-		this.channelFormat = channelFormats[channelFormat]
+		this.channelFormat = channelFormats[channelFormat] // TAY 4.0 this looks like i can still just put in a random integer in range and it'll still pass
+		// TAY 4.1 I think i can probably still hardcode all of these and the tests will still pass
+		// go slow and check one thing at a time, it's tedious, but once done everyone afterwards will thank you
 		this.sourceId = sourceId
 		this.manufacturer = manufacturer
 		this.unit = unit
