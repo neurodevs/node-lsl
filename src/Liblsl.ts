@@ -117,6 +117,7 @@ export type ChannelFormat =
 
 // TAY 2.2 example of an interface to Spy on FFI.  In this case, because `functions` is actually
 // an object with any arbitrary key, you can use the dynamic key, or KeyOf<LibLslBindings> to
+// make it even easier
 /**
  * interface Ffi {
  * 	Library(path: string, functions: {[functionName: string]: any})
