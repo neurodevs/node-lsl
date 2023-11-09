@@ -31,8 +31,6 @@ export default class OutletTest extends AbstractSpruceTest {
 
 	protected static async beforeEach() {
 		await super.beforeEach()
-		process.env.LIBLSL_PATH =
-			'/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib'
 		this.defaultOutlet = this.createOutletWithDefaults({})
 	}
 

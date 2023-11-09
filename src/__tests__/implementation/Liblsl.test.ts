@@ -5,14 +5,28 @@ export default class LiblslTest extends AbstractSpruceTest {
 	private static liblsl: SpyLiblsl
 	private static bindings: LiblslBindings
 
-	private static defaultInfo: any // Make this reference XML node
+	private static defaultInfo: any
 	private static defaultDesc: any
 	private static defaultOutlet: any
 
+	private static envCache: any
+
+	protected static async beforeAll() {
+		this.envCache = process.env
+
+		assert.isTruthy(
+			process.env.LIBLSL_PATH,
+			'Add LIBLSL_PATH="path/to/liblsl.dylib" in your environment'
+		)
+	}
+
+	protected static async afterAll() {
+		process.env = this.envCache
+	}
+
 	protected static async beforeEach() {
 		await super.beforeEach()
-		process.env.LIBLSL_PATH =
-			'/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib'
+
 		this.liblsl = new SpyLiblsl()
 		this.bindings = this.liblsl.getBindings()
 		this.defaultInfo = this.liblsl.createStreamInfo({
@@ -25,18 +39,6 @@ export default class LiblslTest extends AbstractSpruceTest {
 		})
 		this.defaultDesc = this.liblsl.getDesc(this.defaultInfo)
 		this.defaultOutlet = this.liblsl.createOutlet(this.defaultInfo, 0, 360)
-	}
-
-	@test()
-	protected static async liblslThrowsWithUndefinedPath() {
-		delete process.env.LIBLSL_PATH
-		assert.doesThrow(() => new Liblsl())
-	}
-
-	@test()
-	protected static async liblslThrowsWithInvalidPath() {
-		process.env.LIBLSL_PATH = '/some/invalid/path'
-		assert.doesThrow(() => new Liblsl())
 	}
 
 	@test()
@@ -89,17 +91,30 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async liblslCanCreateOutlet() {
-		return this.liblsl.createOutlet(this.defaultInfo, 0, 360)
+		this.liblsl.createOutlet(this.defaultInfo, 0, 360)
 	}
 
 	@test()
 	protected static async liblslCanGetLocalClock() {
-		return this.liblsl.getLocalClock()
+		this.liblsl.getLocalClock()
 	}
 
 	@test()
 	protected static async liblslCanPushSample() {
-		return this.liblsl.pushSample(this.defaultOutlet, [])
+		this.liblsl.pushSample(this.defaultOutlet, [1, 2, 3])
+	}
+
+	// Must be at bottom of tests since it modifies env
+	@test()
+	protected static async liblslThrowsWithInvalidPath() {
+		assert.doesThrow(() => {
+			delete process.env.LIBLSL_PATH
+			new Liblsl()
+		})
+		assert.doesThrow(() => {
+			process.env.LIBLSL_PATH = '/some/invalid/path'
+			new Liblsl()
+		})
 	}
 }
 
