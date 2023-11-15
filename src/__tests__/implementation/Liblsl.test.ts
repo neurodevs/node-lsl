@@ -1,125 +1,231 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import { Liblsl, LiblslBindings } from '../../Liblsl'
+import { randomInt } from 'crypto'
+import AbstractSpruceTest, {
+	test,
+	assert,
+	errorAssert,
+	generateId,
+} from '@sprucelabs/test-utils'
+import ArrayType from 'ref-array-napi'
+import ref from 'ref-napi'
+import LiblslImpl, {
+	CreateStreamInfoOptions,
+	LiblslBindings,
+	Liblsl,
+	LslSample,
+	StreamInfo,
+	CreateOutletOptions,
+	LslBindingsOutlet,
+	LslBindingsStreamInfo,
+} from '../../Liblsl'
 
 export default class LiblslTest extends AbstractSpruceTest {
-	private static liblsl: SpyLiblsl
-	private static bindings: LiblslBindings
+	private static lsl: Liblsl
+	private static libraryPath?: string
+	private static libraryOptions?: Record<string, any>
+	private static fakeBindings: LiblslBindings
+	private static fakeStreamInfo: StreamInfo
+	private static fakeOutlet: LslBindingsOutlet
+	private static createStreamInfoParams?: any[]
+	private static createOutletParams?: any[]
+	private static pushSampleParams?: any[]
+	private static localClock: number
+	private static shouldThrowWhenCreatingBindings: boolean
 
-	private static defaultInfo: any
-	private static defaultDesc: any
-	private static defaultOutlet: any
-
-	private static envCache: any
-
-	protected static async beforeAll() {
-		this.envCache = process.env
-
-		assert.isTruthy(
-			process.env.LIBLSL_PATH,
-			'Add LIBLSL_PATH="path/to/liblsl.dylib" in your environment'
-		)
-	}
-
-	protected static async afterAll() {
-		process.env = this.envCache
-	}
-
-	protected static async beforeEach() {
+	protected static async beforeEach(): Promise<void> {
 		await super.beforeEach()
 
-		this.liblsl = new SpyLiblsl()
-		this.bindings = this.liblsl.getBindings()
-		this.defaultInfo = this.liblsl.createStreamInfo({
-			name: 'Dummy name',
-			type: 'EEG',
-			channelCount: 5,
-			sampleRate: 256,
-			channelFormat: 1,
-			sourceId: 'dummy-id',
-		})
-		this.defaultDesc = this.liblsl.getDesc(this.defaultInfo)
-		this.defaultOutlet = this.liblsl.createOutlet(this.defaultInfo, 0, 360)
-	}
+		delete this.libraryPath
+		delete this.libraryOptions
+		delete this.createStreamInfoParams
+		delete this.createOutletParams
+		delete this.pushSampleParams
 
-	@test()
-	protected static async liblslCanLoadBindings() {
-		assert.isTruthy(this.bindings)
-	}
+		process.env.LIBLSL_PATH = generateId()
 
-	@test()
-	protected static async liblslBindingsHaveRequiredFunctions() {
-		const requiredFunctions = [
-			'lsl_create_streaminfo',
-			'lsl_get_desc',
-			'lsl_append_child_value',
-			'lsl_append_child',
-			'lsl_create_outlet',
-			'lsl_local_clock',
-			'lsl_push_sample_ft',
-		]
-		for (let requiredFunction of requiredFunctions) {
-			assert.isFunction(
-				this.bindings[requiredFunction],
-				`Please define a binding for ${requiredFunction} in the FFI!`
-			)
+		this.fakeStreamInfo = {}
+		this.fakeOutlet = {}
+		this.localClock = new Date().getTime()
+		this.shouldThrowWhenCreatingBindings = false
+
+		this.fakeBindings = {
+			lsl_create_streaminfo: (...params: any[]) => {
+				this.createStreamInfoParams = params
+				return this.fakeStreamInfo
+			},
+			lsl_create_outlet: (...params: any[]) => {
+				this.createOutletParams = params
+				return this.fakeOutlet
+			},
+			lsl_push_sample_ft: (...params: any[]) => {
+				this.pushSampleParams = params
+				return 0
+			},
+			lsl_local_clock: () => this.localClock,
 		}
+
+		LiblslImpl.ffi = {
+			//@ts-ignore
+			Library: (path: string, options: Record<string, any>) => {
+				this.libraryPath = path
+				this.libraryOptions = options
+				if (this.shouldThrowWhenCreatingBindings) {
+					throw new Error('Failed to create bindings')
+				}
+				return this.fakeBindings
+			},
+		}
+
+		LiblslImpl.reset()
+		this.lsl = LiblslImpl.getInstance()
 	}
 
 	@test()
-	protected static async liblslCanCreateStreamInfo() {
-		assert.isTruthy(this.defaultInfo)
+	protected static async throwsIfNoEnvSet() {
+		delete process.env.LIBLSL_PATH
+		const err = assert.doesThrow(() => new LiblslImpl())
+		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+			parameters: ['env.LIBLSL_PATH'],
+		})
 	}
 
 	@test()
-	protected static async liblslCanGetInfoDescription() {
-		assert.isTruthy(this.defaultDesc)
+	protected static async throwsHelpfulErrorWhenBindingsFailToLoad() {
+		this.shouldThrowWhenCreatingBindings = true
+		const err = assert.doesThrow(() => new LiblslImpl())
+		errorAssert.assertError(err, 'FAILED_TO_LOAD_LIBLSL', {
+			liblslPath: process.env.LIBLSL_PATH,
+		})
 	}
 
 	@test()
-	protected static async liblslCanAppendChild() {
-		this.liblsl.appendChild(this.defaultDesc, 'channels')
+	protected static async worksAsASingleton() {
+		const liblsl = LiblslImpl.getInstance()
+		assert.isInstanceOf(liblsl, LiblslImpl)
 	}
 
 	@test()
-	protected static async liblslCanAppendChildValue() {
-		this.liblsl.appendChildValue(
-			this.defaultDesc,
-			'manufacturer',
-			'Lorem Ipsum Inc.'
+	protected static async singletonIsTheSame() {
+		assert.isEqual(LiblslImpl.getInstance(), LiblslImpl.getInstance())
+	}
+
+	@test()
+	protected static canSetInstance() {
+		const fake = new FakeLiblsl()
+		LiblslImpl.setInstance(fake)
+		assert.isEqual(LiblslImpl.getInstance(), fake)
+	}
+
+	@test()
+	protected static async createsExpectedBindingsToLiblsl() {
+		process.env.LIBLSL_PATH = generateId()
+		new LiblslImpl()
+		assert.isEqual(this.libraryPath, process.env.LIBLSL_PATH)
+		const expected = {
+			lsl_create_streaminfo: [
+				streamInfo,
+				['string', 'string', 'int', 'double', 'int', 'string'],
+			],
+			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
+			lsl_local_clock: ['double', []],
+			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
+		}
+		assert.isEqual(
+			JSON.stringify(this.libraryOptions),
+			JSON.stringify(expected)
 		)
 	}
 
 	@test()
-	protected static async liblslCanCreateOutlet() {
-		this.liblsl.createOutlet(this.defaultInfo, 0, 360)
-	}
-
-	@test()
-	protected static async liblslCanGetLocalClock() {
-		this.liblsl.getLocalClock()
-	}
-
-	@test()
-	protected static async liblslCanPushSample() {
-		this.liblsl.pushSample(this.defaultOutlet, [1, 2, 3])
-	}
-
-	// Must be at bottom of tests since it modifies env
-	@test()
-	protected static async liblslThrowsWithInvalidPath() {
-		assert.doesThrow(() => {
-			delete process.env.LIBLSL_PATH
-			new Liblsl()
+	protected static createStreamInfoThrowsWithMissingRequiredParams() {
+		//@ts-ignore
+		const err = assert.doesThrow(() => this.lsl.createStreamInfo())
+		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+			parameters: [
+				'name',
+				'type',
+				'channelCount',
+				'sampleRate',
+				'channelFormat',
+				'sourceId',
+			],
 		})
-		assert.doesThrow(() => {
-			process.env.LIBLSL_PATH = '/some/invalid/path'
-			new Liblsl()
+	}
+
+	@test()
+	protected static async canGetStreamInfoWithRequiredParams() {
+		const options = this.generateRandomCreateStreamInfoOptions()
+		const actual = this.lsl.createStreamInfo(options)
+
+		assert.isEqual(actual, this.fakeStreamInfo)
+		assert.isEqualDeep(this.createStreamInfoParams, Object.values(options))
+	}
+
+	@test()
+	protected static async createOutletThrowsWhenMissingRequiredParams() {
+		//@ts-ignore
+		const err = assert.doesThrow(() => this.lsl.createOutlet({}))
+		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+			parameters: ['info', 'chunkSize', 'maxBuffered'],
 		})
+	}
+
+	@test()
+	protected static async canCreateOutletWithRequiredParams() {
+		const info = this.lsl.createStreamInfo(
+			this.generateRandomCreateStreamInfoOptions()
+		)
+		const options = {
+			info,
+			chunkSize: randomInt(10),
+			maxBuffered: randomInt(10),
+		}
+		const actual = this.lsl.createOutlet(options)
+		assert.isEqualDeep(this.createOutletParams, Object.values(options))
+		assert.isEqual(actual, this.fakeOutlet)
+	}
+
+	@test()
+	protected static async pushSampleThrowsWhenMissingRequiredParams() {
+		//@ts-ignore
+		const err = assert.doesThrow(() => this.lsl.pushSample())
+		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+			parameters: ['outlet', 'sample'],
+		})
+	}
+
+	@test()
+	protected static async pushSampleCallsBindings() {
+		const expected = [1, 2, 3]
+		this.lsl.pushSample(this.fakeOutlet, expected)
+		assert.isEqual(this.pushSampleParams?.[0], this.fakeOutlet)
+		assert.isEqual(this.pushSampleParams?.[1], expected)
+		assert.isEqual(this.pushSampleParams?.[2], this.localClock)
+	}
+
+	private static generateRandomCreateStreamInfoOptions() {
+		return {
+			name: generateId(),
+			type: generateId(),
+			channelCount: randomInt(10),
+			sampleRate: randomInt(10),
+			channelFormat: randomInt(10),
+			sourceId: generateId(),
+		}
 	}
 }
 
-class SpyLiblsl extends Liblsl {
-	public getBindings() {
-		return this.bindings
+class FakeLiblsl implements Liblsl {
+	public createOutlet(_options: CreateOutletOptions): LslBindingsOutlet {
+		return {} as LslBindingsOutlet
 	}
+	public createStreamInfo(
+		_options: CreateStreamInfoOptions
+	): LslBindingsStreamInfo {
+		return {} as StreamInfo
+	}
+	public pushSample(_sample: LslSample): void {}
 }
+
+const streamInfo = ref.refType(ref.types.void)
+const outletType = ref.refType(ref.types.void)
+const FloatArray = ArrayType(ref.types.float)
