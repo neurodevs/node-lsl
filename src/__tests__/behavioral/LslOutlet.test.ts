@@ -223,4 +223,8 @@ class SpyLiblsl implements Liblsl {
 	}
 }
 
-class CheckingOutlet extends LslOutlet {}
+class CheckingOutlet extends LslOutlet {
+	public constructor(options: LslOutletOptions) {
+		super(options)
+	}
+}

@@ -3,7 +3,7 @@ import LiblslImpl, { LslSample } from './Liblsl'
 
 export default class LslOutletImpl implements LslOutlet {
 	private outletOptions: LslOutletOptions
-	private static Class?: new (options: LslOutletOptions) => LslOutlet
+	public static Class?: new (options: LslOutletOptions) => LslOutlet
 
 	protected constructor(options: LslOutletOptions) {
 		const { channelCount, sampleRate, channelFormat, chunkSize, maxBuffered } =
