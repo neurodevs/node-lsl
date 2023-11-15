@@ -151,6 +151,13 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		})
 	}
 
+	@test()
+	protected static async canOverrideClasInstantiatedInFactory() {
+		LslOutlet.Class = CheckingOutlet
+		const instance = this.Outlet()
+		assert.isInstanceOf(instance, CheckingOutlet)
+	}
+
 	private static pushSample(sample: LslSample) {
 		const outlet = this.Outlet()
 		outlet.pushSample(sample)
@@ -185,7 +192,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	}
 
 	private static Outlet(options?: Partial<LslOutletOptions>) {
-		return new LslOutlet({
+		return LslOutlet.Outlet({
 			...this.randomOutletOptions,
 			...options,
 		})
@@ -215,3 +222,5 @@ class SpyLiblsl implements Liblsl {
 		this.lastPushedSample = sample
 	}
 }
+
+class CheckingOutlet extends LslOutlet {}

@@ -1,9 +1,11 @@
 import { SchemaError, assertOptions } from '@sprucelabs/schema'
 import LiblslImpl, { LslSample } from './Liblsl'
 
-export default class LslOutlet {
+export default class LslOutletImpl implements LslOutlet {
 	private outletOptions: LslOutletOptions
-	public constructor(options: LslOutletOptions) {
+	private static Class?: new (options: LslOutletOptions) => LslOutlet
+
+	protected constructor(options: LslOutletOptions) {
 		const { channelCount, sampleRate, channelFormat, chunkSize, maxBuffered } =
 			assertOptions(options, [
 				'name',
@@ -25,6 +27,10 @@ export default class LslOutlet {
 		this.assertValidMaxBufferred(maxBuffered)
 
 		this.outletOptions = options
+	}
+
+	public static Outlet(options: LslOutletOptions) {
+		return new (this.Class ?? this)(options)
 	}
 
 	private assertValidMaxBufferred(maxBuffered: number) {
@@ -140,4 +146,8 @@ export interface LslOutletOptions {
 	unit: string
 	chunkSize: number
 	maxBuffered: number
+}
+
+export interface LslOutlet {
+	pushSample(sample: LslSample): void
 }
