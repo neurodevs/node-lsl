@@ -1,7 +1,8 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
 import { Liblsl, LiblslBindings } from '../../Liblsl'
+import AbstractNodeLslTest from '../AbstractNodeLslTest'
 
-export default class LiblslTest extends AbstractSpruceTest {
+export default class LiblslTest extends AbstractNodeLslTest {
 	private static liblsl: SpyLiblsl
 	private static bindings: LiblslBindings
 
@@ -40,6 +41,10 @@ export default class LiblslTest extends AbstractSpruceTest {
 		this.defaultDesc = this.liblsl.getDesc(this.defaultInfo)
 		this.defaultOutlet = this.liblsl.createOutlet(this.defaultInfo, 0, 360)
 	}
+
+	// protected static async afterEach() {
+	// 	this.defaultInfo.close()
+	// }
 
 	@test()
 	protected static async liblslCanLoadBindings() {
@@ -106,7 +111,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	// Must be at bottom of tests since it modifies env
 	@test()
-	protected static async liblslThrowsWithInvalidPath() {
+	protected static async liblslThrowsWithMissingOrInvalidPath() {
 		assert.doesThrow(() => {
 			delete process.env.LIBLSL_PATH
 			new Liblsl()

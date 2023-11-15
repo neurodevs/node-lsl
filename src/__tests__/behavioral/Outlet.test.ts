@@ -1,22 +1,14 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import {
+	test,
+	assert,
+	generateId,
+} from '@sprucelabs/test-utils'
 import { ChannelFormat } from '../../Liblsl'
 import Outlet from '../../Outlet'
+import AbstractNodeLslTest from '../AbstractNodeLslTest'
 
-export default class OutletTest extends AbstractSpruceTest {
+export default class OutletTest extends AbstractNodeLslTest {
 	private static defaultOutlet: SpyOutlet
-
-	private static saneDefaults = {
-		name: 'Muse S (2nd gen) - EEG',
-		type: 'EEG',
-		channelCount: 5,
-		sampleRate: 256,
-		channelFormat: 'float32',
-		sourceId: 'muse-eeg',
-		manufacturer: 'Interaxon Inc.',
-		unit: 'microvolts',
-		chunkSize: 0,
-		maxBuffered: 360,
-	}
 
 	private static validChannelFormats: ChannelFormat[] = [
 		'undefined',
@@ -29,6 +21,19 @@ export default class OutletTest extends AbstractSpruceTest {
 		'int64',
 	]
 
+	private static saneDefaults = {
+		name: generateId(),
+		type: generateId(),
+		channelCount: 5,
+		sampleRate: 256,
+		channelFormat: 'float32',
+		sourceId: generateId(),
+		manufacturer: generateId(),
+		unit: generateId(),
+		chunkSize: 0,
+		maxBuffered: 360,
+	}
+
 	protected static async beforeEach() {
 		await super.beforeEach()
 		this.defaultOutlet = this.createOutletWithDefaults({})
@@ -38,8 +43,11 @@ export default class OutletTest extends AbstractSpruceTest {
 	protected static async outletHasRequiredProperties() {
 		const requiredProperties = Object.keys(this.saneDefaults)
 		for (let requiredProperty of requiredProperties) {
-			assert.isTrue(
-				requiredProperty in this.defaultOutlet,
+			if (requiredProperty === 'channelFormat') continue
+
+			assert.isEqual(
+				this.defaultOutlet[requiredProperty],
+				this.saneDefaults[requiredProperty],
 				`${requiredProperty} does not exist on Outlet instance`
 			)
 		}
