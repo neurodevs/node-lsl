@@ -50,9 +50,10 @@ export default class LiblslImpl implements Liblsl {
 		const parent = this.bindings.lsl_append_child(desc, 'channels')
 
 		for (const channel of channels) {
-			this.bindings.lsl_append_child_value(parent, 'label', channel.label)
-			this.bindings.lsl_append_child_value(parent, 'unit', channel.unit)
-			this.bindings.lsl_append_child_value(parent, 'type', channel.type)
+			const c = this.bindings.lsl_append_child(parent, 'channel')
+			this.bindings.lsl_append_child_value(c, 'label', channel.label)
+			this.bindings.lsl_append_child_value(c, 'unit', channel.unit)
+			this.bindings.lsl_append_child_value(c, 'type', channel.type)
 		}
 	}
 

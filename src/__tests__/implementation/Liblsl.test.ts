@@ -30,13 +30,15 @@ export default class LiblslTest extends AbstractSpruceTest {
 	private static fakeDesc: LslBindingsDesc
 	private static fakeChildNamedChannels: LslBindingsChild
 	private static createStreamInfoParams?: any[]
-	private static appendChildParams?: any[]
+	private static appendChildParams: any[] = []
 	private static createOutletParams?: any[]
 	private static pushSampleParams?: any[]
 	private static appendChildValueParams: any[]
 	private static localClock: number
 	private static shouldThrowWhenCreatingBindings: boolean
 	private static getDescriptionParams?: [LslBindingsStreamInfo]
+	private static fakeChildNamedChannel: LslBindingsChild
+	private static appendChildHitCount: number
 
 	protected static async beforeEach(): Promise<void> {
 		await super.beforeEach()
@@ -47,7 +49,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 		delete this.createOutletParams
 		delete this.pushSampleParams
 		delete this.getDescriptionParams
-		delete this.appendChildParams
+		this.appendChildParams = []
 		this.appendChildValueParams = []
 
 		process.env.LIBLSL_PATH = generateId()
@@ -56,9 +58,12 @@ export default class LiblslTest extends AbstractSpruceTest {
 		this.fakeDesc = {}
 		this.fakeOutlet = {}
 		this.fakeChildNamedChannels = {}
+		this.fakeChildNamedChannel = {}
 
 		this.localClock = new Date().getTime()
 		this.shouldThrowWhenCreatingBindings = false
+
+		this.appendChildHitCount = 0
 
 		this.fakeBindings = {
 			lsl_create_streaminfo: (...params: any[]) => {
@@ -79,8 +84,12 @@ export default class LiblslTest extends AbstractSpruceTest {
 				return this.fakeDesc
 			},
 			lsl_append_child: (...params: any) => {
-				this.appendChildParams = params
-				return this.fakeChildNamedChannels
+				this.appendChildParams.push(params)
+				if (this.appendChildHitCount === 0) {
+					this.appendChildHitCount++
+					return this.fakeChildNamedChannels
+				}
+				return this.fakeChildNamedChannel
 			},
 			lsl_append_child_value: (...params: any[]) => {
 				this.appendChildValueParams.push(params)
@@ -243,14 +252,17 @@ export default class LiblslTest extends AbstractSpruceTest {
 		this.lsl.appendChannelsToStreamInfo(info, [channel])
 		assert.isEqual(this.getDescriptionParams?.[0], info)
 
-		assert.isEqual(this.appendChildParams?.[0], this.fakeDesc)
-		assert.isEqual(this.appendChildParams?.[1], 'channels')
+		assert.isEqual(this.appendChildParams?.[0][0], this.fakeDesc)
+		assert.isEqual(this.appendChildParams?.[0][1], 'channels')
+
+		assert.isEqual(this.appendChildParams?.[1][0], this.fakeChildNamedChannels)
+		assert.isEqual(this.appendChildParams?.[1][1], 'channel')
 
 		assert.isLength(this.appendChildValueParams, 3)
 
 		for (let i = 0; i < 3; i++) {
 			const param = this.appendChildValueParams[i]
-			assert.isEqual(param[0], this.fakeChildNamedChannels)
+			assert.isEqual(param[0], this.fakeChildNamedChannel)
 		}
 
 		assert.isEqual(this.appendChildValueParams[0][1], 'label')
@@ -267,7 +279,11 @@ export default class LiblslTest extends AbstractSpruceTest {
 		const info = this.createRandomStreamInfo()
 		const channel1 = this.generateRandomChannelValues()
 		const channel2 = this.generateRandomChannelValues()
+
 		this.lsl.appendChannelsToStreamInfo(info, [channel1, channel2])
+
+		assert.isEqual(this.appendChildParams?.[2][0], this.fakeChildNamedChannels)
+		assert.isEqual(this.appendChildParams?.[2][1], 'channel')
 
 		assert.isEqual(this.appendChildValueParams[3][2], channel2.label)
 		assert.isEqual(this.appendChildValueParams[4][2], channel2.unit)
