@@ -40,6 +40,12 @@ export default class LiblslImpl implements Liblsl {
 			})
 		}
 	}
+	public appendChannelsToStreamInfo(
+		info: StreamInfo,
+		channels: LslChannel[]
+	): void {
+		assertOptions({ info, channels }, ['info', 'channels'])
+	}
 
 	private loadBindings(path: string) {
 		return LiblslImpl.ffi.Library(path!, {
@@ -50,6 +56,7 @@ export default class LiblslImpl implements Liblsl {
 			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
 			lsl_local_clock: ['double', []],
 			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
+			lsl_get_desc: [ref.refType(ref.types.void), [streamInfo]],
 		}) as unknown as LiblslBindings
 	}
 
@@ -92,6 +99,7 @@ export default class LiblslImpl implements Liblsl {
 }
 
 export interface Liblsl {
+	appendChannelsToStreamInfo(info: StreamInfo, channels: LslChannel[]): void
 	createStreamInfo(options: CreateStreamInfoOptions): LslBindingsStreamInfo
 	createOutlet(options: CreateOutletOptions): LslBindingsOutlet
 	pushSample(outlet: LslBindingsOutlet, sample: LslSample): void
@@ -110,6 +118,12 @@ export interface CreateStreamInfoOptions {
 	sourceId: string
 	manufacturer?: string
 	unit?: string
+}
+
+export interface LslChannel {
+	label: string
+	unit: string
+	type: string
 }
 
 export interface LiblslBindings {
@@ -135,6 +149,7 @@ export interface LiblslBindings {
 	): void
 
 	lsl_local_clock(): number
+	lsl_get_desc(info: LslBindingsStreamInfo): LslBindingsDesc
 }
 
 const streamInfo = ref.refType(ref.types.void)
@@ -149,3 +164,4 @@ export interface CreateOutletOptions {
 
 export interface LslBindingsStreamInfo {}
 export interface LslBindingsOutlet {}
+export interface LslBindingsDesc {}

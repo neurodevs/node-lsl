@@ -16,6 +16,7 @@ import LiblslImpl, {
 	CreateOutletOptions,
 	LslBindingsOutlet,
 	LslBindingsStreamInfo,
+	LslChannel,
 } from '../../Liblsl'
 
 export default class LiblslTest extends AbstractSpruceTest {
@@ -61,6 +62,9 @@ export default class LiblslTest extends AbstractSpruceTest {
 				return 0
 			},
 			lsl_local_clock: () => this.localClock,
+			lsl_get_desc: () => {
+				this.didGetDescription = true
+			},
 		}
 
 		LiblslImpl.ffi = {
@@ -171,9 +175,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async canCreateOutletWithRequiredParams() {
-		const info = this.lsl.createStreamInfo(
-			this.generateRandomCreateStreamInfoOptions()
-		)
+		const info = this.createRandomStreamInfo()
 		const options = {
 			info,
 			chunkSize: randomInt(10),
@@ -200,6 +202,33 @@ export default class LiblslTest extends AbstractSpruceTest {
 		assert.isEqual(this.pushSampleParams?.[0], this.fakeOutlet)
 		assert.isEqual(this.pushSampleParams?.[1], expected)
 		assert.isEqual(this.pushSampleParams?.[2], this.localClock)
+	}
+
+	@test()
+	protected static async appendChannelsThrowsWithMissingParams() {
+		const err = assert.doesThrow(() => this.lsl.appendChannelsToStreamInfo())
+		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+			parameters: ['info', 'channels'],
+		})
+	}
+
+	@test()
+	protected static async addingSingleChannelGetsDescription() {
+		const info = this.createRandomStreamInfo()
+		const channel: LslChannel = {
+			label: generateId(),
+			type: generateId(),
+			unit: generateId(),
+		}
+
+		this.lsl.appendChannelsToStreamInfo(info, [channel])
+		assert.isTrue(this.didGetDescription)
+	}
+
+	private static createRandomStreamInfo() {
+		return this.lsl.createStreamInfo(
+			this.generateRandomCreateStreamInfoOptions()
+		)
 	}
 
 	private static generateRandomCreateStreamInfoOptions() {
