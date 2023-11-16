@@ -41,10 +41,19 @@ export default class LiblslImpl implements Liblsl {
 		}
 	}
 	public appendChannelsToStreamInfo(
-		info: StreamInfo,
+		info: LslBindingsStreamInfo,
 		channels: LslChannel[]
 	): void {
 		assertOptions({ info, channels }, ['info', 'channels'])
+		const desc = this.bindings.lsl_get_desc(info)
+
+		const parent = this.bindings.lsl_append_child(desc, 'channels')
+
+		for (const channel of channels) {
+			this.bindings.lsl_append_child_value(parent, 'label', channel.label)
+			this.bindings.lsl_append_child_value(parent, 'unit', channel.unit)
+			this.bindings.lsl_append_child_value(parent, 'type', channel.type)
+		}
 	}
 
 	private loadBindings(path: string) {
@@ -56,7 +65,9 @@ export default class LiblslImpl implements Liblsl {
 			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
 			lsl_local_clock: ['double', []],
 			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
-			lsl_get_desc: [ref.refType(ref.types.void), [streamInfo]],
+			lsl_get_desc: [xmlPtr, [streamInfo]],
+			lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
+			lsl_append_child_value: [xmlPtr, [xmlPtr, 'string', 'string']],
 		}) as unknown as LiblslBindings
 	}
 
@@ -76,7 +87,9 @@ export default class LiblslImpl implements Liblsl {
 		return this.bindings.lsl_create_outlet(info, chunkSize, maxBuffered)
 	}
 
-	public createStreamInfo(options: CreateStreamInfoOptions): StreamInfo {
+	public createStreamInfo(
+		options: CreateStreamInfoOptions
+	): LslBindingsStreamInfo {
 		const { name, type, channelCount, sampleRate, channelFormat, sourceId } =
 			assertOptions(options, [
 				'name',
@@ -99,15 +112,16 @@ export default class LiblslImpl implements Liblsl {
 }
 
 export interface Liblsl {
-	appendChannelsToStreamInfo(info: StreamInfo, channels: LslChannel[]): void
+	appendChannelsToStreamInfo(
+		info: LslBindingsStreamInfo,
+		channels: LslChannel[]
+	): void
 	createStreamInfo(options: CreateStreamInfoOptions): LslBindingsStreamInfo
 	createOutlet(options: CreateOutletOptions): LslBindingsOutlet
 	pushSample(outlet: LslBindingsOutlet, sample: LslSample): void
 }
 
 export type LslSample = (number | string | undefined)[]
-
-export interface StreamInfo {}
 
 export interface CreateStreamInfoOptions {
 	name: string
@@ -150,14 +164,20 @@ export interface LiblslBindings {
 
 	lsl_local_clock(): number
 	lsl_get_desc(info: LslBindingsStreamInfo): LslBindingsDesc
+	lsl_append_child(desc: LslBindingsDesc, name: string): LslBindingsChild
+	lsl_append_child_value(
+		child: LslBindingsChild,
+		name: string,
+		value: string
+	): void
 }
 
 const streamInfo = ref.refType(ref.types.void)
 const outletType = ref.refType(ref.types.void)
 const FloatArray = ArrayType(ref.types.float)
-
+const xmlPtr = ref.refType(ref.types.void)
 export interface CreateOutletOptions {
-	info: StreamInfo
+	info: LslBindingsStreamInfo
 	chunkSize: number
 	maxBuffered: number
 }
@@ -165,3 +185,4 @@ export interface CreateOutletOptions {
 export interface LslBindingsStreamInfo {}
 export interface LslBindingsOutlet {}
 export interface LslBindingsDesc {}
+export interface LslBindingsChild {}

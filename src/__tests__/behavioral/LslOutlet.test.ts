@@ -11,6 +11,7 @@ import LiblslImpl, {
 	Liblsl,
 	LslBindingsOutlet,
 	LslBindingsStreamInfo,
+	LslChannel,
 	LslSample,
 } from '../../Liblsl'
 import LslOutlet, { ChannelFormat, LslOutletOptions } from '../../LslOutlet'
@@ -213,6 +214,11 @@ class SpyLiblsl implements Liblsl {
 		this.lastStreamInfoOptions = options
 		return this.streamInfo
 	}
+	public appendChannelsToStreamInfo(
+		info: LslBindingsStreamInfo,
+		channels: LslChannel[]
+	): void {}
+
 	public createOutlet(options: CreateOutletOptions): LslBindingsOutlet {
 		this.lastOutletOptions = options
 		return this.outlet
