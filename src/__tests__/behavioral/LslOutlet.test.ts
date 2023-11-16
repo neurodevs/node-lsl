@@ -180,6 +180,16 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		})
 	}
 
+	@test()
+	protected static async pushSampleShouldNotCreateMultipleOutlets() {
+		const outlet = this.Outlet()
+		outlet.pushSample([1])
+		outlet.pushSample([2])
+		outlet.pushSample([3])
+
+		assert.isEqual(this.spyLsl.createStreamInfoHitCount, 1)
+	}
+
 	private static pushSample(sample: LslSample) {
 		const outlet = this.Outlet()
 		outlet.pushSample(sample)
@@ -233,10 +243,12 @@ class SpyLiblsl implements Liblsl {
 		info: LslBindingsStreamInfo
 		channels: LslChannel[]
 	}
+	public createStreamInfoHitCount = 0
 
 	public createStreamInfo(
 		options: CreateStreamInfoOptions
 	): LslBindingsStreamInfo {
+		this.createStreamInfoHitCount++
 		this.lastStreamInfoOptions = options
 		return this.streamInfo
 	}

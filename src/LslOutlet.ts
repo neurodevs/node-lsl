@@ -1,10 +1,15 @@
 import { SchemaError, assertOptions } from '@sprucelabs/schema'
-import LiblslImpl, { LslBindingsStreamInfo, LslSample } from './Liblsl'
+import LiblslImpl, {
+	LslBindingsOutlet,
+	LslBindingsStreamInfo,
+	LslSample,
+} from './Liblsl'
 
 export default class LslOutletImpl implements LslOutlet {
 	private outletOptions: LslOutletOptions
 	public static Class?: new (options: LslOutletOptions) => LslOutlet
 	private streamInfo: LslBindingsStreamInfo
+	private outlet: LslBindingsOutlet
 
 	protected constructor(options: LslOutletOptions) {
 		const { sampleRate, channelFormat } = assertOptions(options, [
@@ -48,6 +53,12 @@ export default class LslOutletImpl implements LslOutlet {
 				type: this.outletOptions.type,
 			}))
 		)
+
+		this.outlet = this.lsl.createOutlet({
+			info: this.streamInfo,
+			chunkSize: this.outletOptions.chunkSize,
+			maxBuffered: this.outletOptions.maxBuffered,
+		})
 	}
 
 	public static Outlet(options: LslOutletOptions) {
@@ -123,14 +134,7 @@ export default class LslOutletImpl implements LslOutlet {
 	}
 
 	public pushSample(sample: LslSample) {
-		this.lsl.pushSample(
-			this.lsl.createOutlet({
-				info: this.streamInfo,
-				chunkSize: this.outletOptions.chunkSize,
-				maxBuffered: this.outletOptions.maxBuffered,
-			}),
-			sample
-		)
+		this.lsl.pushSample(this.outlet, sample)
 	}
 }
 
