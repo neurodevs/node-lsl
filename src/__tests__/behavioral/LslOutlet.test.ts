@@ -34,11 +34,12 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 	protected static async beforeEach() {
 		await super.beforeEach()
+		delete LslOutlet.Class
 		this.channelIdx = randomInt(7)
 		this.randomOutletOptions = {
 			name: generateId(),
 			type: generateId(),
-			channelCount: randomInt(1, 10),
+			channelLabels: new Array(randomInt(1, 10)).fill(generateId()),
 			sampleRate: Math.random() * 10,
 			channelFormat: CHANNEL_FORMATS[this.channelIdx],
 			sourceId: generateId(),
@@ -60,7 +61,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 			parameters: [
 				'name',
 				'type',
-				'channelCount',
+				'channelLabels',
 				'sampleRate',
 				'channelFormat',
 				'sourceId',
@@ -79,9 +80,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async throwsWithInvalidChannelCount() {
-		this.assertThrowsInvalidChannelCount(0)
-		this.assertThrowsInvalidChannelCount(-1)
-		this.assertThrowsInvalidChannelCount(1.5)
+		this.assertThrowsInvalidChannelLabels(0)
 	}
 
 	@test()
@@ -137,14 +136,18 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async pushingSamplePassesCorrectOptionsToCreateStreamInfo() {
-		this.pushSample([1])
+	protected static async constructionPassesCorrectOptionsToCreateStreamInfo() {
+		this.Outlet()
+
 		const { ...options } = this.randomOutletOptions as any
+
+		options.channelCount = options.channelLabels.length
 
 		delete options.manufacturer
 		delete options.unit
 		delete options.chunkSize
 		delete options.maxBuffered
+		delete options.channelLabels
 
 		assert.isEqualDeep(this.spyLsl.lastStreamInfoOptions, {
 			...options,
@@ -157,6 +160,24 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		LslOutlet.Class = CheckingOutlet
 		const instance = this.Outlet()
 		assert.isInstanceOf(instance, CheckingOutlet)
+	}
+
+	@test('can add one label', [generateId()])
+	@test('can add two labels', [generateId(), generateId()])
+	protected static async appendsChannelsBasedOnCount(labels: string[]) {
+		const type = generateId()
+		const unit = generateId()
+
+		this.Outlet({ channelLabels: labels, type, unit })
+
+		assert.isEqualDeep(this.spyLsl.lastAppendChannelsToStreamInfo, {
+			info: this.spyLsl.streamInfo,
+			channels: labels.map((label) => ({
+				label,
+				type,
+				unit,
+			})),
+		})
 	}
 
 	private static pushSample(sample: LslSample) {
@@ -176,10 +197,11 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		this.assertDoesThrowInvalidParameters({ sampleRate }, ['sampleRate'])
 	}
 
-	private static assertThrowsInvalidChannelCount(count: number) {
-		this.assertDoesThrowInvalidParameters({ channelCount: count }, [
-			'channelCount',
-		])
+	private static assertThrowsInvalidChannelLabels(count: number) {
+		this.assertDoesThrowInvalidParameters(
+			{ channelLabels: new Array(count).fill(generateId()) },
+			['channelLabels']
+		)
 	}
 
 	private static assertDoesThrowInvalidParameters(
@@ -207,6 +229,10 @@ class SpyLiblsl implements Liblsl {
 	public lastStreamInfoOptions?: CreateStreamInfoOptions
 	public outlet: LslBindingsOutlet = {} as LslBindingsOutlet
 	public streamInfo: LslBindingsStreamInfo = {} as LslBindingsStreamInfo
+	public lastAppendChannelsToStreamInfo?: {
+		info: LslBindingsStreamInfo
+		channels: LslChannel[]
+	}
 
 	public createStreamInfo(
 		options: CreateStreamInfoOptions
@@ -217,7 +243,12 @@ class SpyLiblsl implements Liblsl {
 	public appendChannelsToStreamInfo(
 		info: LslBindingsStreamInfo,
 		channels: LslChannel[]
-	): void {}
+	): void {
+		this.lastAppendChannelsToStreamInfo = {
+			info,
+			channels,
+		}
+	}
 
 	public createOutlet(options: CreateOutletOptions): LslBindingsOutlet {
 		this.lastOutletOptions = options

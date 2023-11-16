@@ -1,32 +1,53 @@
 import { SchemaError, assertOptions } from '@sprucelabs/schema'
-import LiblslImpl, { LslSample } from './Liblsl'
+import LiblslImpl, { LslBindingsStreamInfo, LslSample } from './Liblsl'
 
 export default class LslOutletImpl implements LslOutlet {
 	private outletOptions: LslOutletOptions
 	public static Class?: new (options: LslOutletOptions) => LslOutlet
+	private streamInfo: LslBindingsStreamInfo
 
 	protected constructor(options: LslOutletOptions) {
-		const { channelCount, sampleRate, channelFormat, chunkSize, maxBuffered } =
-			assertOptions(options, [
-				'name',
-				'type',
-				'channelCount',
-				'sampleRate',
-				'channelFormat',
-				'sourceId',
-				'manufacturer',
-				'unit',
-				'chunkSize',
-				'maxBuffered',
-			])
+		const { sampleRate, channelFormat } = assertOptions(options, [
+			'name',
+			'type',
+			'channelLabels',
+			'sampleRate',
+			'channelFormat',
+			'sourceId',
+			'manufacturer',
+			'unit',
+			'chunkSize',
+			'maxBuffered',
+		])
 
-		this.assertValidChannelCount(channelCount)
+		this.outletOptions = options
+
+		const { chunkSize, maxBuffered, channelLabels, ...streamInfoOptions } = this
+			.outletOptions as any
+
+		this.assertValidChannelCount(channelLabels.length)
 		this.assertValidSampleRate(sampleRate)
 		this.assertValidChannelFormat(channelFormat)
 		this.assertValidChunkSize(chunkSize)
 		this.assertValidMaxBufferred(maxBuffered)
 
-		this.outletOptions = options
+		delete streamInfoOptions.manufacturer
+		delete streamInfoOptions.unit
+
+		this.streamInfo = this.lsl.createStreamInfo({
+			...streamInfoOptions,
+			channelCount: channelLabels.length,
+			channelFormat: CHANNEL_FORMATS.indexOf(this.outletOptions.channelFormat),
+		})
+
+		this.lsl.appendChannelsToStreamInfo(
+			this.streamInfo,
+			channelLabels.map((label: string) => ({
+				label,
+				unit: this.outletOptions.unit,
+				type: this.outletOptions.type,
+			}))
+		)
 	}
 
 	public static Outlet(options: LslOutletOptions) {
@@ -79,8 +100,8 @@ export default class LslOutletImpl implements LslOutlet {
 		if (!this.isPositiveInteger(channelCount)) {
 			throw new SchemaError({
 				code: 'INVALID_PARAMETERS',
-				parameters: ['channelCount'],
-				friendlyMessage: 'Channel count must be a positive integer.',
+				parameters: ['channelLabels'],
+				friendlyMessage: 'channelLabels must have 1 or more labels.',
 			})
 		}
 	}
@@ -102,21 +123,11 @@ export default class LslOutletImpl implements LslOutlet {
 	}
 
 	public pushSample(sample: LslSample) {
-		const { chunkSize, maxBuffered, ...streamInfoOptions } = this
-			.outletOptions as any
-
-		delete streamInfoOptions.manufacturer
-		delete streamInfoOptions.unit
-
-		const info = this.lsl.createStreamInfo({
-			...streamInfoOptions,
-			channelFormat: CHANNEL_FORMATS.indexOf(this.outletOptions.channelFormat),
-		})
 		this.lsl.pushSample(
 			this.lsl.createOutlet({
-				info,
-				chunkSize,
-				maxBuffered,
+				info: this.streamInfo,
+				chunkSize: this.outletOptions.chunkSize,
+				maxBuffered: this.outletOptions.maxBuffered,
 			}),
 			sample
 		)
@@ -138,7 +149,7 @@ export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 export interface LslOutletOptions {
 	name: string
 	type: string
-	channelCount: number
+	channelLabels: string[]
 	sampleRate: number
 	channelFormat: ChannelFormat
 	sourceId: string
