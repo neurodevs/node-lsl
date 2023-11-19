@@ -1,2 +1,2 @@
 # node-lsl
-Lab Streaming Layer (LSL) on Node
+Lab Streaming Layer (LSL) on Node + TypeScript
