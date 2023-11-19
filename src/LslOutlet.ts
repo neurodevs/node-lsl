@@ -149,7 +149,7 @@ const CHANNEL_FORMATS = [
 	'int16',
 	'int8',
 	'int64',
-]
+] as const
 
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 
