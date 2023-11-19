@@ -11,7 +11,6 @@ import LiblslImpl, {
 	Liblsl,
 	BoundOutlet,
 	BoundStreamInfo,
-	LslChannel,
 	LslSample,
 	AppendChannelsToStreamInfoOptions,
 	PushSampleOptions,
@@ -123,9 +122,12 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	@test('pushing [1] sample sends to LSL', [1])
 	protected static async canPushSampleToLsl(sample: LslSample) {
 		this.pushSample(sample)
-		assert.isEqual(this.spyLiblsl.lastPushedOutlet, this.spyLiblsl.outlet)
-		assert.isEqualDeep(this.spyLiblsl.lastPushedSample, sample)
-		assert.isEqualDeep(this.spyLiblsl.lastOutletOptions, {
+		assert.isEqual(
+			this.spyLiblsl.lastPushSampleOptions?.outlet,
+			this.spyLiblsl.outlet
+		)
+		assert.isEqualDeep(this.spyLiblsl.lastPushSampleOptions?.sample, sample)
+		assert.isEqualDeep(this.spyLiblsl.lastCreateOutletOptions, {
 			info: this.spyLiblsl.streamInfo,
 			chunkSize: this.randomOutletOptions.chunkSize,
 			maxBuffered: this.randomOutletOptions.maxBuffered,
@@ -146,7 +148,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		delete options.maxBuffered
 		delete options.channelNames
 
-		assert.isEqualDeep(this.spyLiblsl.lastStreamInfoOptions, {
+		assert.isEqualDeep(this.spyLiblsl.lastCreateStreamInfoOptions, {
 			...options,
 			channelFormat: this.channelIdx,
 		})
@@ -230,23 +232,21 @@ export default class LslOutletTest extends AbstractSpruceTest {
 }
 
 class SpyLiblsl implements Liblsl {
-	public lastPushedOutlet?: BoundOutlet
-	public lastPushedSample?: LslSample
-	public lastOutletOptions?: CreateOutletOptions
-	public lastStreamInfoOptions?: CreateStreamInfoOptions
+	public lastCreateStreamInfoOptions?: CreateStreamInfoOptions
+	public lastAppendChannelsToStreamInfoOptions?: AppendChannelsToStreamInfoOptions
+	public lastCreateOutletOptions?: CreateOutletOptions
+	public lastPushSampleOptions?: PushSampleOptions
+
 	public outlet: BoundOutlet = {} as BoundOutlet
 	public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
-	public lastAppendChannelsToStreamInfoOptions?: {
-		info: BoundStreamInfo
-		channels: LslChannel[]
-	}
 	public createStreamInfoHitCount = 0
 
 	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
 		this.createStreamInfoHitCount++
-		this.lastStreamInfoOptions = options
+		this.lastCreateStreamInfoOptions = options
 		return this.streamInfo
 	}
+
 	public appendChannelsToStreamInfo(
 		options: AppendChannelsToStreamInfoOptions
 	): void {
@@ -254,12 +254,12 @@ class SpyLiblsl implements Liblsl {
 	}
 
 	public createOutlet(options: CreateOutletOptions): BoundOutlet {
-		this.lastOutletOptions = options
+		this.lastCreateOutletOptions = options
 		return this.outlet
 	}
+
 	public pushSample(options: PushSampleOptions): void {
-		this.lastPushedOutlet = options.outlet
-		this.lastPushedSample = options.sample
+		this.lastPushSampleOptions = options
 	}
 }
 

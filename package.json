@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "main": "build/index.js",
   "repository": "https://github.com/neurodevs/node-lsl.git",
   "scripts": {
