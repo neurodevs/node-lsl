@@ -26,7 +26,9 @@ export default class LslOutletImpl implements LslOutlet {
 		const { chunkSize, maxBuffered, channelNames, ...streamInfoOptions } = this
 			.outletOptions as any
 
-		this.assertValidChannelCount(channelNames.length)
+		const channelCount = channelNames.length
+
+		this.assertValidChannelCount(channelCount)
 		this.assertValidSampleRate(sampleRate)
 		this.assertValidChannelFormat(channelFormat)
 		this.assertValidChunkSize(chunkSize)
@@ -37,8 +39,8 @@ export default class LslOutletImpl implements LslOutlet {
 
 		this.streamInfo = this.lsl.createStreamInfo({
 			...streamInfoOptions,
-			channelCount: channelNames.length,
-			channelFormat: CHANNEL_FORMATS.indexOf(this.outletOptions.channelFormat),
+			channelCount,
+			channelFormat: this.lookupChannelFormat(channelFormat),
 		})
 
 		this.lsl.appendChannelsToStreamInfo({
@@ -63,6 +65,10 @@ export default class LslOutletImpl implements LslOutlet {
 
 	public pushSample(sample: LslSample) {
 		this.lsl.pushSample({ outlet: this.outlet, sample })
+	}
+
+	private lookupChannelFormat(channelFormat: string): number {
+		return CHANNEL_FORMATS.indexOf(channelFormat)
 	}
 
 	private assertValidMaxBufferred(maxBuffered: number) {
