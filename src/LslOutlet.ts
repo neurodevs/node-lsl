@@ -67,7 +67,7 @@ export default class LslOutletImpl implements LslOutlet {
 		this.lsl.pushSample({ outlet: this.outlet, sample })
 	}
 
-	private lookupChannelFormat(channelFormat: string): number {
+	private lookupChannelFormat(channelFormat: ChannelFormat): number {
 		return CHANNEL_FORMATS.indexOf(channelFormat)
 	}
 
