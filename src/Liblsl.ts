@@ -11,17 +11,17 @@ export default class LiblslImpl implements Liblsl {
 
 	public static getInstance() {
 		if (!this.instance) {
-			this.instance = new this()
+			this.setInstance(new this())
 		}
 		return this.instance!
 	}
 
-	public static reset() {
-		delete this.instance
-	}
-
 	public static setInstance(instance: Liblsl) {
 		this.instance = instance
+	}
+
+	public static resetInstance() {
+		delete this.instance
 	}
 
 	public constructor() {
@@ -30,30 +30,14 @@ export default class LiblslImpl implements Liblsl {
 		if (!path) {
 			assertOptions(process, ['env.LIBLSL_PATH'])
 		}
+
 		try {
 			this.bindings = this.loadBindings(path)
-		} catch (err) {
-			console.error(err)
+		} catch {
 			throw new SpruceError({
 				code: 'FAILED_TO_LOAD_LIBLSL',
 				liblslPath: path,
 			})
-		}
-	}
-	public appendChannelsToStreamInfo(
-		info: LslBindingsStreamInfo,
-		channels: LslChannel[]
-	): void {
-		assertOptions({ info, channels }, ['info', 'channels'])
-		const desc = this.bindings.lsl_get_desc(info)
-
-		const parent = this.bindings.lsl_append_child(desc, 'channels')
-
-		for (const channel of channels) {
-			const c = this.bindings.lsl_append_child(parent, 'channel')
-			this.bindings.lsl_append_child_value(c, 'label', channel.label)
-			this.bindings.lsl_append_child_value(c, 'unit', channel.unit)
-			this.bindings.lsl_append_child_value(c, 'type', channel.type)
 		}
 	}
 
@@ -69,28 +53,10 @@ export default class LiblslImpl implements Liblsl {
 			lsl_get_desc: [xmlPtr, [streamInfo]],
 			lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
 			lsl_append_child_value: [xmlPtr, [xmlPtr, 'string', 'string']],
-		}) as unknown as LiblslBindings
+		}) as LiblslBindings
 	}
 
-	public pushSample(outlet: LslBindingsOutlet, sample: LslSample): void {
-		assertOptions({ outlet, sample }, ['outlet', 'sample'])
-		const clock = this.bindings.lsl_local_clock()
-		this.bindings.lsl_push_sample_ft(outlet, sample, clock)
-	}
-
-	public createOutlet(options: CreateOutletOptions) {
-		const { info, chunkSize, maxBuffered } = assertOptions(options, [
-			'info',
-			'chunkSize',
-			'maxBuffered',
-		])
-
-		return this.bindings.lsl_create_outlet(info, chunkSize, maxBuffered)
-	}
-
-	public createStreamInfo(
-		options: CreateStreamInfoOptions
-	): LslBindingsStreamInfo {
+	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
 		const { name, type, channelCount, sampleRate, channelFormat, sourceId } =
 			assertOptions(options, [
 				'name',
@@ -110,19 +76,48 @@ export default class LiblslImpl implements Liblsl {
 			sourceId
 		)
 	}
+
+	public appendChannelsToStreamInfo(
+		options: AppendChannelsToStreamInfoOptions
+	): void {
+		const { info, channels } = assertOptions(options, ['info', 'channels'])
+
+		const desc = this.bindings.lsl_get_desc(info)
+
+		const parent = this.bindings.lsl_append_child(desc, 'channels')
+
+		for (const channel of channels) {
+			const child = this.bindings.lsl_append_child(parent, 'channel')
+			this.bindings.lsl_append_child_value(child, 'label', channel.label)
+			this.bindings.lsl_append_child_value(child, 'unit', channel.unit)
+			this.bindings.lsl_append_child_value(child, 'type', channel.type)
+		}
+	}
+
+	public createOutlet(options: CreateOutletOptions) {
+		const { info, chunkSize, maxBuffered } = assertOptions(options, [
+			'info',
+			'chunkSize',
+			'maxBuffered',
+		])
+
+		return this.bindings.lsl_create_outlet(info, chunkSize, maxBuffered)
+	}
+
+	public pushSample(options: PushSampleOptions): void {
+		const { outlet, sample } = assertOptions(options, ['outlet', 'sample'])
+
+		const clock = this.bindings.lsl_local_clock()
+		this.bindings.lsl_push_sample_ft(outlet, sample, clock)
+	}
 }
 
 export interface Liblsl {
-	appendChannelsToStreamInfo(
-		info: LslBindingsStreamInfo,
-		channels: LslChannel[]
-	): void
-	createStreamInfo(options: CreateStreamInfoOptions): LslBindingsStreamInfo
-	createOutlet(options: CreateOutletOptions): LslBindingsOutlet
-	pushSample(outlet: LslBindingsOutlet, sample: LslSample): void
+	createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo
+	appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
+	createOutlet(options: CreateOutletOptions): BoundOutlet
+	pushSample(options: PushSampleOptions): void
 }
-
-export type LslSample = (number | string | undefined)[]
 
 export interface CreateStreamInfoOptions {
 	name: string
@@ -135,11 +130,28 @@ export interface CreateStreamInfoOptions {
 	unit?: string
 }
 
+export interface AppendChannelsToStreamInfoOptions {
+	info: BoundStreamInfo
+	channels: LslChannel[]
+}
+
+export interface CreateOutletOptions {
+	info: BoundStreamInfo
+	chunkSize: number
+	maxBuffered: number
+}
+
+export interface PushSampleOptions {
+	outlet: BoundOutlet
+	sample: LslSample
+}
+
 export interface LslChannel {
 	label: string
 	unit: string
 	type: string
 }
+export type LslSample = (number | string | undefined)[]
 
 export interface LiblslBindings {
 	lsl_create_streaminfo(
@@ -149,41 +161,32 @@ export interface LiblslBindings {
 		sampleRate: number,
 		channelFormat: number,
 		sourceId: string
-	): LslBindingsStreamInfo
+	): BoundStreamInfo
 
 	lsl_create_outlet(
-		info: LslBindingsStreamInfo,
+		info: BoundStreamInfo,
 		chunkSize: number,
 		maxBuffered: number
-	): LslBindingsOutlet
+	): BoundOutlet
 
 	lsl_push_sample_ft(
-		outlet: LslBindingsOutlet,
+		outlet: BoundOutlet,
 		sample: LslSample,
 		timestamp: number
 	): void
 
 	lsl_local_clock(): number
-	lsl_get_desc(info: LslBindingsStreamInfo): LslBindingsDesc
-	lsl_append_child(desc: LslBindingsDesc, name: string): LslBindingsChild
-	lsl_append_child_value(
-		child: LslBindingsChild,
-		name: string,
-		value: string
-	): void
+	lsl_get_desc(info: BoundStreamInfo): BoundDesc
+	lsl_append_child(desc: BoundDesc, name: string): BoundChild
+	lsl_append_child_value(child: BoundChild, name: string, value: string): void
 }
+
+export interface BoundStreamInfo {}
+export interface BoundOutlet {}
+export interface BoundDesc {}
+export interface BoundChild {}
 
 const streamInfo = ref.refType(ref.types.void)
 const outletType = ref.refType(ref.types.void)
 const FloatArray = ArrayType(ref.types.float)
 const xmlPtr = ref.refType(ref.types.void)
-export interface CreateOutletOptions {
-	info: LslBindingsStreamInfo
-	chunkSize: number
-	maxBuffered: number
-}
-
-export interface LslBindingsStreamInfo {}
-export interface LslBindingsOutlet {}
-export interface LslBindingsDesc {}
-export interface LslBindingsChild {}

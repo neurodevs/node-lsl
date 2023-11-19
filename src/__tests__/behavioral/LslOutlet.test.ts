@@ -9,10 +9,12 @@ import LiblslImpl, {
 	CreateOutletOptions,
 	CreateStreamInfoOptions,
 	Liblsl,
-	LslBindingsOutlet,
-	LslBindingsStreamInfo,
+	BoundOutlet,
+	BoundStreamInfo,
 	LslChannel,
 	LslSample,
+	AppendChannelsToStreamInfoOptions,
+	PushSampleOptions,
 } from '../../Liblsl'
 import LslOutlet, { ChannelFormat, LslOutletOptions } from '../../LslOutlet'
 
@@ -39,7 +41,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		this.randomOutletOptions = {
 			name: generateId(),
 			type: generateId(),
-			channelLabels: new Array(randomInt(1, 10)).fill(generateId()),
+			channelNames: new Array(randomInt(1, 10)).fill(generateId()),
 			sampleRate: Math.random() * 10,
 			channelFormat: CHANNEL_FORMATS[this.channelIdx],
 			sourceId: generateId(),
@@ -61,7 +63,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 			parameters: [
 				'name',
 				'type',
-				'channelLabels',
+				'channelNames',
 				'sampleRate',
 				'channelFormat',
 				'sourceId',
@@ -80,7 +82,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async throwsWithInvalidChannelCount() {
-		this.assertThrowsInvalidChannelLabels(0)
+		this.assertThrowsInvalidChannelNames(0)
 	}
 
 	@test()
@@ -141,13 +143,13 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 		const { ...options } = this.randomOutletOptions as any
 
-		options.channelCount = options.channelLabels.length
+		options.channelCount = options.channelNames.length
 
 		delete options.manufacturer
 		delete options.unit
 		delete options.chunkSize
 		delete options.maxBuffered
-		delete options.channelLabels
+		delete options.channelNames
 
 		assert.isEqualDeep(this.spyLsl.lastStreamInfoOptions, {
 			...options,
@@ -168,9 +170,9 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		const type = generateId()
 		const unit = generateId()
 
-		this.Outlet({ channelLabels: labels, type, unit })
+		this.Outlet({ channelNames: labels, type, unit })
 
-		assert.isEqualDeep(this.spyLsl.lastAppendChannelsToStreamInfo, {
+		assert.isEqualDeep(this.spyLsl.lastAppendChannelsToStreamInfoOptions, {
 			info: this.spyLsl.streamInfo,
 			channels: labels.map((label) => ({
 				label,
@@ -207,10 +209,10 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		this.assertDoesThrowInvalidParameters({ sampleRate }, ['sampleRate'])
 	}
 
-	private static assertThrowsInvalidChannelLabels(count: number) {
+	private static assertThrowsInvalidChannelNames(count: number) {
 		this.assertDoesThrowInvalidParameters(
-			{ channelLabels: new Array(count).fill(generateId()) },
-			['channelLabels']
+			{ channelNames: new Array(count).fill(generateId()) },
+			['channelNames']
 		)
 	}
 
@@ -233,42 +235,36 @@ export default class LslOutletTest extends AbstractSpruceTest {
 }
 
 class SpyLiblsl implements Liblsl {
-	public lastPushedOutlet?: LslBindingsOutlet
+	public lastPushedOutlet?: BoundOutlet
 	public lastPushedSample?: LslSample
 	public lastOutletOptions?: CreateOutletOptions
 	public lastStreamInfoOptions?: CreateStreamInfoOptions
-	public outlet: LslBindingsOutlet = {} as LslBindingsOutlet
-	public streamInfo: LslBindingsStreamInfo = {} as LslBindingsStreamInfo
-	public lastAppendChannelsToStreamInfo?: {
-		info: LslBindingsStreamInfo
+	public outlet: BoundOutlet = {} as BoundOutlet
+	public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
+	public lastAppendChannelsToStreamInfoOptions?: {
+		info: BoundStreamInfo
 		channels: LslChannel[]
 	}
 	public createStreamInfoHitCount = 0
 
-	public createStreamInfo(
-		options: CreateStreamInfoOptions
-	): LslBindingsStreamInfo {
+	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
 		this.createStreamInfoHitCount++
 		this.lastStreamInfoOptions = options
 		return this.streamInfo
 	}
 	public appendChannelsToStreamInfo(
-		info: LslBindingsStreamInfo,
-		channels: LslChannel[]
+		options: AppendChannelsToStreamInfoOptions
 	): void {
-		this.lastAppendChannelsToStreamInfo = {
-			info,
-			channels,
-		}
+		this.lastAppendChannelsToStreamInfoOptions = options
 	}
 
-	public createOutlet(options: CreateOutletOptions): LslBindingsOutlet {
+	public createOutlet(options: CreateOutletOptions): BoundOutlet {
 		this.lastOutletOptions = options
 		return this.outlet
 	}
-	public pushSample(outlet: LslBindingsOutlet, sample: LslSample): void {
-		this.lastPushedOutlet = outlet
-		this.lastPushedSample = sample
+	public pushSample(options: PushSampleOptions): void {
+		this.lastPushedOutlet = options.outlet
+		this.lastPushedSample = options.sample
 	}
 }
 

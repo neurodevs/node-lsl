@@ -1,21 +1,17 @@
 import { SchemaError, assertOptions } from '@sprucelabs/schema'
-import LiblslImpl, {
-	LslBindingsOutlet,
-	LslBindingsStreamInfo,
-	LslSample,
-} from './Liblsl'
+import LiblslImpl, { BoundOutlet, BoundStreamInfo, LslSample } from './Liblsl'
 
 export default class LslOutletImpl implements LslOutlet {
 	private outletOptions: LslOutletOptions
 	public static Class?: new (options: LslOutletOptions) => LslOutlet
-	private streamInfo: LslBindingsStreamInfo
-	private outlet: LslBindingsOutlet
+	private streamInfo: BoundStreamInfo
+	private outlet: BoundOutlet
 
 	protected constructor(options: LslOutletOptions) {
 		const { sampleRate, channelFormat } = assertOptions(options, [
 			'name',
 			'type',
-			'channelLabels',
+			'channelNames',
 			'sampleRate',
 			'channelFormat',
 			'sourceId',
@@ -27,10 +23,10 @@ export default class LslOutletImpl implements LslOutlet {
 
 		this.outletOptions = options
 
-		const { chunkSize, maxBuffered, channelLabels, ...streamInfoOptions } = this
+		const { chunkSize, maxBuffered, channelNames, ...streamInfoOptions } = this
 			.outletOptions as any
 
-		this.assertValidChannelCount(channelLabels.length)
+		this.assertValidChannelCount(channelNames.length)
 		this.assertValidSampleRate(sampleRate)
 		this.assertValidChannelFormat(channelFormat)
 		this.assertValidChunkSize(chunkSize)
@@ -41,18 +37,18 @@ export default class LslOutletImpl implements LslOutlet {
 
 		this.streamInfo = this.lsl.createStreamInfo({
 			...streamInfoOptions,
-			channelCount: channelLabels.length,
+			channelCount: channelNames.length,
 			channelFormat: CHANNEL_FORMATS.indexOf(this.outletOptions.channelFormat),
 		})
 
-		this.lsl.appendChannelsToStreamInfo(
-			this.streamInfo,
-			channelLabels.map((label: string) => ({
+		this.lsl.appendChannelsToStreamInfo({
+			info: this.streamInfo,
+			channels: channelNames.map((label: string) => ({
 				label,
 				unit: this.outletOptions.unit,
 				type: this.outletOptions.type,
-			}))
-		)
+			})),
+		})
 
 		this.outlet = this.lsl.createOutlet({
 			info: this.streamInfo,
@@ -63,6 +59,10 @@ export default class LslOutletImpl implements LslOutlet {
 
 	public static Outlet(options: LslOutletOptions) {
 		return new (this.Class ?? this)(options)
+	}
+
+	public pushSample(sample: LslSample) {
+		this.lsl.pushSample({ outlet: this.outlet, sample })
 	}
 
 	private assertValidMaxBufferred(maxBuffered: number) {
@@ -111,8 +111,8 @@ export default class LslOutletImpl implements LslOutlet {
 		if (!this.isPositiveInteger(channelCount)) {
 			throw new SchemaError({
 				code: 'INVALID_PARAMETERS',
-				parameters: ['channelLabels'],
-				friendlyMessage: 'channelLabels must have 1 or more labels.',
+				parameters: ['channelNames'],
+				friendlyMessage: 'channelNames must have 1 or more labels.',
 			})
 		}
 	}
@@ -132,10 +132,6 @@ export default class LslOutletImpl implements LslOutlet {
 	private get lsl() {
 		return LiblslImpl.getInstance()
 	}
-
-	public pushSample(sample: LslSample) {
-		this.lsl.pushSample(this.outlet, sample)
-	}
 }
 
 const CHANNEL_FORMATS = [
@@ -147,13 +143,18 @@ const CHANNEL_FORMATS = [
 	'int16',
 	'int8',
 	'int64',
-] as const
+]
 
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
+
+export interface LslOutlet {
+	pushSample(sample: LslSample): void
+}
+
 export interface LslOutletOptions {
 	name: string
 	type: string
-	channelLabels: string[]
+	channelNames: string[]
 	sampleRate: number
 	channelFormat: ChannelFormat
 	sourceId: string
@@ -161,8 +162,4 @@ export interface LslOutletOptions {
 	unit: string
 	chunkSize: number
 	maxBuffered: number
-}
-
-export interface LslOutlet {
-	pushSample(sample: LslSample): void
 }
