@@ -93,7 +93,6 @@ export default class LslOutletImpl implements LslOutlet {
 
 	private assertValidChannelFormat(channelFormat: ChannelFormat) {
 		const validFormats = CHANNEL_FORMATS
-
 		if (validFormats.indexOf(channelFormat) === -1) {
 			throw new SchemaError({
 				code: 'INVALID_PARAMETERS',
@@ -104,11 +103,11 @@ export default class LslOutletImpl implements LslOutlet {
 	}
 
 	private assertValidSampleRate(sampleRate: number) {
-		if (!this.isPositiveNumber(sampleRate)) {
+		if (!this.isGreaterThanZero(sampleRate)) {
 			throw new SchemaError({
 				code: 'INVALID_PARAMETERS',
 				parameters: ['sampleRate'],
-				friendlyMessage: 'Sample rate must be a positive number.',
+				friendlyMessage: 'Sample rate must be a positive number or zero.',
 			})
 		}
 	}
@@ -123,16 +122,16 @@ export default class LslOutletImpl implements LslOutlet {
 		}
 	}
 
-	private isPositiveNumber(value: number) {
-		return value > 0
-	}
-
-	private isPositiveIntegerOrZero(value: number) {
-		return Number.isInteger(value) && value >= 0
+	private isGreaterThanZero(value: number) {
+		return value >= 0
 	}
 
 	private isPositiveInteger(value: number) {
 		return Number.isInteger(value) && value > 0
+	}
+
+	private isPositiveIntegerOrZero(value: number) {
+		return Number.isInteger(value) && value >= 0
 	}
 
 	private get lsl() {
@@ -149,7 +148,7 @@ const CHANNEL_FORMATS = [
 	'int16',
 	'int8',
 	'int64',
-] as const
+]
 
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 

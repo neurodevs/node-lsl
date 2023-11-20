@@ -5,17 +5,9 @@ import AbstractSpruceTest, {
 	errorAssert,
 	generateId,
 } from '@sprucelabs/test-utils'
-import LiblslImpl, {
-	CreateOutletOptions,
-	CreateStreamInfoOptions,
-	Liblsl,
-	BoundOutlet,
-	BoundStreamInfo,
-	LslSample,
-	AppendChannelsToStreamInfoOptions,
-	PushSampleOptions,
-} from '../../Liblsl'
+import LiblslImpl, { LslSample } from '../../Liblsl'
 import LslOutlet, { ChannelFormat, LslOutletOptions } from '../../LslOutlet'
+import { SpyLiblsl } from '../SpyLiblsl'
 
 export const CHANNEL_FORMATS = [
 	'undefined',
@@ -26,7 +18,7 @@ export const CHANNEL_FORMATS = [
 	'int16',
 	'int8',
 	'int64',
-] as const
+]
 
 export default class LslOutletTest extends AbstractSpruceTest {
 	private static spyLiblsl: SpyLiblsl
@@ -36,20 +28,8 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	protected static async beforeEach() {
 		await super.beforeEach()
 		delete LslOutlet.Class
-		this.channelIdx = randomInt(7)
-		this.randomOutletOptions = {
-			name: generateId(),
-			type: generateId(),
-			channelNames: new Array(randomInt(1, 10)).fill(generateId()),
-			sampleRate: Math.random() * 10,
-			channelFormat: CHANNEL_FORMATS[this.channelIdx],
-			sourceId: generateId(),
-			manufacturer: generateId(),
-			unit: generateId(),
-			chunkSize: randomInt(0, 10),
-			maxBuffered: randomInt(0, 10),
-		}
-
+		this.channelIdx = randomInt(8)
+		this.randomOutletOptions = generateRandomOptions(this.channelIdx)
 		this.spyLiblsl = new SpyLiblsl()
 		LiblslImpl.setInstance(this.spyLiblsl)
 	}
@@ -81,7 +61,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async throwsWithInvalidSampleRate() {
-		this.assertThrowsInvalidSampleRate(0)
+		this.Outlet({ sampleRate: 0 })
 		this.assertThrowsInvalidSampleRate(-1)
 		this.assertThrowsInvalidSampleRate(-1.5)
 	}
@@ -231,40 +211,23 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	}
 }
 
-class SpyLiblsl implements Liblsl {
-	public lastCreateStreamInfoOptions?: CreateStreamInfoOptions
-	public lastAppendChannelsToStreamInfoOptions?: AppendChannelsToStreamInfoOptions
-	public lastCreateOutletOptions?: CreateOutletOptions
-	public lastPushSampleOptions?: PushSampleOptions
-
-	public outlet: BoundOutlet = {} as BoundOutlet
-	public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
-	public createStreamInfoHitCount = 0
-
-	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
-		this.createStreamInfoHitCount++
-		this.lastCreateStreamInfoOptions = options
-		return this.streamInfo
-	}
-
-	public appendChannelsToStreamInfo(
-		options: AppendChannelsToStreamInfoOptions
-	): void {
-		this.lastAppendChannelsToStreamInfoOptions = options
-	}
-
-	public createOutlet(options: CreateOutletOptions): BoundOutlet {
-		this.lastCreateOutletOptions = options
-		return this.outlet
-	}
-
-	public pushSample(options: PushSampleOptions): void {
-		this.lastPushSampleOptions = options
-	}
-}
-
 class CheckingOutlet extends LslOutlet {
 	public constructor(options: LslOutletOptions) {
 		super(options)
+	}
+}
+
+export function generateRandomOptions(randomChannelIdx: number) {
+	return {
+		name: generateId(),
+		type: generateId(),
+		channelNames: new Array(randomInt(1, 10)).fill(generateId()),
+		sampleRate: Math.random() * 10,
+		channelFormat: CHANNEL_FORMATS[randomChannelIdx],
+		sourceId: generateId(),
+		manufacturer: generateId(),
+		unit: generateId(),
+		chunkSize: randomInt(0, 10),
+		maxBuffered: randomInt(0, 10),
 	}
 }
