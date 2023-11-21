@@ -1,35 +1,30 @@
 import { randomInt } from 'crypto'
-import AbstractSpruceTest, { test } from '@sprucelabs/test-utils'
+import AbstractSpruceTest, { assert, test } from '@sprucelabs/test-utils'
 import LiblslImpl from '../../Liblsl'
-import LslOutletImpl, { LslOutletOptions } from '../../LslOutlet'
-import { SpyLiblsl } from '../SpyLiblsl'
-import { generateRandomOptions } from './LslOutlet.test'
+import { LslOutletOptions } from '../../LslOutlet'
+import TimeMarkerOutlet from '../../TimeMarkerOutlet'
+import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
+import { SpyLiblsl } from '../support/SpyLiblsl'
 
 export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	private static spyLiblsl: SpyLiblsl
 
 	protected static async beforeEach() {
 		await super.beforeEach()
-		delete TimeMarkerOutlet.Class
+		TimeMarkerOutlet.Class = SpyTimeMarkerOutlet
 		this.spyLiblsl = new SpyLiblsl()
 		LiblslImpl.setInstance(this.spyLiblsl)
 	}
 
 	@test()
 	protected static async canCreateFromOutletMethod() {
-		TimeMarkerOutlet.Outlet({})
+		this.Outlet()
 	}
 
 	@test()
-	protected static async canOverrideDefaultOptions() {
-		const options = generateRandomOptions(randomInt(8))
-		TimeMarkerOutlet.Outlet(options)
-	}
-}
-
-class TimeMarkerOutlet extends LslOutletImpl {
-	public static Outlet(options: Partial<LslOutletOptions>) {
-		const defaultOptions = {
+	protected static async loadsWithTimeMarkerSpecificOptions() {
+		const outlet = this.Outlet()
+		assert.isEqualDeep(outlet.options, {
 			name: 'Time markers',
 			type: 'Markers',
 			channelNames: ['Markers'],
@@ -40,7 +35,25 @@ class TimeMarkerOutlet extends LslOutletImpl {
 			unit: 'N/A',
 			chunkSize: 0,
 			maxBuffered: 0,
-		}
-		return new (this.Class ?? this)({ ...defaultOptions, ...options })
+		})
+	}
+
+	@test()
+	protected static async canOverrideDefaultOptions() {
+		const options = generateRandomOutletOptions(randomInt(8))
+		const outlet = this.Outlet(options)
+		assert.isEqualDeep(outlet.options, options)
+	}
+
+	private static Outlet(options?: Partial<LslOutletOptions>) {
+		return TimeMarkerOutlet.Outlet(options) as SpyTimeMarkerOutlet
+	}
+}
+
+class SpyTimeMarkerOutlet extends TimeMarkerOutlet {
+	public options: LslOutletOptions
+	public constructor(options: LslOutletOptions) {
+		super(options)
+		this.options = options
 	}
 }

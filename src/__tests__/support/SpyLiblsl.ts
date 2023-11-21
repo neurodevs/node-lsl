@@ -6,7 +6,7 @@ import {
 	BoundStreamInfo,
 	AppendChannelsToStreamInfoOptions,
 	PushSampleOptions,
-} from '../Liblsl'
+} from '../../Liblsl'
 
 export class SpyLiblsl implements Liblsl {
 	public lastCreateStreamInfoOptions?: CreateStreamInfoOptions

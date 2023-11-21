@@ -7,29 +7,22 @@ import AbstractSpruceTest, {
 } from '@sprucelabs/test-utils'
 import LiblslImpl, { LslSample } from '../../Liblsl'
 import LslOutlet, { ChannelFormat, LslOutletOptions } from '../../LslOutlet'
-import { SpyLiblsl } from '../SpyLiblsl'
-
-export const CHANNEL_FORMATS = [
-	'undefined',
-	'float32',
-	'double64',
-	'string',
-	'int32',
-	'int16',
-	'int8',
-	'int64',
-]
+import { TEST_CHANNEL_FORMATS } from '../support/consts'
+import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
+import { SpyLiblsl } from '../support/SpyLiblsl'
 
 export default class LslOutletTest extends AbstractSpruceTest {
 	private static spyLiblsl: SpyLiblsl
 	private static randomOutletOptions: LslOutletOptions
-	private static channelIdx: number
+	private static channelFormatIdx: number
 
 	protected static async beforeEach() {
 		await super.beforeEach()
 		delete LslOutlet.Class
-		this.channelIdx = randomInt(8)
-		this.randomOutletOptions = generateRandomOptions(this.channelIdx)
+		this.channelFormatIdx = randomInt(8)
+		this.randomOutletOptions = generateRandomOutletOptions(
+			this.channelFormatIdx
+		)
 		this.spyLiblsl = new SpyLiblsl()
 		LiblslImpl.setInstance(this.spyLiblsl)
 	}
@@ -92,8 +85,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async supportsAllKnownChannelFormats() {
-		const valid = CHANNEL_FORMATS
-		for (const format of valid) {
+		for (const format of TEST_CHANNEL_FORMATS) {
 			this.Outlet({ channelFormat: format as ChannelFormat })
 		}
 	}
@@ -130,7 +122,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 		assert.isEqualDeep(this.spyLiblsl.lastCreateStreamInfoOptions, {
 			...options,
-			channelFormat: this.channelIdx,
+			channelFormat: this.channelFormatIdx,
 		})
 	}
 
@@ -214,20 +206,5 @@ export default class LslOutletTest extends AbstractSpruceTest {
 class CheckingOutlet extends LslOutlet {
 	public constructor(options: LslOutletOptions) {
 		super(options)
-	}
-}
-
-export function generateRandomOptions(randomChannelIdx: number) {
-	return {
-		name: generateId(),
-		type: generateId(),
-		channelNames: new Array(randomInt(1, 10)).fill(generateId()),
-		sampleRate: Math.random() * 10,
-		channelFormat: CHANNEL_FORMATS[randomChannelIdx],
-		sourceId: generateId(),
-		manufacturer: generateId(),
-		unit: generateId(),
-		chunkSize: randomInt(0, 10),
-		maxBuffered: randomInt(0, 10),
 	}
 }
