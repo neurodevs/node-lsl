@@ -17,11 +17,6 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async canCreateFromOutletMethod() {
-		this.Outlet()
-	}
-
-	@test()
 	protected static async loadsWithTimeMarkerSpecificOptions() {
 		const outlet = this.Outlet()
 		assert.isEqualDeep(outlet.options, {
