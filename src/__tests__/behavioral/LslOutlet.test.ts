@@ -94,6 +94,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	@test('pushing [1] sample sends to LSL', [1])
 	protected static async canPushSampleToLsl(sample: LslSample) {
 		this.pushSample(sample)
+
 		assert.isEqual(
 			this.spyLiblsl.lastPushSampleOptions?.outlet,
 			this.spyLiblsl.outlet
@@ -130,6 +131,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	protected static async canOverrideClassInstantiatedInFactory() {
 		LslOutlet.Class = CheckingOutlet
 		const instance = this.Outlet()
+
 		assert.isInstanceOf(instance, CheckingOutlet)
 	}
 
@@ -149,6 +151,14 @@ export default class LslOutletTest extends AbstractSpruceTest {
 				unit,
 			})),
 		})
+	}
+
+	@test()
+	protected static async canDestroyOutlet() {
+		const outlet = this.Outlet()
+		outlet.destroy()
+
+		assert.isEqual(this.spyLiblsl.destroyOutletHitCount, 1)
 	}
 
 	@test()

@@ -48,6 +48,7 @@ export default class LiblslImpl implements Liblsl {
 				['string', 'string', 'int', 'double', 'int', 'string'],
 			],
 			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
+			lsl_destroy_outlet: ['void', [outletType]],
 			lsl_local_clock: ['double', []],
 			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
 			lsl_get_desc: [xmlPtr, [streamInfo]],
@@ -104,6 +105,11 @@ export default class LiblslImpl implements Liblsl {
 		return this.bindings.lsl_create_outlet(info, chunkSize, maxBuffered)
 	}
 
+	public destroyOutlet(options: DestroyOutletOptions): void {
+		const { outlet } = assertOptions(options, ['outlet'])
+		this.bindings.lsl_destroy_outlet(outlet)
+	}
+
 	public pushSample(options: PushSampleOptions): void {
 		const { outlet, sample } = assertOptions(options, ['outlet', 'sample'])
 
@@ -116,6 +122,7 @@ export interface Liblsl {
 	createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo
 	appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 	createOutlet(options: CreateOutletOptions): BoundOutlet
+	destroyOutlet(options: DestroyOutletOptions): void
 	pushSample(options: PushSampleOptions): void
 }
 
@@ -139,6 +146,10 @@ export interface CreateOutletOptions {
 	info: BoundStreamInfo
 	chunkSize: number
 	maxBuffered: number
+}
+
+export interface DestroyOutletOptions {
+	outlet: BoundOutlet
 }
 
 export interface PushSampleOptions {
@@ -168,6 +179,8 @@ export interface LiblslBindings {
 		chunkSize: number,
 		maxBuffered: number
 	): BoundOutlet
+
+	lsl_destroy_outlet(outlet: BoundOutlet): void
 
 	lsl_push_sample_ft(
 		outlet: BoundOutlet,

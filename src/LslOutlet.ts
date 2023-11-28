@@ -63,6 +63,10 @@ export default class LslOutletImpl implements LslOutlet {
 		return new (this.Class ?? this)(options)
 	}
 
+	public destroy() {
+		this.lsl.destroyOutlet({ outlet: this.outlet })
+	}
+
 	public pushSample(sample: LslSample) {
 		this.lsl.pushSample({ outlet: this.outlet, sample })
 	}
@@ -153,6 +157,7 @@ const CHANNEL_FORMATS = [
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 
 export interface LslOutlet {
+	destroy(): void
 	pushSample(sample: LslSample): void
 }
 

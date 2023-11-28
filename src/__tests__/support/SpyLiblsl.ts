@@ -17,6 +17,7 @@ export class SpyLiblsl implements Liblsl {
 	public outlet: BoundOutlet = {} as BoundOutlet
 	public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
 	public createStreamInfoHitCount = 0
+	public destroyOutletHitCount = 0
 
 	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
 		this.createStreamInfoHitCount++
@@ -33,6 +34,10 @@ export class SpyLiblsl implements Liblsl {
 	public createOutlet(options: CreateOutletOptions): BoundOutlet {
 		this.lastCreateOutletOptions = options
 		return this.outlet
+	}
+
+	public destroyOutlet() {
+		this.destroyOutletHitCount++
 	}
 
 	public pushSample(options: PushSampleOptions): void {

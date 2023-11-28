@@ -13,6 +13,7 @@ import LiblslImpl, {
 	CreateStreamInfoOptions,
 	AppendChannelsToStreamInfoOptions,
 	CreateOutletOptions,
+	DestroyOutletOptions,
 	PushSampleOptions,
 	LslChannel,
 	BoundOutlet,
@@ -33,6 +34,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 	private static createStreamInfoParams?: any[]
 	private static appendChildParams: any[] = []
 	private static createOutletParams?: any[]
+	private static destroyOutletParams?: any[]
 	private static pushSampleParams?: any[]
 	private static appendChildValueParams: any[]
 	private static localClock: number
@@ -48,6 +50,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 		delete this.libraryOptions
 		delete this.createStreamInfoParams
 		delete this.createOutletParams
+		delete this.destroyOutletParams
 		delete this.pushSampleParams
 		delete this.getDescriptionParams
 		this.appendChildParams = []
@@ -74,6 +77,10 @@ export default class LiblslTest extends AbstractSpruceTest {
 			lsl_create_outlet: (...params: any[]) => {
 				this.createOutletParams = params
 				return this.fakeOutlet
+			},
+			lsl_destroy_outlet: (...params: any[]) => {
+				this.destroyOutletParams = params
+				return
 			},
 			lsl_push_sample_ft: (...params: any[]) => {
 				this.pushSampleParams = params
@@ -203,6 +210,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 				['string', 'string', 'int', 'double', 'int', 'string'],
 			],
 			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
+			lsl_destroy_outlet: ['void', [outletType]],
 			lsl_local_clock: ['double', []],
 			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
 			lsl_get_desc: [xmlPtr, [streamInfo]],
@@ -226,15 +234,9 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async canCreateOutletWithRequiredParams() {
-		const info = this.createRandomStreamInfo()
-		const options = {
-			info,
-			chunkSize: randomInt(10),
-			maxBuffered: randomInt(10),
-		}
-		const actual = this.lsl.createOutlet(options)
+		const { options, outlet } = this.createRandomOutlet()
 		assert.isEqualDeep(this.createOutletParams, Object.values(options))
-		assert.isEqual(actual, this.fakeOutlet)
+		assert.isEqual(outlet, this.fakeOutlet)
 	}
 
 	@test()
@@ -302,10 +304,30 @@ export default class LiblslTest extends AbstractSpruceTest {
 		assert.isEqual(this.appendChildValueParams[5][2], channel2.type)
 	}
 
+	@test()
+	protected static async canDestroyOutlet() {
+		const outlet = this.createRandomOutlet()
+		const options = { outlet }
+		this.lsl.destroyOutlet(options)
+
+		assert.isEqualDeep(this.destroyOutletParams, Object.values(options))
+	}
+
 	private static createRandomStreamInfo() {
 		return this.lsl.createStreamInfo(
 			this.generateRandomCreateStreamInfoOptions()
 		)
+	}
+
+	private static createRandomOutlet() {
+		const info = this.createRandomStreamInfo()
+		const options = {
+			info,
+			chunkSize: randomInt(10),
+			maxBuffered: randomInt(10),
+		}
+		const outlet = this.lsl.createOutlet(options)
+		return { options, outlet }
 	}
 
 	private static generateRandomChannelValues(): LslChannel {
@@ -340,6 +362,8 @@ class FakeLiblsl implements Liblsl {
 	public createOutlet(_options: CreateOutletOptions): BoundOutlet {
 		return {} as BoundOutlet
 	}
+
+	public destroyOutlet(_options: DestroyOutletOptions): void {}
 
 	public pushSample(_options: PushSampleOptions): void {}
 }
