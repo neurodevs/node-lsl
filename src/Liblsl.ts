@@ -42,6 +42,7 @@ export default class LiblslImpl implements Liblsl {
 	}
 
 	private loadBindings(path: string) {
+		//@ts-ignore
 		return LiblslImpl.ffi.Library(path!, {
 			lsl_create_streaminfo: [
 				streamInfo,

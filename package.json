@@ -1,8 +1,11 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "main": "build/index.js",
-  "repository": "https://github.com/neurodevs/node-lsl.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neurodevs/node-lsl.git"
+  },
   "scripts": {
     "build.ci": "yarn build.tsc && yarn build.resolve-paths && yarn lint",
     "build.dev": "yarn build.tsc --sourceMap ; yarn resolve-paths.lint",
