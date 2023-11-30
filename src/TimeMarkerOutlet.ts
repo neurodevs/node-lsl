@@ -16,4 +16,20 @@ export default class TimeMarkerOutlet extends LslOutletImpl {
 		} as LslOutletOptions
 		return new (this.Class ?? this)({ ...defaultOptions, ...options })
 	}
+
+	public async pushMarkers(markers: DurationMarker[]) {
+		for (let marker of markers) {
+			this.pushSample([marker.name])
+			await this.wait(marker.durationMs)
+		}
+	}
+
+	protected async wait(durationMs: number) {
+		return new Promise((resolve) => setTimeout(resolve, durationMs))
+	}
+}
+
+export interface DurationMarker {
+	name: string
+	durationMs: number
 }

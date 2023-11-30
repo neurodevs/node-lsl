@@ -22,6 +22,7 @@ export class SpyLiblsl implements Liblsl {
 	public createStreamInfoHitCount = 0
 	public destroyOutletHitCount = 0
 	public localClockHitCount = 0
+	public pushSampleStrtHitCount = 0
 
 	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
 		this.createStreamInfoHitCount++
@@ -50,6 +51,7 @@ export class SpyLiblsl implements Liblsl {
 
 	public pushSampleStrt(options: PushSampleStrtOptions) {
 		this.lastPushSampleStrtOptions = options
+		this.pushSampleStrtHitCount++
 	}
 
 	public localClock() {
