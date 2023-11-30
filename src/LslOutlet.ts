@@ -1,9 +1,14 @@
 import { SchemaError, assertOptions } from '@sprucelabs/schema'
-import LiblslImpl, { BoundOutlet, BoundStreamInfo, LslSample } from './Liblsl'
+import LiblslImpl, {
+	BoundOutlet,
+	BoundStreamInfo,
+	Liblsl,
+	LslSample,
+} from './Liblsl'
 
 export default class LslOutletImpl implements LslOutlet {
-	private outletOptions: LslOutletOptions
 	public static Class?: new (options: LslOutletOptions) => LslOutlet
+	private options: LslOutletOptions
 	private streamInfo: BoundStreamInfo
 	private outlet: BoundOutlet
 
@@ -21,10 +26,10 @@ export default class LslOutletImpl implements LslOutlet {
 			'maxBuffered',
 		])
 
-		this.outletOptions = options
+		this.options = options
 
 		const { chunkSize, maxBuffered, channelNames, ...streamInfoOptions } = this
-			.outletOptions as any
+			.options as any
 
 		const channelCount = channelNames.length
 
@@ -47,35 +52,53 @@ export default class LslOutletImpl implements LslOutlet {
 			info: this.streamInfo,
 			channels: channelNames.map((label: string) => ({
 				label,
-				unit: this.outletOptions.unit,
-				type: this.outletOptions.type,
+				unit: this.options.unit,
+				type: this.options.type,
 			})),
 		})
 
 		this.outlet = this.lsl.createOutlet({
 			info: this.streamInfo,
-			chunkSize: this.outletOptions.chunkSize,
-			maxBuffered: this.outletOptions.maxBuffered,
+			chunkSize: this.options.chunkSize,
+			maxBuffered: this.options.maxBuffered,
 		})
 	}
 
-	public static Outlet(options: LslOutletOptions) {
+	public static Outlet(options: LslOutletOptions): LslOutlet {
 		return new (this.Class ?? this)(options)
 	}
 
-	public destroy() {
+	public destroy(): void {
 		this.lsl.destroyOutlet({ outlet: this.outlet })
 	}
 
-	public pushSample(sample: LslSample) {
-		this.lsl.pushSample({ outlet: this.outlet, sample })
+	public pushSample(sample: LslSample): void {
+		const timestamp = this.lsl.localClock()
+
+		if (this.options.channelFormat === 'float32') {
+			this.lsl.pushSampleFt({
+				outlet: this.outlet,
+				sample: sample as number[],
+				timestamp,
+			})
+		} else if (this.options.channelFormat === 'string') {
+			this.lsl.pushSampleStrt({
+				outlet: this.outlet,
+				sample: sample as string[],
+				timestamp,
+			})
+		} else {
+			throw new Error(
+				`This method currently does not support the ${this.options.channelFormat} type! Please implement it.`
+			)
+		}
 	}
 
 	private lookupChannelFormat(channelFormat: ChannelFormat): number {
 		return CHANNEL_FORMATS.indexOf(channelFormat)
 	}
 
-	private assertValidMaxBufferred(maxBuffered: number) {
+	private assertValidMaxBufferred(maxBuffered: number): void {
 		if (!this.isPositiveIntegerOrZero(maxBuffered)) {
 			throw new SchemaError({
 				code: 'INVALID_PARAMETERS',
@@ -85,7 +108,7 @@ export default class LslOutletImpl implements LslOutlet {
 		}
 	}
 
-	private assertValidChunkSize(chunkSize: number) {
+	private assertValidChunkSize(chunkSize: number): void {
 		if (!this.isPositiveIntegerOrZero(chunkSize)) {
 			throw new SchemaError({
 				code: 'INVALID_PARAMETERS',
@@ -95,7 +118,7 @@ export default class LslOutletImpl implements LslOutlet {
 		}
 	}
 
-	private assertValidChannelFormat(channelFormat: ChannelFormat) {
+	private assertValidChannelFormat(channelFormat: ChannelFormat): void {
 		const validFormats = CHANNEL_FORMATS
 		if (validFormats.indexOf(channelFormat) === -1) {
 			throw new SchemaError({
@@ -106,7 +129,7 @@ export default class LslOutletImpl implements LslOutlet {
 		}
 	}
 
-	private assertValidSampleRate(sampleRate: number) {
+	private assertValidSampleRate(sampleRate: number): void {
 		if (!this.isGreaterThanZero(sampleRate)) {
 			throw new SchemaError({
 				code: 'INVALID_PARAMETERS',
@@ -116,7 +139,7 @@ export default class LslOutletImpl implements LslOutlet {
 		}
 	}
 
-	private assertValidChannelCount(channelCount: number) {
+	private assertValidChannelCount(channelCount: number): void {
 		if (!this.isPositiveInteger(channelCount)) {
 			throw new SchemaError({
 				code: 'INVALID_PARAMETERS',
@@ -126,19 +149,19 @@ export default class LslOutletImpl implements LslOutlet {
 		}
 	}
 
-	private isGreaterThanZero(value: number) {
+	private isGreaterThanZero(value: number): boolean {
 		return value >= 0
 	}
 
-	private isPositiveInteger(value: number) {
+	private isPositiveInteger(value: number): boolean {
 		return Number.isInteger(value) && value > 0
 	}
 
-	private isPositiveIntegerOrZero(value: number) {
+	private isPositiveIntegerOrZero(value: number): boolean {
 		return Number.isInteger(value) && value >= 0
 	}
 
-	private get lsl() {
+	private get lsl(): Liblsl {
 		return LiblslImpl.getInstance()
 	}
 }

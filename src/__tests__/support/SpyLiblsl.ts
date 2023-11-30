@@ -1,23 +1,27 @@
 import {
-	CreateOutletOptions,
-	CreateStreamInfoOptions,
 	Liblsl,
 	BoundOutlet,
 	BoundStreamInfo,
+	CreateStreamInfoOptions,
 	AppendChannelsToStreamInfoOptions,
-	PushSampleOptions,
+	CreateOutletOptions,
+	PushSampleFtOptions as PushSampleFtOptions,
+	PushSampleStrtOptions,
 } from '../../Liblsl'
 
 export class SpyLiblsl implements Liblsl {
+	public outlet: BoundOutlet = {} as BoundOutlet
+	public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
+
 	public lastCreateStreamInfoOptions?: CreateStreamInfoOptions
 	public lastAppendChannelsToStreamInfoOptions?: AppendChannelsToStreamInfoOptions
 	public lastCreateOutletOptions?: CreateOutletOptions
-	public lastPushSampleOptions?: PushSampleOptions
+	public lastPushSampleFtOptions?: PushSampleFtOptions
+	public lastPushSampleStrtOptions?: PushSampleStrtOptions
 
-	public outlet: BoundOutlet = {} as BoundOutlet
-	public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
 	public createStreamInfoHitCount = 0
 	public destroyOutletHitCount = 0
+	public localClockHitCount = 0
 
 	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
 		this.createStreamInfoHitCount++
@@ -27,7 +31,7 @@ export class SpyLiblsl implements Liblsl {
 
 	public appendChannelsToStreamInfo(
 		options: AppendChannelsToStreamInfoOptions
-	): void {
+	) {
 		this.lastAppendChannelsToStreamInfoOptions = options
 	}
 
@@ -40,7 +44,16 @@ export class SpyLiblsl implements Liblsl {
 		this.destroyOutletHitCount++
 	}
 
-	public pushSample(options: PushSampleOptions): void {
-		this.lastPushSampleOptions = options
+	public pushSampleFt(options: PushSampleFtOptions) {
+		this.lastPushSampleFtOptions = options
+	}
+
+	public pushSampleStrt(options: PushSampleStrtOptions) {
+		this.lastPushSampleStrtOptions = options
+	}
+
+	public localClock() {
+		this.localClockHitCount++
+		return new Date().getTime()
 	}
 }

@@ -19,7 +19,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	@test()
 	protected static async loadsWithTimeMarkerSpecificOptions() {
 		const outlet = this.Outlet()
-		assert.isEqualDeep(outlet.options, {
+		assert.isEqualDeep(outlet.spyOptions, {
 			name: 'Time markers',
 			type: 'Markers',
 			channelNames: ['Markers'],
@@ -37,7 +37,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	protected static async canOverrideDefaultOptions() {
 		const options = generateRandomOutletOptions(randomInt(8))
 		const outlet = this.Outlet(options)
-		assert.isEqualDeep(outlet.options, options)
+		assert.isEqualDeep(outlet.spyOptions, options)
 	}
 
 	private static Outlet(options?: Partial<LslOutletOptions>) {
@@ -46,9 +46,9 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 }
 
 class SpyTimeMarkerOutlet extends TimeMarkerOutlet {
-	public options: LslOutletOptions
+	public spyOptions: LslOutletOptions
 	public constructor(options: LslOutletOptions) {
 		super(options)
-		this.options = options
+		this.spyOptions = options
 	}
 }

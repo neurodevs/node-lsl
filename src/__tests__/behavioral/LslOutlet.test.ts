@@ -90,21 +90,55 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		}
 	}
 
-	@test('pushing [1, 2] sample sends to LSL', [1, 2])
-	@test('pushing [1] sample sends to LSL', [1])
-	protected static async canPushSampleToLsl(sample: LslSample) {
-		this.pushSample(sample)
+	@test('pushing [1, 2] sample sends to LSL', [1.0, 2.0])
+	@test('pushing [1] sample sends to LSL', [1.0])
+	protected static async canPushFloatSampleToLsl(sample: LslSample) {
+		const outlet = this.FloatOutlet()
+		outlet.pushSample(sample)
 
 		assert.isEqual(
-			this.spyLiblsl.lastPushSampleOptions?.outlet,
+			this.spyLiblsl.lastPushSampleFtOptions?.outlet,
 			this.spyLiblsl.outlet
 		)
-		assert.isEqualDeep(this.spyLiblsl.lastPushSampleOptions?.sample, sample)
+		assert.isEqualDeep(this.spyLiblsl.lastPushSampleFtOptions?.sample, sample)
 		assert.isEqualDeep(this.spyLiblsl.lastCreateOutletOptions, {
 			info: this.spyLiblsl.streamInfo,
 			chunkSize: this.randomOutletOptions.chunkSize,
 			maxBuffered: this.randomOutletOptions.maxBuffered,
 		})
+		assert.isNumber(this.spyLiblsl.lastPushSampleFtOptions?.timestamp)
+	}
+
+	@test()
+	protected static async canPushStringSampleToLsl() {
+		const sample = [generateId()]
+		const outlet = this.StringOutlet()
+
+		outlet.pushSample(sample)
+
+		assert.isEqual(
+			this.spyLiblsl.lastPushSampleStrtOptions?.outlet,
+			this.spyLiblsl.outlet
+		)
+		assert.isEqualDeep(this.spyLiblsl.lastPushSampleStrtOptions?.sample, sample)
+		assert.isNumber(this.spyLiblsl.lastPushSampleStrtOptions?.timestamp)
+	}
+
+	@test()
+	protected static async pushingStringTwiceGivesDifferentTimestamps() {
+		const outlet = this.StringOutlet()
+		const sample = [generateId()]
+
+		outlet.pushSample(sample)
+		const t1 = this.spyLiblsl.lastPushSampleStrtOptions?.timestamp
+
+		await this.wait(10)
+
+		outlet.pushSample(sample)
+		const t2 = this.spyLiblsl.lastPushSampleStrtOptions?.timestamp
+
+		assert.isNotEqual(t1, t2)
+		assert.isEqual(this.spyLiblsl.localClockHitCount, 2)
 	}
 
 	@test()
@@ -163,17 +197,32 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async pushSampleShouldNotCreateMultipleOutlets() {
-		const outlet = this.Outlet()
-		outlet.pushSample([1])
-		outlet.pushSample([2])
-		outlet.pushSample([3])
+		const outlet = this.FloatOutlet()
+		outlet.pushSample([1.0])
+		outlet.pushSample([2.0])
+		outlet.pushSample([3.0])
 
 		assert.isEqual(this.spyLiblsl.createStreamInfoHitCount, 1)
 	}
 
-	private static pushSample(sample: LslSample) {
-		const outlet = this.Outlet()
-		outlet.pushSample(sample)
+	@test()
+	protected static async pushSampleThrowsWithUnsupportedType() {
+		const unsupportedTypes = [
+			'undefined',
+			'double64',
+			'int32',
+			'int16',
+			'int8',
+			'int64',
+		] as const
+
+		for (let unsupportedType of unsupportedTypes) {
+			const outlet = this.Outlet({ channelFormat: unsupportedType })
+			assert.doesThrow(
+				() => outlet.pushSample([]),
+				`This method currently does not support the ${unsupportedType} type! Please implement it.`
+			)
+		}
 	}
 
 	private static assertThrowsInvalidMaxBuffered(maxBuffered: number) {
@@ -210,6 +259,14 @@ export default class LslOutletTest extends AbstractSpruceTest {
 			...this.randomOutletOptions,
 			...options,
 		})
+	}
+
+	private static StringOutlet() {
+		return this.Outlet({ channelFormat: 'string' })
+	}
+
+	private static FloatOutlet() {
+		return this.Outlet({ channelFormat: 'float32' })
 	}
 }
 

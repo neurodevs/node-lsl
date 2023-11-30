@@ -9,18 +9,18 @@ export default class LiblslImpl implements Liblsl {
 	public static ffi = ffi
 	private bindings: LiblslBindings
 
-	public static getInstance() {
+	public static getInstance(): Liblsl {
 		if (!this.instance) {
 			this.setInstance(new this())
 		}
 		return this.instance!
 	}
 
-	public static setInstance(instance: Liblsl) {
+	public static setInstance(instance: Liblsl): void {
 		this.instance = instance
 	}
 
-	public static resetInstance() {
+	public static resetInstance(): void {
 		delete this.instance
 	}
 
@@ -52,6 +52,7 @@ export default class LiblslImpl implements Liblsl {
 			lsl_destroy_outlet: ['void', [outletType]],
 			lsl_local_clock: ['double', []],
 			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
+			lsl_push_sample_strt: ['void', [outletType, StringArray, 'double']],
 			lsl_get_desc: [xmlPtr, [streamInfo]],
 			lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
 			lsl_append_child_value: [xmlPtr, [xmlPtr, 'string', 'string']],
@@ -96,7 +97,7 @@ export default class LiblslImpl implements Liblsl {
 		}
 	}
 
-	public createOutlet(options: CreateOutletOptions) {
+	public createOutlet(options: CreateOutletOptions): BoundOutlet {
 		const { info, chunkSize, maxBuffered } = assertOptions(options, [
 			'info',
 			'chunkSize',
@@ -111,11 +112,26 @@ export default class LiblslImpl implements Liblsl {
 		this.bindings.lsl_destroy_outlet(outlet)
 	}
 
-	public pushSample(options: PushSampleOptions): void {
-		const { outlet, sample } = assertOptions(options, ['outlet', 'sample'])
+	public pushSampleFt(options: PushSampleFtOptions): void {
+		const { outlet, sample, timestamp } = assertOptions(options, [
+			'outlet',
+			'sample',
+			'timestamp',
+		])
+		this.bindings.lsl_push_sample_ft(outlet, sample, timestamp)
+	}
 
-		const clock = this.bindings.lsl_local_clock()
-		this.bindings.lsl_push_sample_ft(outlet, sample, clock)
+	public pushSampleStrt(options: PushSampleStrtOptions): void {
+		const { outlet, sample, timestamp } = assertOptions(options, [
+			'outlet',
+			'sample',
+			'timestamp',
+		])
+		this.bindings.lsl_push_sample_strt(outlet, sample, timestamp)
+	}
+
+	public localClock(): number {
+		return this.bindings.lsl_local_clock()
 	}
 }
 
@@ -124,7 +140,9 @@ export interface Liblsl {
 	appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 	createOutlet(options: CreateOutletOptions): BoundOutlet
 	destroyOutlet(options: DestroyOutletOptions): void
-	pushSample(options: PushSampleOptions): void
+	pushSampleFt(options: PushSampleFtOptions): void
+	pushSampleStrt(options: PushSampleStrtOptions): void
+	localClock(): number
 }
 
 export interface CreateStreamInfoOptions {
@@ -153,9 +171,16 @@ export interface DestroyOutletOptions {
 	outlet: BoundOutlet
 }
 
-export interface PushSampleOptions {
+export interface PushSampleFtOptions {
 	outlet: BoundOutlet
-	sample: LslSample
+	sample: number[]
+	timestamp: number
+}
+
+export interface PushSampleStrtOptions {
+	outlet: BoundOutlet
+	sample: string[]
+	timestamp: number
 }
 
 export interface LslChannel {
@@ -189,6 +214,12 @@ export interface LiblslBindings {
 		timestamp: number
 	): void
 
+	lsl_push_sample_strt(
+		outlet: BoundOutlet,
+		sample: LslSample,
+		timestamp: number
+	): void
+
 	lsl_local_clock(): number
 	lsl_get_desc(info: BoundStreamInfo): BoundDesc
 	lsl_append_child(desc: BoundDesc, name: string): BoundChild
@@ -203,4 +234,5 @@ export interface BoundChild {}
 const streamInfo = ref.refType(ref.types.void)
 const outletType = ref.refType(ref.types.void)
 const FloatArray = ArrayType(ref.types.float)
+const StringArray = ArrayType(ref.types.CString)
 const xmlPtr = ref.refType(ref.types.void)

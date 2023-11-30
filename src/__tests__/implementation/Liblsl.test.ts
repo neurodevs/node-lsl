@@ -10,17 +10,13 @@ import ref from 'ref-napi'
 import LiblslImpl, {
 	Liblsl,
 	LiblslBindings,
-	CreateStreamInfoOptions,
-	AppendChannelsToStreamInfoOptions,
-	CreateOutletOptions,
-	DestroyOutletOptions,
-	PushSampleOptions,
 	LslChannel,
 	BoundOutlet,
 	BoundStreamInfo,
 	BoundDesc,
 	BoundChild,
 } from '../../Liblsl'
+import { SpyLiblsl } from '../support/SpyLiblsl'
 
 export default class LiblslTest extends AbstractSpruceTest {
 	private static lsl: Liblsl
@@ -35,9 +31,9 @@ export default class LiblslTest extends AbstractSpruceTest {
 	private static appendChildParams: any[] = []
 	private static createOutletParams?: any[]
 	private static destroyOutletParams?: any[]
-	private static pushSampleParams?: any[]
+	private static pushSampleFtParams?: any[]
+	private static pushSampleStrtParams?: any[]
 	private static appendChildValueParams: any[]
-	private static localClock: number
 	private static shouldThrowWhenCreatingBindings: boolean
 	private static getDescriptionParams?: [BoundStreamInfo]
 	private static fakeChildNamedChannel: BoundChild
@@ -51,7 +47,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 		delete this.createStreamInfoParams
 		delete this.createOutletParams
 		delete this.destroyOutletParams
-		delete this.pushSampleParams
+		delete this.pushSampleFtParams
 		delete this.getDescriptionParams
 		this.appendChildParams = []
 		this.appendChildValueParams = []
@@ -63,46 +59,11 @@ export default class LiblslTest extends AbstractSpruceTest {
 		this.fakeOutlet = {}
 		this.fakeChildNamedChannels = {}
 		this.fakeChildNamedChannel = {}
+		this.fakeBindings = this.FakeBindings()
 
-		this.localClock = new Date().getTime()
 		this.shouldThrowWhenCreatingBindings = false
 
 		this.appendChildHitCount = 0
-
-		this.fakeBindings = {
-			lsl_create_streaminfo: (...params: any[]) => {
-				this.createStreamInfoParams = params
-				return this.fakeStreamInfo
-			},
-			lsl_create_outlet: (...params: any[]) => {
-				this.createOutletParams = params
-				return this.fakeOutlet
-			},
-			lsl_destroy_outlet: (...params: any[]) => {
-				this.destroyOutletParams = params
-				return
-			},
-			lsl_push_sample_ft: (...params: any[]) => {
-				this.pushSampleParams = params
-				return 0
-			},
-			lsl_local_clock: () => this.localClock,
-			lsl_get_desc: (info: BoundStreamInfo) => {
-				this.getDescriptionParams = [info]
-				return this.fakeDesc
-			},
-			lsl_append_child: (...params: any) => {
-				this.appendChildParams.push(params)
-				if (this.appendChildHitCount === 0) {
-					this.appendChildHitCount++
-					return this.fakeChildNamedChannels
-				}
-				return this.fakeChildNamedChannel
-			},
-			lsl_append_child_value: (...params: any[]) => {
-				this.appendChildValueParams.push(params)
-			},
-		}
 
 		LiblslImpl.ffi = {
 			//@ts-ignore
@@ -110,7 +71,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 				this.libraryPath = path
 				this.libraryOptions = options
 				if (this.shouldThrowWhenCreatingBindings) {
-					throw new Error('Failed to create bindings')
+					throw new Error('Failed to create bindings!')
 				}
 				return this.fakeBindings
 			},
@@ -173,11 +134,20 @@ export default class LiblslTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async throwsWhenPushSampleIsMissingRequiredParams() {
+	protected static async throwsWhenPushSampleFtIsMissingRequiredParams() {
 		//@ts-ignore
-		const err = assert.doesThrow(() => this.lsl.pushSample())
+		const err = assert.doesThrow(() => this.lsl.pushSampleFt())
 		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-			parameters: ['outlet', 'sample'],
+			parameters: ['outlet', 'sample', 'timestamp'],
+		})
+	}
+
+	@test()
+	protected static async throwsWhenPushSampleStrtIsMissingRequiredParams() {
+		//@ts-ignore
+		const err = assert.doesThrow(() => this.lsl.pushSampleFt())
+		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+			parameters: ['outlet', 'sample', 'timestamp'],
 		})
 	}
 
@@ -194,7 +164,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	@test()
 	protected static canSetInstance() {
-		const fake = new FakeLiblsl()
+		const fake = new SpyLiblsl()
 		LiblslImpl.setInstance(fake)
 		assert.isEqual(LiblslImpl.getInstance(), fake)
 	}
@@ -213,6 +183,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 			lsl_destroy_outlet: ['void', [outletType]],
 			lsl_local_clock: ['double', []],
 			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
+			lsl_push_sample_strt: ['void', [outletType, StringArray, 'double']],
 			lsl_get_desc: [xmlPtr, [streamInfo]],
 			lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
 			lsl_append_child_value: [xmlPtr, [xmlPtr, 'string', 'string']],
@@ -240,16 +211,33 @@ export default class LiblslTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async canPushSampleWithRequiredParams() {
-		const expected = [1, 2, 3]
+	protected static async canPushFloatSample() {
+		const expected = [1.0, 2.0, 3.0]
+		const timestamp = randomInt(100)
 		const options = {
 			outlet: this.fakeOutlet,
 			sample: expected,
+			timestamp,
 		}
-		this.lsl.pushSample(options)
-		assert.isEqual(this.pushSampleParams?.[0], this.fakeOutlet)
-		assert.isEqual(this.pushSampleParams?.[1], expected)
-		assert.isEqual(this.pushSampleParams?.[2], this.localClock)
+		this.lsl.pushSampleFt(options)
+		assert.isEqual(this.pushSampleFtParams?.[0], this.fakeOutlet)
+		assert.isEqual(this.pushSampleFtParams?.[1], expected)
+		assert.isEqual(this.pushSampleFtParams?.[2], timestamp)
+	}
+
+	@test()
+	protected static async canPushStringSample() {
+		const expected = [generateId()]
+		const timestamp = randomInt(100)
+		const options = {
+			outlet: this.fakeOutlet,
+			sample: expected,
+			timestamp,
+		}
+		this.lsl.pushSampleStrt(options)
+		assert.isEqual(this.pushSampleStrtParams?.[0], this.fakeOutlet)
+		assert.isEqualDeep(this.pushSampleStrtParams?.[1], expected)
+		assert.isEqual(this.pushSampleStrtParams?.[2], timestamp)
 	}
 
 	@test()
@@ -313,6 +301,14 @@ export default class LiblslTest extends AbstractSpruceTest {
 		assert.isEqualDeep(this.destroyOutletParams, Object.values(options))
 	}
 
+	@test()
+	protected static async callingLocalClockTwiceReturnsDifferentTimestamps() {
+		const t1 = this.lsl.localClock()
+		await this.wait(10)
+		const t2 = this.lsl.localClock()
+		assert.isNotEqual(t1, t2)
+	}
+
 	private static createRandomStreamInfo() {
 		return this.lsl.createStreamInfo(
 			this.generateRandomCreateStreamInfoOptions()
@@ -348,27 +344,48 @@ export default class LiblslTest extends AbstractSpruceTest {
 			sourceId: generateId(),
 		}
 	}
-}
 
-class FakeLiblsl implements Liblsl {
-	public createStreamInfo(_options: CreateStreamInfoOptions): BoundStreamInfo {
-		return {} as BoundStreamInfo
+	private static FakeBindings(): LiblslBindings {
+		return {
+			lsl_create_streaminfo: (...params: any[]) => {
+				this.createStreamInfoParams = params
+				return this.fakeStreamInfo
+			},
+			lsl_create_outlet: (...params: any[]) => {
+				this.createOutletParams = params
+				return this.fakeOutlet
+			},
+			lsl_destroy_outlet: (...params: any[]) => {
+				this.destroyOutletParams = params
+			},
+			lsl_push_sample_ft: (...params: any[]) => {
+				this.pushSampleFtParams = params
+			},
+			lsl_push_sample_strt: (...params: any[]) => {
+				this.pushSampleStrtParams = params
+			},
+			lsl_local_clock: () => new Date().getTime(),
+			lsl_get_desc: (info: BoundStreamInfo) => {
+				this.getDescriptionParams = [info]
+				return this.fakeDesc
+			},
+			lsl_append_child: (...params: any) => {
+				this.appendChildParams.push(params)
+				if (this.appendChildHitCount === 0) {
+					this.appendChildHitCount++
+					return this.fakeChildNamedChannels
+				}
+				return this.fakeChildNamedChannel
+			},
+			lsl_append_child_value: (...params: any[]) => {
+				this.appendChildValueParams.push(params)
+			},
+		}
 	}
-
-	public appendChannelsToStreamInfo(
-		_options: AppendChannelsToStreamInfoOptions
-	): void {}
-
-	public createOutlet(_options: CreateOutletOptions): BoundOutlet {
-		return {} as BoundOutlet
-	}
-
-	public destroyOutlet(_options: DestroyOutletOptions): void {}
-
-	public pushSample(_options: PushSampleOptions): void {}
 }
 
 const streamInfo = ref.refType(ref.types.void)
 const outletType = ref.refType(ref.types.void)
 const FloatArray = ArrayType(ref.types.float)
+const StringArray = ArrayType(ref.types.CString)
 const xmlPtr = ref.refType(ref.types.void)
