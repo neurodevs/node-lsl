@@ -8,11 +8,11 @@ import AbstractSpruceTest, {
 import LiblslImpl, { LslSample } from '../../Liblsl'
 import LslOutlet, { LslOutletOptions } from '../../LslOutlet'
 import { TEST_CHANNEL_FORMATS, TestChannelFormat } from '../support/consts'
+import { FakeLiblsl } from '../support/FakeLiblsl'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
-import { SpyLiblsl } from '../support/SpyLiblsl'
 
 export default class LslOutletTest extends AbstractSpruceTest {
-	private static spyLiblsl: SpyLiblsl
+	private static fakeLiblsl: FakeLiblsl
 	private static randomOutletOptions: LslOutletOptions
 	private static channelFormatIdx: number
 
@@ -23,8 +23,8 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		this.randomOutletOptions = generateRandomOutletOptions(
 			this.channelFormatIdx
 		)
-		this.spyLiblsl = new SpyLiblsl()
-		LiblslImpl.setInstance(this.spyLiblsl)
+		this.fakeLiblsl = new FakeLiblsl()
+		LiblslImpl.setInstance(this.fakeLiblsl)
 	}
 
 	@test()
@@ -97,16 +97,16 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		outlet.pushSample(sample)
 
 		assert.isEqual(
-			this.spyLiblsl.lastPushSampleFtOptions?.outlet,
-			this.spyLiblsl.outlet
+			this.fakeLiblsl.lastPushSampleFtOptions?.outlet,
+			this.fakeLiblsl.outlet
 		)
-		assert.isEqualDeep(this.spyLiblsl.lastPushSampleFtOptions?.sample, sample)
-		assert.isEqualDeep(this.spyLiblsl.lastCreateOutletOptions, {
-			info: this.spyLiblsl.streamInfo,
+		assert.isEqualDeep(this.fakeLiblsl.lastPushSampleFtOptions?.sample, sample)
+		assert.isEqualDeep(this.fakeLiblsl.lastCreateOutletOptions, {
+			info: this.fakeLiblsl.streamInfo,
 			chunkSize: this.randomOutletOptions.chunkSize,
 			maxBuffered: this.randomOutletOptions.maxBuffered,
 		})
-		assert.isNumber(this.spyLiblsl.lastPushSampleFtOptions?.timestamp)
+		assert.isNumber(this.fakeLiblsl.lastPushSampleFtOptions?.timestamp)
 	}
 
 	@test()
@@ -117,11 +117,14 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		outlet.pushSample(sample)
 
 		assert.isEqual(
-			this.spyLiblsl.lastPushSampleStrtOptions?.outlet,
-			this.spyLiblsl.outlet
+			this.fakeLiblsl.lastPushSampleStrtOptions?.outlet,
+			this.fakeLiblsl.outlet
 		)
-		assert.isEqualDeep(this.spyLiblsl.lastPushSampleStrtOptions?.sample, sample)
-		assert.isNumber(this.spyLiblsl.lastPushSampleStrtOptions?.timestamp)
+		assert.isEqualDeep(
+			this.fakeLiblsl.lastPushSampleStrtOptions?.sample,
+			sample
+		)
+		assert.isNumber(this.fakeLiblsl.lastPushSampleStrtOptions?.timestamp)
 	}
 
 	@test()
@@ -130,15 +133,15 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		const sample = [generateId()]
 
 		outlet.pushSample(sample)
-		const t1 = this.spyLiblsl.lastPushSampleStrtOptions?.timestamp
+		const t1 = this.fakeLiblsl.lastPushSampleStrtOptions?.timestamp
 
 		await this.wait(10)
 
 		outlet.pushSample(sample)
-		const t2 = this.spyLiblsl.lastPushSampleStrtOptions?.timestamp
+		const t2 = this.fakeLiblsl.lastPushSampleStrtOptions?.timestamp
 
 		assert.isNotEqual(t1, t2)
-		assert.isEqual(this.spyLiblsl.localClockHitCount, 2)
+		assert.isEqual(this.fakeLiblsl.localClockHitCount, 2)
 	}
 
 	@test()
@@ -155,7 +158,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		delete options.maxBuffered
 		delete options.channelNames
 
-		assert.isEqualDeep(this.spyLiblsl.lastCreateStreamInfoOptions, {
+		assert.isEqualDeep(this.fakeLiblsl.lastCreateStreamInfoOptions, {
 			...options,
 			channelFormat: this.channelFormatIdx,
 		})
@@ -177,8 +180,8 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
 		this.Outlet({ channelNames: labels, type, unit })
 
-		assert.isEqualDeep(this.spyLiblsl.lastAppendChannelsToStreamInfoOptions, {
-			info: this.spyLiblsl.streamInfo,
+		assert.isEqualDeep(this.fakeLiblsl.lastAppendChannelsToStreamInfoOptions, {
+			info: this.fakeLiblsl.streamInfo,
 			channels: labels.map((label) => ({
 				label,
 				type,
@@ -192,7 +195,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		const outlet = this.Outlet()
 		outlet.destroy()
 
-		assert.isEqual(this.spyLiblsl.destroyOutletHitCount, 1)
+		assert.isEqual(this.fakeLiblsl.destroyOutletHitCount, 1)
 	}
 
 	@test()
@@ -202,7 +205,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		outlet.pushSample([2.0])
 		outlet.pushSample([3.0])
 
-		assert.isEqual(this.spyLiblsl.createStreamInfoHitCount, 1)
+		assert.isEqual(this.fakeLiblsl.createStreamInfoHitCount, 1)
 	}
 
 	@test()

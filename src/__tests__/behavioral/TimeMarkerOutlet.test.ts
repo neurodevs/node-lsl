@@ -7,18 +7,18 @@ import AbstractSpruceTest, {
 import LiblslImpl from '../../Liblsl'
 import { LslOutletOptions } from '../../LslOutlet'
 import TimeMarkerOutlet from '../../TimeMarkerOutlet'
+import { FakeLiblsl } from '../support/FakeLiblsl'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
-import { SpyLiblsl } from '../support/SpyLiblsl'
 
 export default class TimeMarkerOutletTest extends AbstractSpruceTest {
-	private static spyLiblsl: SpyLiblsl
+	private static fakeLiblsl: FakeLiblsl
 	private static outlet: SpyTimeMarkerOutlet
 
 	protected static async beforeEach() {
 		await super.beforeEach()
 		TimeMarkerOutlet.Class = SpyTimeMarkerOutlet
-		this.spyLiblsl = new SpyLiblsl()
-		LiblslImpl.setInstance(this.spyLiblsl)
+		this.fakeLiblsl = new FakeLiblsl()
+		LiblslImpl.setInstance(this.fakeLiblsl)
 		this.outlet = this.Outlet()
 	}
 
@@ -49,7 +49,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	protected static async pushingSingleMarkerIncrementsHitCountAndWaitTime() {
 		const markers = [this.generateRandomDurationMarker()]
 		await this.outlet.pushMarkers(markers)
-		assert.isEqual(this.spyLiblsl.pushSampleStrtHitCount, 1)
+		assert.isEqual(this.fakeLiblsl.pushSampleStrtHitCount, 1)
 		assert.isEqual(this.outlet.totalWaitTimeMs, markers[0].durationMs)
 	}
 
@@ -60,7 +60,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 			this.generateRandomDurationMarker(),
 		]
 		await this.outlet.pushMarkers(markers)
-		assert.isEqual(this.spyLiblsl.pushSampleStrtHitCount, 2)
+		assert.isEqual(this.fakeLiblsl.pushSampleStrtHitCount, 2)
 		assert.isEqual(
 			this.outlet.totalWaitTimeMs,
 			markers[0].durationMs + markers[1].durationMs

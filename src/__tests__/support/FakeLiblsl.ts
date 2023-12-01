@@ -9,7 +9,7 @@ import {
 	PushSampleStrtOptions,
 } from '../../Liblsl'
 
-export class SpyLiblsl implements Liblsl {
+export class FakeLiblsl implements Liblsl {
 	public outlet: BoundOutlet = {} as BoundOutlet
 	public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
 

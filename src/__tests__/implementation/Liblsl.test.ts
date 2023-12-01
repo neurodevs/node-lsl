@@ -16,7 +16,7 @@ import LiblslImpl, {
 	BoundDesc,
 	BoundChild,
 } from '../../Liblsl'
-import { SpyLiblsl } from '../support/SpyLiblsl'
+import { FakeLiblsl } from '../support/FakeLiblsl'
 
 export default class LiblslTest extends AbstractSpruceTest {
 	private static lsl: Liblsl
@@ -164,7 +164,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	@test()
 	protected static canSetInstance() {
-		const fake = new SpyLiblsl()
+		const fake = new FakeLiblsl()
 		LiblslImpl.setInstance(fake)
 		assert.isEqual(LiblslImpl.getInstance(), fake)
 	}
