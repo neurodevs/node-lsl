@@ -75,23 +75,31 @@ export default class LslOutletImpl implements LslOutlet {
 	public pushSample(sample: LslSample): void {
 		const timestamp = this.lsl.localClock()
 
-		if (this.options.channelFormat === 'float32') {
-			this.lsl.pushSampleFt({
-				outlet: this.outlet,
-				sample: sample as number[],
-				timestamp,
-			})
-		} else if (this.options.channelFormat === 'string') {
-			this.lsl.pushSampleStrt({
-				outlet: this.outlet,
-				sample: sample as string[],
-				timestamp,
-			})
-		} else {
+		const method = this.getPushMethod()
+
+		this.lsl[method]({
+			outlet: this.outlet,
+			sample,
+			timestamp,
+		} as any)
+	}
+
+	private getPushMethod() {
+		const channelFormat = this.options.channelFormat
+
+		const methodMap: Record<string, keyof Liblsl> = {
+			float32: 'pushSampleFt',
+			string: 'pushSampleStrt',
+		}
+
+		const method = methodMap[channelFormat]
+
+		if (!this.lsl[method]) {
 			throw new Error(
 				`This method currently does not support the ${this.options.channelFormat} type! Please implement it.`
 			)
 		}
+		return method
 	}
 
 	private lookupChannelFormat(channelFormat: ChannelFormat): number {
