@@ -1,4 +1,12 @@
-import { SchemaError, assertOptions } from '@sprucelabs/schema'
+import { assertOptions } from '@sprucelabs/schema'
+import {
+	assertValidChannelCount,
+	assertValidChannelFormat,
+	assertValidChunkSize,
+	assertValidMaxBufferred,
+	assertValidSampleRate,
+} from './assertions'
+import { CHANNEL_FORMATS, ChannelFormat } from './consts'
 import LiblslImpl, {
 	BoundOutlet,
 	BoundStreamInfo,
@@ -33,11 +41,11 @@ export default class LslOutletImpl implements LslOutlet {
 
 		const channelCount = channelNames.length
 
-		this.assertValidChannelCount(channelCount)
-		this.assertValidSampleRate(sampleRate)
-		this.assertValidChannelFormat(channelFormat)
-		this.assertValidChunkSize(chunkSize)
-		this.assertValidMaxBufferred(maxBuffered)
+		assertValidChannelCount(channelCount)
+		assertValidSampleRate(sampleRate)
+		assertValidChannelFormat(channelFormat)
+		assertValidChunkSize(chunkSize)
+		assertValidMaxBufferred(maxBuffered)
 
 		delete streamInfoOptions.manufacturer
 		delete streamInfoOptions.unit
@@ -74,7 +82,6 @@ export default class LslOutletImpl implements LslOutlet {
 
 	public pushSample(sample: LslSample): void {
 		const timestamp = this.lsl.localClock()
-
 		const method = this.getPushMethod()
 
 		this.lsl[method]({
@@ -106,86 +113,10 @@ export default class LslOutletImpl implements LslOutlet {
 		return CHANNEL_FORMATS.indexOf(channelFormat)
 	}
 
-	private assertValidMaxBufferred(maxBuffered: number): void {
-		if (!this.isPositiveIntegerOrZero(maxBuffered)) {
-			throw new SchemaError({
-				code: 'INVALID_PARAMETERS',
-				parameters: ['maxBuffered'],
-				friendlyMessage: 'Max buffered must be a positive integer or zero.',
-			})
-		}
-	}
-
-	private assertValidChunkSize(chunkSize: number): void {
-		if (!this.isPositiveIntegerOrZero(chunkSize)) {
-			throw new SchemaError({
-				code: 'INVALID_PARAMETERS',
-				parameters: ['chunkSize'],
-				friendlyMessage: 'Chunk size must be a positive integer or zero.',
-			})
-		}
-	}
-
-	private assertValidChannelFormat(channelFormat: ChannelFormat): void {
-		const validFormats = CHANNEL_FORMATS
-		if (validFormats.indexOf(channelFormat) === -1) {
-			throw new SchemaError({
-				code: 'INVALID_PARAMETERS',
-				parameters: ['channelFormat'],
-				friendlyMessage: 'Channel format must be a valid format.',
-			})
-		}
-	}
-
-	private assertValidSampleRate(sampleRate: number): void {
-		if (!this.isGreaterThanZero(sampleRate)) {
-			throw new SchemaError({
-				code: 'INVALID_PARAMETERS',
-				parameters: ['sampleRate'],
-				friendlyMessage: 'Sample rate must be a positive number or zero.',
-			})
-		}
-	}
-
-	private assertValidChannelCount(channelCount: number): void {
-		if (!this.isPositiveInteger(channelCount)) {
-			throw new SchemaError({
-				code: 'INVALID_PARAMETERS',
-				parameters: ['channelNames'],
-				friendlyMessage: 'channelNames must have 1 or more labels.',
-			})
-		}
-	}
-
-	private isGreaterThanZero(value: number): boolean {
-		return value >= 0
-	}
-
-	private isPositiveInteger(value: number): boolean {
-		return Number.isInteger(value) && value > 0
-	}
-
-	private isPositiveIntegerOrZero(value: number): boolean {
-		return Number.isInteger(value) && value >= 0
-	}
-
 	private get lsl(): Liblsl {
 		return LiblslImpl.getInstance()
 	}
 }
-
-const CHANNEL_FORMATS = [
-	'undefined',
-	'float32',
-	'double64',
-	'string',
-	'int32',
-	'int16',
-	'int8',
-	'int64',
-] as const
-
-export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 
 export interface LslOutlet {
 	destroy(): void

@@ -6,8 +6,8 @@ import AbstractSpruceTest, {
 	generateId,
 } from '@sprucelabs/test-utils'
 import LiblslImpl, { LslSample } from '../../Liblsl'
-import LslOutlet, { ChannelFormat, LslOutletOptions } from '../../LslOutlet'
-import { TEST_CHANNEL_FORMATS } from '../support/consts'
+import LslOutlet, { LslOutletOptions } from '../../LslOutlet'
+import { TEST_CHANNEL_FORMATS, TestChannelFormat } from '../support/consts'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
 import { SpyLiblsl } from '../support/SpyLiblsl'
 
@@ -86,7 +86,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	@test()
 	protected static async supportsAllKnownChannelFormats() {
 		for (const format of TEST_CHANNEL_FORMATS) {
-			this.Outlet({ channelFormat: format as ChannelFormat })
+			this.Outlet({ channelFormat: format as TestChannelFormat })
 		}
 	}
 
