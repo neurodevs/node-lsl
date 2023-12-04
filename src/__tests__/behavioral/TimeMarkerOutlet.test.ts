@@ -40,7 +40,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async canOverrideDefaultOptions() {
-		const options = generateRandomOutletOptions(randomInt(8))
+		const options = generateRandomOutletOptions()
 		const outlet = this.Outlet(options)
 		assert.isEqualDeep(outlet.spyOptions, options)
 	}
