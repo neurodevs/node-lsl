@@ -6,7 +6,7 @@ import {
 	assertValidMaxBufferred,
 	assertValidSampleRate,
 } from './assertions'
-import { CHANNEL_FORMATS, ChannelFormat } from './consts'
+import { CHANNEL_FORMATS_MAP, ChannelFormat } from './consts'
 import LiblslImpl, {
 	BoundOutlet,
 	BoundStreamInfo,
@@ -19,6 +19,7 @@ export default class LslOutletImpl implements LslOutlet {
 	private options: LslOutletOptions
 	private streamInfo: BoundStreamInfo
 	private outlet: BoundOutlet
+	private pushSampleByType: (options: any) => void
 
 	protected constructor(options: LslOutletOptions) {
 		const { sampleRate, channelFormat } = assertOptions(options, [
@@ -70,6 +71,9 @@ export default class LslOutletImpl implements LslOutlet {
 			chunkSize: this.options.chunkSize,
 			maxBuffered: this.options.maxBuffered,
 		})
+
+		const pushMethod = this.getPushMethod()
+		this.pushSampleByType = this.lsl[pushMethod].bind(this.lsl)
 	}
 
 	public static Outlet(options: LslOutletOptions): LslOutlet {
@@ -82,16 +86,15 @@ export default class LslOutletImpl implements LslOutlet {
 
 	public pushSample(sample: LslSample): void {
 		const timestamp = this.lsl.localClock()
-		const method = this.getPushMethod()
 
-		this.lsl[method]({
+		this.pushSampleByType({
 			outlet: this.outlet,
 			sample,
 			timestamp,
-		} as any)
+		})
 	}
 
-	private getPushMethod() {
+	private getPushMethod(): keyof Liblsl {
 		const channelFormat = this.options.channelFormat
 
 		const methodMap: Record<string, keyof Liblsl> = {
@@ -99,18 +102,16 @@ export default class LslOutletImpl implements LslOutlet {
 			string: 'pushSampleStrt',
 		}
 
-		const method = methodMap[channelFormat]
-
-		if (!this.lsl[method]) {
+		if (!(channelFormat in methodMap)) {
 			throw new Error(
-				`This method currently does not support the ${this.options.channelFormat} type! Please implement it.`
+				`This method currently does not support the ${channelFormat} type! Please implement it.`
 			)
 		}
-		return method
+		return methodMap[channelFormat]
 	}
 
 	private lookupChannelFormat(channelFormat: ChannelFormat): number {
-		return CHANNEL_FORMATS.indexOf(channelFormat)
+		return CHANNEL_FORMATS_MAP[channelFormat]
 	}
 
 	private get lsl(): Liblsl {

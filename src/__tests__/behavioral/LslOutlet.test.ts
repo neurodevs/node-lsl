@@ -1,4 +1,3 @@
-import { randomInt } from 'crypto'
 import AbstractSpruceTest, {
 	test,
 	assert,
@@ -7,7 +6,12 @@ import AbstractSpruceTest, {
 } from '@sprucelabs/test-utils'
 import LiblslImpl, { LslSample } from '../../Liblsl'
 import LslOutlet, { LslOutletOptions } from '../../LslOutlet'
-import { TEST_CHANNEL_FORMATS, TestChannelFormat } from '../support/consts'
+import {
+	TEST_CHANNEL_FORMATS_MAP,
+	TEST_SUPPORTED_CHANNEL_FORMATS,
+	TEST_UNSUPPORTED_CHANNEL_FORMATS,
+	TestChannelFormat,
+} from '../support/consts'
 import { FakeLiblsl } from '../support/FakeLiblsl'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
 
@@ -19,10 +23,10 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	protected static async beforeEach() {
 		await super.beforeEach()
 		delete LslOutlet.Class
-		this.channelFormatIdx = randomInt(8)
-		this.randomOutletOptions = generateRandomOutletOptions(
-			this.channelFormatIdx
-		)
+		this.randomOutletOptions = generateRandomOutletOptions()
+
+		const channelFormat = this.randomOutletOptions.channelFormat
+		this.channelFormatIdx = TEST_CHANNEL_FORMATS_MAP[channelFormat]
 		this.fakeLiblsl = new FakeLiblsl()
 		LiblslImpl.setInstance(this.fakeLiblsl)
 	}
@@ -84,8 +88,18 @@ export default class LslOutletTest extends AbstractSpruceTest {
 	}
 
 	@test()
+	protected static async throwsWithUnsupportedType() {
+		for (let unsupportedType of TEST_UNSUPPORTED_CHANNEL_FORMATS) {
+			assert.doesThrow(
+				() => this.Outlet({ channelFormat: unsupportedType }),
+				`This method currently does not support the ${unsupportedType} type! Please implement it.`
+			)
+		}
+	}
+
+	@test()
 	protected static async supportsAllKnownChannelFormats() {
-		for (const format of TEST_CHANNEL_FORMATS) {
+		for (const format of TEST_SUPPORTED_CHANNEL_FORMATS) {
 			this.Outlet({ channelFormat: format as TestChannelFormat })
 		}
 	}
@@ -206,26 +220,6 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		outlet.pushSample([3.0])
 
 		assert.isEqual(this.fakeLiblsl.createStreamInfoHitCount, 1)
-	}
-
-	@test()
-	protected static async pushSampleThrowsWithUnsupportedType() {
-		const unsupportedTypes = [
-			'undefined',
-			'double64',
-			'int32',
-			'int16',
-			'int8',
-			'int64',
-		] as const
-
-		for (let unsupportedType of unsupportedTypes) {
-			const outlet = this.Outlet({ channelFormat: unsupportedType })
-			assert.doesThrow(
-				() => outlet.pushSample([]),
-				`This method currently does not support the ${unsupportedType} type! Please implement it.`
-			)
-		}
 	}
 
 	private static assertThrowsInvalidMaxBuffered(maxBuffered: number) {
