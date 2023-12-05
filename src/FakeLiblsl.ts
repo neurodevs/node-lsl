@@ -7,9 +7,9 @@ import {
 	CreateOutletOptions,
 	PushSampleFtOptions as PushSampleFtOptions,
 	PushSampleStrtOptions,
-} from '../../Liblsl'
+} from './Liblsl'
 
-export class FakeLiblsl implements Liblsl {
+export default class FakeLiblsl implements Liblsl {
 	public outlet: BoundOutlet = {} as BoundOutlet
 	public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
 

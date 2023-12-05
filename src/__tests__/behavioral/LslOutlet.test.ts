@@ -4,6 +4,7 @@ import AbstractSpruceTest, {
 	errorAssert,
 	generateId,
 } from '@sprucelabs/test-utils'
+import FakeLiblsl from '../../FakeLiblsl'
 import LiblslImpl, { LslSample } from '../../Liblsl'
 import LslOutlet, { LslOutletOptions } from '../../LslOutlet'
 import {
@@ -12,7 +13,6 @@ import {
 	TEST_UNSUPPORTED_CHANNEL_FORMATS,
 	TestChannelFormat,
 } from '../support/consts'
-import { FakeLiblsl } from '../support/FakeLiblsl'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
 
 export default class LslOutletTest extends AbstractSpruceTest {

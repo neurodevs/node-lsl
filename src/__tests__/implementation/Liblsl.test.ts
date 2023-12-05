@@ -7,6 +7,7 @@ import AbstractSpruceTest, {
 } from '@sprucelabs/test-utils'
 import ArrayType from 'ref-array-napi'
 import ref from 'ref-napi'
+import FakeLiblsl from '../../FakeLiblsl'
 import LiblslImpl, {
 	Liblsl,
 	LiblslBindings,
@@ -16,7 +17,6 @@ import LiblslImpl, {
 	BoundDesc,
 	BoundChild,
 } from '../../Liblsl'
-import { FakeLiblsl } from '../support/FakeLiblsl'
 
 export default class LiblslTest extends AbstractSpruceTest {
 	private static lsl: Liblsl

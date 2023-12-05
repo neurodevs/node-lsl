@@ -4,10 +4,10 @@ import AbstractSpruceTest, {
 	generateId,
 	test,
 } from '@sprucelabs/test-utils'
+import FakeLiblsl from '../../FakeLiblsl'
 import LiblslImpl from '../../Liblsl'
 import { LslOutletOptions } from '../../LslOutlet'
 import TimeMarkerOutlet from '../../TimeMarkerOutlet'
-import { FakeLiblsl } from '../support/FakeLiblsl'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
 
 export default class TimeMarkerOutletTest extends AbstractSpruceTest {
