@@ -86,7 +86,6 @@ export default class LiblslImpl implements Liblsl {
 		const { info, channels } = assertOptions(options, ['info', 'channels'])
 
 		const desc = this.bindings.lsl_get_desc(info)
-
 		const parent = this.bindings.lsl_append_child(desc, 'channels')
 
 		for (const channel of channels) {

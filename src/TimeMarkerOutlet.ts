@@ -1,6 +1,9 @@
 import LslOutletImpl, { LslOutletOptions } from './LslOutlet'
 
-export default class TimeMarkerOutlet extends LslOutletImpl {
+export default class TimeMarkerOutletImpl
+	extends LslOutletImpl
+	implements TimeMarkerOutlet
+{
 	public static Outlet(options?: Partial<LslOutletOptions>) {
 		const defaultOptions = {
 			name: 'Time markers',
@@ -14,6 +17,7 @@ export default class TimeMarkerOutlet extends LslOutletImpl {
 			chunkSize: 0,
 			maxBuffered: 0,
 		} as LslOutletOptions
+
 		return new (this.Class ?? this)({ ...defaultOptions, ...options })
 	}
 
@@ -32,4 +36,8 @@ export default class TimeMarkerOutlet extends LslOutletImpl {
 export interface DurationMarker {
 	name: string
 	durationMs: number
+}
+
+export interface TimeMarkerOutlet {
+	pushMarkers(markers: DurationMarker[]): Promise<void>
 }

@@ -7,7 +7,7 @@ import AbstractSpruceTest, {
 import FakeLiblsl from '../../FakeLiblsl'
 import LiblslImpl from '../../Liblsl'
 import { LslOutletOptions } from '../../LslOutlet'
-import TimeMarkerOutlet from '../../TimeMarkerOutlet'
+import TimeMarkerOutletImpl from '../../TimeMarkerOutlet'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
 
 export default class TimeMarkerOutletTest extends AbstractSpruceTest {
@@ -16,7 +16,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 
 	protected static async beforeEach() {
 		await super.beforeEach()
-		TimeMarkerOutlet.Class = SpyTimeMarkerOutlet
+		TimeMarkerOutletImpl.Class = SpyTimeMarkerOutlet
 		this.fakeLiblsl = new FakeLiblsl()
 		LiblslImpl.setInstance(this.fakeLiblsl)
 		this.outlet = this.Outlet()
@@ -72,11 +72,11 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	}
 
 	private static Outlet(options?: Partial<LslOutletOptions>) {
-		return TimeMarkerOutlet.Outlet(options) as SpyTimeMarkerOutlet
+		return TimeMarkerOutletImpl.Outlet(options) as SpyTimeMarkerOutlet
 	}
 }
 
-class SpyTimeMarkerOutlet extends TimeMarkerOutlet {
+class SpyTimeMarkerOutlet extends TimeMarkerOutletImpl {
 	public spyOptions: LslOutletOptions
 	public totalWaitTimeMs: number
 
