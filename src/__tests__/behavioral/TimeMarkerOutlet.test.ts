@@ -72,7 +72,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	}
 
 	private static Outlet(options?: Partial<LslOutletOptions>) {
-		return TimeMarkerOutletImpl.Outlet(options) as SpyTimeMarkerOutlet
+		return TimeMarkerOutletImpl.TimeMarkerOutlet(options) as SpyTimeMarkerOutlet
 	}
 }
 

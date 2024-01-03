@@ -4,7 +4,7 @@ export default class TimeMarkerOutletImpl
 	extends LslOutletImpl
 	implements TimeMarkerOutlet
 {
-	public static Outlet(options?: Partial<LslOutletOptions>) {
+	public static TimeMarkerOutlet(options?: Partial<LslOutletOptions>) {
 		const defaultOptions = {
 			name: 'Time markers',
 			type: 'Markers',
@@ -18,7 +18,11 @@ export default class TimeMarkerOutletImpl
 			maxBuffered: 0,
 		} as LslOutletOptions
 
-		return new (this.Class ?? this)({ ...defaultOptions, ...options })
+		//@ts-ignore
+		return new (this.Class ?? this)({
+			...defaultOptions,
+			...options,
+		}) as TimeMarkerOutlet
 	}
 
 	public async pushMarkers(markers: DurationMarker[]) {
