@@ -47,19 +47,17 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 
 	@test()
 	protected static async pushingSingleMarkerIncrementsHitCountAndWaitTime() {
-		const markers = [this.generateRandomDurationMarker()]
+		const markers = [this.generateDurationMarkerValues()]
 		await this.outlet.pushMarkers(markers)
+
 		assert.isEqual(this.fakeLiblsl.pushSampleStrtHitCount, 1)
 		assert.isEqual(this.outlet.totalWaitTimeMs, markers[0].durationMs)
 	}
 
 	@test()
 	protected static async pushingTwoMarkersIncrementsHitCountAndWaitTimeTwice() {
-		const markers = [
-			this.generateRandomDurationMarker(),
-			this.generateRandomDurationMarker(),
-		]
-		await this.outlet.pushMarkers(markers)
+		const markers = await this.pushTotalMarkers(2)
+
 		assert.isEqual(this.fakeLiblsl.pushSampleStrtHitCount, 2)
 		assert.isEqual(
 			this.outlet.totalWaitTimeMs,
@@ -67,8 +65,88 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 		)
 	}
 
-	private static generateRandomDurationMarker() {
-		return { name: generateId(), durationMs: randomInt(100, 1000) }
+	@test('can stop on the first marker', 1)
+	@test('can stop on the second marker', 2)
+	@test('can stop on the third marker', 3)
+	protected static async canStopTimeMarkersMidPush(bailIdx: number) {
+		let hitCount = 0
+
+		this.outlet.pushSample = () => {
+			hitCount += 1
+			if (hitCount === bailIdx) {
+				this.outlet.stop()
+			}
+		}
+
+		await this.pushTotalMarkers(10)
+
+		assert.isEqual(hitCount, bailIdx)
+	}
+
+	@test()
+	protected static async canStartAgainAfterStopping() {
+		this.outlet.stop()
+
+		let hitCount = 0
+
+		this.outlet.pushSample = () => {
+			hitCount++
+		}
+
+		await this.pushTotalMarkers(10)
+
+		assert.isEqual(hitCount, 10)
+	}
+
+	@test()
+	protected static async doesNotWaitIfStopped() {
+		this.setupTimeMarkerImpl()
+
+		const startMs = Date.now()
+
+		const promise = this.pushTotalMarkers(2, 1000)
+
+		this.outlet.stop()
+
+		await promise
+
+		const endMs = Date.now()
+		assert.isBelow(endMs - startMs, 10)
+	}
+
+	@test()
+	protected static async clearsTheTimeoutOnStop() {
+		this.setupTimeMarkerImpl()
+
+		const promise = this.pushTotalMarkers(2, 100)
+
+		this.outlet.stop()
+		this.outlet.pushSample = () => assert.fail('Should not have been called')
+
+		await promise
+		await this.wait(100)
+	}
+
+	private static setupTimeMarkerImpl() {
+		TimeMarkerOutletImpl.Class = TimeMarkerOutletImpl as any
+		this.outlet = this.Outlet()
+	}
+
+	private static async pushTotalMarkers(total: number, durationMs?: number) {
+		const markers = new Array(total)
+			.fill(null)
+			.map(() => this.generateDurationMarkerValues(durationMs))
+
+		await this.outlet.pushMarkers(markers)
+
+		return markers
+	}
+
+	private static generateDurationMarkerValues(durationMs?: number) {
+		return {
+			name: generateId(),
+			durationMs: durationMs ?? randomInt(100, 1000),
+		}
 	}
 
 	private static Outlet(options?: Partial<LslOutletOptions>) {
