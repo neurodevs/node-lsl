@@ -3,7 +3,7 @@ import {
 	assertValidChannelCount,
 	assertValidChannelFormat,
 	assertValidChunkSize,
-	assertValidMaxBufferred,
+	assertValidMaxBuffered,
 	assertValidSampleRate,
 } from './assertions'
 import { CHANNEL_FORMATS_MAP, ChannelFormat } from './consts'
@@ -46,7 +46,7 @@ export default class LslOutletImpl implements LslOutlet {
 		assertValidSampleRate(sampleRate)
 		assertValidChannelFormat(channelFormat)
 		assertValidChunkSize(chunkSize)
-		assertValidMaxBufferred(maxBuffered)
+		assertValidMaxBuffered(maxBuffered)
 
 		delete streamInfoOptions.manufacturer
 		delete streamInfoOptions.unit

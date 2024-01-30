@@ -7,7 +7,7 @@ import {
 	isStringInArray,
 } from './validations'
 
-export function assertValidMaxBufferred(maxBuffered: number): void {
+export function assertValidMaxBuffered(maxBuffered: number): void {
 	if (!isPositiveIntegerOrZero(maxBuffered)) {
 		throw new SchemaError({
 			code: 'INVALID_PARAMETERS',
