@@ -10,4 +10,7 @@ export * from './implementations/TimeMarkerOutlet'
 export { default as FakeLiblsl } from './testDoubles/FakeLiblsl'
 export * from './testDoubles/FakeLiblsl'
 
+export { default as SpyTimeMarkerOutlet } from './testDoubles/SpyTimeMarkerOutlet'
+export * from './testDoubles/SpyTimeMarkerOutlet'
+
 export * from './nodeLsl.types'

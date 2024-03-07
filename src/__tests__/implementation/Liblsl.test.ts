@@ -5,17 +5,20 @@ import AbstractSpruceTest, {
 	errorAssert,
 	generateId,
 } from '@sprucelabs/test-utils'
-import ArrayType from 'ref-array-napi'
-import ref from 'ref-napi'
 import LiblslImpl from '../../implementations/Liblsl'
 import {
 	BoundChild,
 	BoundDesc,
 	BoundOutlet,
 	BoundStreamInfo,
+	FloatArray,
 	Liblsl,
 	LiblslBindings,
 	LslChannel,
+	StringArray,
+	outletType,
+	streamInfo,
+	xmlPtr,
 } from '../../nodeLsl.types'
 import FakeLiblsl from '../../testDoubles/FakeLiblsl'
 
@@ -384,9 +387,3 @@ export default class LiblslTest extends AbstractSpruceTest {
 		}
 	}
 }
-
-const streamInfo = ref.refType(ref.types.void)
-const outletType = ref.refType(ref.types.void)
-const FloatArray = ArrayType(ref.types.float)
-const StringArray = ArrayType(ref.types.CString)
-const xmlPtr = ref.refType(ref.types.void)
