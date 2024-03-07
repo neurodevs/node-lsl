@@ -25,6 +25,10 @@ export default class LslOutletImpl implements LslOutlet {
 	private outlet: BoundOutlet
 	private pushSampleByType: (options: any) => void
 
+	public static Outlet(options: LslOutletOptions): LslOutlet {
+		return new (this.Class ?? this)(options)
+	}
+
 	protected constructor(options: LslOutletOptions) {
 		const { sampleRate, channelFormat } = assertOptions(options, [
 			'name',
@@ -78,10 +82,6 @@ export default class LslOutletImpl implements LslOutlet {
 
 		const pushMethod = this.getPushMethod()
 		this.pushSampleByType = this.lsl[pushMethod].bind(this.lsl)
-	}
-
-	public static Outlet(options: LslOutletOptions): LslOutlet {
-		return new (this.Class ?? this)(options)
 	}
 
 	public destroy(): void {

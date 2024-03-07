@@ -13,4 +13,7 @@ export * from './testDoubles/FakeLiblsl'
 export { default as SpyTimeMarkerOutlet } from './testDoubles/SpyTimeMarkerOutlet'
 export * from './testDoubles/SpyTimeMarkerOutlet'
 
+export { default as MockTimeMarkerOutlet } from './testDoubles/MockTimeMarkerOutlet'
+export * from './testDoubles/MockTimeMarkerOutlet'
+
 export * from './nodeLsl.types'
