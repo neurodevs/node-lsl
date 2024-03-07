@@ -19,5 +19,3 @@ export const CHANNEL_FORMATS_MAP = {
 	int8: 6,
 	int64: 7,
 }
-
-export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]

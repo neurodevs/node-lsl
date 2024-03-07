@@ -4,9 +4,10 @@ import AbstractSpruceTest, {
 	errorAssert,
 	generateId,
 } from '@sprucelabs/test-utils'
-import FakeLiblsl from '../../FakeLiblsl'
-import LiblslImpl, { LslSample } from '../../Liblsl'
-import LslOutlet, { LslOutletOptions } from '../../LslOutlet'
+import LiblslImpl from '../../implementations/Liblsl'
+import LslOutlet from '../../implementations/LslOutlet'
+import { LslOutletOptions, LslSample } from '../../nodeLsl.types'
+import FakeLiblsl from '../../testDoubles/FakeLiblsl'
 import {
 	TEST_CHANNEL_FORMATS_MAP,
 	TEST_SUPPORTED_CHANNEL_FORMATS,

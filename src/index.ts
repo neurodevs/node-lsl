@@ -1,10 +1,13 @@
-export { default as LiblslImpl } from './Liblsl'
-export * from './Liblsl'
+export { default as LiblslImpl } from './implementations/Liblsl'
+export * from './implementations/Liblsl'
 
-export { default as LslOutletImpl } from './LslOutlet'
-export * from './LslOutlet'
+export { default as LslOutletImpl } from './implementations/LslOutlet'
+export * from './implementations/LslOutlet'
 
-export { default as TimeMarkerOutletImpl } from './TimeMarkerOutlet'
-export * from './TimeMarkerOutlet'
+export { default as TimeMarkerOutletImpl } from './implementations/TimeMarkerOutlet'
+export * from './implementations/TimeMarkerOutlet'
 
-export { default as FakeLiblsl } from './FakeLiblsl'
+export { default as FakeLiblsl } from './testDoubles/FakeLiblsl'
+export * from './testDoubles/FakeLiblsl'
+
+export * from './nodeLsl.types'

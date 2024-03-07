@@ -1,13 +1,13 @@
 import {
-	Liblsl,
 	BoundOutlet,
 	BoundStreamInfo,
 	CreateStreamInfoOptions,
 	AppendChannelsToStreamInfoOptions,
 	CreateOutletOptions,
-	PushSampleFtOptions as PushSampleFtOptions,
+	PushSampleFtOptions,
 	PushSampleStrtOptions,
-} from './Liblsl'
+	Liblsl,
+} from '../nodeLsl.types'
 
 export default class FakeLiblsl implements Liblsl {
 	public outlet: BoundOutlet = {} as BoundOutlet

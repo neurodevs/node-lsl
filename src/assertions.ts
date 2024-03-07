@@ -1,5 +1,6 @@
 import { SchemaError } from '@sprucelabs/schema'
-import { CHANNEL_FORMATS, ChannelFormat } from './consts'
+import { CHANNEL_FORMATS } from './consts'
+import { ChannelFormat } from './nodeLsl.types'
 import {
 	isGreaterThanOrEqualToZero,
 	isPositiveInteger,

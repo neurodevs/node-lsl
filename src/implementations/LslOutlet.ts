@@ -5,14 +5,18 @@ import {
 	assertValidChunkSize,
 	assertValidMaxBuffered,
 	assertValidSampleRate,
-} from './assertions'
-import { CHANNEL_FORMATS_MAP, ChannelFormat } from './consts'
-import LiblslImpl, {
+} from '../assertions'
+import { CHANNEL_FORMATS_MAP } from '../consts'
+import {
+	LslOutlet,
+	LslOutletOptions,
+	ChannelFormat,
 	BoundOutlet,
 	BoundStreamInfo,
 	Liblsl,
 	LslSample,
-} from './Liblsl'
+} from '../nodeLsl.types'
+import LiblslImpl from './Liblsl'
 
 export default class LslOutletImpl implements LslOutlet {
 	public static Class?: new (options: LslOutletOptions) => LslOutlet
@@ -117,22 +121,4 @@ export default class LslOutletImpl implements LslOutlet {
 	private get lsl(): Liblsl {
 		return LiblslImpl.getInstance()
 	}
-}
-
-export interface LslOutlet {
-	destroy(): void
-	pushSample(sample: LslSample): void
-}
-
-export interface LslOutletOptions {
-	name: string
-	type: string
-	channelNames: string[]
-	sampleRate: number
-	channelFormat: ChannelFormat
-	sourceId: string
-	manufacturer: string
-	unit: string
-	chunkSize: number
-	maxBuffered: number
 }

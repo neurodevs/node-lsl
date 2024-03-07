@@ -1,4 +1,9 @@
-import LslOutletImpl, { LslOutletOptions } from './LslOutlet'
+import {
+	TimeMarkerOutlet,
+	LslOutletOptions,
+	DurationMarker,
+} from '../nodeLsl.types'
+import LslOutletImpl from './LslOutlet'
 
 export default class TimeMarkerOutletImpl
 	extends LslOutletImpl
@@ -47,27 +52,14 @@ export default class TimeMarkerOutletImpl
 		return new Promise((resolve) => this.setTimeout(resolve, durationMs))
 	}
 
-	private setTimeout(
-		resolve: (value: unknown) => void,
-		durationMs: number
-	): void {
+	private setTimeout(resolve: (value: unknown) => void, durationMs: number) {
 		this.waitResolve = resolve as any
 		this.timeout = setTimeout(resolve, durationMs)
 	}
 
-	public stop(): void {
+	public stop() {
 		this.waitResolve?.()
 		clearTimeout(this.timeout)
 		this.isPlaying = false
 	}
-}
-
-export interface DurationMarker {
-	name: string
-	durationMs: number
-}
-
-export interface TimeMarkerOutlet {
-	pushMarkers(markers: DurationMarker[]): Promise<void>
-	stop(): void
 }
