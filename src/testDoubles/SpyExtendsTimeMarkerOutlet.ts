@@ -1,7 +1,7 @@
 import TimeMarkerOutletImpl from '../implementations/TimeMarkerOutlet'
 import { LslOutletOptions } from '../nodeLsl.types'
 
-export default class SpyTimeMarkerOutlet extends TimeMarkerOutletImpl {
+export default class SpyExtendsTimeMarkerOutlet extends TimeMarkerOutletImpl {
 	public spyOptions: LslOutletOptions
 	public totalWaitTimeMs: number
 

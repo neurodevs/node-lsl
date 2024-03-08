@@ -1,42 +1,36 @@
-import { DurationMarker, TimeMarkerOutlet } from '../nodeLsl.types'
+import { assert } from '@sprucelabs/test-utils'
+import { DurationMarker, TimeMarkerOutlet } from '..'
 
 export default class MockTimeMarkerOutlet implements TimeMarkerOutlet {
-	public pushMarkersCalls: DurationMarker[][]
-	public pushSampleCalls: string[][]
-	public numStopCalls: number
-	public numDestroyCalls: number
+	public static instance: MockTimeMarkerOutlet
+	private didPushMarkers = false
+	private markers?: DurationMarker[]
 
-	public static TimeMarkerOutlet() {
-		return new this()
+	public constructor() {
+		MockTimeMarkerOutlet.instance = this
+	}
+	public stop(): void {}
+
+	public async pushMarkers(markers: DurationMarker[]): Promise<void> {
+		this.didPushMarkers = true
+		this.markers = markers
 	}
 
-	protected constructor() {
-		this.pushMarkersCalls = []
-		this.pushSampleCalls = []
-		this.numStopCalls = 0
-		this.numDestroyCalls = 0
+	public assertDidPushMarkers(markers?: DurationMarker[]) {
+		assert.isTrue(
+			this.didPushMarkers,
+			`Expected to have pushed markers but didn't. Try 'outlet.pushMarkers(...)'`
+		)
+
+		if (markers) {
+			assert.isEqualDeep(this.markers, markers)
+		}
 	}
 
-	public async pushMarkers(markers: DurationMarker[]) {
-		this.pushMarkersCalls.push(markers)
-	}
-
-	public pushSample(sample: string[]) {
-		this.pushSampleCalls.push(sample)
-	}
-
-	public stop() {
-		this.numStopCalls++
-	}
-
-	public destroy() {
-		this.numDestroyCalls++
-	}
-
-	public resetMock() {
-		this.pushMarkersCalls = []
-		this.pushSampleCalls = []
-		this.numStopCalls = 0
-		this.numDestroyCalls = 0
+	public assertDidNotPushMarkers() {
+		assert.isFalse(
+			this.didPushMarkers,
+			`Expected to NOT have pushed markers but did. Try 'outlet.pushMarkers(...)'`
+		)
 	}
 }
