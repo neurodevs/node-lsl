@@ -22,7 +22,7 @@ export interface LslOutletOptions {
 
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 
-export interface TimeMarkerOutlet {
+export interface TimeMarkerOutlet extends LslOutlet {
 	pushMarkers(markers: DurationMarker[]): Promise<void>
 	stop(): void
 }
