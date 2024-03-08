@@ -6,7 +6,7 @@ export default class SpyImplementsTimeMarkerOutlet implements TimeMarkerOutlet {
 	public numStopCalls: number
 	public numDestroyCalls: number
 
-	public static TimeMarkerOutlet() {
+	public static Outlet() {
 		return new this()
 	}
 
@@ -33,7 +33,7 @@ export default class SpyImplementsTimeMarkerOutlet implements TimeMarkerOutlet {
 		this.numDestroyCalls++
 	}
 
-	public resetMock() {
+	public resetSpy() {
 		this.pushMarkersCalls = []
 		this.pushSampleCalls = []
 		this.numStopCalls = 0

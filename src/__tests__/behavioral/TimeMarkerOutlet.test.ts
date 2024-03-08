@@ -104,14 +104,11 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 		this.setupTimeMarkerImpl()
 
 		const startMs = Date.now()
-
 		const promise = this.pushTotalMarkers(2, 1000)
-
 		this.outlet.stop()
-
 		await promise
-
 		const endMs = Date.now()
+
 		assert.isBelow(endMs - startMs, 10)
 	}
 
@@ -151,8 +148,6 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	}
 
 	private static Outlet(options?: Partial<LslOutletOptions>) {
-		return TimeMarkerOutletImpl.TimeMarkerOutlet(
-			options
-		) as SpyExtendsTimeMarkerOutlet
+		return TimeMarkerOutletImpl.Outlet(options) as SpyExtendsTimeMarkerOutlet
 	}
 }

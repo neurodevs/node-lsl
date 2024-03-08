@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "6.4.1",
+  "version": "7.0.0",
   "main": "build/index.js",
   "repository": {
     "type": "git",
