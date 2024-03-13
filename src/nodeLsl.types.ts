@@ -27,7 +27,9 @@ export interface TimeMarkerOutlet extends LslOutlet {
 	stop(): void
 }
 
-export type TimeMarkerOutletConstructor = new () => TimeMarkerOutlet
+export type TimeMarkerOutletConstructor = new (
+	options: LslOutletOptions
+) => TimeMarkerOutlet
 
 export interface DurationMarker {
 	name: string

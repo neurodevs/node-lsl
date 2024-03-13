@@ -6,11 +6,7 @@ export default class SpyImplementsTimeMarkerOutlet implements TimeMarkerOutlet {
 	public numStopCalls: number
 	public numDestroyCalls: number
 
-	public static Outlet() {
-		return new this()
-	}
-
-	protected constructor() {
+	public constructor() {
 		this.pushMarkersCalls = []
 		this.pushSampleCalls = []
 		this.numStopCalls = 0

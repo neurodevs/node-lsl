@@ -2,6 +2,7 @@ import {
 	TimeMarkerOutlet,
 	LslOutletOptions,
 	DurationMarker,
+	TimeMarkerOutletConstructor,
 } from '../nodeLsl.types'
 import LslOutletImpl from './LslOutlet'
 
@@ -9,6 +10,8 @@ export default class TimeMarkerOutletImpl
 	extends LslOutletImpl
 	implements TimeMarkerOutlet
 {
+	public static Class?: TimeMarkerOutletConstructor
+
 	private isPlaying: boolean = false
 	private waitResolve?: () => void
 	private timeout?: any
@@ -27,7 +30,6 @@ export default class TimeMarkerOutletImpl
 			maxBuffered: 0,
 		} as LslOutletOptions
 
-		//@ts-ignore
 		return new (this.Class ?? this)({
 			...defaultOptions,
 			...options,
