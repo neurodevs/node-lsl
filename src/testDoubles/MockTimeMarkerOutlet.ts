@@ -2,15 +2,10 @@ import { assert } from '@sprucelabs/test-utils'
 import { DurationMarker, LslSample, TimeMarkerOutlet } from '..'
 
 export default class MockTimeMarkerOutlet implements TimeMarkerOutlet {
-	public static instance: MockTimeMarkerOutlet
 	private didPushMarkers = false
 	private pushedMarkers?: DurationMarker[]
 	private didPushSamples = false
 	private pushedSamples?: LslSample[]
-
-	public constructor() {
-		MockTimeMarkerOutlet.instance = this
-	}
 
 	public stop(): void {}
 	public destroy(): void {}
