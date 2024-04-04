@@ -41,8 +41,8 @@ export interface Liblsl {
 	appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 	createOutlet(options: CreateOutletOptions): BoundOutlet
 	destroyOutlet(options: DestroyOutletOptions): void
-	pushSampleFt(options: PushSampleFtOptions): void
-	pushSampleStrt(options: PushSampleStrtOptions): void
+	pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions): void
+	pushSampleStringTimestamp(options: PushSampleStringTimestampOptions): void
 	localClock(): number
 }
 
@@ -72,13 +72,13 @@ export interface DestroyOutletOptions {
 	outlet: BoundOutlet
 }
 
-export interface PushSampleFtOptions {
+export interface PushSampleFloatTimestampOptions {
 	outlet: BoundOutlet
 	sample: number[]
 	timestamp: number
 }
 
-export interface PushSampleStrtOptions {
+export interface PushSampleStringTimestampOptions {
 	outlet: BoundOutlet
 	sample: string[]
 	timestamp: number
@@ -89,6 +89,7 @@ export interface LslChannel {
 	unit: string
 	type: string
 }
+
 export type LslSample = (number | string | undefined)[]
 
 export interface LiblslBindings {
@@ -122,14 +123,14 @@ export interface LiblslBindings {
 	): void
 
 	lsl_local_clock(): number
-	lsl_get_desc(info: BoundStreamInfo): BoundDesc
-	lsl_append_child(desc: BoundDesc, name: string): BoundChild
+	lsl_get_desc(info: BoundStreamInfo): BoundDescription
+	lsl_append_child(desc: BoundDescription, name: string): BoundChild
 	lsl_append_child_value(child: BoundChild, name: string, value: string): void
 }
 
 export interface BoundStreamInfo {}
 export interface BoundOutlet {}
-export interface BoundDesc {}
+export interface BoundDescription {}
 export interface BoundChild {}
 
 export const streamInfo = ref.refType(ref.types.void)

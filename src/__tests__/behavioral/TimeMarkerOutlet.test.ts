@@ -51,7 +51,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 		const markers = [this.generateDurationMarkerValues()]
 		await this.outlet.pushMarkers(markers)
 
-		assert.isEqual(this.fakeLiblsl.pushSampleStrtHitCount, 1)
+		assert.isEqual(this.fakeLiblsl.pushSampleStringTimestampHitCount, 1)
 		assert.isEqual(this.outlet.totalWaitTimeMs, markers[0].durationMs)
 	}
 
@@ -59,7 +59,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 	protected static async pushingTwoMarkersIncrementsHitCountAndWaitTimeTwice() {
 		const markers = await this.pushTotalMarkers(2)
 
-		assert.isEqual(this.fakeLiblsl.pushSampleStrtHitCount, 2)
+		assert.isEqual(this.fakeLiblsl.pushSampleStringTimestampHitCount, 2)
 		assert.isEqual(
 			this.outlet.totalWaitTimeMs,
 			markers[0].durationMs + markers[1].durationMs

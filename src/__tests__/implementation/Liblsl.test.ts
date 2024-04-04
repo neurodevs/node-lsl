@@ -8,7 +8,7 @@ import AbstractSpruceTest, {
 import LiblslImpl from '../../implementations/Liblsl'
 import {
 	BoundChild,
-	BoundDesc,
+	BoundDescription,
 	BoundOutlet,
 	BoundStreamInfo,
 	FloatArray,
@@ -29,21 +29,21 @@ export default class LiblslTest extends AbstractSpruceTest {
 	private static fakeBindings: LiblslBindings
 	private static fakeStreamInfo: BoundStreamInfo
 	private static fakeOutlet: BoundOutlet
-	private static fakeDesc: BoundDesc
+	private static fakeDesc: BoundDescription
 	private static fakeChildNamedChannels: BoundChild
 	private static createStreamInfoParams?: any[]
 	private static appendChildParams: any[] = []
 	private static createOutletParams?: any[]
 	private static destroyOutletParams?: any[]
-	private static pushSampleFtParams?: any[]
-	private static pushSampleStrtParams?: any[]
+	private static pushSampleFloatTimestampParams?: any[]
+	private static pushSampleStringTimestampParams?: any[]
 	private static appendChildValueParams: any[]
 	private static shouldThrowWhenCreatingBindings: boolean
 	private static getDescriptionParams?: [BoundStreamInfo]
 	private static fakeChildNamedChannel: BoundChild
 	private static appendChildHitCount: number
 
-	protected static async beforeEach(): Promise<void> {
+	protected static async beforeEach() {
 		await super.beforeEach()
 
 		delete this.libraryPath
@@ -51,7 +51,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 		delete this.createStreamInfoParams
 		delete this.createOutletParams
 		delete this.destroyOutletParams
-		delete this.pushSampleFtParams
+		delete this.pushSampleFloatTimestampParams
 		delete this.getDescriptionParams
 		this.appendChildParams = []
 		this.appendChildValueParams = []
@@ -138,18 +138,18 @@ export default class LiblslTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async throwsWhenPushSampleFtIsMissingRequiredParams() {
+	protected static async throwsWhenPushSampleFloatTimestampIsMissingRequiredParams() {
 		//@ts-ignore
-		const err = assert.doesThrow(() => this.lsl.pushSampleFt())
+		const err = assert.doesThrow(() => this.lsl.pushSampleFloatTimestamp())
 		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
 			parameters: ['outlet', 'sample', 'timestamp'],
 		})
 	}
 
 	@test()
-	protected static async throwsWhenPushSampleStrtIsMissingRequiredParams() {
+	protected static async throwsWhenPushSampleStringTimestampIsMissingRequiredParams() {
 		//@ts-ignore
-		const err = assert.doesThrow(() => this.lsl.pushSampleFt())
+		const err = assert.doesThrow(() => this.lsl.pushSampleFloatTimestamp())
 		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
 			parameters: ['outlet', 'sample', 'timestamp'],
 		})
@@ -223,10 +223,10 @@ export default class LiblslTest extends AbstractSpruceTest {
 			sample: expected,
 			timestamp,
 		}
-		this.lsl.pushSampleFt(options)
-		assert.isEqual(this.pushSampleFtParams?.[0], this.fakeOutlet)
-		assert.isEqual(this.pushSampleFtParams?.[1], expected)
-		assert.isEqual(this.pushSampleFtParams?.[2], timestamp)
+		this.lsl.pushSampleFloatTimestamp(options)
+		assert.isEqual(this.pushSampleFloatTimestampParams?.[0], this.fakeOutlet)
+		assert.isEqual(this.pushSampleFloatTimestampParams?.[1], expected)
+		assert.isEqual(this.pushSampleFloatTimestampParams?.[2], timestamp)
 	}
 
 	@test()
@@ -238,10 +238,10 @@ export default class LiblslTest extends AbstractSpruceTest {
 			sample: expected,
 			timestamp,
 		}
-		this.lsl.pushSampleStrt(options)
-		assert.isEqual(this.pushSampleStrtParams?.[0], this.fakeOutlet)
-		assert.isEqualDeep(this.pushSampleStrtParams?.[1], expected)
-		assert.isEqual(this.pushSampleStrtParams?.[2], timestamp)
+		this.lsl.pushSampleStringTimestamp(options)
+		assert.isEqual(this.pushSampleStringTimestampParams?.[0], this.fakeOutlet)
+		assert.isEqualDeep(this.pushSampleStringTimestampParams?.[1], expected)
+		assert.isEqual(this.pushSampleStringTimestampParams?.[2], timestamp)
 	}
 
 	@test()
@@ -330,7 +330,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 		return { options, outlet }
 	}
 
-	private static generateRandomChannelValues(): LslChannel {
+	private static generateRandomChannelValues() {
 		return {
 			label: generateId(),
 			type: generateId(),
@@ -349,7 +349,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 		}
 	}
 
-	private static FakeBindings(): LiblslBindings {
+	private static FakeBindings() {
 		return {
 			lsl_create_streaminfo: (...params: any[]) => {
 				this.createStreamInfoParams = params
@@ -363,10 +363,10 @@ export default class LiblslTest extends AbstractSpruceTest {
 				this.destroyOutletParams = params
 			},
 			lsl_push_sample_ft: (...params: any[]) => {
-				this.pushSampleFtParams = params
+				this.pushSampleFloatTimestampParams = params
 			},
 			lsl_push_sample_strt: (...params: any[]) => {
-				this.pushSampleStrtParams = params
+				this.pushSampleStringTimestampParams = params
 			},
 			lsl_local_clock: () => new Date().getTime(),
 			lsl_get_desc: (info: BoundStreamInfo) => {

@@ -7,10 +7,10 @@ export default class MockTimeMarkerOutlet implements TimeMarkerOutlet {
 	private didPushSamples = false
 	private pushedSamples?: LslSample[]
 
-	public stop(): void {}
-	public destroy(): void {}
+	public stop() {}
+	public destroy() {}
 
-	public pushSample(sample: LslSample): void {
+	public pushSample(sample: LslSample) {
 		if (!this.didPushSamples) {
 			this.didPushSamples = true
 			this.pushedSamples = []
@@ -18,7 +18,7 @@ export default class MockTimeMarkerOutlet implements TimeMarkerOutlet {
 		this.pushedSamples?.push(sample)
 	}
 
-	public async pushMarkers(markers: DurationMarker[]): Promise<void> {
+	public async pushMarkers(markers: DurationMarker[]) {
 		this.didPushMarkers = true
 		this.pushedMarkers = markers
 	}

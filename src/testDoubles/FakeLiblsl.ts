@@ -4,8 +4,8 @@ import {
 	CreateStreamInfoOptions,
 	AppendChannelsToStreamInfoOptions,
 	CreateOutletOptions,
-	PushSampleFtOptions,
-	PushSampleStrtOptions,
+	PushSampleFloatTimestampOptions,
+	PushSampleStringTimestampOptions,
 	Liblsl,
 } from '../nodeLsl.types'
 
@@ -16,15 +16,15 @@ export default class FakeLiblsl implements Liblsl {
 	public lastCreateStreamInfoOptions?: CreateStreamInfoOptions
 	public lastAppendChannelsToStreamInfoOptions?: AppendChannelsToStreamInfoOptions
 	public lastCreateOutletOptions?: CreateOutletOptions
-	public lastPushSampleFtOptions?: PushSampleFtOptions
-	public lastPushSampleStrtOptions?: PushSampleStrtOptions
+	public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
+	public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
 
 	public createStreamInfoHitCount = 0
 	public destroyOutletHitCount = 0
 	public localClockHitCount = 0
-	public pushSampleStrtHitCount = 0
+	public pushSampleStringTimestampHitCount = 0
 
-	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
+	public createStreamInfo(options: CreateStreamInfoOptions) {
 		this.createStreamInfoHitCount++
 		this.lastCreateStreamInfoOptions = options
 		return this.streamInfo
@@ -36,7 +36,7 @@ export default class FakeLiblsl implements Liblsl {
 		this.lastAppendChannelsToStreamInfoOptions = options
 	}
 
-	public createOutlet(options: CreateOutletOptions): BoundOutlet {
+	public createOutlet(options: CreateOutletOptions) {
 		this.lastCreateOutletOptions = options
 		return this.outlet
 	}
@@ -45,13 +45,13 @@ export default class FakeLiblsl implements Liblsl {
 		this.destroyOutletHitCount++
 	}
 
-	public pushSampleFt(options: PushSampleFtOptions) {
-		this.lastPushSampleFtOptions = options
+	public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
+		this.lastPushSampleFloatTimestampOptions = options
 	}
 
-	public pushSampleStrt(options: PushSampleStrtOptions) {
-		this.lastPushSampleStrtOptions = options
-		this.pushSampleStrtHitCount++
+	public pushSampleStringTimestamp(options: PushSampleStringTimestampOptions) {
+		this.lastPushSampleStringTimestampOptions = options
+		this.pushSampleStringTimestampHitCount++
 	}
 
 	public localClock() {

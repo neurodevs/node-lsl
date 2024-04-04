@@ -112,16 +112,21 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		outlet.pushSample(sample)
 
 		assert.isEqual(
-			this.fakeLiblsl.lastPushSampleFtOptions?.outlet,
+			this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.outlet,
 			this.fakeLiblsl.outlet
 		)
-		assert.isEqualDeep(this.fakeLiblsl.lastPushSampleFtOptions?.sample, sample)
+		assert.isEqualDeep(
+			this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.sample,
+			sample
+		)
 		assert.isEqualDeep(this.fakeLiblsl.lastCreateOutletOptions, {
 			info: this.fakeLiblsl.streamInfo,
 			chunkSize: this.randomOutletOptions.chunkSize,
 			maxBuffered: this.randomOutletOptions.maxBuffered,
 		})
-		assert.isNumber(this.fakeLiblsl.lastPushSampleFtOptions?.timestamp)
+		assert.isNumber(
+			this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.timestamp
+		)
 	}
 
 	@test()
@@ -132,14 +137,16 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		outlet.pushSample(sample)
 
 		assert.isEqual(
-			this.fakeLiblsl.lastPushSampleStrtOptions?.outlet,
+			this.fakeLiblsl.lastPushSampleStringTimestampOptions?.outlet,
 			this.fakeLiblsl.outlet
 		)
 		assert.isEqualDeep(
-			this.fakeLiblsl.lastPushSampleStrtOptions?.sample,
+			this.fakeLiblsl.lastPushSampleStringTimestampOptions?.sample,
 			sample
 		)
-		assert.isNumber(this.fakeLiblsl.lastPushSampleStrtOptions?.timestamp)
+		assert.isNumber(
+			this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestamp
+		)
 	}
 
 	@test()
@@ -148,12 +155,12 @@ export default class LslOutletTest extends AbstractSpruceTest {
 		const sample = [generateId()]
 
 		outlet.pushSample(sample)
-		const t1 = this.fakeLiblsl.lastPushSampleStrtOptions?.timestamp
+		const t1 = this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestamp
 
 		await this.wait(10)
 
 		outlet.pushSample(sample)
-		const t2 = this.fakeLiblsl.lastPushSampleStrtOptions?.timestamp
+		const t2 = this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestamp
 
 		assert.isNotEqual(t1, t2)
 		assert.isEqual(this.fakeLiblsl.localClockHitCount, 2)

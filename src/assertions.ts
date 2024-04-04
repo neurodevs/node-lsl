@@ -8,7 +8,7 @@ import {
 	isStringInArray,
 } from './validations'
 
-export function assertValidMaxBuffered(maxBuffered: number): void {
+export function assertValidMaxBuffered(maxBuffered: number) {
 	if (!isPositiveIntegerOrZero(maxBuffered)) {
 		throw new SchemaError({
 			code: 'INVALID_PARAMETERS',
@@ -18,7 +18,7 @@ export function assertValidMaxBuffered(maxBuffered: number): void {
 	}
 }
 
-export function assertValidChunkSize(chunkSize: number): void {
+export function assertValidChunkSize(chunkSize: number) {
 	if (!isPositiveIntegerOrZero(chunkSize)) {
 		throw new SchemaError({
 			code: 'INVALID_PARAMETERS',
@@ -28,7 +28,7 @@ export function assertValidChunkSize(chunkSize: number): void {
 	}
 }
 
-export function assertValidChannelFormat(channelFormat: ChannelFormat): void {
+export function assertValidChannelFormat(channelFormat: ChannelFormat) {
 	if (!isStringInArray(channelFormat, CHANNEL_FORMATS)) {
 		throw new SchemaError({
 			code: 'INVALID_PARAMETERS',
@@ -38,7 +38,7 @@ export function assertValidChannelFormat(channelFormat: ChannelFormat): void {
 	}
 }
 
-export function assertValidSampleRate(sampleRate: number): void {
+export function assertValidSampleRate(sampleRate: number) {
 	if (!isGreaterThanOrEqualToZero(sampleRate)) {
 		throw new SchemaError({
 			code: 'INVALID_PARAMETERS',
@@ -48,7 +48,7 @@ export function assertValidSampleRate(sampleRate: number): void {
 	}
 }
 
-export function assertValidChannelCount(channelCount: number): void {
+export function assertValidChannelCount(channelCount: number) {
 	if (!isPositiveInteger(channelCount)) {
 		throw new SchemaError({
 			code: 'INVALID_PARAMETERS',

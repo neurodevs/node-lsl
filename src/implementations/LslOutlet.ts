@@ -25,7 +25,7 @@ export default class LslOutletImpl implements LslOutlet {
 	private outlet: BoundOutlet
 	private pushSampleByType: (options: any) => void
 
-	public static Outlet(options: LslOutletOptions): LslOutlet {
+	public static Outlet(options: LslOutletOptions) {
 		return new (this.Class ?? this)(options)
 	}
 
@@ -84,11 +84,11 @@ export default class LslOutletImpl implements LslOutlet {
 		this.pushSampleByType = this.lsl[pushMethod].bind(this.lsl)
 	}
 
-	public destroy(): void {
+	public destroy() {
 		this.lsl.destroyOutlet({ outlet: this.outlet })
 	}
 
-	public pushSample(sample: LslSample): void {
+	public pushSample(sample: LslSample) {
 		const timestamp = this.lsl.localClock()
 
 		this.pushSampleByType({
@@ -98,12 +98,12 @@ export default class LslOutletImpl implements LslOutlet {
 		})
 	}
 
-	private getPushMethod(): keyof Liblsl {
+	private getPushMethod() {
 		const channelFormat = this.options.channelFormat
 
 		const methodMap: Record<string, keyof Liblsl> = {
-			float32: 'pushSampleFt',
-			string: 'pushSampleStrt',
+			float32: 'pushSampleFloatTimestamp',
+			string: 'pushSampleStringTimestamp',
 		}
 
 		if (!(channelFormat in methodMap)) {
@@ -114,11 +114,11 @@ export default class LslOutletImpl implements LslOutlet {
 		return methodMap[channelFormat]
 	}
 
-	private lookupChannelFormat(channelFormat: ChannelFormat): number {
+	private lookupChannelFormat(channelFormat: ChannelFormat) {
 		return CHANNEL_FORMATS_MAP[channelFormat]
 	}
 
-	private get lsl(): Liblsl {
+	private get lsl() {
 		return LiblslImpl.getInstance()
 	}
 }
