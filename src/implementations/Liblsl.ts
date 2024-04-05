@@ -1,14 +1,8 @@
 import { assertOptions } from '@sprucelabs/schema'
-import ffi from 'ffi-napi'
+import { DataType, load, open } from 'ffi-rs'
 import SpruceError from '../errors/SpruceError'
 import {
 	Liblsl,
-	LiblslBindings,
-	streamInfo,
-	outletType,
-	FloatArray,
-	StringArray,
-	xmlPtr,
 	CreateStreamInfoOptions,
 	BoundStreamInfo,
 	AppendChannelsToStreamInfoOptions,
@@ -17,12 +11,13 @@ import {
 	DestroyOutletOptions,
 	PushSampleFtOptions,
 	PushSampleStrtOptions,
+	streamInfo,
 } from '../nodeLsl.types'
 
 export default class LiblslImpl implements Liblsl {
 	private static instance?: Liblsl
-	public static ffi = ffi
-	private bindings: LiblslBindings
+	public static ffi = {}
+	private bindings: any
 
 	public static getInstance(): Liblsl {
 		if (!this.instance) {
@@ -47,6 +42,7 @@ export default class LiblslImpl implements Liblsl {
 		}
 
 		try {
+			console.log('test')
 			this.bindings = this.loadBindings(path)
 		} catch {
 			throw new SpruceError({
@@ -57,21 +53,93 @@ export default class LiblslImpl implements Liblsl {
 	}
 
 	private loadBindings(path: string) {
+		open({
+			library: 'liblsl',
+			path,
+		})
+		//debugger
+
+		const lsl_create_streaminfo = (
+			options: CreateStreamInfoOptions
+		): streamInfo | null => {
+			const { name, type, channelCount, sampleRate, channelFormat, sourceId } =
+				options
+
+			// Check if required options are provided
+			// if (
+			// 	!name ||
+			// 	!type ||
+			// 	!channelCount ||
+			// 	!sampleRate ||
+			// 	!channelFormat ||
+			// 	!sourceId
+			// ) {
+			// 	debugger
+			// 	console.error(
+			// 		'Error: Missing required options for lsl_create_streaminfo'
+			// 	)
+			// 	return null
+			// }
+
+			try {
+				debugger
+				const result = load({
+					library: 'liblsl',
+					funcName: 'lsl_create_streaminfo',
+					retType: streamInfo,
+					paramsType: [
+						DataType.String,
+						DataType.String,
+						DataType.I32,
+						DataType.Double,
+						DataType.I32,
+						DataType.String,
+					],
+					paramsValue: [
+						name,
+						type,
+						channelCount,
+						sampleRate,
+						channelFormat,
+						sourceId,
+					],
+				})
+				debugger
+				return result
+			} catch (error) {
+				debugger
+				console.error('Error in lsl_create_streaminfo:', error)
+				return null
+			}
+		}
+
+		return {
+			lsl_create_streaminfo,
+			lsl_create_outlet() {},
+			lsl_destroy_outlet() {},
+			lsl_local_clock() {},
+			lsl_push_sample_ft() {},
+			lsl_push_sample_strt() {},
+			lsl_get_desc() {},
+			lsl_append_child() {},
+			lsl_append_child_value() {},
+		}
+
 		//@ts-ignore
-		return LiblslImpl.ffi.Library(path!, {
-			lsl_create_streaminfo: [
-				streamInfo,
-				['string', 'string', 'int', 'double', 'int', 'string'],
-			],
-			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
-			lsl_destroy_outlet: ['void', [outletType]],
-			lsl_local_clock: ['double', []],
-			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
-			lsl_push_sample_strt: ['void', [outletType, StringArray, 'double']],
-			lsl_get_desc: [xmlPtr, [streamInfo]],
-			lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
-			lsl_append_child_value: [xmlPtr, [xmlPtr, 'string', 'string']],
-		}) as LiblslBindings
+		// return LiblslImpl.ffi.Library(path!, {
+		// 	lsl_create_streaminfo: [
+		// 		streamInfo,
+		// 		['string', 'string', 'int', 'double', 'int', 'string'],
+		// 	],
+		// 	lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
+		// 	lsl_destroy_outlet: ['void', [outletType]],
+		// 	lsl_local_clock: ['double', []],
+		// 	lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
+		// 	lsl_push_sample_strt: ['void', [outletType, StringArray, 'double']],
+		// 	lsl_get_desc: [xmlPtr, [streamInfo]],
+		// 	lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
+		// 	lsl_append_child_value: [xmlPtr, [xmlPtr, 'string', 'string']],
+		// }) as LiblslBindings
 	}
 
 	public createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo {
@@ -85,14 +153,7 @@ export default class LiblslImpl implements Liblsl {
 				'sourceId',
 			])
 
-		return this.bindings.lsl_create_streaminfo(
-			name,
-			type,
-			channelCount,
-			sampleRate,
-			channelFormat,
-			sourceId
-		)
+		return this.bindings.lsl_create_streaminfo(options)
 	}
 
 	public appendChannelsToStreamInfo(

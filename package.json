@@ -75,9 +75,8 @@
     "@sprucelabs/schema": "^29.4.43",
     "@sprucelabs/spruce-core-schemas": "^39.0.277",
     "@sprucelabs/spruce-skill-utils": "^30.4.10",
-    "ffi-napi": "^4.0.3",
+    "ffi-rs": "^1.0.52",
     "node-gyp": "^10.1.0",
-    "ref-array-napi": "^1.2.2",
     "ref-napi": "^3.0.3"
   }
 }

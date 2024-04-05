@@ -1,5 +1,4 @@
-import ArrayType from 'ref-array-napi'
-import ref from 'ref-napi'
+import { DataType } from 'ffi-rs'
 import { CHANNEL_FORMATS } from './consts'
 
 export interface LslOutlet {
@@ -132,8 +131,8 @@ export interface BoundOutlet {}
 export interface BoundDesc {}
 export interface BoundChild {}
 
-export const streamInfo = ref.refType(ref.types.void)
-export const outletType = ref.refType(ref.types.void)
-export const FloatArray = ArrayType(ref.types.float)
-export const StringArray = ArrayType(ref.types.CString)
-export const xmlPtr = ref.refType(ref.types.void)
+export const streamInfo = DataType.External
+export const outletType = {}
+export const FloatArray = {}
+export const StringArray = {}
+export const xmlPtr = {}
