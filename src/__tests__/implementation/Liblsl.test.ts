@@ -5,20 +5,17 @@ import AbstractSpruceTest, {
 	errorAssert,
 	generateId,
 } from '@sprucelabs/test-utils'
+import { DataType, OpenParams } from 'ffi-rs'
 import LiblslImpl from '../../implementations/Liblsl'
 import {
 	BoundChild,
 	BoundDescription,
 	BoundOutlet,
 	BoundStreamInfo,
-	FloatArray,
+	FfiRsDefineOptions,
 	Liblsl,
 	LiblslBindings,
 	LslChannel,
-	StringArray,
-	outletType,
-	streamInfo,
-	xmlPtr,
 } from '../../nodeLsl.types'
 import FakeLiblsl from '../../testDoubles/FakeLiblsl'
 
@@ -42,6 +39,8 @@ export default class LiblslTest extends AbstractSpruceTest {
 	private static getDescriptionParams?: [BoundStreamInfo]
 	private static fakeChildNamedChannel: BoundChild
 	private static appendChildHitCount: number
+	private static ffiRsOpenOptions?: OpenParams
+	private static ffiRsDefineOptions: FfiRsDefineOptions
 
 	protected static async beforeEach() {
 		await super.beforeEach()
@@ -69,16 +68,17 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 		this.appendChildHitCount = 0
 
-		LiblslImpl.ffi = {
-			//@ts-ignore
-			Library: (path: string, options: Record<string, any>) => {
-				this.libraryPath = path
-				this.libraryOptions = options
-				if (this.shouldThrowWhenCreatingBindings) {
-					throw new Error('Failed to create bindings!')
-				}
-				return this.fakeBindings
-			},
+		delete this.ffiRsOpenOptions
+		LiblslImpl.ffiRsOpen = (options) => {
+			this.ffiRsOpenOptions = options
+		}
+
+		LiblslImpl.ffiRsDefine = (options) => {
+			this.ffiRsDefineOptions = options
+			if (this.shouldThrowWhenCreatingBindings) {
+				throw new Error('Failed to create bindings!')
+			}
+			return this.fakeBindings as any
 		}
 
 		LiblslImpl.resetInstance()
@@ -100,6 +100,14 @@ export default class LiblslTest extends AbstractSpruceTest {
 		const err = assert.doesThrow(() => new LiblslImpl())
 		errorAssert.assertError(err, 'FAILED_TO_LOAD_LIBLSL', {
 			liblslPath: process.env.LIBLSL_PATH,
+		})
+	}
+
+	@test()
+	protected static async callsOpenOnFfRs() {
+		assert.isEqualDeep(this.ffiRsOpenOptions, {
+			library: 'lsl',
+			path: process.env.LIBLSL_PATH,
 		})
 	}
 
@@ -174,28 +182,61 @@ export default class LiblslTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async createsExpectedBindingsToLiblsl() {
-		process.env.LIBLSL_PATH = generateId()
-		new LiblslImpl()
-		assert.isEqual(this.libraryPath, process.env.LIBLSL_PATH)
-		const expected = {
-			lsl_create_streaminfo: [
-				streamInfo,
-				['string', 'string', 'int', 'double', 'int', 'string'],
-			],
-			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
-			lsl_destroy_outlet: ['void', [outletType]],
-			lsl_local_clock: ['double', []],
-			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
-			lsl_push_sample_strt: ['void', [outletType, StringArray, 'double']],
-			lsl_get_desc: [xmlPtr, [streamInfo]],
-			lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
-			lsl_append_child_value: [xmlPtr, [xmlPtr, 'string', 'string']],
-		}
-		assert.isEqual(
-			JSON.stringify(this.libraryOptions),
-			JSON.stringify(expected)
-		)
+	protected static async createsExpectedBindingsWithFfiRs() {
+		assert.isEqualDeep(this.ffiRsDefineOptions, {
+			lsl_create_streaminfo: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [
+					DataType.String,
+					DataType.String,
+					DataType.I32,
+					DataType.Double,
+					DataType.I32,
+					DataType.String,
+				],
+			},
+			lsl_create_outlet: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [DataType.External, DataType.I32, DataType.I32],
+			},
+			lsl_destroy_outlet: {
+				library: 'lsl',
+				retType: DataType.Void,
+				paramsType: [DataType.External],
+			},
+			lsl_local_clock: {
+				library: 'lsl',
+				retType: DataType.Double,
+				paramsType: [],
+			},
+			lsl_push_sample_ft: {
+				library: 'lsl',
+				retType: DataType.Void,
+				paramsType: [DataType.External, DataType.DoubleArray, DataType.Double],
+			},
+			lsl_push_sample_strt: {
+				library: 'lsl',
+				retType: DataType.Void,
+				paramsType: [DataType.External, DataType.StringArray, DataType.Double],
+			},
+			lsl_get_desc: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [DataType.External],
+			},
+			lsl_append_child: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [DataType.External, DataType.String],
+			},
+			lsl_append_child_value: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [DataType.External, DataType.String, DataType.String],
+			},
+		})
 	}
 
 	@test()

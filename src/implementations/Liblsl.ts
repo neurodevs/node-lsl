@@ -1,14 +1,9 @@
 import { assertOptions } from '@sprucelabs/schema'
-import ffi from 'ffi-napi'
+import { DataType, define, open } from 'ffi-rs'
 import SpruceError from '../errors/SpruceError'
 import {
 	Liblsl,
 	LiblslBindings,
-	streamInfo,
-	outletType,
-	FloatArray,
-	StringArray,
-	xmlPtr,
 	CreateStreamInfoOptions,
 	AppendChannelsToStreamInfoOptions,
 	CreateOutletOptions,
@@ -19,7 +14,9 @@ import {
 
 export default class LiblslImpl implements Liblsl {
 	private static instance?: Liblsl
-	public static ffi = ffi
+	public static ffiRsOpen = open
+	public static ffiRsDefine = define
+
 	private bindings: LiblslBindings
 
 	public static getInstance() {
@@ -54,21 +51,66 @@ export default class LiblslImpl implements Liblsl {
 		}
 	}
 
-	private loadBindings(path: string) {
-		return LiblslImpl.ffi.Library(path!, {
-			lsl_create_streaminfo: [
-				streamInfo,
-				['string', 'string', 'int', 'double', 'int', 'string'],
-			],
-			lsl_create_outlet: [outletType, [streamInfo, 'int', 'int']],
-			lsl_destroy_outlet: ['void', [outletType]],
-			lsl_local_clock: ['double', []],
-			lsl_push_sample_ft: ['void', [outletType, FloatArray, 'double']],
-			lsl_push_sample_strt: ['void', [outletType, StringArray, 'double']],
-			lsl_get_desc: [xmlPtr, [streamInfo]],
-			lsl_append_child: [xmlPtr, [xmlPtr, 'string']],
-			lsl_append_child_value: [xmlPtr, [xmlPtr, 'string', 'string']],
-		}) as LiblslBindings
+	private loadBindings(liblslPath: string) {
+		LiblslImpl.ffiRsOpen({
+			library: 'lsl',
+			path: liblslPath,
+		})
+
+		return LiblslImpl.ffiRsDefine({
+			lsl_create_streaminfo: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [
+					DataType.String,
+					DataType.String,
+					DataType.I32,
+					DataType.Double,
+					DataType.I32,
+					DataType.String,
+				],
+			},
+			lsl_create_outlet: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [DataType.External, DataType.I32, DataType.I32],
+			},
+			lsl_destroy_outlet: {
+				library: 'lsl',
+				retType: DataType.Void,
+				paramsType: [DataType.External],
+			},
+			lsl_local_clock: {
+				library: 'lsl',
+				retType: DataType.Double,
+				paramsType: [],
+			},
+			lsl_push_sample_ft: {
+				library: 'lsl',
+				retType: DataType.Void,
+				paramsType: [DataType.External, DataType.DoubleArray, DataType.Double],
+			},
+			lsl_push_sample_strt: {
+				library: 'lsl',
+				retType: DataType.Void,
+				paramsType: [DataType.External, DataType.StringArray, DataType.Double],
+			},
+			lsl_get_desc: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [DataType.External],
+			},
+			lsl_append_child: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [DataType.External, DataType.String],
+			},
+			lsl_append_child_value: {
+				library: 'lsl',
+				retType: DataType.External,
+				paramsType: [DataType.External, DataType.String, DataType.String],
+			},
+		}) as unknown as LiblslBindings
 	}
 
 	public createStreamInfo(options: CreateStreamInfoOptions) {
