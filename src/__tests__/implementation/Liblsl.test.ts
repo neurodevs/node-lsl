@@ -104,7 +104,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async callsOpenOnFfRs() {
+	protected static async callsOpenOnFfiRs() {
 		assert.isEqualDeep(this.ffiRsOpenOptions, {
 			library: 'lsl',
 			path: process.env.LIBLSL_PATH,
@@ -265,9 +265,12 @@ export default class LiblslTest extends AbstractSpruceTest {
 			timestamp,
 		}
 		this.lsl.pushSampleFloatTimestamp(options)
-		assert.isEqual(this.pushSampleFloatTimestampParams?.[0], this.fakeOutlet)
-		assert.isEqual(this.pushSampleFloatTimestampParams?.[1], expected)
-		assert.isEqual(this.pushSampleFloatTimestampParams?.[2], timestamp)
+
+		assert.isEqualDeep(this.pushSampleFloatTimestampParams, [
+			this.fakeOutlet,
+			expected,
+			timestamp,
+		])
 	}
 
 	@test()
@@ -294,7 +297,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 			info,
 			channels: [channel],
 		})
-		assert.isEqual(this.getDescriptionParams?.[0], info)
+		assert.isEqualDeep(this.getDescriptionParams?.[0], [info])
 
 		assert.isEqual(this.appendChildParams?.[0][0], this.fakeDesc)
 		assert.isEqual(this.appendChildParams?.[0][1], 'channels')
@@ -392,21 +395,21 @@ export default class LiblslTest extends AbstractSpruceTest {
 
 	private static FakeBindings() {
 		return {
-			lsl_create_streaminfo: (...params: any[]) => {
+			lsl_create_streaminfo: (params: any[]) => {
 				this.createStreamInfoParams = params
 				return this.fakeStreamInfo
 			},
-			lsl_create_outlet: (...params: any[]) => {
+			lsl_create_outlet: (params: any[]) => {
 				this.createOutletParams = params
 				return this.fakeOutlet
 			},
-			lsl_destroy_outlet: (...params: any[]) => {
+			lsl_destroy_outlet: (params: any[]) => {
 				this.destroyOutletParams = params
 			},
-			lsl_push_sample_ft: (...params: any[]) => {
+			lsl_push_sample_ft: (params: any[]) => {
 				this.pushSampleFloatTimestampParams = params
 			},
-			lsl_push_sample_strt: (...params: any[]) => {
+			lsl_push_sample_strt: (params: any[]) => {
 				this.pushSampleStringTimestampParams = params
 			},
 			lsl_local_clock: () => new Date().getTime(),
@@ -414,7 +417,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 				this.getDescriptionParams = [info]
 				return this.fakeDesc
 			},
-			lsl_append_child: (...params: any) => {
+			lsl_append_child: (params: any) => {
 				this.appendChildParams.push(params)
 				if (this.appendChildHitCount === 0) {
 					this.appendChildHitCount++
@@ -422,7 +425,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 				}
 				return this.fakeChildNamedChannel
 			},
-			lsl_append_child_value: (...params: any[]) => {
+			lsl_append_child_value: (params: any[]) => {
 				this.appendChildValueParams.push(params)
 			},
 		}

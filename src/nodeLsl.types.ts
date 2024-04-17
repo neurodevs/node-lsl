@@ -93,38 +93,21 @@ export type LslSample = (number | string | undefined)[]
 
 export interface LiblslBindings {
 	lsl_create_streaminfo(
-		name: string,
-		type: string,
-		channelCount: number,
-		sampleRate: number,
-		channelFormat: number,
-		sourceId: string
+		options: [string, string, number, number, number, string]
 	): BoundStreamInfo
 
-	lsl_create_outlet(
-		info: BoundStreamInfo,
-		chunkSize: number,
-		maxBuffered: number
-	): BoundOutlet
+	lsl_create_outlet(options: [BoundStreamInfo, number, number]): BoundOutlet
 
-	lsl_destroy_outlet(outlet: BoundOutlet): void
+	lsl_destroy_outlet(outlet: [BoundOutlet]): void
 
-	lsl_push_sample_ft(
-		outlet: BoundOutlet,
-		sample: LslSample,
-		timestamp: number
-	): void
+	lsl_push_sample_ft(options: [BoundOutlet, LslSample, number]): void
 
-	lsl_push_sample_strt(
-		outlet: BoundOutlet,
-		sample: LslSample,
-		timestamp: number
-	): void
+	lsl_push_sample_strt(options: [BoundOutlet, LslSample, number]): void
 
 	lsl_local_clock(): number
-	lsl_get_desc(info: BoundStreamInfo): BoundDescription
-	lsl_append_child(desc: BoundDescription, name: string): BoundChild
-	lsl_append_child_value(child: BoundChild, name: string, value: string): void
+	lsl_get_desc(info: [BoundStreamInfo]): BoundDescription
+	lsl_append_child(options: [BoundDescription, string]): BoundChild
+	lsl_append_child_value(options: [BoundChild, string, string]): void
 }
 
 export interface BoundStreamInfo {}

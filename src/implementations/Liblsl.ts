@@ -124,14 +124,14 @@ export default class LiblslImpl implements Liblsl {
 				'sourceId',
 			])
 
-		return this.bindings.lsl_create_streaminfo(
+		return this.bindings.lsl_create_streaminfo([
 			name,
 			type,
 			channelCount,
 			sampleRate,
 			channelFormat,
-			sourceId
-		)
+			sourceId,
+		])
 	}
 
 	public appendChannelsToStreamInfo(
@@ -139,14 +139,14 @@ export default class LiblslImpl implements Liblsl {
 	) {
 		const { info, channels } = assertOptions(options, ['info', 'channels'])
 
-		const description = this.bindings.lsl_get_desc(info)
-		const parent = this.bindings.lsl_append_child(description, 'channels')
+		const description = this.bindings.lsl_get_desc([info])
+		const parent = this.bindings.lsl_append_child([description, 'channels'])
 
 		for (const channel of channels) {
-			const child = this.bindings.lsl_append_child(parent, 'channel')
-			this.bindings.lsl_append_child_value(child, 'label', channel.label)
-			this.bindings.lsl_append_child_value(child, 'unit', channel.unit)
-			this.bindings.lsl_append_child_value(child, 'type', channel.type)
+			const child = this.bindings.lsl_append_child([parent, 'channel'])
+			this.bindings.lsl_append_child_value([child, 'label', channel.label])
+			this.bindings.lsl_append_child_value([child, 'unit', channel.unit])
+			this.bindings.lsl_append_child_value([child, 'type', channel.type])
 		}
 	}
 
@@ -157,12 +157,12 @@ export default class LiblslImpl implements Liblsl {
 			'maxBuffered',
 		])
 
-		return this.bindings.lsl_create_outlet(info, chunkSize, maxBuffered)
+		return this.bindings.lsl_create_outlet([info, chunkSize, maxBuffered])
 	}
 
 	public destroyOutlet(options: DestroyOutletOptions) {
 		const { outlet } = assertOptions(options, ['outlet'])
-		this.bindings.lsl_destroy_outlet(outlet)
+		this.bindings.lsl_destroy_outlet([outlet])
 	}
 
 	public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
@@ -171,7 +171,7 @@ export default class LiblslImpl implements Liblsl {
 			'sample',
 			'timestamp',
 		])
-		this.bindings.lsl_push_sample_ft(outlet, sample, timestamp)
+		this.bindings.lsl_push_sample_ft([outlet, sample, timestamp])
 	}
 
 	public pushSampleStringTimestamp(options: PushSampleStringTimestampOptions) {
@@ -180,7 +180,7 @@ export default class LiblslImpl implements Liblsl {
 			'sample',
 			'timestamp',
 		])
-		this.bindings.lsl_push_sample_strt(outlet, sample, timestamp)
+		this.bindings.lsl_push_sample_strt([outlet, sample, timestamp])
 	}
 
 	public localClock() {
