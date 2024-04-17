@@ -34,7 +34,7 @@ export default class LiblslImpl implements Liblsl {
 		delete this.instance
 	}
 
-	public constructor() {
+	protected constructor() {
 		const path = process.env.LIBLSL_PATH!
 
 		if (!path) {
