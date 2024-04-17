@@ -32,6 +32,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 	private static appendChildParams: any[] = []
 	private static createOutletParams?: any[]
 	private static destroyOutletParams?: any[]
+	private static localClockParams?: any[]
 	private static pushSampleFloatTimestampParams?: any[]
 	private static pushSampleStringTimestampParams?: any[]
 	private static appendChildValueParams: any[]
@@ -362,6 +363,13 @@ export default class LiblslTest extends AbstractSpruceTest {
 		assert.isNotEqual(t1, t2)
 	}
 
+	@test()
+	protected static async localClockBindingReceivesEmptyArray() {
+		delete this.localClockParams
+		this.lsl.localClock()
+		assert.isEqualDeep(this.localClockParams, [])
+	}
+
 	private static createRandomStreamInfo() {
 		return this.lsl.createStreamInfo(
 			this.generateRandomCreateStreamInfoOptions()
@@ -417,7 +425,10 @@ export default class LiblslTest extends AbstractSpruceTest {
 			lsl_push_sample_strt: (params: any[]) => {
 				this.pushSampleStringTimestampParams = params
 			},
-			lsl_local_clock: () => new Date().getTime(),
+			lsl_local_clock: (params: []) => {
+				this.localClockParams = params
+				return new Date().getTime()
+			},
 			lsl_get_desc: (info: BoundStreamInfo) => {
 				this.getDescriptionParams = [info]
 				return this.fakeDesc

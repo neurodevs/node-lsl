@@ -184,6 +184,6 @@ export default class LiblslImpl implements Liblsl {
 	}
 
 	public localClock() {
-		return this.bindings.lsl_local_clock()
+		return this.bindings.lsl_local_clock([])
 	}
 }

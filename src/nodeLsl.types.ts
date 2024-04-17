@@ -104,7 +104,7 @@ export interface LiblslBindings {
 
 	lsl_push_sample_strt(options: [BoundOutlet, LslSample, number]): void
 
-	lsl_local_clock(): number
+	lsl_local_clock(options: []): number
 	lsl_get_desc(info: [BoundStreamInfo]): BoundDescription
 	lsl_append_child(options: [BoundDescription, string]): BoundChild
 	lsl_append_child_value(options: [BoundChild, string, string]): void
