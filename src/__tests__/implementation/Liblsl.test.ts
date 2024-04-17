@@ -88,7 +88,9 @@ export default class LiblslTest extends AbstractSpruceTest {
 	@test()
 	protected static async throwsWithMissingEnv() {
 		delete process.env.LIBLSL_PATH
-		const err = assert.doesThrow(() => new LiblslImpl())
+		LiblslImpl.resetInstance()
+
+		const err = assert.doesThrow(() => LiblslImpl.getInstance())
 		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
 			parameters: ['env.LIBLSL_PATH'],
 		})
@@ -97,7 +99,9 @@ export default class LiblslTest extends AbstractSpruceTest {
 	@test()
 	protected static async throwsWhenBindingsFailToLoad() {
 		this.shouldThrowWhenCreatingBindings = true
-		const err = assert.doesThrow(() => new LiblslImpl())
+		LiblslImpl.resetInstance()
+
+		const err = assert.doesThrow(() => LiblslImpl.getInstance())
 		errorAssert.assertError(err, 'FAILED_TO_LOAD_LIBLSL', {
 			liblslPath: process.env.LIBLSL_PATH,
 		})
@@ -166,6 +170,7 @@ export default class LiblslTest extends AbstractSpruceTest {
 	@test()
 	protected static async worksAsASingleton() {
 		const liblsl = LiblslImpl.getInstance()
+		//@ts-ignore
 		assert.isInstanceOf(liblsl, LiblslImpl)
 	}
 
