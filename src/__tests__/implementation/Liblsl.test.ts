@@ -1,449 +1,472 @@
 import { randomInt } from 'crypto'
 import AbstractSpruceTest, {
-	test,
-	assert,
-	errorAssert,
-	generateId,
+    test,
+    assert,
+    errorAssert,
+    generateId,
 } from '@sprucelabs/test-utils'
 import { DataType, OpenParams } from 'ffi-rs'
 import LiblslImpl from '../../implementations/Liblsl'
 import {
-	BoundChild,
-	BoundDescription,
-	BoundOutlet,
-	BoundStreamInfo,
-	FfiRsDefineOptions,
-	Liblsl,
-	LiblslBindings,
-	LslChannel,
+    BoundChild,
+    BoundDescription,
+    BoundOutlet,
+    BoundStreamInfo,
+    FfiRsDefineOptions,
+    Liblsl,
+    LiblslBindings,
+    LslChannel,
 } from '../../nodeLsl.types'
 import FakeLiblsl from '../../testDoubles/FakeLiblsl'
 
 export default class LiblslTest extends AbstractSpruceTest {
-	private static lsl: Liblsl
-	private static libraryPath?: string
-	private static libraryOptions?: Record<string, any>
-	private static fakeBindings: LiblslBindings
-	private static fakeStreamInfo: BoundStreamInfo
-	private static fakeOutlet: BoundOutlet
-	private static fakeDesc: BoundDescription
-	private static fakeChildNamedChannels: BoundChild
-	private static createStreamInfoParams?: any[]
-	private static appendChildParams: any[] = []
-	private static createOutletParams?: any[]
-	private static destroyOutletParams?: any[]
-	private static localClockParams?: any[]
-	private static pushSampleFloatTimestampParams?: any[]
-	private static pushSampleStringTimestampParams?: any[]
-	private static appendChildValueParams: any[]
-	private static shouldThrowWhenCreatingBindings: boolean
-	private static getDescriptionParams?: [BoundStreamInfo]
-	private static fakeChildNamedChannel: BoundChild
-	private static appendChildHitCount: number
-	private static ffiRsOpenOptions?: OpenParams
-	private static ffiRsDefineOptions: FfiRsDefineOptions
+    private static lsl: Liblsl
+    private static libraryPath?: string
+    private static libraryOptions?: Record<string, any>
+    private static fakeBindings: LiblslBindings
+    private static fakeStreamInfo: BoundStreamInfo
+    private static fakeOutlet: BoundOutlet
+    private static fakeDesc: BoundDescription
+    private static fakeChildNamedChannels: BoundChild
+    private static createStreamInfoParams?: any[]
+    private static appendChildParams: any[] = []
+    private static createOutletParams?: any[]
+    private static destroyOutletParams?: any[]
+    private static localClockParams?: any[]
+    private static pushSampleFloatTimestampParams?: any[]
+    private static pushSampleStringTimestampParams?: any[]
+    private static appendChildValueParams: any[]
+    private static shouldThrowWhenCreatingBindings: boolean
+    private static getDescriptionParams?: [BoundStreamInfo]
+    private static fakeChildNamedChannel: BoundChild
+    private static appendChildHitCount: number
+    private static ffiRsOpenOptions?: OpenParams
+    private static ffiRsDefineOptions: FfiRsDefineOptions
 
-	protected static async beforeEach() {
-		await super.beforeEach()
+    protected static async beforeEach() {
+        await super.beforeEach()
 
-		delete this.libraryPath
-		delete this.libraryOptions
-		delete this.createStreamInfoParams
-		delete this.createOutletParams
-		delete this.destroyOutletParams
-		delete this.pushSampleFloatTimestampParams
-		delete this.getDescriptionParams
-		this.appendChildParams = []
-		this.appendChildValueParams = []
+        delete this.libraryPath
+        delete this.libraryOptions
+        delete this.createStreamInfoParams
+        delete this.createOutletParams
+        delete this.destroyOutletParams
+        delete this.pushSampleFloatTimestampParams
+        delete this.getDescriptionParams
+        this.appendChildParams = []
+        this.appendChildValueParams = []
 
-		process.env.LIBLSL_PATH = generateId()
+        process.env.LIBLSL_PATH = generateId()
 
-		this.fakeStreamInfo = {}
-		this.fakeDesc = {}
-		this.fakeOutlet = {}
-		this.fakeChildNamedChannels = {}
-		this.fakeChildNamedChannel = {}
-		this.fakeBindings = this.FakeBindings()
+        this.fakeStreamInfo = {}
+        this.fakeDesc = {}
+        this.fakeOutlet = {}
+        this.fakeChildNamedChannels = {}
+        this.fakeChildNamedChannel = {}
+        this.fakeBindings = this.FakeBindings()
 
-		this.shouldThrowWhenCreatingBindings = false
+        this.shouldThrowWhenCreatingBindings = false
 
-		this.appendChildHitCount = 0
+        this.appendChildHitCount = 0
 
-		delete this.ffiRsOpenOptions
-		LiblslImpl.ffiRsOpen = (options) => {
-			this.ffiRsOpenOptions = options
-		}
+        delete this.ffiRsOpenOptions
+        LiblslImpl.ffiRsOpen = (options) => {
+            this.ffiRsOpenOptions = options
+        }
 
-		LiblslImpl.ffiRsDefine = (options) => {
-			this.ffiRsDefineOptions = options
-			if (this.shouldThrowWhenCreatingBindings) {
-				throw new Error('Failed to create bindings!')
-			}
-			return this.fakeBindings as any
-		}
+        LiblslImpl.ffiRsDefine = (options) => {
+            this.ffiRsDefineOptions = options
+            if (this.shouldThrowWhenCreatingBindings) {
+                throw new Error('Failed to create bindings!')
+            }
+            return this.fakeBindings as any
+        }
 
-		LiblslImpl.resetInstance()
-		this.lsl = LiblslImpl.getInstance()
-	}
+        LiblslImpl.resetInstance()
+        this.lsl = LiblslImpl.getInstance()
+    }
 
-	@test()
-	protected static async throwsWithMissingEnv() {
-		delete process.env.LIBLSL_PATH
-		LiblslImpl.resetInstance()
+    @test()
+    protected static async throwsWithMissingEnv() {
+        delete process.env.LIBLSL_PATH
+        LiblslImpl.resetInstance()
 
-		const err = assert.doesThrow(() => LiblslImpl.getInstance())
-		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-			parameters: ['env.LIBLSL_PATH'],
-		})
-	}
+        const err = assert.doesThrow(() => LiblslImpl.getInstance())
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['env.LIBLSL_PATH'],
+        })
+    }
 
-	@test()
-	protected static async throwsWhenBindingsFailToLoad() {
-		this.shouldThrowWhenCreatingBindings = true
-		LiblslImpl.resetInstance()
+    @test()
+    protected static async throwsWhenBindingsFailToLoad() {
+        this.shouldThrowWhenCreatingBindings = true
+        LiblslImpl.resetInstance()
 
-		const err = assert.doesThrow(() => LiblslImpl.getInstance())
-		errorAssert.assertError(err, 'FAILED_TO_LOAD_LIBLSL', {
-			liblslPath: process.env.LIBLSL_PATH,
-		})
-	}
+        const err = assert.doesThrow(() => LiblslImpl.getInstance())
+        errorAssert.assertError(err, 'FAILED_TO_LOAD_LIBLSL', {
+            liblslPath: process.env.LIBLSL_PATH,
+        })
+    }
 
-	@test()
-	protected static async callsOpenOnFfiRs() {
-		assert.isEqualDeep(this.ffiRsOpenOptions, {
-			library: 'lsl',
-			path: process.env.LIBLSL_PATH,
-		})
-	}
+    @test()
+    protected static async callsOpenOnFfiRs() {
+        assert.isEqualDeep(this.ffiRsOpenOptions, {
+            library: 'lsl',
+            path: process.env.LIBLSL_PATH,
+        })
+    }
 
-	@test()
-	protected static throwsWhenCreateStreamInfoIsMissingRequiredParams() {
-		//@ts-ignore
-		const err = assert.doesThrow(() => this.lsl.createStreamInfo())
-		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-			parameters: [
-				'name',
-				'type',
-				'channelCount',
-				'sampleRate',
-				'channelFormat',
-				'sourceId',
-			],
-		})
-	}
+    @test()
+    protected static throwsWhenCreateStreamInfoIsMissingRequiredParams() {
+        //@ts-ignore
+        const err = assert.doesThrow(() => this.lsl.createStreamInfo())
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: [
+                'name',
+                'type',
+                'channelCount',
+                'sampleRate',
+                'channelFormat',
+                'sourceId',
+            ],
+        })
+    }
 
-	@test()
-	protected static async throwsWhenAppendChannelsIsMissingRequiredParams() {
-		//@ts-ignore
-		const err = assert.doesThrow(() => this.lsl.appendChannelsToStreamInfo({}))
-		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-			parameters: ['info', 'channels'],
-		})
-	}
+    @test()
+    protected static async throwsWhenAppendChannelsIsMissingRequiredParams() {
+        const err = assert.doesThrow(() =>
+            //@ts-ignore
+            this.lsl.appendChannelsToStreamInfo({})
+        )
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['info', 'channels'],
+        })
+    }
 
-	@test()
-	protected static async throwsWhenCreateOutletIsMissingRequiredParams() {
-		//@ts-ignore
-		const err = assert.doesThrow(() => this.lsl.createOutlet({}))
-		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-			parameters: ['info', 'chunkSize', 'maxBuffered'],
-		})
-	}
+    @test()
+    protected static async throwsWhenCreateOutletIsMissingRequiredParams() {
+        //@ts-ignore
+        const err = assert.doesThrow(() => this.lsl.createOutlet({}))
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['info', 'chunkSize', 'maxBuffered'],
+        })
+    }
 
-	@test()
-	protected static async throwsWhenPushSampleFloatTimestampIsMissingRequiredParams() {
-		//@ts-ignore
-		const err = assert.doesThrow(() => this.lsl.pushSampleFloatTimestamp())
-		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-			parameters: ['outlet', 'sample', 'timestamp'],
-		})
-	}
+    @test()
+    protected static async throwsWhenPushSampleFloatTimestampIsMissingRequiredParams() {
+        //@ts-ignore
+        const err = assert.doesThrow(() => this.lsl.pushSampleFloatTimestamp())
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['outlet', 'sample', 'timestamp'],
+        })
+    }
 
-	@test()
-	protected static async throwsWhenPushSampleStringTimestampIsMissingRequiredParams() {
-		//@ts-ignore
-		const err = assert.doesThrow(() => this.lsl.pushSampleFloatTimestamp())
-		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-			parameters: ['outlet', 'sample', 'timestamp'],
-		})
-	}
+    @test()
+    protected static async throwsWhenPushSampleStringTimestampIsMissingRequiredParams() {
+        //@ts-ignore
+        const err = assert.doesThrow(() => this.lsl.pushSampleFloatTimestamp())
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['outlet', 'sample', 'timestamp'],
+        })
+    }
 
-	@test()
-	protected static async worksAsASingleton() {
-		const liblsl = LiblslImpl.getInstance()
-		//@ts-ignore
-		assert.isInstanceOf(liblsl, LiblslImpl)
-	}
+    @test()
+    protected static async worksAsASingleton() {
+        const liblsl = LiblslImpl.getInstance()
+        //@ts-ignore
+        assert.isInstanceOf(liblsl, LiblslImpl)
+    }
 
-	@test()
-	protected static async singletonIsTheSame() {
-		assert.isEqual(LiblslImpl.getInstance(), LiblslImpl.getInstance())
-	}
+    @test()
+    protected static async singletonIsTheSame() {
+        assert.isEqual(LiblslImpl.getInstance(), LiblslImpl.getInstance())
+    }
 
-	@test()
-	protected static canSetInstance() {
-		const fake = new FakeLiblsl()
-		LiblslImpl.setInstance(fake)
-		assert.isEqual(LiblslImpl.getInstance(), fake)
-	}
+    @test()
+    protected static canSetInstance() {
+        const fake = new FakeLiblsl()
+        LiblslImpl.setInstance(fake)
+        assert.isEqual(LiblslImpl.getInstance(), fake)
+    }
 
-	@test()
-	protected static async createsExpectedBindingsWithFfiRs() {
-		assert.isEqualDeep(this.ffiRsDefineOptions, {
-			lsl_create_streaminfo: {
-				library: 'lsl',
-				retType: DataType.External,
-				paramsType: [
-					DataType.String,
-					DataType.String,
-					DataType.I32,
-					DataType.Double,
-					DataType.I32,
-					DataType.String,
-				],
-			},
-			lsl_create_outlet: {
-				library: 'lsl',
-				retType: DataType.External,
-				paramsType: [DataType.External, DataType.I32, DataType.I32],
-			},
-			lsl_destroy_outlet: {
-				library: 'lsl',
-				retType: DataType.Void,
-				paramsType: [DataType.External],
-			},
-			lsl_local_clock: {
-				library: 'lsl',
-				retType: DataType.Double,
-				paramsType: [],
-			},
-			lsl_push_sample_ft: {
-				library: 'lsl',
-				retType: DataType.Void,
-				paramsType: [DataType.External, DataType.DoubleArray, DataType.Double],
-			},
-			lsl_push_sample_strt: {
-				library: 'lsl',
-				retType: DataType.Void,
-				paramsType: [DataType.External, DataType.StringArray, DataType.Double],
-			},
-			lsl_get_desc: {
-				library: 'lsl',
-				retType: DataType.External,
-				paramsType: [DataType.External],
-			},
-			lsl_append_child: {
-				library: 'lsl',
-				retType: DataType.External,
-				paramsType: [DataType.External, DataType.String],
-			},
-			lsl_append_child_value: {
-				library: 'lsl',
-				retType: DataType.External,
-				paramsType: [DataType.External, DataType.String, DataType.String],
-			},
-		})
-	}
+    @test()
+    protected static async createsExpectedBindingsWithFfiRs() {
+        assert.isEqualDeep(this.ffiRsDefineOptions, {
+            lsl_create_streaminfo: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [
+                    DataType.String,
+                    DataType.String,
+                    DataType.I32,
+                    DataType.Double,
+                    DataType.I32,
+                    DataType.String,
+                ],
+            },
+            lsl_create_outlet: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External, DataType.I32, DataType.I32],
+            },
+            lsl_destroy_outlet: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
+            },
+            lsl_local_clock: {
+                library: 'lsl',
+                retType: DataType.Double,
+                paramsType: [],
+            },
+            lsl_push_sample_ft: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [
+                    DataType.External,
+                    DataType.FloatArray,
+                    DataType.Double,
+                ],
+            },
+            lsl_push_sample_strt: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [
+                    DataType.External,
+                    DataType.StringArray,
+                    DataType.Double,
+                ],
+            },
+            lsl_get_desc: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External],
+            },
+            lsl_append_child: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External, DataType.String],
+            },
+            lsl_append_child_value: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [
+                    DataType.External,
+                    DataType.String,
+                    DataType.String,
+                ],
+            },
+        })
+    }
 
-	@test()
-	protected static async canCreateStreamInfoWithRequiredParams() {
-		const options = this.generateRandomCreateStreamInfoOptions()
-		const actual = this.lsl.createStreamInfo(options)
+    @test()
+    protected static async canCreateStreamInfoWithRequiredParams() {
+        const options = this.generateRandomCreateStreamInfoOptions()
+        const actual = this.lsl.createStreamInfo(options)
 
-		assert.isEqual(actual, this.fakeStreamInfo)
-		assert.isEqualDeep(this.createStreamInfoParams, Object.values(options))
-	}
+        assert.isEqual(actual, this.fakeStreamInfo)
+        assert.isEqualDeep(this.createStreamInfoParams, Object.values(options))
+    }
 
-	@test()
-	protected static async canCreateOutletWithRequiredParams() {
-		const { options, outlet } = this.createRandomOutlet()
-		assert.isEqualDeep(this.createOutletParams, Object.values(options))
-		assert.isEqual(outlet, this.fakeOutlet)
-	}
+    @test()
+    protected static async canCreateOutletWithRequiredParams() {
+        const { options, outlet } = this.createRandomOutlet()
+        assert.isEqualDeep(this.createOutletParams, Object.values(options))
+        assert.isEqual(outlet, this.fakeOutlet)
+    }
 
-	@test()
-	protected static async canPushFloatSample() {
-		const expected = [1.0, 2.0, 3.0]
-		const timestamp = randomInt(100)
-		const options = {
-			outlet: this.fakeOutlet,
-			sample: expected,
-			timestamp,
-		}
-		this.lsl.pushSampleFloatTimestamp(options)
+    @test()
+    protected static async canPushFloatSample() {
+        const expected = [1.0, 2.0, 3.0]
+        const timestamp = randomInt(100)
+        const options = {
+            outlet: this.fakeOutlet,
+            sample: expected,
+            timestamp,
+        }
+        this.lsl.pushSampleFloatTimestamp(options)
 
-		assert.isEqualDeep(this.pushSampleFloatTimestampParams, [
-			this.fakeOutlet,
-			expected,
-			timestamp,
-		])
-	}
+        assert.isEqualDeep(this.pushSampleFloatTimestampParams, [
+            this.fakeOutlet,
+            expected,
+            timestamp,
+        ])
+    }
 
-	@test()
-	protected static async canPushStringSample() {
-		const expected = [generateId()]
-		const timestamp = randomInt(100)
-		const options = {
-			outlet: this.fakeOutlet,
-			sample: expected,
-			timestamp,
-		}
-		this.lsl.pushSampleStringTimestamp(options)
-		assert.isEqual(this.pushSampleStringTimestampParams?.[0], this.fakeOutlet)
-		assert.isEqualDeep(this.pushSampleStringTimestampParams?.[1], expected)
-		assert.isEqual(this.pushSampleStringTimestampParams?.[2], timestamp)
-	}
+    @test()
+    protected static async canPushStringSample() {
+        const expected = [generateId()]
+        const timestamp = randomInt(100)
+        const options = {
+            outlet: this.fakeOutlet,
+            sample: expected,
+            timestamp,
+        }
+        this.lsl.pushSampleStringTimestamp(options)
+        assert.isEqual(
+            this.pushSampleStringTimestampParams?.[0],
+            this.fakeOutlet
+        )
+        assert.isEqualDeep(this.pushSampleStringTimestampParams?.[1], expected)
+        assert.isEqual(this.pushSampleStringTimestampParams?.[2], timestamp)
+    }
 
-	@test()
-	protected static async addingSingleChannelGetsDescription() {
-		const info = this.createRandomStreamInfo()
-		const channel: LslChannel = this.generateRandomChannelValues()
+    @test()
+    protected static async addingSingleChannelGetsDescription() {
+        const info = this.createRandomStreamInfo()
+        const channel: LslChannel = this.generateRandomChannelValues()
 
-		this.lsl.appendChannelsToStreamInfo({
-			info,
-			channels: [channel],
-		})
-		assert.isEqualDeep(this.getDescriptionParams?.[0], [info])
+        this.lsl.appendChannelsToStreamInfo({
+            info,
+            channels: [channel],
+        })
+        assert.isEqualDeep(this.getDescriptionParams?.[0], [info])
 
-		assert.isEqual(this.appendChildParams?.[0][0], this.fakeDesc)
-		assert.isEqual(this.appendChildParams?.[0][1], 'channels')
+        assert.isEqual(this.appendChildParams?.[0][0], this.fakeDesc)
+        assert.isEqual(this.appendChildParams?.[0][1], 'channels')
 
-		assert.isEqual(this.appendChildParams?.[1][0], this.fakeChildNamedChannels)
-		assert.isEqual(this.appendChildParams?.[1][1], 'channel')
+        assert.isEqual(
+            this.appendChildParams?.[1][0],
+            this.fakeChildNamedChannels
+        )
+        assert.isEqual(this.appendChildParams?.[1][1], 'channel')
 
-		assert.isLength(this.appendChildValueParams, 3)
+        assert.isLength(this.appendChildValueParams, 3)
 
-		for (let i = 0; i < 3; i++) {
-			const param = this.appendChildValueParams[i]
-			assert.isEqual(param[0], this.fakeChildNamedChannel)
-		}
+        for (let i = 0; i < 3; i++) {
+            const param = this.appendChildValueParams[i]
+            assert.isEqual(param[0], this.fakeChildNamedChannel)
+        }
 
-		assert.isEqual(this.appendChildValueParams[0][1], 'label')
-		assert.isEqual(this.appendChildValueParams[1][1], 'unit')
-		assert.isEqual(this.appendChildValueParams[2][1], 'type')
+        assert.isEqual(this.appendChildValueParams[0][1], 'label')
+        assert.isEqual(this.appendChildValueParams[1][1], 'unit')
+        assert.isEqual(this.appendChildValueParams[2][1], 'type')
 
-		assert.isEqual(this.appendChildValueParams[0][2], channel.label)
-		assert.isEqual(this.appendChildValueParams[1][2], channel.unit)
-		assert.isEqual(this.appendChildValueParams[2][2], channel.type)
-	}
+        assert.isEqual(this.appendChildValueParams[0][2], channel.label)
+        assert.isEqual(this.appendChildValueParams[1][2], channel.unit)
+        assert.isEqual(this.appendChildValueParams[2][2], channel.type)
+    }
 
-	@test()
-	protected static async addingMultpleChannelsAddsChildrenToChannelsChild() {
-		const info = this.createRandomStreamInfo()
-		const channel1 = this.generateRandomChannelValues()
-		const channel2 = this.generateRandomChannelValues()
+    @test()
+    protected static async addingMultpleChannelsAddsChildrenToChannelsChild() {
+        const info = this.createRandomStreamInfo()
+        const channel1 = this.generateRandomChannelValues()
+        const channel2 = this.generateRandomChannelValues()
 
-		this.lsl.appendChannelsToStreamInfo({
-			info,
-			channels: [channel1, channel2],
-		})
+        this.lsl.appendChannelsToStreamInfo({
+            info,
+            channels: [channel1, channel2],
+        })
 
-		assert.isEqual(this.appendChildParams?.[2][0], this.fakeChildNamedChannels)
-		assert.isEqual(this.appendChildParams?.[2][1], 'channel')
+        assert.isEqual(
+            this.appendChildParams?.[2][0],
+            this.fakeChildNamedChannels
+        )
+        assert.isEqual(this.appendChildParams?.[2][1], 'channel')
 
-		assert.isEqual(this.appendChildValueParams[3][2], channel2.label)
-		assert.isEqual(this.appendChildValueParams[4][2], channel2.unit)
-		assert.isEqual(this.appendChildValueParams[5][2], channel2.type)
-	}
+        assert.isEqual(this.appendChildValueParams[3][2], channel2.label)
+        assert.isEqual(this.appendChildValueParams[4][2], channel2.unit)
+        assert.isEqual(this.appendChildValueParams[5][2], channel2.type)
+    }
 
-	@test()
-	protected static async canDestroyOutlet() {
-		const outlet = this.createRandomOutlet()
-		const options = { outlet }
-		this.lsl.destroyOutlet(options)
+    @test()
+    protected static async canDestroyOutlet() {
+        const outlet = this.createRandomOutlet()
+        const options = { outlet }
+        this.lsl.destroyOutlet(options)
 
-		assert.isEqualDeep(this.destroyOutletParams, Object.values(options))
-	}
+        assert.isEqualDeep(this.destroyOutletParams, Object.values(options))
+    }
 
-	@test()
-	protected static async callingLocalClockTwiceReturnsDifferentTimestamps() {
-		const t1 = this.lsl.localClock()
-		await this.wait(10)
-		const t2 = this.lsl.localClock()
-		assert.isNotEqual(t1, t2)
-	}
+    @test()
+    protected static async callingLocalClockTwiceReturnsDifferentTimestamps() {
+        const t1 = this.lsl.localClock()
+        await this.wait(10)
+        const t2 = this.lsl.localClock()
+        assert.isNotEqual(t1, t2)
+    }
 
-	@test()
-	protected static async localClockBindingReceivesEmptyArray() {
-		delete this.localClockParams
-		this.lsl.localClock()
-		assert.isEqualDeep(this.localClockParams, [])
-	}
+    @test()
+    protected static async localClockBindingReceivesEmptyArray() {
+        delete this.localClockParams
+        this.lsl.localClock()
+        assert.isEqualDeep(this.localClockParams, [])
+    }
 
-	private static createRandomStreamInfo() {
-		return this.lsl.createStreamInfo(
-			this.generateRandomCreateStreamInfoOptions()
-		)
-	}
+    private static createRandomStreamInfo() {
+        return this.lsl.createStreamInfo(
+            this.generateRandomCreateStreamInfoOptions()
+        )
+    }
 
-	private static createRandomOutlet() {
-		const info = this.createRandomStreamInfo()
-		const options = {
-			info,
-			chunkSize: randomInt(10),
-			maxBuffered: randomInt(10),
-		}
-		const outlet = this.lsl.createOutlet(options)
-		return { options, outlet }
-	}
+    private static createRandomOutlet() {
+        const info = this.createRandomStreamInfo()
+        const options = {
+            info,
+            chunkSize: randomInt(10),
+            maxBuffered: randomInt(10),
+        }
+        const outlet = this.lsl.createOutlet(options)
+        return { options, outlet }
+    }
 
-	private static generateRandomChannelValues() {
-		return {
-			label: generateId(),
-			type: generateId(),
-			unit: generateId(),
-		}
-	}
+    private static generateRandomChannelValues() {
+        return {
+            label: generateId(),
+            type: generateId(),
+            unit: generateId(),
+        }
+    }
 
-	private static generateRandomCreateStreamInfoOptions() {
-		return {
-			name: generateId(),
-			type: generateId(),
-			channelCount: randomInt(1, 10),
-			sampleRate: randomInt(100),
-			channelFormat: randomInt(7),
-			sourceId: generateId(),
-		}
-	}
+    private static generateRandomCreateStreamInfoOptions() {
+        return {
+            name: generateId(),
+            type: generateId(),
+            channelCount: randomInt(1, 10),
+            sampleRate: randomInt(100),
+            channelFormat: randomInt(7),
+            sourceId: generateId(),
+        }
+    }
 
-	private static FakeBindings() {
-		return {
-			lsl_create_streaminfo: (params: any[]) => {
-				this.createStreamInfoParams = params
-				return this.fakeStreamInfo
-			},
-			lsl_create_outlet: (params: any[]) => {
-				this.createOutletParams = params
-				return this.fakeOutlet
-			},
-			lsl_destroy_outlet: (params: any[]) => {
-				this.destroyOutletParams = params
-			},
-			lsl_push_sample_ft: (params: any[]) => {
-				this.pushSampleFloatTimestampParams = params
-			},
-			lsl_push_sample_strt: (params: any[]) => {
-				this.pushSampleStringTimestampParams = params
-			},
-			lsl_local_clock: (params: []) => {
-				this.localClockParams = params
-				return new Date().getTime()
-			},
-			lsl_get_desc: (info: BoundStreamInfo) => {
-				this.getDescriptionParams = [info]
-				return this.fakeDesc
-			},
-			lsl_append_child: (params: any) => {
-				this.appendChildParams.push(params)
-				if (this.appendChildHitCount === 0) {
-					this.appendChildHitCount++
-					return this.fakeChildNamedChannels
-				}
-				return this.fakeChildNamedChannel
-			},
-			lsl_append_child_value: (params: any[]) => {
-				this.appendChildValueParams.push(params)
-			},
-		}
-	}
+    private static FakeBindings() {
+        return {
+            lsl_create_streaminfo: (params: any[]) => {
+                this.createStreamInfoParams = params
+                return this.fakeStreamInfo
+            },
+            lsl_create_outlet: (params: any[]) => {
+                this.createOutletParams = params
+                return this.fakeOutlet
+            },
+            lsl_destroy_outlet: (params: any[]) => {
+                this.destroyOutletParams = params
+            },
+            lsl_push_sample_ft: (params: any[]) => {
+                this.pushSampleFloatTimestampParams = params
+            },
+            lsl_push_sample_strt: (params: any[]) => {
+                this.pushSampleStringTimestampParams = params
+            },
+            lsl_local_clock: (params: []) => {
+                this.localClockParams = params
+                return new Date().getTime()
+            },
+            lsl_get_desc: (info: BoundStreamInfo) => {
+                this.getDescriptionParams = [info]
+                return this.fakeDesc
+            },
+            lsl_append_child: (params: any) => {
+                this.appendChildParams.push(params)
+                if (this.appendChildHitCount === 0) {
+                    this.appendChildHitCount++
+                    return this.fakeChildNamedChannels
+                }
+                return this.fakeChildNamedChannel
+            },
+            lsl_append_child_value: (params: any[]) => {
+                this.appendChildValueParams.push(params)
+            },
+        }
+    }
 }

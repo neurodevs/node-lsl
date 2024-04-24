@@ -4,18 +4,18 @@ import { LslOutletOptions } from '../../nodeLsl.types'
 import { TEST_SUPPORTED_CHANNEL_FORMATS } from './consts'
 
 export default function generateRandomOutletOptions() {
-	const randomChannelIdx = randomInt(TEST_SUPPORTED_CHANNEL_FORMATS.length)
+    const randomChannelIdx = randomInt(TEST_SUPPORTED_CHANNEL_FORMATS.length)
 
-	return {
-		name: generateId(),
-		type: generateId(),
-		channelNames: new Array(randomInt(1, 10)).fill(generateId()),
-		sampleRate: Math.random() * 10,
-		channelFormat: TEST_SUPPORTED_CHANNEL_FORMATS[randomChannelIdx],
-		sourceId: generateId(),
-		manufacturer: generateId(),
-		unit: generateId(),
-		chunkSize: randomInt(0, 10),
-		maxBuffered: randomInt(0, 10),
-	} as LslOutletOptions
+    return {
+        name: generateId(),
+        type: generateId(),
+        channelNames: new Array(randomInt(1, 10)).fill(generateId()),
+        sampleRate: Math.random() * 10,
+        channelFormat: TEST_SUPPORTED_CHANNEL_FORMATS[randomChannelIdx],
+        sourceId: generateId(),
+        manufacturer: generateId(),
+        unit: generateId(),
+        chunkSize: randomInt(0, 10),
+        maxBuffered: randomInt(0, 10),
+    } as LslOutletOptions
 }

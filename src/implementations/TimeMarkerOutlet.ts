@@ -1,67 +1,67 @@
 import {
-	TimeMarkerOutlet,
-	LslOutletOptions,
-	DurationMarker,
-	TimeMarkerOutletConstructor,
+    TimeMarkerOutlet,
+    LslOutletOptions,
+    DurationMarker,
+    TimeMarkerOutletConstructor,
 } from '../nodeLsl.types'
 import LslOutletImpl from './LslOutlet'
 
 export default class TimeMarkerOutletImpl
-	extends LslOutletImpl
-	implements TimeMarkerOutlet
+    extends LslOutletImpl
+    implements TimeMarkerOutlet
 {
-	public static Class?: TimeMarkerOutletConstructor
+    public static Class?: TimeMarkerOutletConstructor
 
-	private isPlaying: boolean = false
-	private waitResolve?: () => void
-	private timeout?: any
+    private isPlaying = false
+    private waitResolve?: () => void
+    private timeout?: any
 
-	public static Outlet(options?: Partial<LslOutletOptions>) {
-		const defaultOptions = {
-			name: 'Time markers',
-			type: 'Markers',
-			channelNames: ['Markers'],
-			sampleRate: 0,
-			channelFormat: 'string',
-			sourceId: 'time-markers',
-			manufacturer: 'N/A',
-			unit: 'N/A',
-			chunkSize: 0,
-			maxBuffered: 0,
-		} as LslOutletOptions
+    public static Outlet(options?: Partial<LslOutletOptions>) {
+        const defaultOptions = {
+            name: 'Time markers',
+            type: 'Markers',
+            channelNames: ['Markers'],
+            sampleRate: 0,
+            channelFormat: 'string',
+            sourceId: 'time-markers',
+            manufacturer: 'N/A',
+            unit: 'N/A',
+            chunkSize: 0,
+            maxBuffered: 0,
+        } as LslOutletOptions
 
-		return new (this.Class ?? this)({
-			...defaultOptions,
-			...options,
-		}) as TimeMarkerOutlet
-	}
+        return new (this.Class ?? this)({
+            ...defaultOptions,
+            ...options,
+        }) as TimeMarkerOutlet
+    }
 
-	public async pushMarkers(markers: DurationMarker[]) {
-		this.isPlaying = true
+    public async pushMarkers(markers: DurationMarker[]) {
+        this.isPlaying = true
 
-		for (let marker of markers) {
-			this.pushSample([marker.name])
+        for (let marker of markers) {
+            this.pushSample([marker.name])
 
-			await this.wait(marker.durationMs)
+            await this.wait(marker.durationMs)
 
-			if (!this.isPlaying) {
-				return
-			}
-		}
-	}
+            if (!this.isPlaying) {
+                return
+            }
+        }
+    }
 
-	protected async wait(durationMs: number) {
-		return new Promise((resolve) => this.setTimeout(resolve, durationMs))
-	}
+    protected async wait(durationMs: number) {
+        return new Promise((resolve) => this.setTimeout(resolve, durationMs))
+    }
 
-	private setTimeout(resolve: (value: unknown) => void, durationMs: number) {
-		this.waitResolve = resolve as any
-		this.timeout = setTimeout(resolve, durationMs)
-	}
+    private setTimeout(resolve: (value: unknown) => void, durationMs: number) {
+        this.waitResolve = resolve as any
+        this.timeout = setTimeout(resolve, durationMs)
+    }
 
-	public stop() {
-		this.waitResolve?.()
-		clearTimeout(this.timeout)
-		this.isPlaying = false
-	}
+    public stop() {
+        this.waitResolve?.()
+        clearTimeout(this.timeout)
+        this.isPlaying = false
+    }
 }
