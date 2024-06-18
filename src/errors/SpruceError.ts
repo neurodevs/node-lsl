@@ -8,7 +8,7 @@ export default class SpruceError extends BaseSpruceError<ErrorOptions> {
         let message
         switch (options?.code) {
             case 'FAILED_TO_LOAD_LIBLSL':
-                message = `Well shoot! Loading the liblsl dylib failed. I tried to load it from ${options.liblslPath}.`
+                message = `Well shoot! Loading the liblsl dylib failed. I tried to load it from ${options.liblslPath}. Original error:\n\n${options.originalError}`
                 break
             default:
                 message = super.friendlyMessage()

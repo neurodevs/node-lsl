@@ -19,6 +19,24 @@ export default class LiblslImpl implements Liblsl {
 
     private bindings: LiblslBindings
 
+    protected constructor() {
+        const path = process.env.LIBLSL_PATH!
+
+        if (!path) {
+            assertOptions(process, ['env.LIBLSL_PATH'])
+        }
+
+        try {
+            this.bindings = this.loadBindings(path)
+        } catch (error) {
+            throw new SpruceError({
+                code: 'FAILED_TO_LOAD_LIBLSL',
+                liblslPath: path,
+                originalError: error as any,
+            })
+        }
+    }
+
     public static getInstance() {
         if (!this.instance) {
             this.setInstance(new this())
@@ -32,23 +50,6 @@ export default class LiblslImpl implements Liblsl {
 
     public static resetInstance() {
         delete this.instance
-    }
-
-    protected constructor() {
-        const path = process.env.LIBLSL_PATH!
-
-        if (!path) {
-            assertOptions(process, ['env.LIBLSL_PATH'])
-        }
-
-        try {
-            this.bindings = this.loadBindings(path)
-        } catch {
-            throw new SpruceError({
-                code: 'FAILED_TO_LOAD_LIBLSL',
-                liblslPath: path,
-            })
-        }
     }
 
     private loadBindings(liblslPath: string) {
