@@ -5,17 +5,23 @@ This package is a Node wrapper around the C++ [liblsl](https://github.com/sccn/l
 
 ## Installation
 
-First, you need to install the C++ [liblsl](https://github.com/sccn/liblsl) library. I personally use brew on MacOS to install it, and the provided link to it specifies alternatives:
+First, you need to install the C++ [liblsl](https://github.com/sccn/liblsl) library. I personally use brew on MacOS to install it, and the previous link to it specifies alternatives:
 
 `brew install labstreaminglayer/tap/lsl`
 
-Then, you need to install the `node-lsl` package with your preferred package manager (make sure to be in the right directory for your Node project):
+Then, you need to install the package with your preferred package manager (make sure to be in the right directory for your Node project):
 
 `npm install @neurodevs/node-lsl` 
 
 or 
 
 `yarn add @neurodevs/node-lsl`
+
+Finally, you need to add the following to your `.env` file or otherwise make it an environmental variable. This path is just what happens to be on my system, so please update your path accordingly:
+
+```.env
+LIBLSL_PATH=/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib
+```
 
 ## Usage
 
@@ -39,5 +45,5 @@ const outlet = await LslOutletImpl.Outlet({
 })
 
 // Must be in async function
-await outlet.pushSample(0.5)
+await outlet.pushSample(...)
 ```
