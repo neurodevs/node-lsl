@@ -49,7 +49,7 @@ const outlet = LslOutletImpl.Outlet({
 await outlet.pushSample(...)
 ```
 
-LSL is also often used to push time markers for different phases of an experiment or session. This package provides a default implementation for pushing time markers:
+LSL is also often used to push time markers for different phases of an experiment or session:
 
 ```typescript
 import { TimeMarkerOutletImpl } from '@neurodevs/node-lsl'
