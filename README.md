@@ -1,7 +1,17 @@
 # node-lsl
 Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series data over a network.
 
-This package is a Node wrapper around the C++ [liblsl](https://github.com/sccn/liblsl) library. It was developed and tested on a MacOS system with an M2 chip. It should work with any M-series chip: M1, M2, M3. There are known issues for this package with x86 MacOS architectures. Its performance on Linux or Windows machines is unknown.
+## Table of Contents
+- [Installation](#installation)
+- [Overview](#overview)
+- [Usage](#usage)
+  - [LslOutlet](#lsloutlet)
+  - [TimeMarkerOutlet](#timemarkeroutlet) 
+- [Test Doubles](#test-doubles)
+
+## Overview
+
+This package is a Node wrapper around the C++ [liblsl](https://github.com/sccn/liblsl) library. It was developed and tested on a MacOS system with an M2 chip. It should work with any M-series chip: M1, M2, M3. There are known issues for this package with x86 MacOS architectures. It's untested for Windows or Linux.
 
 Please note that this package currently only supports LSL outlets (sending data over a network). It does not yet support LSL inlets (receiving data from a network).
 
@@ -27,6 +37,8 @@ LIBLSL_PATH=/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib
 
 ## Usage
 
+### LslOutlet
+
 LSL is often used to stream EEG data over a network. For example, to instantiate an LSL outlet for the [Muse S 2nd generation](https://choosemuse.com/products/muse-s-gen-2) headband:
 
 ```typescript
@@ -48,6 +60,8 @@ const outlet = LslOutletImpl.Outlet({
 // Must be in async function
 await outlet.pushSample(...)
 ```
+
+### TimeMarkerOutlet
 
 LSL is also often used to push time markers that mark different phases of an experiment or session:
 
