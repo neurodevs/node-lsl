@@ -2,8 +2,8 @@
 Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series data over a network.
 
 ## Table of Contents
-- [Installation](#installation)
 - [Overview](#overview)
+- [Installation](#installation)
 - [Usage](#usage)
   - [LslOutlet](#lsloutlet)
   - [TimeMarkerOutlet](#timemarkeroutlet) 
