@@ -1,7 +1,7 @@
 # node-lsl
 Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series data over a network.
 
-This package is a Node wrapper around the C++ [liblsl](https://github.com/sccn/liblsl) library. It was developed and tested on a MacOS system with an M2 chip. It should work with any M-series chip: M1, M2, M3. There are known issues for this package with x86 MacOS architectures. It is unknown how it performs on Linux or Windows machines.
+This package is a Node wrapper around the C++ [liblsl](https://github.com/sccn/liblsl) library. It was developed and tested on a MacOS system with an M2 chip. It should work with any M-series chip: M1, M2, M3. There are known issues for this package with x86 MacOS architectures. Its performance on Linux or Windows machines is unknown.
 
 Please note that this package currently only supports LSL outlets (sending data over a network). It does not yet support LSL inlets (receiving data from a network).
 
