@@ -7,7 +7,7 @@ Please note that this package currently only supports LSL outlets (sending data 
 
 ## Installation
 
-First, you need to install the C++ [liblsl](https://github.com/sccn/liblsl) library. On MacOS, you can use Homebrew to install it, as specified in the [documentation](https://github.com/sccn/liblsl?tab=readme-ov-file#getting-and-using-liblsl):
+First, you need to install the C++ [liblsl](https://github.com/sccn/liblsl) library. On MacOS, you can use Homebrew to install it, as specified in its [documentation](https://github.com/sccn/liblsl?tab=readme-ov-file#getting-and-using-liblsl):
 
 `brew install labstreaminglayer/tap/lsl`
 
@@ -78,7 +78,7 @@ const markers = [
 await outlet.pushMarkers(markers)
 ```
 
-If you then want to early stop the time marker outlet, you simply do:
+If you then want to stop the time marker outlet early, you simply do:
 
 ```typescript
 outlet.stop()
