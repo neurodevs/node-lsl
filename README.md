@@ -3,15 +3,15 @@ Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series
 
 This package is a Node wrapper around the C++ [liblsl](https://github.com/sccn/liblsl) library. It was developed and tested on a MacOS system with an M2 chip. It should work with any M-series chip: M1, M2, M3. There are known issues for this package with x86 MacOS architectures.
 
-Please note that this package currently only supports LSL outlets, ie. sending data over a network. It does not yet support LSL inlets, ie. receiving data from a network.
+Please note that this package currently only supports LSL outlets (sending data over a network). It does not yet support LSL inlets (receiving data from a network).
 
 ## Installation
 
-First, you need to install the C++ [liblsl](https://github.com/sccn/liblsl) library. I personally use brew on MacOS to install it, and the previous link to it specifies alternatives:
+First, you need to install the C++ liblsl library. On MacOS, you can use Homebrew to install it, as specified in the documentation:
 
 `brew install labstreaminglayer/tap/lsl`
 
-Then, you need to install the package with your preferred package manager (make sure to be in the right directory for your Node project):
+Then, install the package with your preferred package manager (make sure to be in the right directory for your Node project):
 
 `npm install @neurodevs/node-lsl` 
 
@@ -19,7 +19,7 @@ or
 
 `yarn add @neurodevs/node-lsl`
 
-Finally, you need to add the following to your `.env` file or otherwise make it an environmental variable. This path is just what happens to be on my system, so please update your path accordingly:
+Finally, add the following to your .env file or otherwise set it as an environmental variable. Update the path to match your system:
 
 ```.env
 LIBLSL_PATH=/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib
@@ -27,7 +27,7 @@ LIBLSL_PATH=/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib
 
 ## Usage
 
-LSL is often used to stream EEG data over a network. For example, see below for how to instantiate an LSL outlet for the [Muse S 2nd generation](https://choosemuse.com/products/muse-s-gen-2) headband. You'll still need to separately pull data from the Muse and call `pushSample` accordingly.
+LSL is often used to stream EEG data over a network. For example, to instantiate an LSL outlet for the [Muse S 2nd generation](https://choosemuse.com/products/muse-s-gen-2) headband:
 
 ```typescript
 import { LslOutletImpl } from '@neurodevs/node-lsl'
@@ -49,9 +49,7 @@ const outlet = LslOutletImpl.Outlet({
 await outlet.pushSample(...)
 ```
 
-LSL is also often used to push time markers for the beginning and end of different phases. Usually, the time marker is represented as a unique string and pushed at the precise time that some event happens. 
-
-This package provides a default implementation for pushing time markers that should work for most use cases. It's basically just a regular LslOutlet with a set of preconfigured values that are appropriate for a time marker outlet:
+LSL is also often used to push time markers for different phases. This package provides a default implementation for pushing time markers:
 
 ```typescript
 import { TimeMarkerOutletImpl } from '@neurodevs/node-lsl'
@@ -66,7 +64,27 @@ await outlet.pushSample('phase-1-begin')
 await outlet.pushSample('phase-1-end')
 ```
 
-You can also optionally pass any LslOutlet options to the time marker outlet. For example if you want to override the type:
+There is also a `pushMarkers` method that pushes a time marker, waits for a specified duration, then pushes the next marker:
+
+```typescript
+const markers = [
+    { name: 'phase-1-begin', durationMs: 30 * 1000 },
+    { name: 'phase-1-end', durationMs: 0.1 * 1000 },
+    { name: 'phase-2-begin', durationMs: 60 * 1000 },
+    ...
+]
+
+// Must be in async function, hangs until complete
+await outlet.pushMarkers(markers)
+```
+
+If you then want to early stop the time marker outlet, you simply do:
+
+```typescript
+outlet.stop()
+```
+
+You can optionally pass any LslOutlet options to the time marker outlet during instantiation. For example, if you want to override the type:
 
 ```typescript
 import { TimeMarkerOutletImpl } from '@neurodevs/node-lsl'
@@ -74,3 +92,26 @@ import { TimeMarkerOutletImpl } from '@neurodevs/node-lsl'
 const outlet = TimeMarkerOutletImpl.Outlet({
     type: 'custom-type'
 })
+```
+
+## Test Doubles
+
+This package was developed using test-driven development (TDD). If you follow TDD, you'll likely want test doubles to fake or mock certain behaviors for these classes.
+
+For example, the `MockTimeMarkerOutlet` class lets you test whether your application appropriately calls its methods without actually doing anything. Set this mock in your test code like this:
+
+```typescript
+import { TimeMarkerOutletImpl, MockTimeMarkerOutlet } from '@neurodevs/node-lsl'
+
+// In your tests / beforeEach
+TimeMarkerOutletImpl.Class = MockTimeMarkerOutlet
+
+const mock = TimeMarkerOutletImpl.Outlet()
+
+// Do something in your application that should start the outlet
+
+const expectedMarkers = ['phase-1-begin', ...]
+mock.assertDidPushSamples(expectedMarkers)
+```
+
+Now, you'll have a failing test. There will be a helpful error message to guide you towards the solution. Basically, you just need to call the `pushSample` method in your application with the expected markers. See examples above for how to do so.
