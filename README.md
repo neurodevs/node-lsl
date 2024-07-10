@@ -64,7 +64,7 @@ await outlet.pushSample('phase-1-begin')
 await outlet.pushSample('phase-1-end')
 ```
 
-There is also a `pushMarkers` method that pushes a time marker, waits for a specified duration, then pushes the next marker:
+There is also a `pushMarkers` method that pushes a time marker, waits for a specified duration, then pushes the next marker. I recommend that each time marker has a duration of at least 100 ms so that LSL receives the markers in the right order.
 
 ```typescript
 const markers = [
@@ -96,7 +96,7 @@ const outlet = TimeMarkerOutletImpl.Outlet({
 
 ## Test Doubles
 
-This package was developed using test-driven development (TDD). If you follow TDD, you'll likely want test doubles to fake or mock certain behaviors for these classes.
+This package was developed using test-driven development (TDD). If you also follow TDD, you'll likely want test doubles to fake or mock certain behaviors for these classes.
 
 For example, the `MockTimeMarkerOutlet` class lets you test whether your application appropriately calls its methods without actually doing anything. Set this mock in your test code like this:
 
