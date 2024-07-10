@@ -27,15 +27,14 @@ LIBLSL_PATH=/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib
 
 LSL is often used to stream EEG data over a network. For example, see below for how to instantiate an LSL outlet for the [Muse S 2nd generation](https://choosemuse.com/products/muse-s-gen-2) headband. You'll still need to separately pull data from the Muse and call `pushSample` accordingly.
 
-```
+```typescript
 import { LslOutletImpl } from '@neurodevs/node-lsl'
 
-// Must be in async function
-const outlet = await LslOutletImpl.Outlet({
+const outlet = LslOutletImpl.Outlet({
     name: 'Muse S (2nd gen)',
     type: 'EEG',
     channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
-    sampleRate: MUSE_EEG_SAMPLE_RATE_HZ,
+    sampleRate: 256,
     channelFormat: 'float32',
     sourceId: 'muse-s-eeg',
     manufacturer: 'Interaxon Inc.',
@@ -47,3 +46,29 @@ const outlet = await LslOutletImpl.Outlet({
 // Must be in async function
 await outlet.pushSample(...)
 ```
+
+LSL is also often used to push time markers for the beginning and end of different phases. Usually, the time marker is represented as a unique string and pushed at the precise time that some event happens. 
+
+This package provides a default implementation for pushing time markers that should work for most use cases. It's basically just a regular LslOutlet with a set of preconfigured values that are appropriate for a time marker outlet:
+
+```typescript
+import { TimeMarkerOutletImpl } from '@neurodevs/node-lsl'
+
+const outlet = TimeMarkerOutletImpl.Outlet()
+
+// Must be in async function
+await outlet.pushSample('phase-1-begin')
+
+// Wait for phase to end
+
+await outlet.pushSample('phase-1-end')
+```
+
+You can also optionally pass any LslOutlet options to the time marker outlet. For example if you want to override the type:
+
+```typescript
+import { TimeMarkerOutletImpl } from '@neurodevs/node-lsl'
+
+const outlet = TimeMarkerOutletImpl.Outlet({
+    type: 'custom-type'
+})
