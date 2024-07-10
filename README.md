@@ -7,7 +7,7 @@ Please note that this package currently only supports LSL outlets (sending data 
 
 ## Installation
 
-First, you need to install the C++ liblsl library. On MacOS, you can use Homebrew to install it, as specified in the documentation:
+First, you need to install the C++ [liblsl](https://github.com/sccn/liblsl) library. On MacOS, you can use Homebrew to install it, as specified in the [documentation](https://github.com/sccn/liblsl?tab=readme-ov-file#getting-and-using-liblsl):
 
 `brew install labstreaminglayer/tap/lsl`
 
