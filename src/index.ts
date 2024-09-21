@@ -20,3 +20,5 @@ export { default as MockTimeMarkerOutlet } from './testDoubles/MockTimeMarkerOut
 export * from './testDoubles/MockTimeMarkerOutlet'
 
 export * from './nodeLsl.types'
+
+export { default as generateRandomOutletOptions } from './__tests__/support/generateRandomOutletOptions'
