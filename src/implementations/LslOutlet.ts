@@ -8,8 +8,6 @@ import {
 } from '../assertions'
 import { CHANNEL_FORMATS_MAP } from '../consts'
 import {
-    LslOutlet,
-    LslOutletOptions,
     ChannelFormat,
     BoundOutlet,
     BoundStreamInfo,
@@ -19,15 +17,12 @@ import {
 import LiblslImpl from './Liblsl'
 
 export default class LslOutletImpl implements LslOutlet {
-    public static Class?: new (options: LslOutletOptions) => LslOutlet
+    public static Class?: LslOutletConstructor
+
     private options: LslOutletOptions
     private streamInfo: BoundStreamInfo
     private outlet: BoundOutlet
     private pushSampleByType: (options: any) => void
-
-    public static Outlet(options: LslOutletOptions) {
-        return new (this.Class ?? this)(options)
-    }
 
     protected constructor(options: LslOutletOptions) {
         const { sampleRate, channelFormat } = assertOptions(options, [
@@ -84,6 +79,10 @@ export default class LslOutletImpl implements LslOutlet {
         this.pushSampleByType = this.lsl[pushMethod].bind(this.lsl)
     }
 
+    public static Outlet(options: LslOutletOptions) {
+        return new (this.Class ?? this)(options)
+    }
+
     public destroy() {
         this.lsl.destroyOutlet({ outlet: this.outlet })
     }
@@ -121,4 +120,24 @@ export default class LslOutletImpl implements LslOutlet {
     private get lsl() {
         return LiblslImpl.getInstance()
     }
+}
+
+export interface LslOutlet {
+    destroy(): void
+    pushSample(sample: LslSample): void
+}
+
+export type LslOutletConstructor = new (options: LslOutletOptions) => LslOutlet
+
+export interface LslOutletOptions {
+    name: string
+    type: string
+    channelNames: string[]
+    sampleRate: number
+    channelFormat: ChannelFormat
+    sourceId: string
+    manufacturer: string
+    unit: string
+    chunkSize: number
+    maxBuffered: number
 }

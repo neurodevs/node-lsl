@@ -1,6 +1,6 @@
 import { randomInt } from 'crypto'
 import { generateId } from '@sprucelabs/test-utils'
-import { LslOutletOptions } from '../../nodeLsl.types'
+import { LslOutletOptions } from '../../implementations/LslOutlet'
 import { TEST_SUPPORTED_CHANNEL_FORMATS } from './consts'
 
 export default function generateRandomOutletOptions() {

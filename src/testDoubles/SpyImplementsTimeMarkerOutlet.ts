@@ -1,4 +1,5 @@
-import { DurationMarker, TimeMarkerOutlet } from '../nodeLsl.types'
+import { TimeMarkerOutlet } from '../implementations/TimeMarkerOutlet'
+import { DurationMarker } from '../nodeLsl.types'
 
 export default class SpyImplementsTimeMarkerOutlet implements TimeMarkerOutlet {
     public pushMarkersCalls: DurationMarker[][]

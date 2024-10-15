@@ -5,8 +5,8 @@ import AbstractSpruceTest, {
     generateId,
 } from '@sprucelabs/test-utils'
 import LiblslImpl from '../../implementations/Liblsl'
-import LslOutlet from '../../implementations/LslOutlet'
-import { LslOutletOptions, LslSample } from '../../nodeLsl.types'
+import LslOutlet, { LslOutletOptions } from '../../implementations/LslOutlet'
+import { LslSample } from '../../nodeLsl.types'
 import FakeLiblsl from '../../testDoubles/FakeLiblsl'
 import {
     TEST_CHANNEL_FORMATS_MAP,

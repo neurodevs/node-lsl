@@ -1,34 +1,7 @@
 import { FuncObj, FieldType } from 'ffi-rs'
 import { CHANNEL_FORMATS } from './consts'
 
-export interface LslOutlet {
-    destroy(): void
-    pushSample(sample: LslSample): void
-}
-
-export interface LslOutletOptions {
-    name: string
-    type: string
-    channelNames: string[]
-    sampleRate: number
-    channelFormat: ChannelFormat
-    sourceId: string
-    manufacturer: string
-    unit: string
-    chunkSize: number
-    maxBuffered: number
-}
-
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
-
-export interface TimeMarkerOutlet extends LslOutlet {
-    pushMarkers(markers: DurationMarker[]): Promise<void>
-    stop(): void
-}
-
-export type TimeMarkerOutletConstructor = new (
-    options: LslOutletOptions
-) => TimeMarkerOutlet
 
 export interface DurationMarker {
     name: string

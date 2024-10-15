@@ -1,5 +1,5 @@
+import { LslOutletOptions } from '../implementations/LslOutlet'
 import TimeMarkerOutletImpl from '../implementations/TimeMarkerOutlet'
-import { LslOutletOptions } from '../nodeLsl.types'
 
 export default class SpyExtendsTimeMarkerOutlet extends TimeMarkerOutletImpl {
     public spyOptions: LslOutletOptions

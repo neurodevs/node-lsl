@@ -5,8 +5,8 @@ import AbstractSpruceTest, {
     test,
 } from '@sprucelabs/test-utils'
 import LiblslImpl from '../../implementations/Liblsl'
+import { LslOutletOptions } from '../../implementations/LslOutlet'
 import TimeMarkerOutletImpl from '../../implementations/TimeMarkerOutlet'
-import { LslOutletOptions } from '../../nodeLsl.types'
 import FakeLiblsl from '../../testDoubles/FakeLiblsl'
 import SpyExtendsTimeMarkerOutlet from '../../testDoubles/SpyExtendsTimeMarkerOutlet'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'

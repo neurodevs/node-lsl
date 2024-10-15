@@ -1,10 +1,5 @@
-import {
-    TimeMarkerOutlet,
-    LslOutletOptions,
-    DurationMarker,
-    TimeMarkerOutletConstructor,
-} from '../nodeLsl.types'
-import LslOutletImpl from './LslOutlet'
+import { DurationMarker } from '../nodeLsl.types'
+import LslOutletImpl, { LslOutlet, LslOutletOptions } from './LslOutlet'
 
 export default class TimeMarkerOutletImpl
     extends LslOutletImpl
@@ -65,3 +60,12 @@ export default class TimeMarkerOutletImpl
         this.isPlaying = false
     }
 }
+
+export interface TimeMarkerOutlet extends LslOutlet {
+    pushMarkers(markers: DurationMarker[]): Promise<void>
+    stop(): void
+}
+
+export type TimeMarkerOutletConstructor = new (
+    options: LslOutletOptions
+) => TimeMarkerOutlet
