@@ -86,7 +86,7 @@ export default class LslOutletImpl implements LslOutlet {
         return instance
     }
 
-    private static wait(waitMs: number) {
+    private static async wait(waitMs: number) {
         return new Promise((resolve) => setTimeout(resolve, waitMs))
     }
 
