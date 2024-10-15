@@ -11,7 +11,7 @@ export default class TimeMarkerOutletImpl
     private waitResolve?: () => void
     private timeout?: any
 
-    public static Outlet(options?: Partial<LslOutletOptions>) {
+    public static async Create(options?: Partial<LslOutletOptions>) {
         const defaultOptions = {
             name: 'Time markers',
             type: 'Markers',

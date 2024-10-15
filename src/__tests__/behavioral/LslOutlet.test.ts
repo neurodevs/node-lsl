@@ -5,7 +5,9 @@ import AbstractSpruceTest, {
     generateId,
 } from '@sprucelabs/test-utils'
 import LiblslImpl from '../../implementations/Liblsl'
-import LslOutlet, { LslOutletOptions } from '../../implementations/LslOutlet'
+import LslOutletImpl, {
+    LslOutletOptions,
+} from '../../implementations/LslOutlet'
 import { LslSample } from '../../nodeLsl.types'
 import FakeLiblsl from '../../testDoubles/FakeLiblsl'
 import {
@@ -23,19 +25,22 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
     protected static async beforeEach() {
         await super.beforeEach()
-        delete LslOutlet.Class
+        delete LslOutletImpl.Class
         this.randomOutletOptions = generateRandomOutletOptions()
 
         const channelFormat = this.randomOutletOptions.channelFormat
         this.channelFormatIdx = TEST_CHANNEL_FORMATS_MAP[channelFormat]
         this.fakeLiblsl = new FakeLiblsl()
+
         LiblslImpl.setInstance(this.fakeLiblsl)
     }
 
     @test()
-    protected static async throwsWhenMissingRequiredParams() {
-        //@ts-ignore
-        const err = assert.doesThrow(() => new LslOutlet())
+    protected static async throwsWithMissingRequiredParams() {
+        const err = await assert.doesThrowAsync(
+            //@ts-ignore
+            async () => await LslOutletImpl.Create()
+        )
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
             parameters: [
                 'name',
@@ -54,45 +59,51 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async throwsWithInvalidChannelNames() {
-        this.assertThrowsInvalidChannelNames(0)
+        await this.assertThrowsInvalidChannelNames(0)
+    }
+
+    @test()
+    protected static async allowsZeroSampleRate() {
+        await this.Outlet({ sampleRate: 0 })
     }
 
     @test()
     protected static async throwsWithInvalidSampleRate() {
-        this.Outlet({ sampleRate: 0 })
-        this.assertThrowsInvalidSampleRate(-1)
-        this.assertThrowsInvalidSampleRate(-1.5)
+        await this.assertThrowsInvalidSampleRate(-1)
+        await this.assertThrowsInvalidSampleRate(-1.5)
     }
 
     @test()
     protected static async throwsWithInvalidChannelFormat() {
-        //@ts-ignore
-        this.assertDoesThrowInvalidParameters({ channelFormat: generateId() }, [
-            'channelFormat',
-        ])
+        await this.assertDoesThrowInvalidParameters(
+            //@ts-ignore
+            { channelFormat: generateId() },
+            ['channelFormat']
+        )
     }
 
     @test()
     protected static async throwsWithInvalidChunkSize() {
-        this.Outlet({ chunkSize: 0 })
-        this.assertThrowsInvalidChunkSize(-1)
-        this.assertThrowsInvalidChunkSize(-1.5)
-        this.assertThrowsInvalidChunkSize(1.5)
+        await this.Outlet({ chunkSize: 0 })
+        await this.assertThrowsInvalidChunkSize(-1)
+        await this.assertThrowsInvalidChunkSize(-1.5)
+        await this.assertThrowsInvalidChunkSize(1.5)
     }
 
     @test()
     protected static async throwsWithInvalidMaxBuffered() {
-        this.Outlet({ maxBuffered: 0 })
-        this.assertThrowsInvalidMaxBuffered(-1)
-        this.assertThrowsInvalidMaxBuffered(-1.5)
-        this.assertThrowsInvalidMaxBuffered(1.5)
+        await this.Outlet({ maxBuffered: 0 })
+        await this.assertThrowsInvalidMaxBuffered(-1)
+        await this.assertThrowsInvalidMaxBuffered(-1.5)
+        await this.assertThrowsInvalidMaxBuffered(1.5)
     }
 
     @test()
     protected static async throwsWithUnsupportedType() {
         for (let unsupportedType of TEST_UNSUPPORTED_CHANNEL_FORMATS) {
-            assert.doesThrow(
-                () => this.Outlet({ channelFormat: unsupportedType }),
+            await assert.doesThrowAsync(
+                async () =>
+                    await this.Outlet({ channelFormat: unsupportedType }),
                 `This method currently does not support the ${unsupportedType} type! Please implement it.`
             )
         }
@@ -101,14 +112,14 @@ export default class LslOutletTest extends AbstractSpruceTest {
     @test()
     protected static async supportsAllKnownChannelFormats() {
         for (const format of TEST_SUPPORTED_CHANNEL_FORMATS) {
-            this.Outlet({ channelFormat: format as TestChannelFormat })
+            await this.Outlet({ channelFormat: format as TestChannelFormat })
         }
     }
 
     @test('pushing [1, 2] sample sends to LSL', [1.0, 2.0])
     @test('pushing [1] sample sends to LSL', [1.0])
     protected static async canPushFloatSampleToLsl(sample: LslSample) {
-        const outlet = this.FloatOutlet()
+        const outlet = await this.FloatOutlet()
         outlet.pushSample(sample)
 
         assert.isEqual(
@@ -132,7 +143,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
     @test()
     protected static async canPushStringSampleToLsl() {
         const sample = [generateId()]
-        const outlet = this.StringOutlet()
+        const outlet = await this.StringOutlet()
 
         outlet.pushSample(sample)
 
@@ -151,7 +162,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async pushingStringTwiceGivesDifferentTimestamps() {
-        const outlet = this.StringOutlet()
+        const outlet = await this.StringOutlet()
         const sample = [generateId()]
 
         outlet.pushSample(sample)
@@ -170,7 +181,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async constructionCreatesStreamInfo() {
-        this.Outlet()
+        await this.Outlet()
 
         const { ...options } = this.randomOutletOptions as any
 
@@ -190,8 +201,8 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async canOverrideClassInstantiatedInFactory() {
-        LslOutlet.Class = CheckingOutlet
-        const instance = this.Outlet()
+        LslOutletImpl.Class = CheckingOutlet
+        const instance = await this.Outlet()
 
         assert.isInstanceOf(instance, CheckingOutlet)
     }
@@ -202,7 +213,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
         const type = generateId()
         const unit = generateId()
 
-        this.Outlet({ channelNames: labels, type, unit })
+        await this.Outlet({ channelNames: labels, type, unit })
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastAppendChannelsToStreamInfoOptions,
@@ -219,7 +230,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async canDestroyOutlet() {
-        const outlet = this.Outlet()
+        const outlet = await this.Outlet()
         outlet.destroy()
 
         assert.isEqual(this.fakeLiblsl.destroyOutletHitCount, 1)
@@ -227,7 +238,7 @@ export default class LslOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async pushSampleShouldNotCreateMultipleOutlets() {
-        const outlet = this.FloatOutlet()
+        const outlet = await this.FloatOutlet()
         outlet.pushSample([1.0])
         outlet.pushSample([2.0])
         outlet.pushSample([3.0])
@@ -235,52 +246,69 @@ export default class LslOutletTest extends AbstractSpruceTest {
         assert.isEqual(this.fakeLiblsl.createStreamInfoHitCount, 1)
     }
 
-    private static assertThrowsInvalidMaxBuffered(maxBuffered: number) {
-        this.assertDoesThrowInvalidParameters({ maxBuffered }, ['maxBuffered'])
+    @test()
+    protected static async waitsForTenMsAfterConstructionBeforeReturning() {
+        const startMs = Date.now()
+        await this.Outlet({ waitAfterConstructionMs: 10 })
+        const endMs = Date.now()
+
+        assert.isAbove(endMs - startMs, 10)
     }
 
-    private static assertThrowsInvalidChunkSize(chunkSize: number) {
-        this.assertDoesThrowInvalidParameters({ chunkSize }, ['chunkSize'])
+    private static async assertThrowsInvalidMaxBuffered(maxBuffered: number) {
+        await this.assertDoesThrowInvalidParameters({ maxBuffered }, [
+            'maxBuffered',
+        ])
     }
 
-    private static assertThrowsInvalidSampleRate(sampleRate: number) {
-        this.assertDoesThrowInvalidParameters({ sampleRate }, ['sampleRate'])
+    private static async assertThrowsInvalidChunkSize(chunkSize: number) {
+        await this.assertDoesThrowInvalidParameters({ chunkSize }, [
+            'chunkSize',
+        ])
     }
 
-    private static assertThrowsInvalidChannelNames(count: number) {
-        this.assertDoesThrowInvalidParameters(
+    private static async assertThrowsInvalidSampleRate(sampleRate: number) {
+        await this.assertDoesThrowInvalidParameters({ sampleRate }, [
+            'sampleRate',
+        ])
+    }
+
+    private static async assertThrowsInvalidChannelNames(count: number) {
+        await this.assertDoesThrowInvalidParameters(
             { channelNames: new Array(count).fill(generateId()) },
             ['channelNames']
         )
     }
 
-    private static assertDoesThrowInvalidParameters(
+    private static async assertDoesThrowInvalidParameters(
         options: Partial<LslOutletOptions>,
         parameters: string[]
     ) {
-        const err = assert.doesThrow(() => this.Outlet(options))
+        const err = await assert.doesThrowAsync(
+            async () => await this.Outlet(options)
+        )
         errorAssert.assertError(err, 'INVALID_PARAMETERS', {
             parameters,
         })
     }
 
-    private static Outlet(options?: Partial<LslOutletOptions>) {
-        return LslOutlet.Outlet({
+    private static async StringOutlet() {
+        return await this.Outlet({ channelFormat: 'string' })
+    }
+
+    private static async FloatOutlet() {
+        return await this.Outlet({ channelFormat: 'float32' })
+    }
+
+    private static async Outlet(options?: Partial<LslOutletOptions>) {
+        return await LslOutletImpl.Create({
             ...this.randomOutletOptions,
             ...options,
         })
     }
-
-    private static StringOutlet() {
-        return this.Outlet({ channelFormat: 'string' })
-    }
-
-    private static FloatOutlet() {
-        return this.Outlet({ channelFormat: 'float32' })
-    }
 }
 
-class CheckingOutlet extends LslOutlet {
+class CheckingOutlet extends LslOutletImpl {
     public constructor(options: LslOutletOptions) {
         super(options)
     }

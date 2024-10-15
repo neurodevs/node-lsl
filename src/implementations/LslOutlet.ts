@@ -79,8 +79,15 @@ export default class LslOutletImpl implements LslOutlet {
         this.pushSampleByType = this.lsl[pushMethod].bind(this.lsl)
     }
 
-    public static Outlet(options: LslOutletOptions) {
-        return new (this.Class ?? this)(options)
+    public static async Create(options: LslOutletOptions) {
+        const { waitAfterConstructionMs = 10 } = options ?? {}
+        const instance = new (this.Class ?? this)(options)
+        await this.wait(waitAfterConstructionMs)
+        return instance
+    }
+
+    private static wait(waitMs: number) {
+        return new Promise((resolve) => setTimeout(resolve, waitMs))
     }
 
     public destroy() {
@@ -140,4 +147,5 @@ export interface LslOutletOptions {
     unit: string
     chunkSize: number
     maxBuffered: number
+    waitAfterConstructionMs?: number
 }

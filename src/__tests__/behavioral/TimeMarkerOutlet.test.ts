@@ -20,7 +20,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
         TimeMarkerOutletImpl.Class = SpyTimeMarkerOutlet
         this.fakeLiblsl = new FakeLiblsl()
         LiblslImpl.setInstance(this.fakeLiblsl)
-        this.outlet = this.Outlet()
+        this.outlet = await this.Outlet()
     }
 
     @test()
@@ -42,7 +42,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
     @test()
     protected static async canOverrideDefaultOptions() {
         const options = generateRandomOutletOptions()
-        const outlet = this.Outlet(options)
+        const outlet = await this.Outlet(options)
         assert.isEqualDeep(outlet.passedOptions, options)
     }
 
@@ -101,7 +101,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async doesNotWaitIfStopped() {
-        this.setupTimeMarkerImpl()
+        await this.setupTimeMarkerImpl()
 
         const startMs = Date.now()
         const promise = this.pushTotalMarkers(2, 1000)
@@ -114,7 +114,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async clearsTheTimeoutOnStop() {
-        this.setupTimeMarkerImpl()
+        await this.setupTimeMarkerImpl()
 
         const promise = this.pushTotalMarkers(2, 100)
 
@@ -126,9 +126,9 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
         await this.wait(100)
     }
 
-    private static setupTimeMarkerImpl() {
+    private static async setupTimeMarkerImpl() {
         TimeMarkerOutletImpl.Class = TimeMarkerOutletImpl as any
-        this.outlet = this.Outlet()
+        this.outlet = await this.Outlet()
     }
 
     private static async pushTotalMarkers(total: number, durationMs?: number) {
@@ -148,7 +148,9 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
         }
     }
 
-    private static Outlet(options?: Partial<LslOutletOptions>) {
-        return TimeMarkerOutletImpl.Outlet(options) as SpyTimeMarkerOutlet
+    private static async Outlet(options?: Partial<LslOutletOptions>) {
+        return (await TimeMarkerOutletImpl.Create(
+            options
+        )) as SpyTimeMarkerOutlet
     }
 }
