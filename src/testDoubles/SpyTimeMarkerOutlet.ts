@@ -1,13 +1,13 @@
 import { LslOutletOptions } from '../implementations/LslOutlet'
 import TimeMarkerOutletImpl from '../implementations/TimeMarkerOutlet'
 
-export default class SpyExtendsTimeMarkerOutlet extends TimeMarkerOutletImpl {
-    public spyOptions: LslOutletOptions
+export default class SpyTimeMarkerOutlet extends TimeMarkerOutletImpl {
+    public passedOptions: LslOutletOptions
     public totalWaitTimeMs: number
 
     public constructor(options: LslOutletOptions) {
         super(options)
-        this.spyOptions = options
+        this.passedOptions = options
         this.totalWaitTimeMs = 0
     }
 

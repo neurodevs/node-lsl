@@ -1,7 +1,7 @@
 import { TimeMarkerOutlet } from '../implementations/TimeMarkerOutlet'
 import { DurationMarker } from '../nodeLsl.types'
 
-export default class SpyImplementsTimeMarkerOutlet implements TimeMarkerOutlet {
+export default class FakeTimeMarkerOutlet implements TimeMarkerOutlet {
     public pushMarkersCalls: DurationMarker[][]
     public pushSampleCalls: string[][]
     public numStopCalls: number
@@ -30,7 +30,7 @@ export default class SpyImplementsTimeMarkerOutlet implements TimeMarkerOutlet {
         this.numDestroyCalls++
     }
 
-    public resetSpy() {
+    public resetTestDouble() {
         this.pushMarkersCalls = []
         this.pushSampleCalls = []
         this.numStopCalls = 0

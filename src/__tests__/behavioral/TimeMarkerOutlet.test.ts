@@ -8,16 +8,16 @@ import LiblslImpl from '../../implementations/Liblsl'
 import { LslOutletOptions } from '../../implementations/LslOutlet'
 import TimeMarkerOutletImpl from '../../implementations/TimeMarkerOutlet'
 import FakeLiblsl from '../../testDoubles/FakeLiblsl'
-import SpyExtendsTimeMarkerOutlet from '../../testDoubles/SpyExtendsTimeMarkerOutlet'
+import SpyTimeMarkerOutlet from '../../testDoubles/SpyTimeMarkerOutlet'
 import generateRandomOutletOptions from '../support/generateRandomOutletOptions'
 
 export default class TimeMarkerOutletTest extends AbstractSpruceTest {
     private static fakeLiblsl: FakeLiblsl
-    private static outlet: SpyExtendsTimeMarkerOutlet
+    private static outlet: SpyTimeMarkerOutlet
 
     protected static async beforeEach() {
         await super.beforeEach()
-        TimeMarkerOutletImpl.Class = SpyExtendsTimeMarkerOutlet
+        TimeMarkerOutletImpl.Class = SpyTimeMarkerOutlet
         this.fakeLiblsl = new FakeLiblsl()
         LiblslImpl.setInstance(this.fakeLiblsl)
         this.outlet = this.Outlet()
@@ -25,7 +25,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
 
     @test()
     protected static async loadsWithTimeMarkerSpecificOptions() {
-        assert.isEqualDeep(this.outlet.spyOptions, {
+        assert.isEqualDeep(this.outlet.passedOptions, {
             name: 'Time markers',
             type: 'Markers',
             channelNames: ['Markers'],
@@ -43,7 +43,7 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
     protected static async canOverrideDefaultOptions() {
         const options = generateRandomOutletOptions()
         const outlet = this.Outlet(options)
-        assert.isEqualDeep(outlet.spyOptions, options)
+        assert.isEqualDeep(outlet.passedOptions, options)
     }
 
     @test()
@@ -149,8 +149,6 @@ export default class TimeMarkerOutletTest extends AbstractSpruceTest {
     }
 
     private static Outlet(options?: Partial<LslOutletOptions>) {
-        return TimeMarkerOutletImpl.Outlet(
-            options
-        ) as SpyExtendsTimeMarkerOutlet
+        return TimeMarkerOutletImpl.Outlet(options) as SpyTimeMarkerOutlet
     }
 }

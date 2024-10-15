@@ -1,3 +1,5 @@
+export * from './nodeLsl.types'
+
 export { default as LiblslImpl } from './implementations/Liblsl'
 export * from './implementations/Liblsl'
 
@@ -10,15 +12,13 @@ export * from './implementations/TimeMarkerOutlet'
 export { default as FakeLiblsl } from './testDoubles/FakeLiblsl'
 export * from './testDoubles/FakeLiblsl'
 
-export { default as SpyExtendsTimeMarkerOutlet } from './testDoubles/SpyExtendsTimeMarkerOutlet'
-export * from './testDoubles/SpyExtendsTimeMarkerOutlet'
-
-export { default as SpyImplementsTimeMarkerOutlet } from './testDoubles/SpyImplementsTimeMarkerOutlet'
-export * from './testDoubles/SpyImplementsTimeMarkerOutlet'
+export { default as FakeTimeMarkerOutlet } from './testDoubles/FakeTimeMarkerOutlet'
+export * from './testDoubles/FakeTimeMarkerOutlet'
 
 export { default as MockTimeMarkerOutlet } from './testDoubles/MockTimeMarkerOutlet'
 export * from './testDoubles/MockTimeMarkerOutlet'
 
-export * from './nodeLsl.types'
+export { default as SpyTimeMarkerOutlet } from './testDoubles/SpyTimeMarkerOutlet'
+export * from './testDoubles/SpyTimeMarkerOutlet'
 
 export { default as generateRandomOutletOptions } from './__tests__/support/generateRandomOutletOptions'
