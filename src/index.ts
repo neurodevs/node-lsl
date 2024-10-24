@@ -12,6 +12,9 @@ export * from './implementations/TimeMarkerOutlet'
 export { default as FakeLiblsl } from './testDoubles/FakeLiblsl'
 export * from './testDoubles/FakeLiblsl'
 
+export { default as FakeLslOutlet } from './testDoubles/FakeLslOutlet'
+export * from './testDoubles/FakeLslOutlet'
+
 export { default as FakeTimeMarkerOutlet } from './testDoubles/FakeTimeMarkerOutlet'
 export * from './testDoubles/FakeTimeMarkerOutlet'
 
