@@ -87,17 +87,6 @@ export default class LiblslTest extends AbstractSpruceTest {
     }
 
     @test()
-    protected static async throwsWithMissingEnv() {
-        delete process.env.LIBLSL_PATH
-        LiblslImpl.resetInstance()
-
-        const err = assert.doesThrow(() => LiblslImpl.getInstance())
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['env.LIBLSL_PATH'],
-        })
-    }
-
-    @test()
     protected static async throwsWhenBindingsFailToLoad() {
         this.shouldThrowWhenCreatingBindings = true
         LiblslImpl.resetInstance()
@@ -391,6 +380,19 @@ export default class LiblslTest extends AbstractSpruceTest {
         delete this.localClockParams
         this.lsl.localClock()
         assert.isEqualDeep(this.localClockParams, [])
+    }
+
+    @test()
+    protected static async defaultsToMacOsPath() {
+        delete process.env.LIBLSL_PATH
+
+        LiblslImpl.resetInstance()
+        this.lsl = LiblslImpl.getInstance()
+
+        assert.isEqual(
+            this.ffiRsOpenOptions?.path,
+            '/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib'
+        )
     }
 
     private static createRandomStreamInfo() {

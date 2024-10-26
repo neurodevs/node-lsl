@@ -17,15 +17,14 @@ export default class LiblslImpl implements Liblsl {
     public static ffiRsOpen = open
     public static ffiRsDefine = define
 
-    private bindings: LiblslBindings
+    private bindings!: LiblslBindings
 
     protected constructor() {
-        const path = process.env.LIBLSL_PATH!
+        const path = process.env.LIBLSL_PATH! ?? this.defaultMacOsPath
+        this.tryToLoadBindings(path)
+    }
 
-        if (!path) {
-            assertOptions(process, ['env.LIBLSL_PATH'])
-        }
-
+    private tryToLoadBindings(path: string) {
         try {
             this.bindings = this.loadBindings(path)
         } catch (error) {
@@ -211,4 +210,7 @@ export default class LiblslImpl implements Liblsl {
     public localClock() {
         return this.bindings.lsl_local_clock([])
     }
+
+    private readonly defaultMacOsPath =
+        '/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib'
 }
