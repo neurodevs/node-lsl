@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "10.1.1",
+  "version": "10.1.2",
   "main": "build/index.js",
   "repository": {
     "type": "git",
@@ -31,22 +31,22 @@
     "test.rs": "node build/test.js"
   },
   "devDependencies": {
-    "@sprucelabs/jest-json-reporter": "^8.0.427",
-    "@sprucelabs/resolve-path-aliases": "^2.0.406",
-    "@sprucelabs/test": "^9.0.48",
-    "@sprucelabs/test-utils": "^5.1.374",
+    "@sprucelabs/jest-json-reporter": "^8.0.538",
+    "@sprucelabs/resolve-path-aliases": "^2.0.513",
+    "@sprucelabs/test": "^9.0.57",
+    "@sprucelabs/test-utils": "^5.1.496",
     "@types/ffi-napi": "^4.0.10",
-    "@types/node": "^22.7.4",
+    "@types/node": "^22.8.7",
     "chokidar-cli": "^3.0.0",
-    "concurrently": "^9.0.1",
-    "eslint": "^9.11.1",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.14.0",
     "eslint-config-spruce": "^11.2.26",
     "jest": "^29.7.0",
     "jest-circus": "^29.7.0",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "tsc-watch": "^6.2.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   },
   "description": "Lab Streaming Layer (LSL) bindings for Node",
   "skill": {
@@ -74,11 +74,11 @@
     }
   },
   "dependencies": {
-    "@sprucelabs/error": "^6.0.427",
-    "@sprucelabs/schema": "^30.0.476",
-    "@sprucelabs/spruce-core-schemas": "^40.1.420",
-    "@sprucelabs/spruce-skill-utils": "^31.0.495",
-    "ffi-rs": "^1.0.96",
+    "@sprucelabs/error": "^6.0.537",
+    "@sprucelabs/schema": "^30.0.553",
+    "@sprucelabs/spruce-core-schemas": "^40.1.540",
+    "@sprucelabs/spruce-skill-utils": "^31.0.614",
+    "ffi-rs": "^1.0.98",
     "node-gyp": "^10.2.0",
     "ref-array-napi": "^1.2.2",
     "ref-napi": "^3.0.3"
