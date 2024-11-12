@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "10.1.2",
+  "version": "10.1.3",
   "main": "build/index.js",
   "repository": {
     "type": "git",
@@ -31,12 +31,12 @@
     "test.rs": "node build/test.js"
   },
   "devDependencies": {
-    "@sprucelabs/jest-json-reporter": "^8.0.538",
-    "@sprucelabs/resolve-path-aliases": "^2.0.513",
+    "@sprucelabs/jest-json-reporter": "^8.0.540",
+    "@sprucelabs/resolve-path-aliases": "^2.0.514",
     "@sprucelabs/test": "^9.0.57",
-    "@sprucelabs/test-utils": "^5.1.496",
+    "@sprucelabs/test-utils": "^5.1.500",
     "@types/ffi-napi": "^4.0.10",
-    "@types/node": "^22.8.7",
+    "@types/node": "^22.9.0",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^9.1.0",
     "eslint": "^9.14.0",
@@ -74,10 +74,10 @@
     }
   },
   "dependencies": {
-    "@sprucelabs/error": "^6.0.537",
-    "@sprucelabs/schema": "^30.0.553",
-    "@sprucelabs/spruce-core-schemas": "^40.1.540",
-    "@sprucelabs/spruce-skill-utils": "^31.0.614",
+    "@sprucelabs/error": "^6.0.539",
+    "@sprucelabs/schema": "^30.0.558",
+    "@sprucelabs/spruce-core-schemas": "^40.1.545",
+    "@sprucelabs/spruce-skill-utils": "^31.0.622",
     "ffi-rs": "^1.0.98",
     "node-gyp": "^10.2.0",
     "ref-array-napi": "^1.2.2",
