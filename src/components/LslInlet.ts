@@ -1,4 +1,4 @@
-export default class LslInlet implements Inlet {
+export default class LslInlet implements StreamInlet {
     public static Class?: LslInletConstructor
 
     protected constructor() {}
@@ -8,6 +8,6 @@ export default class LslInlet implements Inlet {
     }
 }
 
-export interface Inlet {}
+export interface StreamInlet {}
 
-export type LslInletConstructor = new () => Inlet
+export type LslInletConstructor = new () => StreamInlet
