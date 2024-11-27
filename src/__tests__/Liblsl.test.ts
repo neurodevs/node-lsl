@@ -6,7 +6,7 @@ import AbstractSpruceTest, {
     generateId,
 } from '@sprucelabs/test-utils'
 import { DataType, OpenParams } from 'ffi-rs'
-import LiblslImpl from '../../components/Liblsl'
+import LiblslImpl from '../components/Liblsl'
 import {
     BoundChild,
     BoundDescription,
@@ -16,8 +16,8 @@ import {
     Liblsl,
     LiblslBindings,
     LslChannel,
-} from '../../nodeLsl.types'
-import FakeLiblsl from '../../testDoubles/FakeLiblsl'
+} from '../nodeLsl.types'
+import FakeLiblsl from '../testDoubles/FakeLiblsl'
 
 export default class LiblslTest extends AbstractSpruceTest {
     private static lsl: Liblsl

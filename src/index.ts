@@ -24,4 +24,4 @@ export * from './testDoubles/MockTimeMarkerOutlet'
 export { default as SpyTimeMarkerOutlet } from './testDoubles/SpyTimeMarkerOutlet'
 export * from './testDoubles/SpyTimeMarkerOutlet'
 
-export { default as generateRandomOutletOptions } from './__tests__/support/generateRandomOutletOptions'
+export { default as generateRandomOutletOptions } from './testDoubles/generateRandomOutletOptions'
