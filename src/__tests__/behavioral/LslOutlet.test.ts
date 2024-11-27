@@ -4,10 +4,10 @@ import AbstractSpruceTest, {
     errorAssert,
     generateId,
 } from '@sprucelabs/test-utils'
-import LiblslImpl from '../../implementations/Liblsl'
+import LiblslImpl from '../../components/Liblsl'
 import LslOutletImpl, {
     LslOutletOptions,
-} from '../../implementations/LslOutlet'
+} from '../../components/LslOutlet'
 import { LslSample } from '../../nodeLsl.types'
 import FakeLiblsl from '../../testDoubles/FakeLiblsl'
 import {

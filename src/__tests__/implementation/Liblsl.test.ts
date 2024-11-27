@@ -6,7 +6,7 @@ import AbstractSpruceTest, {
     generateId,
 } from '@sprucelabs/test-utils'
 import { DataType, OpenParams } from 'ffi-rs'
-import LiblslImpl from '../../implementations/Liblsl'
+import LiblslImpl from '../../components/Liblsl'
 import {
     BoundChild,
     BoundDescription,

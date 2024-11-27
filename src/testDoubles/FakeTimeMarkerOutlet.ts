@@ -1,4 +1,4 @@
-import { TimeMarkerOutlet } from '../implementations/TimeMarkerOutlet'
+import { TimeMarkerOutlet } from '../components/TimeMarkerOutlet'
 import { DurationMarker } from '../nodeLsl.types'
 
 export default class FakeTimeMarkerOutlet implements TimeMarkerOutlet {

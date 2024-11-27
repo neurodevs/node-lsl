@@ -1,4 +1,4 @@
-import { LslOutlet, LslOutletOptions } from '../implementations/LslOutlet'
+import { LslOutlet, LslOutletOptions } from '../components/LslOutlet'
 import { LslSample } from '../nodeLsl.types'
 
 export default class FakeLslOutlet implements LslOutlet {
