@@ -8,8 +8,8 @@ import LiblslImpl from '../components/Liblsl'
 import { LslOutletOptions } from '../components/LslOutlet'
 import TimeMarkerOutletImpl from '../components/TimeMarkerOutlet'
 import FakeLiblsl from '../testDoubles/FakeLiblsl'
-import SpyTimeMarkerOutlet from '../testDoubles/SpyTimeMarkerOutlet'
 import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
+import SpyTimeMarkerOutlet from '../testDoubles/SpyTimeMarkerOutlet'
 
 export default class TimeMarkerOutletTest extends AbstractSpruceTest {
     private static fakeLiblsl: FakeLiblsl

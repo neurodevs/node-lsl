@@ -5,17 +5,15 @@ import AbstractSpruceTest, {
     generateId,
 } from '@sprucelabs/test-utils'
 import LiblslImpl from '../components/Liblsl'
-import LslOutletImpl, {
-    LslOutletOptions,
-} from '../components/LslOutlet'
+import LslOutletImpl, { LslOutletOptions } from '../components/LslOutlet'
 import { LslSample } from '../nodeLsl.types'
-import FakeLiblsl from '../testDoubles/FakeLiblsl'
 import {
     TEST_CHANNEL_FORMATS_MAP,
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
     TestChannelFormat,
 } from '../testDoubles/consts'
+import FakeLiblsl from '../testDoubles/FakeLiblsl'
 import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
 
 export default class LslOutletTest extends AbstractSpruceTest {
