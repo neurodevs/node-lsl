@@ -1,4 +1,5 @@
 import { generateId } from '@sprucelabs/test-utils'
+import LiblslImpl from './Liblsl'
 
 export default class LslInlet implements StreamInlet {
     public static Class?: LslInletConstructor
@@ -23,10 +24,23 @@ export default class LslInlet implements StreamInlet {
         this.sourceId = sourceId
         this.manufacturer = manufacturer
         this.units = units
+
+        this.lsl.createStreamInfo({
+            name,
+            type,
+            channelCount: 1,
+            sampleRate: 0,
+            channelFormat: 0,
+            sourceId,
+        })
     }
 
     public static Create(options?: LslInletOptions) {
         return new (this.Class ?? this)(options)
+    }
+
+    private get lsl() {
+        return LiblslImpl.getInstance()
     }
 
     private readonly defaultName = `lsl-inlet-${generateId()}`

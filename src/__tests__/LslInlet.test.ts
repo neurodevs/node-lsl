@@ -151,6 +151,35 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async createsStreamInfo() {
+        assert.isEqual(
+            this.fakeLiblsl.createStreamInfoHitCount,
+            1,
+            'Should have called createStreamInfo!'
+        )
+    }
+
+    @test()
+    protected static async passesOptionsToStreamInfo() {
+        const options = {
+            name: generateId(),
+            type: generateId(),
+            channelCount: 1,
+            sampleRate: 0,
+            channelFormat: 0,
+            sourceId: generateId(),
+        }
+
+        this.LslInlet(options)
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastCreateStreamInfoOptions,
+            options,
+            'Should have passed options to createStreamInfo!'
+        )
+    }
+
     private static setSpyLslInlet() {
         LslInlet.Class = SpyLslInlet
     }
