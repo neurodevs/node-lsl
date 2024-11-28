@@ -1,7 +1,13 @@
+import { generateId } from '@sprucelabs/test-utils'
+
 export default class LslInlet implements StreamInlet {
     public static Class?: LslInletConstructor
 
-    protected constructor() {}
+    protected name: string
+
+    protected constructor() {
+        this.name = generateId()
+    }
 
     public static Create() {
         return new (this.Class ?? this)()
