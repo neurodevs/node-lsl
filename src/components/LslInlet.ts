@@ -6,7 +6,7 @@ export default class LslInlet implements StreamInlet {
     protected name: string
 
     protected constructor() {
-        this.name = generateId()
+        this.name = `lsl-inlet-${generateId()}`
     }
 
     public static Create() {

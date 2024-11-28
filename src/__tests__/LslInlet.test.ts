@@ -30,6 +30,13 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async uniqueNameHasSetPrefix() {
+        const instance = this.LslInlet()
+
+        assert.doesInclude(instance.getName(), 'lsl-inlet-')
+    }
+
     private static LslInlet() {
         return LslInlet.Create() as SpyLslInlet
     }
