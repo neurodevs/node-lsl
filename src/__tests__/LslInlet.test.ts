@@ -135,6 +135,18 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async canManuallySetUnits() {
+        const units = generateId()
+        const instance = this.LslInlet({ units })
+
+        assert.isEqual(
+            instance.getUnits(),
+            units,
+            'Units should be set to provided value!'
+        )
+    }
+
     private static LslInlet(options?: LslInletOptions) {
         return LslInlet.Create(options) as SpyLslInlet
     }
