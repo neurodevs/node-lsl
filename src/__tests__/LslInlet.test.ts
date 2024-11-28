@@ -81,6 +81,18 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async generatesUniqueSourceIdIfNotProvided() {
+        const instance1 = this.LslInlet()
+        const instance2 = this.LslInlet()
+
+        assert.isNotEqual(
+            instance1.getSourceId(),
+            instance2.getSourceId(),
+            'Inlet sourceIds should be unique!'
+        )
+    }
+
     private static LslInlet(options?: LslInletOptions) {
         return LslInlet.Create(options) as SpyLslInlet
     }

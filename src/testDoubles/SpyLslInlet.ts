@@ -12,4 +12,8 @@ export class SpyLslInlet extends LslInlet {
     public getType() {
         return this.type
     }
+
+    public getSourceId() {
+        return this.sourceId
+    }
 }
