@@ -114,6 +114,18 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async canManuallySetManufacturer() {
+        const manufacturer = generateId()
+        const instance = this.LslInlet({ manufacturer })
+
+        assert.isEqual(
+            instance.getManufacturer(),
+            manufacturer,
+            'Manufacturer should be set to provided value!'
+        )
+    }
+
     private static LslInlet(options?: LslInletOptions) {
         return LslInlet.Create(options) as SpyLslInlet
     }
