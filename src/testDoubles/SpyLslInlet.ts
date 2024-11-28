@@ -8,4 +8,8 @@ export class SpyLslInlet extends LslInlet {
     public getName() {
         return this.name
     }
+
+    public getType() {
+        return this.type
+    }
 }

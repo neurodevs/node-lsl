@@ -4,10 +4,13 @@ export default class LslInlet implements StreamInlet {
     public static Class?: LslInletConstructor
 
     protected name: string
+    protected type: string
 
     protected constructor(options?: LslInletOptions) {
         const { name } = options ?? {}
+
         this.name = name ?? `lsl-inlet-${generateId()}`
+        this.type = generateId()
     }
 
     public static Create(options?: LslInletOptions) {
