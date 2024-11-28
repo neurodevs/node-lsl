@@ -93,6 +93,18 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async canManuallySetSourceId() {
+        const sourceId = generateId()
+        const instance = this.LslInlet({ sourceId })
+
+        assert.isEqual(
+            instance.getSourceId(),
+            sourceId,
+            'SourceId should be set to provided value!'
+        )
+    }
+
     private static LslInlet(options?: LslInletOptions) {
         return LslInlet.Create(options) as SpyLslInlet
     }

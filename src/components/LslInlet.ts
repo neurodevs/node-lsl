@@ -8,11 +8,11 @@ export default class LslInlet implements StreamInlet {
     protected sourceId: string
 
     protected constructor(options?: LslInletOptions) {
-        const { name, type } = options ?? {}
+        const { name, type, sourceId } = options ?? {}
 
         this.name = name ?? `lsl-inlet-${generateId()}`
         this.type = type ?? generateId()
-        this.sourceId = generateId()
+        this.sourceId = sourceId ?? generateId()
     }
 
     public static Create(options?: LslInletOptions) {
@@ -27,4 +27,5 @@ export type LslInletConstructor = new () => StreamInlet
 export interface LslInletOptions {
     name?: string
     type?: string
+    sourceId?: string
 }
