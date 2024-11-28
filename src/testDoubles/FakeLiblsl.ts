@@ -60,4 +60,17 @@ export default class FakeLiblsl implements Liblsl {
         this.localClockHitCount++
         return new Date().getTime()
     }
+
+    public resetTestDouble() {
+        this.lastCreateStreamInfoOptions = undefined
+        this.lastAppendChannelsToStreamInfoOptions = undefined
+        this.lastCreateOutletOptions = undefined
+        this.lastPushSampleFloatTimestampOptions = undefined
+        this.lastPushSampleStringTimestampOptions = undefined
+
+        this.createStreamInfoHitCount = 0
+        this.destroyOutletHitCount = 0
+        this.localClockHitCount = 0
+        this.pushSampleStringTimestampHitCount = 0
+    }
 }
