@@ -8,16 +8,24 @@ export default class LslInlet implements StreamInlet {
     protected sourceId: string
 
     protected constructor(options?: LslInletOptions) {
-        const { name, type, sourceId } = options ?? {}
+        const {
+            name = this.defaultName,
+            type = this.defaultType,
+            sourceId = this.defaultSourceId,
+        } = options ?? {}
 
-        this.name = name ?? `lsl-inlet-${generateId()}`
-        this.type = type ?? generateId()
-        this.sourceId = sourceId ?? generateId()
+        this.name = name
+        this.type = type
+        this.sourceId = sourceId
     }
 
     public static Create(options?: LslInletOptions) {
         return new (this.Class ?? this)(options)
     }
+
+    private readonly defaultName = `lsl-inlet-${generateId()}`
+    private readonly defaultType = generateId()
+    private readonly defaultSourceId = generateId()
 }
 
 export interface StreamInlet {}
