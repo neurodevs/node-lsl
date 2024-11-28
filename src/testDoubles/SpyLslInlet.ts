@@ -20,4 +20,8 @@ export class SpyLslInlet extends LslInlet {
     public getManufacturer() {
         return this.manufacturer
     }
+
+    public getUnits() {
+        return this.units
+    }
 }

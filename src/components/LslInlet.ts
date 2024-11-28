@@ -7,6 +7,7 @@ export default class LslInlet implements StreamInlet {
     protected type: string
     protected sourceId: string
     protected manufacturer: string
+    protected units: string
 
     protected constructor(options?: LslInletOptions) {
         const {
@@ -20,6 +21,7 @@ export default class LslInlet implements StreamInlet {
         this.type = type
         this.sourceId = sourceId
         this.manufacturer = manufacturer
+        this.units = 'N/A'
     }
 
     public static Create(options?: LslInletOptions) {

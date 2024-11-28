@@ -126,6 +126,15 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async setsUnitsToNAIfNotProvided() {
+        assert.isEqual(
+            this.instance.getUnits(),
+            'N/A',
+            'Units should be set to "N/A"!'
+        )
+    }
+
     private static LslInlet(options?: LslInletOptions) {
         return LslInlet.Create(options) as SpyLslInlet
     }
