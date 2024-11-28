@@ -3,16 +3,20 @@ import AbstractSpruceTest, {
     assert,
     generateId,
 } from '@sprucelabs/test-utils'
+import LiblslImpl from '../components/Liblsl'
 import LslInlet, { LslInletOptions } from '../components/LslInlet'
+import FakeLiblsl from '../testDoubles/FakeLiblsl'
 import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
 
 export default class LslInletTest extends AbstractSpruceTest {
     private static instance: SpyLslInlet
+    private static fakeLiblsl: FakeLiblsl
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        LslInlet.Class = SpyLslInlet
+        this.setFakeLiblsl()
+        this.setSpyLslInlet()
 
         this.instance = this.LslInlet()
     }
@@ -145,6 +149,15 @@ export default class LslInletTest extends AbstractSpruceTest {
             units,
             'Units should be set to provided value!'
         )
+    }
+
+    private static setSpyLslInlet() {
+        LslInlet.Class = SpyLslInlet
+    }
+
+    private static setFakeLiblsl() {
+        this.fakeLiblsl = new FakeLiblsl()
+        LiblslImpl.setInstance(this.fakeLiblsl)
     }
 
     private static LslInlet(options?: LslInletOptions) {
