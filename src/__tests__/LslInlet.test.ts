@@ -69,6 +69,18 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async canManuallySetType() {
+        const type = generateId()
+        const instance = this.LslInlet({ type })
+
+        assert.isEqual(
+            instance.getType(),
+            type,
+            'Type should be set to provided value!'
+        )
+    }
+
     private static LslInlet(options?: LslInletOptions) {
         return LslInlet.Create(options) as SpyLslInlet
     }
