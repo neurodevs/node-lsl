@@ -1,5 +1,9 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import LslInlet from '../components/LslInlet'
+import AbstractSpruceTest, {
+    test,
+    assert,
+    generateId,
+} from '@sprucelabs/test-utils'
+import LslInlet, { LslInletOptions } from '../components/LslInlet'
 import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
 
 export default class LslInletTest extends AbstractSpruceTest {
@@ -15,7 +19,7 @@ export default class LslInletTest extends AbstractSpruceTest {
 
     @test()
     protected static async canCreateLslInlet() {
-        assert.isTruthy(this.instance)
+        assert.isTruthy(this.instance, 'Instance should be created!')
     }
 
     @test()
@@ -34,10 +38,26 @@ export default class LslInletTest extends AbstractSpruceTest {
     protected static async uniqueNameHasSetPrefix() {
         const instance = this.LslInlet()
 
-        assert.doesInclude(instance.getName(), 'lsl-inlet-')
+        assert.doesInclude(
+            instance.getName(),
+            'lsl-inlet-',
+            'Name should have set prefix!'
+        )
     }
 
-    private static LslInlet() {
-        return LslInlet.Create() as SpyLslInlet
+    @test()
+    protected static async canManuallySetName() {
+        const name = generateId()
+        const instance = this.LslInlet({ name })
+
+        assert.isEqual(
+            instance.getName(),
+            name,
+            'Name should be set to provided value!'
+        )
+    }
+
+    private static LslInlet(options?: LslInletOptions) {
+        return LslInlet.Create(options) as SpyLslInlet
     }
 }

@@ -1,8 +1,8 @@
-import LslInlet from '../components/LslInlet'
+import LslInlet, { LslInletOptions } from '../components/LslInlet'
 
 export class SpyLslInlet extends LslInlet {
-    public constructor() {
-        super()
+    public constructor(options?: LslInletOptions) {
+        super(options)
     }
 
     public getName() {

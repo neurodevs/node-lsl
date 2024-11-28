@@ -5,15 +5,20 @@ export default class LslInlet implements StreamInlet {
 
     protected name: string
 
-    protected constructor() {
-        this.name = `lsl-inlet-${generateId()}`
+    protected constructor(options?: LslInletOptions) {
+        const { name } = options ?? {}
+        this.name = name ?? `lsl-inlet-${generateId()}`
     }
 
-    public static Create() {
-        return new (this.Class ?? this)()
+    public static Create(options?: LslInletOptions) {
+        return new (this.Class ?? this)(options)
     }
 }
 
 export interface StreamInlet {}
 
 export type LslInletConstructor = new () => StreamInlet
+
+export interface LslInletOptions {
+    name?: string
+}
