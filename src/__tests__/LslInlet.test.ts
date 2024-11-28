@@ -7,7 +7,7 @@ import LslInlet, { LslInletOptions } from '../components/LslInlet'
 import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
 
 export default class LslInletTest extends AbstractSpruceTest {
-    private static instance: LslInlet
+    private static instance: SpyLslInlet
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -102,6 +102,15 @@ export default class LslInletTest extends AbstractSpruceTest {
             instance.getSourceId(),
             sourceId,
             'SourceId should be set to provided value!'
+        )
+    }
+
+    @test()
+    protected static async setsManufacturerToNAIfNotProvided() {
+        assert.isEqual(
+            this.instance.getManufacturer(),
+            'N/A',
+            'Manufacturer should be set to "N/A"!'
         )
     }
 
