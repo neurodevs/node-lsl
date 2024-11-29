@@ -80,6 +80,16 @@ export default class LiblslImpl implements Liblsl {
                 retType: DataType.Void,
                 paramsType: [DataType.External],
             },
+            lsl_create_inlet: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External, DataType.I32, DataType.I32],
+            },
+            lsl_destroy_inlet: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
+            },
             lsl_local_clock: {
                 library: 'lsl',
                 retType: DataType.Double,
