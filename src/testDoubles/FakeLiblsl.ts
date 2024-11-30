@@ -7,6 +7,9 @@ import {
     PushSampleFloatTimestampOptions,
     PushSampleStringTimestampOptions,
     Liblsl,
+    CreateInletOptions,
+    DestroyInletOptions,
+    BoundInlet,
 } from '../nodeLsl.types'
 
 export default class FakeLiblsl implements Liblsl {
@@ -18,6 +21,8 @@ export default class FakeLiblsl implements Liblsl {
     public lastCreateOutletOptions?: CreateOutletOptions
     public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
     public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
+    public lastCreateInletOptions?: CreateInletOptions
+    public lastDestroyInletOptions?: DestroyInletOptions
 
     public createStreamInfoHitCount = 0
     public destroyOutletHitCount = 0
@@ -41,10 +46,6 @@ export default class FakeLiblsl implements Liblsl {
         return this.outlet
     }
 
-    public destroyOutlet() {
-        this.destroyOutletHitCount++
-    }
-
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
         this.lastPushSampleFloatTimestampOptions = options
     }
@@ -54,6 +55,19 @@ export default class FakeLiblsl implements Liblsl {
     ) {
         this.lastPushSampleStringTimestampOptions = options
         this.pushSampleStringTimestampHitCount++
+    }
+
+    public destroyOutlet() {
+        this.destroyOutletHitCount++
+    }
+
+    public createInlet(options: CreateInletOptions) {
+        this.lastCreateInletOptions = options
+        return {} as BoundInlet
+    }
+
+    public destroyInlet(options: DestroyInletOptions) {
+        this.lastDestroyInletOptions = options
     }
 
     public localClock() {

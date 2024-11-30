@@ -10,6 +10,8 @@ import {
     DestroyOutletOptions,
     PushSampleFloatTimestampOptions,
     PushSampleStringTimestampOptions,
+    CreateInletOptions,
+    DestroyInletOptions,
 } from '../nodeLsl.types'
 
 export default class LiblslImpl implements Liblsl {
@@ -192,11 +194,6 @@ export default class LiblslImpl implements Liblsl {
         return this.bindings.lsl_create_outlet([info, chunkSize, maxBuffered])
     }
 
-    public destroyOutlet(options: DestroyOutletOptions) {
-        const { outlet } = assertOptions(options, ['outlet'])
-        this.bindings.lsl_destroy_outlet([outlet])
-    }
-
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
         const { outlet, sample, timestamp } = assertOptions(options, [
             'outlet',
@@ -216,6 +213,23 @@ export default class LiblslImpl implements Liblsl {
         ])
         this.bindings.lsl_push_sample_strt([outlet, sample, timestamp])
     }
+
+    public destroyOutlet(options: DestroyOutletOptions) {
+        const { outlet } = assertOptions(options, ['outlet'])
+        this.bindings.lsl_destroy_outlet([outlet])
+    }
+
+    public createInlet(options: CreateInletOptions) {
+        const { info, chunkSize, maxBuffered } = assertOptions(options, [
+            'info',
+            'chunkSize',
+            'maxBuffered',
+        ])
+
+        return this.bindings.lsl_create_inlet([info, chunkSize, maxBuffered])
+    }
+
+    public destroyInlet(_options: DestroyInletOptions) {}
 
     public localClock() {
         return this.bindings.lsl_local_clock([])

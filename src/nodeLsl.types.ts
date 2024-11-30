@@ -12,9 +12,11 @@ export interface Liblsl {
     createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
     createOutlet(options: CreateOutletOptions): BoundOutlet
-    destroyOutlet(options: DestroyOutletOptions): void
     pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions): void
     pushSampleStringTimestamp(options: PushSampleStringTimestampOptions): void
+    destroyOutlet(options: DestroyOutletOptions): void
+    createInlet(options: CreateInletOptions): BoundInlet
+    destroyInlet(options: DestroyInletOptions): void
     localClock(): number
 }
 
@@ -34,14 +36,18 @@ export interface AppendChannelsToStreamInfoOptions {
     channels: LslChannel[]
 }
 
+export interface LslChannel {
+    label: string
+    unit: string
+    type: string
+}
+
+export type LslSample = (number | string | undefined)[]
+
 export interface CreateOutletOptions {
     info: BoundStreamInfo
     chunkSize: number
     maxBuffered: number
-}
-
-export interface DestroyOutletOptions {
-    outlet: BoundOutlet
 }
 
 export interface PushSampleFloatTimestampOptions {
@@ -56,35 +62,38 @@ export interface PushSampleStringTimestampOptions {
     timestamp: number
 }
 
-export interface LslChannel {
-    label: string
-    unit: string
-    type: string
+export interface DestroyOutletOptions {
+    outlet: BoundOutlet
 }
 
-export type LslSample = (number | string | undefined)[]
+export interface CreateInletOptions {
+    info: BoundStreamInfo
+    chunkSize: number
+    maxBuffered: number
+}
+
+export interface DestroyInletOptions {}
 
 export interface LiblslBindings {
     lsl_create_streaminfo(
-        options: [string, string, number, number, number, string]
+        args: [string, string, number, number, number, string]
     ): BoundStreamInfo
 
-    lsl_create_outlet(options: [BoundStreamInfo, number, number]): BoundOutlet
-
-    lsl_destroy_outlet(outlet: [BoundOutlet]): void
-
-    lsl_push_sample_ft(options: [BoundOutlet, LslSample, number]): void
-
-    lsl_push_sample_strt(options: [BoundOutlet, LslSample, number]): void
-
-    lsl_local_clock(options: []): number
-    lsl_get_desc(info: [BoundStreamInfo]): BoundDescription
-    lsl_append_child(options: [BoundDescription, string]): BoundChild
-    lsl_append_child_value(options: [BoundChild, string, string]): void
+    lsl_create_outlet(args: [BoundStreamInfo, number, number]): BoundOutlet
+    lsl_push_sample_ft(args: [BoundOutlet, LslSample, number]): void
+    lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): void
+    lsl_destroy_outlet(args: [BoundOutlet]): void
+    lsl_create_inlet(args: any): BoundInlet
+    lsl_destroy_inlet(args: any): void
+    lsl_local_clock(args: []): number
+    lsl_get_desc(args: [BoundStreamInfo]): BoundDescription
+    lsl_append_child(args: [BoundDescription, string]): BoundChild
+    lsl_append_child_value(args: [BoundChild, string, string]): void
 }
 
 export interface BoundStreamInfo {}
 export interface BoundOutlet {}
+export interface BoundInlet {}
 export interface BoundDescription {}
 export interface BoundChild {}
 

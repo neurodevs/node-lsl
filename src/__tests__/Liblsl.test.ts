@@ -10,6 +10,7 @@ import LiblslImpl from '../components/Liblsl'
 import {
     BoundChild,
     BoundDescription,
+    BoundInlet,
     BoundOutlet,
     BoundStreamInfo,
     FfiRsDefineOptions,
@@ -26,12 +27,15 @@ export default class LiblslTest extends AbstractSpruceTest {
     private static fakeBindings: LiblslBindings
     private static fakeStreamInfo: BoundStreamInfo
     private static fakeOutlet: BoundOutlet
+    private static fakeInlet: BoundInlet
     private static fakeDesc: BoundDescription
     private static fakeChildNamedChannels: BoundChild
     private static createStreamInfoParams?: any[]
     private static appendChildParams: any[] = []
     private static createOutletParams?: any[]
     private static destroyOutletParams?: any[]
+    private static createInletParams?: any[]
+    private static destroyInletParams?: any[]
     private static localClockParams?: any[]
     private static pushSampleFloatTimestampParams?: any[]
     private static pushSampleStringTimestampParams?: any[]
@@ -51,6 +55,8 @@ export default class LiblslTest extends AbstractSpruceTest {
         delete this.createStreamInfoParams
         delete this.createOutletParams
         delete this.destroyOutletParams
+        delete this.createInletParams
+        delete this.destroyInletParams
         delete this.pushSampleFloatTimestampParams
         delete this.getDescriptionParams
         this.appendChildParams = []
@@ -405,6 +411,13 @@ export default class LiblslTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async canCreateInletWithRequiredParams() {
+        const { options, inlet } = this.createRandomInlet()
+        assert.isEqualDeep(this.createInletParams, Object.values(options))
+        assert.isEqual(inlet, this.fakeInlet)
+    }
+
     private static createRandomStreamInfo() {
         return this.lsl.createStreamInfo(
             this.generateRandomCreateStreamInfoOptions()
@@ -412,14 +425,25 @@ export default class LiblslTest extends AbstractSpruceTest {
     }
 
     private static createRandomOutlet() {
+        const options = this.createRandomOptions()
+        const outlet = this.lsl.createOutlet(options)
+        return { options, outlet }
+    }
+
+    private static createRandomInlet() {
+        const options = this.createRandomOptions()
+        const inlet = this.lsl.createInlet(options)
+        return { options, inlet }
+    }
+
+    private static createRandomOptions() {
         const info = this.createRandomStreamInfo()
         const options = {
             info,
             chunkSize: randomInt(10),
             maxBuffered: randomInt(10),
         }
-        const outlet = this.lsl.createOutlet(options)
-        return { options, outlet }
+        return options
     }
 
     private static generateRandomChannelValues() {
@@ -451,14 +475,21 @@ export default class LiblslTest extends AbstractSpruceTest {
                 this.createOutletParams = params
                 return this.fakeOutlet
             },
-            lsl_destroy_outlet: (params: any[]) => {
-                this.destroyOutletParams = params
-            },
             lsl_push_sample_ft: (params: any[]) => {
                 this.pushSampleFloatTimestampParams = params
             },
             lsl_push_sample_strt: (params: any[]) => {
                 this.pushSampleStringTimestampParams = params
+            },
+            lsl_destroy_outlet: (params: any[]) => {
+                this.destroyOutletParams = params
+            },
+            lsl_create_inlet: (params: any[]) => {
+                this.createInletParams = params
+                return this.fakeInlet
+            },
+            lsl_destroy_inlet: (params: any[]) => {
+                this.destroyInletParams = params
             },
             lsl_local_clock: (params: []) => {
                 this.localClockParams = params
