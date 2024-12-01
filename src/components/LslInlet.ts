@@ -44,11 +44,15 @@ export default class LslInlet implements StreamInlet {
         this.lsl.createStreamInfo({
             name: this.name,
             type: this.type,
-            channelCount: this.channelNames.length,
+            channelCount: this.channelCount,
             sampleRate: this.sampleRate,
             channelFormat: 0,
             sourceId: this.sourceId,
         })
+    }
+
+    private get channelCount() {
+        return this.channelNames.length
     }
 
     private get lsl() {
