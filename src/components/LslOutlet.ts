@@ -55,15 +55,7 @@ export default class LslOutletImpl implements LslOutlet {
         delete streamInfoOptions.unit
 
         this.createStreamInfo()
-
-        this.lsl.appendChannelsToStreamInfo({
-            info: this.streamInfo,
-            channels: channelNames.map((label: string) => ({
-                label,
-                unit: this.options.unit,
-                type: this.options.type,
-            })),
-        })
+        this.appendChannelsToStreamInfo()
 
         this.outlet = this.lsl.createOutlet({
             info: this.streamInfo,
@@ -90,6 +82,17 @@ export default class LslOutletImpl implements LslOutlet {
             channelCount: this.options.channelNames.length,
             channelFormat: this.lookupChannelFormat(this.options.channelFormat),
             sourceId: this.options.sourceId,
+        })
+    }
+
+    private appendChannelsToStreamInfo() {
+        this.lsl.appendChannelsToStreamInfo({
+            info: this.streamInfo,
+            channels: this.options.channelNames.map((label: string) => ({
+                label,
+                unit: this.options.unit,
+                type: this.options.type,
+            })),
         })
     }
 
