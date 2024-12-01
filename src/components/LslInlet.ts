@@ -25,18 +25,22 @@ export default class LslInlet implements StreamInlet {
         this.manufacturer = manufacturer
         this.units = units
 
-        this.lsl.createStreamInfo({
-            name,
-            type,
-            channelCount: 1,
-            sampleRate: 0,
-            channelFormat: 0,
-            sourceId,
-        })
+        this.createStreamInfo()
     }
 
     public static Create(options?: LslInletOptions) {
         return new (this.Class ?? this)(options)
+    }
+
+    private createStreamInfo() {
+        this.lsl.createStreamInfo({
+            name: this.name,
+            type: this.type,
+            channelCount: 1,
+            sampleRate: 0,
+            channelFormat: 0,
+            sourceId: this.sourceId,
+        })
     }
 
     private get lsl() {
