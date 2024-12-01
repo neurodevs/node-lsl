@@ -21,8 +21,8 @@ export default class LslOutletImpl implements LslOutlet {
 
     private options: LslOutletOptions
     private streamInfo!: BoundStreamInfo
-    private outlet: BoundOutlet
-    private pushSampleByType: (options: any) => void
+    private outlet!: BoundOutlet
+    private pushSampleByType!: (options: any) => void
 
     protected constructor(options: LslOutletOptions) {
         const { sampleRate, channelFormat } = assertOptions(options, [
@@ -56,15 +56,9 @@ export default class LslOutletImpl implements LslOutlet {
 
         this.createStreamInfo()
         this.appendChannelsToStreamInfo()
+        this.createLslOutlet()
 
-        this.outlet = this.lsl.createOutlet({
-            info: this.streamInfo,
-            chunkSize: this.options.chunkSize,
-            maxBuffered: this.options.maxBuffered,
-        })
-
-        const pushMethod = this.getPushMethod()
-        this.pushSampleByType = this.lsl[pushMethod].bind(this.lsl)
+        this.setPushSampleType()
     }
 
     public static async Create(options: LslOutletOptions) {
@@ -72,6 +66,10 @@ export default class LslOutletImpl implements LslOutlet {
         const instance = new (this.Class ?? this)(options)
         await this.wait(waitAfterConstructionMs)
         return instance
+    }
+
+    private static async wait(waitMs: number) {
+        return new Promise((resolve) => setTimeout(resolve, waitMs))
     }
 
     private createStreamInfo() {
@@ -96,8 +94,17 @@ export default class LslOutletImpl implements LslOutlet {
         })
     }
 
-    private static async wait(waitMs: number) {
-        return new Promise((resolve) => setTimeout(resolve, waitMs))
+    private createLslOutlet() {
+        this.outlet = this.lsl.createOutlet({
+            info: this.streamInfo,
+            chunkSize: this.options.chunkSize,
+            maxBuffered: this.options.maxBuffered,
+        })
+    }
+
+    private setPushSampleType() {
+        const pushMethod = this.getPushMethod()
+        this.pushSampleByType = this.lsl[pushMethod].bind(this.lsl)
     }
 
     public destroy() {
