@@ -167,7 +167,7 @@ export default class LslInletTest extends AbstractSpruceTest {
             name: generateId(),
             type: generateId(),
             channelCount: 1,
-            sampleRate: 0,
+            sampleRate: 100 * Math.random(),
             channelFormat: 0,
             sourceId: generateId(),
         }

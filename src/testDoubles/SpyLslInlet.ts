@@ -1,7 +1,7 @@
 import LslInlet, { LslInletOptions } from '../components/LslInlet'
 
 export class SpyLslInlet extends LslInlet {
-    public constructor(options?: LslInletOptions) {
+    public constructor(options: LslInletOptions) {
         super(options)
     }
 
