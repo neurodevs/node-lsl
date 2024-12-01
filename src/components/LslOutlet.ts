@@ -57,7 +57,6 @@ export default class LslOutletImpl implements LslOutlet {
         this.createStreamInfo()
         this.appendChannelsToStreamInfo()
         this.createLslOutlet()
-
         this.setPushSampleType()
     }
 
