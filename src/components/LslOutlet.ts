@@ -20,7 +20,7 @@ export default class LslOutletImpl implements LslOutlet {
     public static Class?: LslOutletConstructor
 
     private options: LslOutletOptions
-    private streamInfo: BoundStreamInfo
+    private streamInfo!: BoundStreamInfo
     private outlet: BoundOutlet
     private pushSampleByType: (options: any) => void
 
@@ -54,11 +54,7 @@ export default class LslOutletImpl implements LslOutlet {
         delete streamInfoOptions.manufacturer
         delete streamInfoOptions.unit
 
-        this.streamInfo = this.lsl.createStreamInfo({
-            ...streamInfoOptions,
-            channelCount,
-            channelFormat: this.lookupChannelFormat(channelFormat),
-        })
+        this.createStreamInfo()
 
         this.lsl.appendChannelsToStreamInfo({
             info: this.streamInfo,
@@ -84,6 +80,17 @@ export default class LslOutletImpl implements LslOutlet {
         const instance = new (this.Class ?? this)(options)
         await this.wait(waitAfterConstructionMs)
         return instance
+    }
+
+    private createStreamInfo() {
+        this.streamInfo = this.lsl.createStreamInfo({
+            name: this.options.name,
+            type: this.options.type,
+            sampleRate: this.options.sampleRate,
+            channelCount: this.options.channelNames.length,
+            channelFormat: this.lookupChannelFormat(this.options.channelFormat),
+            sourceId: this.options.sourceId,
+        })
     }
 
     private static async wait(waitMs: number) {
@@ -139,8 +146,8 @@ export type LslOutletConstructor = new (options: LslOutletOptions) => LslOutlet
 export interface LslOutletOptions {
     name: string
     type: string
-    channelNames: string[]
     sampleRate: number
+    channelNames: string[]
     channelFormat: ChannelFormat
     sourceId: string
     manufacturer: string
