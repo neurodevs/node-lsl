@@ -11,10 +11,12 @@ export default class LslInlet implements StreamInlet {
     protected manufacturer: string
     protected units: string
     private sampleRate: number
+    private channelNames: string[]
 
     protected constructor(options: LslInletOptions) {
         const {
             sampleRate,
+            channelNames,
             name = this.defaultName,
             type = this.defaultType,
             sourceId = this.defaultSourceId,
@@ -23,6 +25,7 @@ export default class LslInlet implements StreamInlet {
         } = options ?? {}
 
         this.sampleRate = sampleRate
+        this.channelNames = channelNames
         this.name = name
         this.type = type
         this.sourceId = sourceId
@@ -33,7 +36,7 @@ export default class LslInlet implements StreamInlet {
     }
 
     public static Create(options: LslInletOptions) {
-        assertOptions(options, ['sampleRate', 'channelCount', 'channelFormat'])
+        assertOptions(options, ['sampleRate', 'channelNames', 'channelFormat'])
         return new (this.Class ?? this)(options)
     }
 
@@ -41,7 +44,7 @@ export default class LslInlet implements StreamInlet {
         this.lsl.createStreamInfo({
             name: this.name,
             type: this.type,
-            channelCount: 1,
+            channelCount: this.channelNames.length,
             sampleRate: this.sampleRate,
             channelFormat: 0,
             sourceId: this.sourceId,
@@ -65,7 +68,7 @@ export type LslInletConstructor = new (options: LslInletOptions) => StreamInlet
 
 export interface LslInletOptions {
     sampleRate: number
-    channelCount: number
+    channelNames: string[]
     channelFormat: number
     name?: string
     type?: string

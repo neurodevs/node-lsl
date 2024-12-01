@@ -166,7 +166,7 @@ export default class LslInletTest extends AbstractSpruceTest {
         const options = {
             name: generateId(),
             type: generateId(),
-            channelCount: 1,
+            channelCount: this.channelNames.length,
             sampleRate: 100 * Math.random(),
             channelFormat: 0,
             sourceId: generateId(),
@@ -188,7 +188,7 @@ export default class LslInletTest extends AbstractSpruceTest {
             () => LslInlet.Create()
         )
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['sampleRate', 'channelCount', 'channelFormat'],
+            parameters: ['sampleRate', 'channelNames', 'channelFormat'],
         })
     }
 
@@ -201,10 +201,12 @@ export default class LslInletTest extends AbstractSpruceTest {
         LiblslImpl.setInstance(this.fakeLiblsl)
     }
 
+    private static readonly channelNames = [generateId(), generateId()]
+
     private static LslInlet(options?: Partial<LslInletOptions>) {
         const defaultOptions = {
             sampleRate: 0,
-            channelCount: 1,
+            channelNames: this.channelNames,
             channelFormat: 0,
             ...options,
         } as LslInletOptions
