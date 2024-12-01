@@ -2,6 +2,7 @@ import AbstractSpruceTest, {
     test,
     assert,
     generateId,
+    errorAssert,
 } from '@sprucelabs/test-utils'
 import LiblslImpl from '../components/Liblsl'
 import LslInlet, { LslInletOptions } from '../components/LslInlet'
@@ -180,6 +181,17 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async throwsWithMissingRequiredOptions() {
+        const err = assert.doesThrow(
+            // @ts-ignore
+            () => LslInlet.Create()
+        )
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['sampleRate', 'channelCount', 'channelFormat'],
+        })
+    }
+
     private static setSpyLslInlet() {
         LslInlet.Class = SpyLslInlet
     }
@@ -189,7 +201,13 @@ export default class LslInletTest extends AbstractSpruceTest {
         LiblslImpl.setInstance(this.fakeLiblsl)
     }
 
-    private static LslInlet(options?: LslInletOptions) {
-        return LslInlet.Create(options) as SpyLslInlet
+    private static LslInlet(options?: Partial<LslInletOptions>) {
+        const defaultOptions = {
+            sampleRate: 0,
+            channelCount: 1,
+            channelFormat: 0,
+            ...options,
+        } as LslInletOptions
+        return LslInlet.Create(defaultOptions) as SpyLslInlet
     }
 }

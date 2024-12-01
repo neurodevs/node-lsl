@@ -1,3 +1,4 @@
+import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
 import LiblslImpl from './Liblsl'
 
@@ -28,7 +29,8 @@ export default class LslInlet implements StreamInlet {
         this.createStreamInfo()
     }
 
-    public static Create(options?: LslInletOptions) {
+    public static Create(options: LslInletOptions) {
+        assertOptions(options, ['sampleRate', 'channelCount', 'channelFormat'])
         return new (this.Class ?? this)(options)
     }
 
@@ -59,6 +61,9 @@ export interface StreamInlet {}
 export type LslInletConstructor = new () => StreamInlet
 
 export interface LslInletOptions {
+    sampleRate: number
+    channelCount: number
+    channelFormat: number
     name?: string
     type?: string
     sourceId?: string
