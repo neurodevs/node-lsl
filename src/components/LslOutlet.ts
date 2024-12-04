@@ -25,7 +25,7 @@ export default class LslOutletImpl implements LslOutlet {
     private pushSampleByType!: (options: any) => void
 
     protected constructor(options: LslOutletOptions) {
-        const { sampleRate, channelFormat } = assertOptions(options, [
+        assertOptions(options, [
             'name',
             'type',
             'channelNames',
@@ -40,9 +40,18 @@ export default class LslOutletImpl implements LslOutlet {
 
         this.options = options
 
+        this.handleOptions()
+        this.createStreamInfo()
+        this.appendChannelsToStreamInfo()
+        this.createLslOutlet()
+        this.setPushSampleType()
+    }
+
+    private handleOptions() {
         const { chunkSize, maxBuffered, channelNames, ...streamInfoOptions } =
             this.options as any
 
+        const { sampleRate, channelFormat } = streamInfoOptions
         const channelCount = channelNames.length
 
         assertValidChannelCount(channelCount)
@@ -53,11 +62,6 @@ export default class LslOutletImpl implements LslOutlet {
 
         delete streamInfoOptions.manufacturer
         delete streamInfoOptions.unit
-
-        this.createStreamInfo()
-        this.appendChannelsToStreamInfo()
-        this.createLslOutlet()
-        this.setPushSampleType()
     }
 
     public static async Create(options: LslOutletOptions) {
