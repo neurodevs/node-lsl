@@ -10,7 +10,7 @@ export default class LslStreamInfoTest extends AbstractNodeLslTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        LslStreamInfo.Class = SpyLslStreamInfo
+        this.setSpyLslStreamInfo()
 
         this.instance = this.LslStreamInfo()
     }
@@ -189,6 +189,10 @@ export default class LslStreamInfoTest extends AbstractNodeLslTest {
             },
             'Should have called appendChannelsToStreamInfo!'
         )
+    }
+
+    private static setSpyLslStreamInfo() {
+        LslStreamInfo.Class = SpyLslStreamInfo
     }
 
     private static LslStreamInfo(options?: Partial<StreamInfoOptions>) {
