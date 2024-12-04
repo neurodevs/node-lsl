@@ -29,6 +29,23 @@ export default class LslInletTest extends AbstractSpruceTest {
     }
 
     @test()
+    protected static async throwsWithMissingRequiredOptions() {
+        const err = assert.doesThrow(
+            // @ts-ignore
+            () => LslInlet.Create()
+        )
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: [
+                'sampleRate',
+                'channelNames',
+                'channelFormat',
+                'chunkSize',
+                'maxBuffered',
+            ],
+        })
+    }
+
+    @test()
     protected static async generatesUniqueNameIfNotProvided() {
         const instance1 = this.LslInlet()
         const instance2 = this.LslInlet()
@@ -189,17 +206,6 @@ export default class LslInletTest extends AbstractSpruceTest {
             expected,
             'Should have passed options to createStreamInfo!'
         )
-    }
-
-    @test()
-    protected static async throwsWithMissingRequiredOptions() {
-        const err = assert.doesThrow(
-            // @ts-ignore
-            () => LslInlet.Create()
-        )
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['sampleRate', 'channelNames', 'channelFormat'],
-        })
     }
 
     @test()

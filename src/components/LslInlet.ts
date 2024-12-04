@@ -50,7 +50,13 @@ export default class LslInlet implements StreamInlet {
     }
 
     public static Create(options: LslInletOptions) {
-        assertOptions(options, ['sampleRate', 'channelNames', 'channelFormat'])
+        assertOptions(options, [
+            'sampleRate',
+            'channelNames',
+            'channelFormat',
+            'chunkSize',
+            'maxBuffered',
+        ])
         return new (this.Class ?? this)(options)
     }
 

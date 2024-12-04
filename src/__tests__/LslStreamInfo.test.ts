@@ -7,7 +7,7 @@ export default class LslStreamInfoTest extends AbstractSpruceTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.instance = this.StreamInfo()
+        this.instance = this.LslStreamInfo()
     }
 
     @test()
@@ -15,7 +15,7 @@ export default class LslStreamInfoTest extends AbstractSpruceTest {
         assert.isTruthy(this.instance, 'Instance should be created!')
     }
 
-    private static StreamInfo() {
+    private static LslStreamInfo() {
         return LslStreamInfo.Create()
     }
 }
