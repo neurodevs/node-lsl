@@ -29,6 +29,7 @@ export default class AbstractNodeLslTest extends AbstractSpruceTest {
 
     protected static setFakeStreamInfo() {
         LslStreamInfo.Class = FakeStreamInfo
+        FakeStreamInfo.resetTestDouble()
     }
 
     protected static setSpyLslInlet() {

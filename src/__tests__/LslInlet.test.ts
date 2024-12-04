@@ -74,7 +74,7 @@ export default class LslInletTest extends AbstractNodeLslTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastCreateInletOptions,
             {
-                info: fakeInfo,
+                info: fakeInfo.boundStreamInfo,
                 chunkSize: this.chunkSize,
                 maxBuffered: this.maxBuffered,
             },

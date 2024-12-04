@@ -6,25 +6,28 @@ import {
     assertValidMaxBuffered,
     assertValidSampleRate,
 } from '../assertions'
-import { CHANNEL_FORMATS_MAP } from '../consts'
-import {
-    ChannelFormat,
-    BoundOutlet,
-    BoundStreamInfo,
-    Liblsl,
-    LslSample,
-} from '../nodeLsl.types'
+import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from '../nodeLsl.types'
 import LiblslImpl from './Liblsl'
+import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
 export default class LslOutletImpl implements LslOutlet {
     public static Class?: LslOutletConstructor
 
+    private info: StreamInfo
     private options: LslOutletOptions
-    private streamInfo!: BoundStreamInfo
     private outlet!: BoundOutlet
     private pushSampleByType!: (options: any) => void
 
-    protected constructor(options: LslOutletOptions) {
+    protected constructor(info: StreamInfo, options: LslOutletOptions) {
+        this.info = info
+        this.options = options
+
+        this.validateOptions()
+        this.createLslOutlet()
+        this.setPushSampleType()
+    }
+
+    public static async Create(options: LslOutletOptions) {
         assertOptions(options, [
             'name',
             'type',
@@ -38,19 +41,23 @@ export default class LslOutletImpl implements LslOutlet {
             'unit',
         ])
 
-        this.options = options
-
-        this.validateOptions()
-        this.createStreamInfo()
-        this.appendChannelsToStreamInfo()
-        this.createLslOutlet()
-        this.setPushSampleType()
-    }
-
-    public static async Create(options: LslOutletOptions) {
         const { waitAfterConstructionMs = 10 } = options ?? {}
-        const instance = new (this.Class ?? this)(options)
+
+        const streamInfoOptions = {
+            channelNames: options.channelNames,
+            channelFormat: options.channelFormat,
+            sampleRate: options.sampleRate,
+            name: options.name,
+            type: options.type,
+            sourceId: options.sourceId,
+            units: options.unit,
+        }
+
+        const info = this.LslStreamInfo(streamInfoOptions)
+        const instance = new (this.Class ?? this)(info, options)
+
         await this.wait(waitAfterConstructionMs)
+
         return instance
     }
 
@@ -62,31 +69,9 @@ export default class LslOutletImpl implements LslOutlet {
         assertValidMaxBuffered(this.maxBuffered)
     }
 
-    private createStreamInfo() {
-        this.streamInfo = this.lsl.createStreamInfo({
-            name: this.name,
-            type: this.type,
-            sampleRate: this.sampleRate,
-            channelCount: this.channelCount,
-            channelFormat: this.lookupChannelFormat(this.channelFormat),
-            sourceId: this.sourceId,
-        })
-    }
-
-    private appendChannelsToStreamInfo() {
-        this.lsl.appendChannelsToStreamInfo({
-            info: this.streamInfo,
-            channels: this.channelNames.map((label: string) => ({
-                label,
-                unit: this.unit,
-                type: this.type,
-            })),
-        })
-    }
-
     private createLslOutlet() {
         this.outlet = this.lsl.createOutlet({
-            info: this.streamInfo,
+            info: this.boundStreamInfo,
             chunkSize: this.chunkSize,
             maxBuffered: this.maxBuffered,
         })
@@ -127,22 +112,6 @@ export default class LslOutletImpl implements LslOutlet {
         return methodMap[channelFormat]
     }
 
-    private lookupChannelFormat(channelFormat: ChannelFormat) {
-        return CHANNEL_FORMATS_MAP[channelFormat]
-    }
-
-    private get name() {
-        return this.options.name
-    }
-
-    private get type() {
-        return this.options.type
-    }
-
-    private get sourceId() {
-        return this.options.sourceId
-    }
-
     private get channelNames() {
         return this.options.channelNames
     }
@@ -167,8 +136,8 @@ export default class LslOutletImpl implements LslOutlet {
         return this.options.maxBuffered
     }
 
-    private get unit() {
-        return this.options.unit
+    private get boundStreamInfo() {
+        return this.info.boundStreamInfo
     }
 
     private get lsl() {
@@ -178,6 +147,10 @@ export default class LslOutletImpl implements LslOutlet {
     private static async wait(waitMs: number) {
         return new Promise((resolve) => setTimeout(resolve, waitMs))
     }
+
+    private static LslStreamInfo(options: StreamInfoOptions) {
+        return LslStreamInfo.Create(options)
+    }
 }
 
 export interface LslOutlet {
@@ -185,7 +158,10 @@ export interface LslOutlet {
     pushSample(sample: LslSample): void
 }
 
-export type LslOutletConstructor = new (options: LslOutletOptions) => LslOutlet
+export type LslOutletConstructor = new (
+    info: StreamInfo,
+    options: LslOutletOptions
+) => LslOutlet
 
 export interface LslOutletOptions {
     name: string

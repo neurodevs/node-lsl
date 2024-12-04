@@ -1,5 +1,6 @@
 import { DurationMarker } from '../nodeLsl.types'
 import LslOutletImpl, { LslOutlet, LslOutletOptions } from './LslOutlet'
+import { StreamInfo } from './LslStreamInfo'
 
 export default class TimeMarkerOutletImpl
     extends LslOutletImpl
@@ -25,7 +26,7 @@ export default class TimeMarkerOutletImpl
             maxBuffered: 0,
         } as LslOutletOptions
 
-        return new (this.Class ?? this)({
+        return new (this.Class ?? this)({} as StreamInfo, {
             ...defaultOptions,
             ...options,
         }) as TimeMarkerOutlet
@@ -67,5 +68,6 @@ export interface TimeMarkerOutlet extends LslOutlet {
 }
 
 export type TimeMarkerOutletConstructor = new (
+    info: StreamInfo,
     options: LslOutletOptions
 ) => TimeMarkerOutlet

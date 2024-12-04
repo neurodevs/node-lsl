@@ -11,6 +11,6 @@ export class SpyLslInlet extends LslInlet {
     }
 
     public getStreamInfo() {
-        return this.streamInfo
+        return this.info
     }
 }

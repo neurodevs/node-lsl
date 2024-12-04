@@ -1,12 +1,13 @@
 import { LslOutletOptions } from '../components/LslOutlet'
+import { StreamInfo } from '../components/LslStreamInfo'
 import TimeMarkerOutletImpl from '../components/TimeMarkerOutlet'
 
 export default class SpyTimeMarkerOutlet extends TimeMarkerOutletImpl {
     public passedOptions: LslOutletOptions
     public totalWaitTimeMs: number
 
-    public constructor(options: LslOutletOptions) {
-        super(options)
+    public constructor(info: StreamInfo, options: LslOutletOptions) {
+        super(info, options)
         this.passedOptions = options
         this.totalWaitTimeMs = 0
     }

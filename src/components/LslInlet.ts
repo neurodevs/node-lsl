@@ -1,6 +1,6 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
-import { BoundStreamInfo, ChannelFormat } from '../nodeLsl.types'
+import { ChannelFormat } from '../nodeLsl.types'
 import LiblslImpl from './Liblsl'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
@@ -8,7 +8,7 @@ export default class LslInlet implements StreamInlet {
     public static Class?: LslInletConstructor
 
     protected name: string
-    protected streamInfo: BoundStreamInfo
+    protected info: StreamInfo
     private chunkSize: number
     private maxBuffered: number
 
@@ -19,7 +19,7 @@ export default class LslInlet implements StreamInlet {
             maxBuffered,
         } = options ?? {}
 
-        this.streamInfo = info
+        this.info = info
         this.chunkSize = chunkSize
         this.maxBuffered = maxBuffered
         this.name = name
@@ -43,10 +43,14 @@ export default class LslInlet implements StreamInlet {
 
     private createLslInlet() {
         this.lsl.createInlet({
-            info: this.streamInfo,
+            info: this.boundStreamInfo,
             chunkSize: this.chunkSize,
             maxBuffered: this.maxBuffered,
         })
+    }
+
+    private get boundStreamInfo() {
+        return this.info.boundStreamInfo
     }
 
     private get lsl() {

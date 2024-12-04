@@ -25,7 +25,10 @@ export default class FakeLiblsl implements Liblsl {
     public lastDestroyInletOptions?: DestroyInletOptions
 
     public createStreamInfoHitCount = 0
+    public createOutletHitCount = 0
     public destroyOutletHitCount = 0
+    public createInletHitCount = 0
+    public destroyInletHitCount = 0
     public localClockHitCount = 0
     public pushSampleStringTimestampHitCount = 0
 
@@ -41,11 +44,6 @@ export default class FakeLiblsl implements Liblsl {
         this.lastAppendChannelsToStreamInfoOptions = options
     }
 
-    public createOutlet(options: CreateOutletOptions) {
-        this.lastCreateOutletOptions = options
-        return this.outlet
-    }
-
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
         this.lastPushSampleFloatTimestampOptions = options
     }
@@ -57,16 +55,24 @@ export default class FakeLiblsl implements Liblsl {
         this.pushSampleStringTimestampHitCount++
     }
 
+    public createOutlet(options: CreateOutletOptions) {
+        this.createOutletHitCount++
+        this.lastCreateOutletOptions = options
+        return this.outlet
+    }
+
     public destroyOutlet() {
         this.destroyOutletHitCount++
     }
 
     public createInlet(options: CreateInletOptions) {
+        this.createInletHitCount++
         this.lastCreateInletOptions = options
         return {} as BoundInlet
     }
 
     public destroyInlet(options: DestroyInletOptions) {
+        this.destroyInletHitCount++
         this.lastDestroyInletOptions = options
     }
 

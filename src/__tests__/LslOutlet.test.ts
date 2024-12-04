@@ -1,19 +1,19 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import LslOutletImpl, { LslOutletOptions } from '../components/LslOutlet'
+import { StreamInfo } from '../components/LslStreamInfo'
 import { LslSample } from '../nodeLsl.types'
 import {
-    TEST_CHANNEL_FORMATS_MAP,
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
     TestChannelFormat,
 } from '../testDoubles/consts'
 
+import FakeStreamInfo from '../testDoubles/FakeStreamInfo'
 import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
 import AbstractNodeLslTest from './AbstractNodeLslTest'
 
 export default class LslOutletTest extends AbstractNodeLslTest {
     private static randomOutletOptions: LslOutletOptions
-    private static channelFormatIdx: number
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -21,10 +21,9 @@ export default class LslOutletTest extends AbstractNodeLslTest {
         delete LslOutletImpl.Class
 
         this.randomOutletOptions = generateRandomOutletOptions()
-        const channelFormat = this.randomOutletOptions.channelFormat
-        this.channelFormatIdx = TEST_CHANNEL_FORMATS_MAP[channelFormat]
 
         this.setFakeLiblsl()
+        this.setFakeStreamInfo()
     }
 
     @test()
@@ -175,19 +174,14 @@ export default class LslOutletTest extends AbstractNodeLslTest {
     protected static async constructionCreatesStreamInfo() {
         await this.Outlet()
 
-        const { ...options } = this.randomOutletOptions as any
-
-        options.channelCount = options.channelNames.length
-
-        delete options.manufacturer
-        delete options.unit
-        delete options.chunkSize
-        delete options.maxBuffered
-        delete options.channelNames
-
-        assert.isEqualDeep(this.fakeLiblsl.lastCreateStreamInfoOptions, {
-            ...options,
-            channelFormat: this.channelFormatIdx,
+        assert.isEqualDeep(FakeStreamInfo.callsToConstructor[0], {
+            channelNames: this.randomOutletOptions.channelNames,
+            channelFormat: this.randomOutletOptions.channelFormat,
+            sampleRate: this.randomOutletOptions.sampleRate,
+            name: this.randomOutletOptions.name,
+            type: this.randomOutletOptions.type,
+            sourceId: this.randomOutletOptions.sourceId,
+            units: this.randomOutletOptions.unit,
         })
     }
 
@@ -197,27 +191,6 @@ export default class LslOutletTest extends AbstractNodeLslTest {
         const instance = await this.Outlet()
 
         assert.isInstanceOf(instance, CheckingOutlet)
-    }
-
-    @test('can add one label to channels', [generateId()])
-    @test('can add two labels to channels', [generateId(), generateId()])
-    protected static async appendsChannelsBasedOnCount(labels: string[]) {
-        const type = generateId()
-        const unit = generateId()
-
-        await this.Outlet({ channelNames: labels, type, unit })
-
-        assert.isEqualDeep(
-            this.fakeLiblsl.lastAppendChannelsToStreamInfoOptions,
-            {
-                info: this.fakeLiblsl.streamInfo,
-                channels: labels.map((label) => ({
-                    label,
-                    type,
-                    unit,
-                })),
-            }
-        )
     }
 
     @test()
@@ -235,7 +208,7 @@ export default class LslOutletTest extends AbstractNodeLslTest {
         outlet.pushSample([2.0])
         outlet.pushSample([3.0])
 
-        assert.isEqual(this.fakeLiblsl.createStreamInfoHitCount, 1)
+        assert.isEqual(this.fakeLiblsl.createOutletHitCount, 1)
     }
 
     @test()
@@ -301,7 +274,7 @@ export default class LslOutletTest extends AbstractNodeLslTest {
 }
 
 class CheckingOutlet extends LslOutletImpl {
-    public constructor(options: LslOutletOptions) {
-        super(options)
+    public constructor(info: StreamInfo, options: LslOutletOptions) {
+        super(info, options)
     }
 }
