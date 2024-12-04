@@ -62,10 +62,6 @@ export default class LslOutletImpl implements LslOutlet {
         assertValidMaxBuffered(this.maxBuffered)
     }
 
-    private static async wait(waitMs: number) {
-        return new Promise((resolve) => setTimeout(resolve, waitMs))
-    }
-
     private createStreamInfo() {
         this.streamInfo = this.lsl.createStreamInfo({
             name: this.name,
@@ -178,6 +174,10 @@ export default class LslOutletImpl implements LslOutlet {
     private get lsl() {
         return LiblslImpl.getInstance()
     }
+
+    private static async wait(waitMs: number) {
+        return new Promise((resolve) => setTimeout(resolve, waitMs))
+    }
 }
 
 export interface LslOutlet {
@@ -190,13 +190,13 @@ export type LslOutletConstructor = new (options: LslOutletOptions) => LslOutlet
 export interface LslOutletOptions {
     name: string
     type: string
-    sampleRate: number
+    sourceId: string
     channelNames: string[]
     channelFormat: ChannelFormat
-    sourceId: string
-    manufacturer: string
-    unit: string
+    sampleRate: number
     chunkSize: number
     maxBuffered: number
+    manufacturer: string
+    unit: string
     waitAfterConstructionMs?: number
 }
