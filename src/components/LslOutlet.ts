@@ -28,14 +28,14 @@ export default class LslOutletImpl implements LslOutlet {
         assertOptions(options, [
             'name',
             'type',
-            'channelNames',
-            'sampleRate',
-            'channelFormat',
             'sourceId',
-            'manufacturer',
-            'unit',
+            'channelNames',
+            'channelFormat',
+            'sampleRate',
             'chunkSize',
             'maxBuffered',
+            'manufacturer',
+            'unit',
         ])
 
         this.options = options
@@ -47,29 +47,19 @@ export default class LslOutletImpl implements LslOutlet {
         this.setPushSampleType()
     }
 
-    private validateOptions() {
-        const {
-            sampleRate,
-            channelNames,
-            channelFormat,
-            chunkSize,
-            maxBuffered,
-        } = this.options as any
-
-        const channelCount = channelNames.length
-
-        assertValidChannelCount(channelCount)
-        assertValidSampleRate(sampleRate)
-        assertValidChannelFormat(channelFormat)
-        assertValidChunkSize(chunkSize)
-        assertValidMaxBuffered(maxBuffered)
-    }
-
     public static async Create(options: LslOutletOptions) {
         const { waitAfterConstructionMs = 10 } = options ?? {}
         const instance = new (this.Class ?? this)(options)
         await this.wait(waitAfterConstructionMs)
         return instance
+    }
+
+    private validateOptions() {
+        assertValidChannelCount(this.channelCount)
+        assertValidSampleRate(this.sampleRate)
+        assertValidChannelFormat(this.channelFormat)
+        assertValidChunkSize(this.chunkSize)
+        assertValidMaxBuffered(this.maxBuffered)
     }
 
     private static async wait(waitMs: number) {
@@ -78,22 +68,22 @@ export default class LslOutletImpl implements LslOutlet {
 
     private createStreamInfo() {
         this.streamInfo = this.lsl.createStreamInfo({
-            name: this.options.name,
-            type: this.options.type,
-            sampleRate: this.options.sampleRate,
-            channelCount: this.options.channelNames.length,
-            channelFormat: this.lookupChannelFormat(this.options.channelFormat),
-            sourceId: this.options.sourceId,
+            name: this.name,
+            type: this.type,
+            sampleRate: this.sampleRate,
+            channelCount: this.channelNames.length,
+            channelFormat: this.lookupChannelFormat(this.channelFormat),
+            sourceId: this.sourceId,
         })
     }
 
     private appendChannelsToStreamInfo() {
         this.lsl.appendChannelsToStreamInfo({
             info: this.streamInfo,
-            channels: this.options.channelNames.map((label: string) => ({
+            channels: this.channelNames.map((label: string) => ({
                 label,
-                unit: this.options.unit,
-                type: this.options.type,
+                unit: this.unit,
+                type: this.type,
             })),
         })
     }
@@ -101,8 +91,8 @@ export default class LslOutletImpl implements LslOutlet {
     private createLslOutlet() {
         this.outlet = this.lsl.createOutlet({
             info: this.streamInfo,
-            chunkSize: this.options.chunkSize,
-            maxBuffered: this.options.maxBuffered,
+            chunkSize: this.chunkSize,
+            maxBuffered: this.maxBuffered,
         })
     }
 
@@ -126,7 +116,7 @@ export default class LslOutletImpl implements LslOutlet {
     }
 
     private getPushMethod() {
-        const channelFormat = this.options.channelFormat
+        const channelFormat = this.channelFormat
 
         const methodMap: Record<string, keyof Liblsl> = {
             float32: 'pushSampleFloatTimestamp',
@@ -143,6 +133,46 @@ export default class LslOutletImpl implements LslOutlet {
 
     private lookupChannelFormat(channelFormat: ChannelFormat) {
         return CHANNEL_FORMATS_MAP[channelFormat]
+    }
+
+    private get name() {
+        return this.options.name
+    }
+
+    private get type() {
+        return this.options.type
+    }
+
+    private get sourceId() {
+        return this.options.sourceId
+    }
+
+    private get channelNames() {
+        return this.options.channelNames
+    }
+
+    private get channelCount() {
+        return this.channelNames.length
+    }
+
+    private get channelFormat() {
+        return this.options.channelFormat
+    }
+
+    private get sampleRate() {
+        return this.options.sampleRate
+    }
+
+    private get chunkSize() {
+        return this.options.chunkSize
+    }
+
+    private get maxBuffered() {
+        return this.options.maxBuffered
+    }
+
+    private get unit() {
+        return this.options.unit
     }
 
     private get lsl() {

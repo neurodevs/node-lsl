@@ -43,14 +43,14 @@ export default class LslOutletTest extends AbstractSpruceTest {
             parameters: [
                 'name',
                 'type',
-                'channelNames',
-                'sampleRate',
-                'channelFormat',
                 'sourceId',
-                'manufacturer',
-                'unit',
+                'channelNames',
+                'channelFormat',
+                'sampleRate',
                 'chunkSize',
                 'maxBuffered',
+                'manufacturer',
+                'unit',
             ],
         })
     }
