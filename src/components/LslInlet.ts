@@ -8,33 +8,21 @@ export default class LslInlet implements StreamInlet {
     public static Class?: LslInletConstructor
 
     protected name: string
-    protected type: string
-    protected sourceId: string
-    protected manufacturer: string
-    protected units: string
     protected streamInfo: BoundStreamInfo
     private chunkSize: number
     private maxBuffered: number
 
     protected constructor(info: StreamInfo, options: LslInletOptions) {
         const {
+            name = this.defaultName,
             chunkSize,
             maxBuffered,
-            name = this.defaultName,
-            type = this.defaultType,
-            sourceId = this.defaultSourceId,
-            manufacturer = this.defaultManufacturer,
-            units = this.defaultUnits,
         } = options ?? {}
 
         this.streamInfo = info
         this.chunkSize = chunkSize
         this.maxBuffered = maxBuffered
         this.name = name
-        this.type = type
-        this.sourceId = sourceId
-        this.manufacturer = manufacturer
-        this.units = units
 
         this.createLslInlet()
     }
@@ -66,10 +54,6 @@ export default class LslInlet implements StreamInlet {
     }
 
     private readonly defaultName = `lsl-inlet-${generateId()}`
-    private readonly defaultType = generateId()
-    private readonly defaultSourceId = generateId()
-    private readonly defaultManufacturer = 'N/A'
-    private readonly defaultUnits = 'N/A'
 
     private static LslStreamInfo(options: StreamInfoOptions) {
         return LslStreamInfo.Create(options)

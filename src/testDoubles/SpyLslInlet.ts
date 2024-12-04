@@ -10,22 +10,6 @@ export class SpyLslInlet extends LslInlet {
         return this.name
     }
 
-    public getType() {
-        return this.type
-    }
-
-    public getSourceId() {
-        return this.sourceId
-    }
-
-    public getManufacturer() {
-        return this.manufacturer
-    }
-
-    public getUnits() {
-        return this.units
-    }
-
     public getStreamInfo() {
         return this.streamInfo
     }
