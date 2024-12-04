@@ -1,6 +1,5 @@
 import { test, assert, errorAssert } from '@sprucelabs/test-utils'
 import LslInlet, { LslInletOptions } from '../components/LslInlet'
-import LslStreamInfo from '../components/LslStreamInfo'
 import FakeStreamInfo from '../testDoubles/FakeStreamInfo'
 import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
 import AbstractNodeLslTest from './AbstractNodeLslTest'
@@ -81,14 +80,6 @@ export default class LslInletTest extends AbstractNodeLslTest {
             },
             'Should have called createInlet!'
         )
-    }
-
-    private static setSpyLslInlet() {
-        LslInlet.Class = SpyLslInlet
-    }
-
-    private static setFakeStreamInfo() {
-        LslStreamInfo.Class = FakeStreamInfo
     }
 
     private static LslInlet(options?: Partial<LslInletOptions>) {

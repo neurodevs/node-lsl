@@ -191,10 +191,6 @@ export default class LslStreamInfoTest extends AbstractNodeLslTest {
         )
     }
 
-    private static setSpyLslStreamInfo() {
-        LslStreamInfo.Class = SpyLslStreamInfo
-    }
-
     private static LslStreamInfo(options?: Partial<StreamInfoOptions>) {
         return LslStreamInfo.Create({
             ...this.defaultOptions,

@@ -1,10 +1,4 @@
-import AbstractSpruceTest, {
-    test,
-    assert,
-    errorAssert,
-    generateId,
-} from '@sprucelabs/test-utils'
-import LiblslImpl from '../components/Liblsl'
+import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import LslOutletImpl, { LslOutletOptions } from '../components/LslOutlet'
 import { LslSample } from '../nodeLsl.types'
 import {
@@ -13,24 +7,24 @@ import {
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
     TestChannelFormat,
 } from '../testDoubles/consts'
-import FakeLiblsl from '../testDoubles/FakeLiblsl'
-import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
 
-export default class LslOutletTest extends AbstractSpruceTest {
-    private static fakeLiblsl: FakeLiblsl
+import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
+import AbstractNodeLslTest from './AbstractNodeLslTest'
+
+export default class LslOutletTest extends AbstractNodeLslTest {
     private static randomOutletOptions: LslOutletOptions
     private static channelFormatIdx: number
 
     protected static async beforeEach() {
         await super.beforeEach()
-        delete LslOutletImpl.Class
-        this.randomOutletOptions = generateRandomOutletOptions()
 
+        delete LslOutletImpl.Class
+
+        this.randomOutletOptions = generateRandomOutletOptions()
         const channelFormat = this.randomOutletOptions.channelFormat
         this.channelFormatIdx = TEST_CHANNEL_FORMATS_MAP[channelFormat]
-        this.fakeLiblsl = new FakeLiblsl()
 
-        LiblslImpl.setInstance(this.fakeLiblsl)
+        this.setFakeLiblsl()
     }
 
     @test()

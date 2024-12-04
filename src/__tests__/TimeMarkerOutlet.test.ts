@@ -1,25 +1,20 @@
 import { randomInt } from 'crypto'
-import AbstractSpruceTest, {
-    assert,
-    generateId,
-    test,
-} from '@sprucelabs/test-utils'
-import LiblslImpl from '../components/Liblsl'
+import { assert, generateId, test } from '@sprucelabs/test-utils'
 import { LslOutletOptions } from '../components/LslOutlet'
 import TimeMarkerOutletImpl from '../components/TimeMarkerOutlet'
-import FakeLiblsl from '../testDoubles/FakeLiblsl'
 import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
 import SpyTimeMarkerOutlet from '../testDoubles/SpyTimeMarkerOutlet'
+import AbstractNodeLslTest from './AbstractNodeLslTest'
 
-export default class TimeMarkerOutletTest extends AbstractSpruceTest {
-    private static fakeLiblsl: FakeLiblsl
+export default class TimeMarkerOutletTest extends AbstractNodeLslTest {
     private static outlet: SpyTimeMarkerOutlet
 
     protected static async beforeEach() {
         await super.beforeEach()
-        TimeMarkerOutletImpl.Class = SpyTimeMarkerOutlet
-        this.fakeLiblsl = new FakeLiblsl()
-        LiblslImpl.setInstance(this.fakeLiblsl)
+
+        this.setSpyTimeMarkerOutlet()
+        this.setFakeLiblsl()
+
         this.outlet = await this.Outlet()
     }
 
