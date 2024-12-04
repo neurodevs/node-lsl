@@ -40,14 +40,14 @@ export default class LslOutletImpl implements LslOutlet {
 
         this.options = options
 
-        this.handleOptions()
+        this.validateOptions()
         this.createStreamInfo()
         this.appendChannelsToStreamInfo()
         this.createLslOutlet()
         this.setPushSampleType()
     }
 
-    private handleOptions() {
+    private validateOptions() {
         const {
             sampleRate,
             channelNames,
