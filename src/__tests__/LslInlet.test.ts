@@ -6,6 +6,7 @@ import AbstractSpruceTest, {
 } from '@sprucelabs/test-utils'
 import LiblslImpl from '../components/Liblsl'
 import LslInlet, { LslInletOptions } from '../components/LslInlet'
+import { CHANNEL_FORMATS } from '../consts'
 import FakeLiblsl from '../testDoubles/FakeLiblsl'
 import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
 
@@ -163,20 +164,29 @@ export default class LslInletTest extends AbstractSpruceTest {
 
     @test()
     protected static async passesOptionsToStreamInfo() {
+        const randomChannelIdx = Math.floor(
+            Math.random() * CHANNEL_FORMATS.length
+        )
+
         const options = {
             name: generateId(),
             type: generateId(),
             channelCount: this.channelNames.length,
             sampleRate: 100 * Math.random(),
-            channelFormat: 0,
+            channelFormat: CHANNEL_FORMATS[randomChannelIdx],
             sourceId: generateId(),
         }
 
         this.LslInlet(options)
 
+        const expected = {
+            ...options,
+            channelFormat: randomChannelIdx,
+        }
+
         assert.isEqualDeep(
             this.fakeLiblsl.lastCreateStreamInfoOptions,
-            options,
+            expected,
             'Should have passed options to createStreamInfo!'
         )
     }
