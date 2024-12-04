@@ -220,6 +220,19 @@ export default class LslInletTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async createsLslInlet() {
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastCreateInletOptions,
+            {
+                info: this.instance.getStreamInfo(),
+                chunkSize: this.chunkSize,
+                maxBuffered: this.maxBuffered,
+            },
+            'Should have called createInlet!'
+        )
+    }
+
     private static setSpyLslInlet() {
         LslInlet.Class = SpyLslInlet
     }
@@ -232,12 +245,16 @@ export default class LslInletTest extends AbstractSpruceTest {
     private static readonly type = generateId()
     private static readonly channelNames = [generateId(), generateId()]
     private static readonly units = generateId()
+    private static readonly chunkSize = Math.floor(Math.random() * 100)
+    private static readonly maxBuffered = Math.floor(Math.random() * 100)
 
     private static LslInlet(options?: Partial<LslInletOptions>) {
         const defaultOptions = {
             sampleRate: 0,
             channelNames: this.channelNames,
             channelFormat: 'float32',
+            chunkSize: this.chunkSize,
+            maxBuffered: this.maxBuffered,
             ...options,
         } as LslInletOptions
         return LslInlet.Create(defaultOptions) as SpyLslInlet

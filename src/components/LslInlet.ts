@@ -16,12 +16,16 @@ export default class LslInlet implements StreamInlet {
     private sampleRate: number
     private channelNames: string[]
     private channelFormat: ChannelFormat
+    private chunkSize: number
+    private maxBuffered: number
 
     protected constructor(options: LslInletOptions) {
         const {
             sampleRate,
             channelNames,
             channelFormat,
+            chunkSize,
+            maxBuffered,
             name = this.defaultName,
             type = this.defaultType,
             sourceId = this.defaultSourceId,
@@ -32,6 +36,8 @@ export default class LslInlet implements StreamInlet {
         this.sampleRate = sampleRate
         this.channelNames = channelNames
         this.channelFormat = channelFormat
+        this.chunkSize = chunkSize
+        this.maxBuffered = maxBuffered
         this.name = name
         this.type = type
         this.sourceId = sourceId
@@ -40,6 +46,7 @@ export default class LslInlet implements StreamInlet {
 
         this.createStreamInfo()
         this.appendChannelsToStreamInfo()
+        this.createLslInlet()
     }
 
     public static Create(options: LslInletOptions) {
@@ -66,6 +73,14 @@ export default class LslInlet implements StreamInlet {
                 unit: this.units,
                 type: this.type,
             })),
+        })
+    }
+
+    private createLslInlet() {
+        this.lsl.createInlet({
+            info: this.streamInfo,
+            chunkSize: this.chunkSize,
+            maxBuffered: this.maxBuffered,
         })
     }
 
@@ -96,6 +111,8 @@ export interface LslInletOptions {
     sampleRate: number
     channelNames: string[]
     channelFormat: ChannelFormat
+    chunkSize: number
+    maxBuffered: number
     name?: string
     type?: string
     sourceId?: string
