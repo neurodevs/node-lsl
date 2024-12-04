@@ -67,7 +67,7 @@ export default class LslOutletImpl implements LslOutlet {
             name: this.name,
             type: this.type,
             sampleRate: this.sampleRate,
-            channelCount: this.channelNames.length,
+            channelCount: this.channelCount,
             channelFormat: this.lookupChannelFormat(this.channelFormat),
             sourceId: this.sourceId,
         })
