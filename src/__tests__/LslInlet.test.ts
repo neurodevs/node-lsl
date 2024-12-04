@@ -202,6 +202,24 @@ export default class LslInletTest extends AbstractSpruceTest {
         })
     }
 
+    @test()
+    protected static async appendsChannelsToStreamInfo() {
+        this.LslInlet({ units: this.units, type: this.type })
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastAppendChannelsToStreamInfoOptions,
+            {
+                info: this.instance.getStreamInfo(),
+                channels: this.channelNames.map((label: string) => ({
+                    label,
+                    unit: this.units,
+                    type: this.type,
+                })),
+            },
+            'Should have called appendChannelsToStreamInfo!'
+        )
+    }
+
     private static setSpyLslInlet() {
         LslInlet.Class = SpyLslInlet
     }
@@ -211,13 +229,15 @@ export default class LslInletTest extends AbstractSpruceTest {
         LiblslImpl.setInstance(this.fakeLiblsl)
     }
 
+    private static readonly type = generateId()
     private static readonly channelNames = [generateId(), generateId()]
+    private static readonly units = generateId()
 
     private static LslInlet(options?: Partial<LslInletOptions>) {
         const defaultOptions = {
             sampleRate: 0,
             channelNames: this.channelNames,
-            channelFormat: 0,
+            channelFormat: 'float32',
             ...options,
         } as LslInletOptions
         return LslInlet.Create(defaultOptions) as SpyLslInlet

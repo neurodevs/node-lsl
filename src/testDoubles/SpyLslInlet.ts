@@ -24,4 +24,8 @@ export class SpyLslInlet extends LslInlet {
     public getUnits() {
         return this.units
     }
+
+    public getStreamInfo() {
+        return this.streamInfo
+    }
 }

@@ -1,7 +1,7 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
 import { CHANNEL_FORMATS_MAP } from '../consts'
-import { ChannelFormat } from '../nodeLsl.types'
+import { BoundStreamInfo, ChannelFormat } from '../nodeLsl.types'
 import LiblslImpl from './Liblsl'
 
 export default class LslInlet implements StreamInlet {
@@ -12,6 +12,7 @@ export default class LslInlet implements StreamInlet {
     protected sourceId: string
     protected manufacturer: string
     protected units: string
+    protected streamInfo!: BoundStreamInfo
     private sampleRate: number
     private channelNames: string[]
     private channelFormat: ChannelFormat
@@ -38,6 +39,7 @@ export default class LslInlet implements StreamInlet {
         this.units = units
 
         this.createStreamInfo()
+        this.appendChannelsToStreamInfo()
     }
 
     public static Create(options: LslInletOptions) {
@@ -46,13 +48,24 @@ export default class LslInlet implements StreamInlet {
     }
 
     private createStreamInfo() {
-        this.lsl.createStreamInfo({
+        this.streamInfo = this.lsl.createStreamInfo({
             name: this.name,
             type: this.type,
             channelCount: this.channelCount,
             sampleRate: this.sampleRate,
             channelFormat: this.lslChannelFormat,
             sourceId: this.sourceId,
+        })
+    }
+
+    private appendChannelsToStreamInfo() {
+        this.lsl.appendChannelsToStreamInfo({
+            info: this.streamInfo,
+            channels: this.channelNames.map((label: string) => ({
+                label,
+                unit: this.units,
+                type: this.type,
+            })),
         })
     }
 
