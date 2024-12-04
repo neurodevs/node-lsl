@@ -1,8 +1,8 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
-import { CHANNEL_FORMATS_MAP } from '../consts'
 import { BoundStreamInfo, ChannelFormat } from '../nodeLsl.types'
 import LiblslImpl from './Liblsl'
+import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
 export default class LslInlet implements StreamInlet {
     public static Class?: LslInletConstructor
@@ -12,18 +12,12 @@ export default class LslInlet implements StreamInlet {
     protected sourceId: string
     protected manufacturer: string
     protected units: string
-    protected streamInfo!: BoundStreamInfo
-    private sampleRate: number
-    private channelNames: string[]
-    private channelFormat: ChannelFormat
+    protected streamInfo: BoundStreamInfo
     private chunkSize: number
     private maxBuffered: number
 
-    protected constructor(options: LslInletOptions) {
+    protected constructor(info: StreamInfo, options: LslInletOptions) {
         const {
-            sampleRate,
-            channelNames,
-            channelFormat,
             chunkSize,
             maxBuffered,
             name = this.defaultName,
@@ -33,9 +27,7 @@ export default class LslInlet implements StreamInlet {
             units = this.defaultUnits,
         } = options ?? {}
 
-        this.sampleRate = sampleRate
-        this.channelNames = channelNames
-        this.channelFormat = channelFormat
+        this.streamInfo = info
         this.chunkSize = chunkSize
         this.maxBuffered = maxBuffered
         this.name = name
@@ -44,42 +36,21 @@ export default class LslInlet implements StreamInlet {
         this.manufacturer = manufacturer
         this.units = units
 
-        this.createStreamInfo()
-        this.appendChannelsToStreamInfo()
         this.createLslInlet()
     }
 
     public static Create(options: LslInletOptions) {
         assertOptions(options, [
-            'sampleRate',
             'channelNames',
             'channelFormat',
+            'sampleRate',
             'chunkSize',
             'maxBuffered',
         ])
-        return new (this.Class ?? this)(options)
-    }
-
-    private createStreamInfo() {
-        this.streamInfo = this.lsl.createStreamInfo({
-            name: this.name,
-            type: this.type,
-            channelCount: this.channelCount,
-            sampleRate: this.sampleRate,
-            channelFormat: this.lslChannelFormat,
-            sourceId: this.sourceId,
-        })
-    }
-
-    private appendChannelsToStreamInfo() {
-        this.lsl.appendChannelsToStreamInfo({
-            info: this.streamInfo,
-            channels: this.channelNames.map((label: string) => ({
-                label,
-                unit: this.units,
-                type: this.type,
-            })),
-        })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { maxBuffered, chunkSize, ...streamInfoOptions } = options
+        const info = this.LslStreamInfo(streamInfoOptions)
+        return new (this.Class ?? this)(info, options)
     }
 
     private createLslInlet() {
@@ -88,14 +59,6 @@ export default class LslInlet implements StreamInlet {
             chunkSize: this.chunkSize,
             maxBuffered: this.maxBuffered,
         })
-    }
-
-    private get lslChannelFormat() {
-        return CHANNEL_FORMATS_MAP[this.channelFormat]
-    }
-
-    private get channelCount() {
-        return this.channelNames.length
     }
 
     private get lsl() {
@@ -107,11 +70,18 @@ export default class LslInlet implements StreamInlet {
     private readonly defaultSourceId = generateId()
     private readonly defaultManufacturer = 'N/A'
     private readonly defaultUnits = 'N/A'
+
+    private static LslStreamInfo(options: StreamInfoOptions) {
+        return LslStreamInfo.Create(options)
+    }
 }
 
 export interface StreamInlet {}
 
-export type LslInletConstructor = new (options: LslInletOptions) => StreamInlet
+export type LslInletConstructor = new (
+    info: StreamInfo,
+    options: LslInletOptions
+) => StreamInlet
 
 export interface LslInletOptions {
     sampleRate: number

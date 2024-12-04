@@ -3,6 +3,14 @@ export * from './nodeLsl.types'
 export { default as LiblslImpl } from './components/Liblsl'
 export * from './components/Liblsl'
 
+export { default as LslStreamInfo } from './components/LslStreamInfo'
+export * from './components/LslStreamInfo'
+
+export { default as SpyLslStreamInfo } from './testDoubles/SpyLslStreamInfo'
+export * from './testDoubles/SpyLslStreamInfo'
+
+export { default as FakeStreamInfo } from './testDoubles/FakeStreamInfo'
+
 export { default as LslOutletImpl } from './components/LslOutlet'
 export * from './components/LslOutlet'
 
