@@ -1,23 +1,15 @@
-import AbstractSpruceTest, {
-    test,
-    assert,
-    generateId,
-    errorAssert,
-} from '@sprucelabs/test-utils'
-import LiblslImpl from '../components/Liblsl'
+import { test, assert, generateId, errorAssert } from '@sprucelabs/test-utils'
 import LslInlet, { LslInletOptions } from '../components/LslInlet'
 import { CHANNEL_FORMATS } from '../consts'
-import FakeLiblsl from '../testDoubles/FakeLiblsl'
 import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
+import AbstractNodeLslTest from './AbstractNodeLslTest'
 
-export default class LslInletTest extends AbstractSpruceTest {
+export default class LslInletTest extends AbstractNodeLslTest {
     private static instance: SpyLslInlet
-    private static fakeLiblsl: FakeLiblsl
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setFakeLiblsl()
         this.setSpyLslInlet()
 
         this.instance = this.LslInlet()
@@ -241,11 +233,6 @@ export default class LslInletTest extends AbstractSpruceTest {
 
     private static setSpyLslInlet() {
         LslInlet.Class = SpyLslInlet
-    }
-
-    private static setFakeLiblsl() {
-        this.fakeLiblsl = new FakeLiblsl()
-        LiblslImpl.setInstance(this.fakeLiblsl)
     }
 
     private static readonly type = generateId()

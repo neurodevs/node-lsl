@@ -1,7 +1,8 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
 import LslStreamInfo, { StreamInfo } from '../components/LslStreamInfo'
+import AbstractNodeLslTest from './AbstractNodeLslTest'
 
-export default class LslStreamInfoTest extends AbstractSpruceTest {
+export default class LslStreamInfoTest extends AbstractNodeLslTest {
     private static instance: StreamInfo
 
     protected static async beforeEach() {
