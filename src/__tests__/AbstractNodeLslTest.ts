@@ -40,11 +40,11 @@ export default class AbstractNodeLslTest extends AbstractSpruceTest {
         TimeMarkerOutletImpl.Class = SpyTimeMarkerOutlet
     }
 
-    protected static readonly channelNames = [generateId(), generateId()]
-    protected static readonly infoName = generateId()
+    protected static readonly name_ = generateId()
     protected static readonly type = generateId()
     protected static readonly sourceId = generateId()
     protected static readonly units = generateId()
+    protected static readonly channelNames = [generateId(), generateId()]
     protected static readonly chunkSize = Math.floor(Math.random() * 100)
     protected static readonly maxBuffered = Math.floor(Math.random() * 100)
 }

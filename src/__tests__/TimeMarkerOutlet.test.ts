@@ -2,6 +2,7 @@ import { randomInt } from 'crypto'
 import { assert, generateId, test } from '@sprucelabs/test-utils'
 import { LslOutletOptions } from '../components/LslOutlet'
 import TimeMarkerOutletImpl from '../components/TimeMarkerOutlet'
+import FakeStreamInfo from '../testDoubles/FakeStreamInfo'
 import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
 import SpyTimeMarkerOutlet from '../testDoubles/SpyTimeMarkerOutlet'
 import AbstractNodeLslTest from './AbstractNodeLslTest'
@@ -12,6 +13,7 @@ export default class TimeMarkerOutletTest extends AbstractNodeLslTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeStreamInfo()
         this.setSpyTimeMarkerOutlet()
         this.setFakeLiblsl()
 
@@ -21,16 +23,16 @@ export default class TimeMarkerOutletTest extends AbstractNodeLslTest {
     @test()
     protected static async loadsWithTimeMarkerSpecificOptions() {
         assert.isEqualDeep(this.outlet.passedOptions, {
-            name: 'Time markers',
-            type: 'Markers',
-            channelNames: ['Markers'],
-            sampleRate: 0,
-            channelFormat: 'string',
-            sourceId: 'time-markers',
-            manufacturer: 'N/A',
-            unit: 'N/A',
-            chunkSize: 0,
-            maxBuffered: 0,
+            name: this.name_,
+            type: this.type,
+            channelNames: this.channelNames,
+            sampleRate: this.sampleRate,
+            channelFormat: this.channelFormat,
+            sourceId: this.sourceId,
+            manufacturer: this.manufacturer,
+            unit: this.unit,
+            chunkSize: this.chunkSize,
+            maxBuffered: this.maxBuffered,
         })
     }
 
@@ -121,6 +123,23 @@ export default class TimeMarkerOutletTest extends AbstractNodeLslTest {
         await this.wait(100)
     }
 
+    @test()
+    protected static async createsStreamInfoWithCorrectOptions() {
+        assert.isEqualDeep(
+            FakeStreamInfo.callsToConstructor[0],
+            {
+                channelNames: this.channelNames,
+                channelFormat: this.channelFormat,
+                sampleRate: this.sampleRate,
+                name: this.name_,
+                type: this.type,
+                sourceId: this.sourceId,
+                units: this.unit,
+            },
+            'Should create stream info!'
+        )
+    }
+
     private static async setupTimeMarkerImpl() {
         TimeMarkerOutletImpl.Class = TimeMarkerOutletImpl as any
         this.outlet = await this.Outlet()
@@ -142,6 +161,17 @@ export default class TimeMarkerOutletTest extends AbstractNodeLslTest {
             durationMs: durationMs ?? randomInt(100, 1000),
         }
     }
+
+    protected static readonly name_ = 'Time markers'
+    protected static readonly type = 'Markers'
+    protected static readonly channelNames = ['Markers']
+    protected static readonly channelFormat = 'string'
+    protected static readonly sourceId = 'time-markers'
+    protected static readonly manufacturer = 'N/A'
+    protected static readonly unit = 'N/A'
+    protected static readonly sampleRate = 0
+    protected static readonly chunkSize = 0
+    protected static readonly maxBuffered = 0
 
     private static async Outlet(options?: Partial<LslOutletOptions>) {
         return (await TimeMarkerOutletImpl.Create(

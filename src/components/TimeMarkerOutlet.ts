@@ -1,6 +1,6 @@
 import { DurationMarker } from '../nodeLsl.types'
 import LslOutletImpl, { LslOutlet, LslOutletOptions } from './LslOutlet'
-import { StreamInfo } from './LslStreamInfo'
+import LslStreamInfo, { StreamInfo } from './LslStreamInfo'
 
 export default class TimeMarkerOutletImpl
     extends LslOutletImpl
@@ -13,23 +13,33 @@ export default class TimeMarkerOutletImpl
     private timeout?: any
 
     public static async Create(options?: Partial<LslOutletOptions>) {
-        const defaultOptions = {
+        const { unit, manufacturer, maxBuffered, chunkSize } = options ?? {}
+
+        const infoOptions = {
             name: 'Time markers',
             type: 'Markers',
             channelNames: ['Markers'],
             sampleRate: 0,
             channelFormat: 'string',
             sourceId: 'time-markers',
-            manufacturer: 'N/A',
-            unit: 'N/A',
-            chunkSize: 0,
-            maxBuffered: 0,
+            units: unit ?? 'N/A',
+            ...options,
         } as LslOutletOptions
 
-        return new (this.Class ?? this)({} as StreamInfo, {
-            ...defaultOptions,
-            ...options,
-        }) as TimeMarkerOutlet
+        const info = LslStreamInfo.Create(infoOptions)
+
+        const outletOptions = {
+            ...infoOptions,
+            manufacturer: manufacturer ?? 'N/A',
+            chunkSize: chunkSize ?? 0,
+            maxBuffered: maxBuffered ?? 0,
+            unit: unit ?? 'N/A',
+        }
+
+        // @ts-ignore
+        delete outletOptions.units
+
+        return new (this.Class ?? this)(info, outletOptions) as TimeMarkerOutlet
     }
 
     public async pushMarkers(markers: DurationMarker[]) {
