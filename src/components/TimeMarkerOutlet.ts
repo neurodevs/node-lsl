@@ -30,9 +30,9 @@ export default class TimeMarkerOutletImpl
 
         const outletOptions = {
             ...infoOptions,
-            manufacturer: manufacturer ?? 'N/A',
             chunkSize: chunkSize ?? 0,
             maxBuffered: maxBuffered ?? 0,
+            manufacturer: manufacturer ?? 'N/A',
             unit: unit ?? 'N/A',
         }
 
