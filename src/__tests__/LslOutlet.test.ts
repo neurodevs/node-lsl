@@ -10,9 +10,9 @@ import {
 
 import FakeStreamInfo from '../testDoubles/FakeStreamInfo'
 import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
-import AbstractNodeLslTest from './AbstractNodeLslTest'
+import AbstractLslTest from './AbstractLslTest'
 
-export default class LslOutletTest extends AbstractNodeLslTest {
+export default class LslOutletTest extends AbstractLslTest {
     private static randomOutletOptions: LslOutletOptions
 
     protected static async beforeEach() {

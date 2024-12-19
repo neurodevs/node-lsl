@@ -2,9 +2,9 @@ import { test, assert, generateId, errorAssert } from '@sprucelabs/test-utils'
 import LslStreamInfo, { StreamInfoOptions } from '../components/LslStreamInfo'
 import { CHANNEL_FORMATS } from '../consts'
 import SpyLslStreamInfo from '../testDoubles/SpyLslStreamInfo'
-import AbstractNodeLslTest from './AbstractNodeLslTest'
+import AbstractLslTest from './AbstractLslTest'
 
-export default class LslStreamInfoTest extends AbstractNodeLslTest {
+export default class LslStreamInfoTest extends AbstractLslTest {
     private static instance: SpyLslStreamInfo
 
     protected static async beforeEach() {

@@ -9,7 +9,7 @@ import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
 import SpyLslStreamInfo from '../testDoubles/SpyLslStreamInfo'
 import SpyTimeMarkerOutlet from '../testDoubles/SpyTimeMarkerOutlet'
 
-export default class AbstractNodeLslTest extends AbstractSpruceTest {
+export default class AbstractLslTest extends AbstractSpruceTest {
     protected static fakeLiblsl: FakeLiblsl
 
     protected static async beforeEach() {

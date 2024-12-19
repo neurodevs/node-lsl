@@ -5,9 +5,9 @@ import TimeMarkerOutletImpl from '../components/TimeMarkerOutlet'
 import FakeStreamInfo from '../testDoubles/FakeStreamInfo'
 import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
 import SpyTimeMarkerOutlet from '../testDoubles/SpyTimeMarkerOutlet'
-import AbstractNodeLslTest from './AbstractNodeLslTest'
+import AbstractLslTest from './AbstractLslTest'
 
-export default class TimeMarkerOutletTest extends AbstractNodeLslTest {
+export default class TimeMarkerOutletTest extends AbstractLslTest {
     private static outlet: SpyTimeMarkerOutlet
 
     protected static async beforeEach() {
