@@ -14,7 +14,7 @@ import {
     DestroyInletOptions,
 } from '../nodeLsl.types'
 
-export default class LiblslImpl implements Liblsl {
+export default class LiblslAdapter implements Liblsl {
     private static instance?: Liblsl
     public static ffiRsOpen = open
     public static ffiRsDefine = define
@@ -54,12 +54,12 @@ export default class LiblslImpl implements Liblsl {
     }
 
     private loadBindings(liblslPath: string) {
-        LiblslImpl.ffiRsOpen({
+        LiblslAdapter.ffiRsOpen({
             library: 'lsl',
             path: liblslPath,
         })
 
-        return LiblslImpl.ffiRsDefine({
+        return LiblslAdapter.ffiRsDefine({
             lsl_create_streaminfo: {
                 library: 'lsl',
                 retType: DataType.External,

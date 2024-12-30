@@ -1,13 +1,16 @@
 import AbstractSpruceTest, { generateId } from '@sprucelabs/test-utils'
-import LiblslImpl from '../components/Liblsl'
-import LslInlet from '../components/LslInlet'
+import EventMarkerOutlet from '../components/EventMarkerOutlet'
+import LiblslAdapter from '../components/LiblslAdapter'
 import LslStreamInfo from '../components/LslStreamInfo'
-import TimeMarkerOutletImpl from '../components/TimeMarkerOutlet'
-import FakeLiblsl from '../testDoubles/FakeLiblsl'
-import FakeStreamInfo from '../testDoubles/FakeStreamInfo'
-import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
-import SpyLslStreamInfo from '../testDoubles/SpyLslStreamInfo'
-import SpyTimeMarkerOutlet from '../testDoubles/SpyTimeMarkerOutlet'
+import LslStreamInlet from '../components/LslStreamInlet'
+
+import LslStreamOutlet from '../components/LslStreamOutlet'
+import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl'
+import { SpyLslInlet } from '../testDoubles/LslInlet/SpyLslInlet'
+import FakeLslOutlet from '../testDoubles/LslOutlet/FakeLslOutlet'
+import SpyMarkerOutlet from '../testDoubles/MarkerOutlet/SpyMarkerOutlet'
+import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo'
+import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo'
 
 export default class AbstractLslTest extends AbstractSpruceTest {
     protected static fakeLiblsl: FakeLiblsl
@@ -20,11 +23,11 @@ export default class AbstractLslTest extends AbstractSpruceTest {
 
     protected static setFakeLiblsl() {
         this.fakeLiblsl = new FakeLiblsl()
-        LiblslImpl.setInstance(this.fakeLiblsl)
+        LiblslAdapter.setInstance(this.fakeLiblsl)
     }
 
-    protected static setSpyLslStreamInfo() {
-        LslStreamInfo.Class = SpyLslStreamInfo
+    protected static setSpyStreamInfo() {
+        LslStreamInfo.Class = SpyStreamInfo
     }
 
     protected static setFakeStreamInfo() {
@@ -33,11 +36,16 @@ export default class AbstractLslTest extends AbstractSpruceTest {
     }
 
     protected static setSpyLslInlet() {
-        LslInlet.Class = SpyLslInlet
+        LslStreamInlet.Class = SpyLslInlet
     }
 
-    protected static setSpyTimeMarkerOutlet() {
-        TimeMarkerOutletImpl.Class = SpyTimeMarkerOutlet
+    protected static setFakeLslOutlet() {
+        LslStreamOutlet.Class = FakeLslOutlet
+        FakeLslOutlet.resetTestDouble()
+    }
+
+    protected static setSpyMarkerOutlet() {
+        EventMarkerOutlet.Class = SpyMarkerOutlet
     }
 
     protected static readonly name_ = generateId()

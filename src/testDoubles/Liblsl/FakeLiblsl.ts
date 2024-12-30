@@ -10,7 +10,7 @@ import {
     CreateInletOptions,
     DestroyInletOptions,
     BoundInlet,
-} from '../nodeLsl.types'
+} from '../../nodeLsl.types'
 
 export default class FakeLiblsl implements Liblsl {
     public outlet: BoundOutlet = {} as BoundOutlet

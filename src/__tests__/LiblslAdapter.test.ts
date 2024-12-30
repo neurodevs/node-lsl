@@ -1,12 +1,7 @@
 import { randomInt } from 'crypto'
-import AbstractSpruceTest, {
-    test,
-    assert,
-    errorAssert,
-    generateId,
-} from '@sprucelabs/test-utils'
+import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { DataType, OpenParams } from 'ffi-rs'
-import LiblslImpl from '../components/Liblsl'
+import LiblslAdapter from '../components/LiblslAdapter'
 import {
     BoundChild,
     BoundDescription,
@@ -18,9 +13,10 @@ import {
     LiblslBindings,
     LslChannel,
 } from '../nodeLsl.types'
-import FakeLiblsl from '../testDoubles/FakeLiblsl'
+import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl'
+import AbstractLslTest from './AbstractLslTest'
 
-export default class LiblslTest extends AbstractSpruceTest {
+export default class LiblslAdapterTest extends AbstractLslTest {
     private static lsl: Liblsl
     private static libraryPath?: string
     private static libraryOptions?: Record<string, any>
@@ -76,11 +72,11 @@ export default class LiblslTest extends AbstractSpruceTest {
         this.appendChildHitCount = 0
 
         delete this.ffiRsOpenOptions
-        LiblslImpl.ffiRsOpen = (options) => {
+        LiblslAdapter.ffiRsOpen = (options) => {
             this.ffiRsOpenOptions = options
         }
 
-        LiblslImpl.ffiRsDefine = (options) => {
+        LiblslAdapter.ffiRsDefine = (options) => {
             this.ffiRsDefineOptions = options
             if (this.shouldThrowWhenCreatingBindings) {
                 throw new Error('Failed to create bindings!')
@@ -88,16 +84,16 @@ export default class LiblslTest extends AbstractSpruceTest {
             return this.fakeBindings as any
         }
 
-        LiblslImpl.resetInstance()
-        this.lsl = LiblslImpl.getInstance()
+        LiblslAdapter.resetInstance()
+        this.lsl = LiblslAdapter.getInstance()
     }
 
     @test()
     protected static async throwsWhenBindingsFailToLoad() {
         this.shouldThrowWhenCreatingBindings = true
-        LiblslImpl.resetInstance()
+        LiblslAdapter.resetInstance()
 
-        const err = assert.doesThrow(() => LiblslImpl.getInstance())
+        const err = assert.doesThrow(() => LiblslAdapter.getInstance())
         errorAssert.assertError(err, 'FAILED_TO_LOAD_LIBLSL', {
             liblslPath: process.env.LIBLSL_PATH,
         })
@@ -167,21 +163,21 @@ export default class LiblslTest extends AbstractSpruceTest {
 
     @test()
     protected static async worksAsASingleton() {
-        const liblsl = LiblslImpl.getInstance()
+        const liblsl = LiblslAdapter.getInstance()
         //@ts-ignore
-        assert.isInstanceOf(liblsl, LiblslImpl)
+        assert.isInstanceOf(liblsl, LiblslAdapter)
     }
 
     @test()
     protected static async singletonIsTheSame() {
-        assert.isEqual(LiblslImpl.getInstance(), LiblslImpl.getInstance())
+        assert.isEqual(LiblslAdapter.getInstance(), LiblslAdapter.getInstance())
     }
 
     @test()
     protected static canSetInstance() {
         const fake = new FakeLiblsl()
-        LiblslImpl.setInstance(fake)
-        assert.isEqual(LiblslImpl.getInstance(), fake)
+        LiblslAdapter.setInstance(fake)
+        assert.isEqual(LiblslAdapter.getInstance(), fake)
     }
 
     @test()
@@ -402,8 +398,8 @@ export default class LiblslTest extends AbstractSpruceTest {
     protected static async defaultsToMacOsPath() {
         delete process.env.LIBLSL_PATH
 
-        LiblslImpl.resetInstance()
-        this.lsl = LiblslImpl.getInstance()
+        LiblslAdapter.resetInstance()
+        this.lsl = LiblslAdapter.getInstance()
 
         assert.isEqual(
             this.ffiRsOpenOptions?.path,

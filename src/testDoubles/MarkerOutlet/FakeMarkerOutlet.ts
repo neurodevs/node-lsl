@@ -1,7 +1,7 @@
-import { TimeMarkerOutlet } from '../components/TimeMarkerOutlet'
-import { DurationMarker } from '../nodeLsl.types'
+import { MarkerOutlet } from '../../components/EventMarkerOutlet'
+import { DurationMarker } from '../../nodeLsl.types'
 
-export default class FakeTimeMarkerOutlet implements TimeMarkerOutlet {
+export default class FakeMarkerOutlet implements MarkerOutlet {
     public pushMarkersCalls: DurationMarker[][]
     public pushSampleCalls: string[][]
     public numStopCalls: number
@@ -30,7 +30,7 @@ export default class FakeTimeMarkerOutlet implements TimeMarkerOutlet {
         this.numDestroyCalls++
     }
 
-    public resetTestDouble() {
+    public resetSpy() {
         this.pushMarkersCalls = []
         this.pushSampleCalls = []
         this.numStopCalls = 0

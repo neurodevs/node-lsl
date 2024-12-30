@@ -1,10 +1,10 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
 import { ChannelFormat } from '../nodeLsl.types'
-import LiblslImpl from './Liblsl'
+import LiblslAdapter from './LiblslAdapter'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
-export default class LslInlet implements StreamInlet {
+export default class LslStreamInlet implements LslInlet {
     public static Class?: LslInletConstructor
 
     protected name: string
@@ -54,7 +54,7 @@ export default class LslInlet implements StreamInlet {
     }
 
     private get lsl() {
-        return LiblslImpl.getInstance()
+        return LiblslAdapter.getInstance()
     }
 
     private readonly defaultName = `lsl-inlet-${generateId()}`
@@ -64,12 +64,12 @@ export default class LslInlet implements StreamInlet {
     }
 }
 
-export interface StreamInlet {}
+export interface LslInlet {}
 
 export type LslInletConstructor = new (
     info: StreamInfo,
     options: LslInletOptions
-) => StreamInlet
+) => LslInlet
 
 export interface LslInletOptions {
     sampleRate: number

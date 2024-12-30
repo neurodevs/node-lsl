@@ -5,8 +5,8 @@ Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series
 - [Overview](#overview)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [LslOutlet](#lsloutlet)
-  - [TimeMarkerOutlet](#timemarkeroutlet) 
+  - [LslStreamOutlet](#lslstreamoutlet)
+  - [EventMarkerOutlet](#eventmarkeroutlet) 
 - [Test Doubles](#test-doubles)
 
 ## Overview
@@ -37,14 +37,14 @@ LIBLSL_PATH=/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib
 
 ## Usage
 
-### LslOutlet
+### LslStreamOutlet
 
 LSL is often used to stream EEG data over a network. For example, to instantiate an LSL outlet for the [Muse S 2nd generation](https://choosemuse.com/products/muse-s-gen-2) headband:
 
 ```typescript
-import { LslOutletImpl } from '@neurodevs/node-lsl'
+import { LslStreamOutlet } from '@neurodevs/node-lsl'
 
-const outlet = LslOutletImpl.Outlet({
+const instance = LslStreamOutlet.Create({
     name: 'Muse S (2nd gen)',
     type: 'EEG',
     channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
@@ -58,29 +58,18 @@ const outlet = LslOutletImpl.Outlet({
 })
 
 // Must be in async function
-await outlet.pushSample(...)
+await instance.pushSample(...)
 ```
 
-### TimeMarkerOutlet
+### EventMarkerOutlet
 
-LSL is also often used to push time markers that mark different phases of an experiment or session:
-
-```typescript
-import { TimeMarkerOutletImpl } from '@neurodevs/node-lsl'
-
-const outlet = TimeMarkerOutletImpl.Outlet()
-
-// Must be in async function
-await outlet.pushSample('phase-1-begin')
-
-// Wait for phase to end
-
-await outlet.pushSample('phase-1-end')
-```
-
-There is also a `pushMarkers` method that pushes a time marker, waits for a specified duration, then pushes the next marker. I recommend that each time marker has a duration of at least 100 ms so that LSL receives the markers in the right order.
+LSL is also often used to push event markers that mark different phases of an experiment or session. The `pushMarkers` method pushes an event marker, waits for a specified duration, then pushes the next marker. I recommend that each event marker has a duration of at least 100 ms so that LSL receives the markers in the right order.
 
 ```typescript
+import { EventMarkerOutlet } from '@neurodevs/node-lsl'
+
+const instance = EventMarkerOutlet.Create()
+
 const markers = [
     { name: 'phase-1-begin', durationMs: 30 * 1000 },
     { name: 'phase-1-end', durationMs: 0.1 * 1000 },
@@ -89,38 +78,28 @@ const markers = [
 ]
 
 // Must be in async function, hangs until complete
-await outlet.pushMarkers(markers)
+await instance.pushMarkers(markers)
 ```
 
-If you then want to stop the time marker outlet early, you simply do:
+If you then want to stop the `EventMarkerOutlet` early, you simply do:
 
 ```typescript
-outlet.stop()
-```
-
-You can optionally pass any LslOutlet options to the time marker outlet during instantiation. For example, if you want to override the type:
-
-```typescript
-import { TimeMarkerOutletImpl } from '@neurodevs/node-lsl'
-
-const outlet = TimeMarkerOutletImpl.Outlet({
-    type: 'custom-type'
-})
+instance.stop()
 ```
 
 ## Test Doubles
 
 This package was developed using test-driven development (TDD). If you also follow TDD, you'll likely want test doubles to fake or mock certain behaviors for these classes.
 
-For example, the `MockTimeMarkerOutlet` class lets you test whether your application appropriately calls its methods without actually doing anything. Set this mock in your test code like this:
+For example, the `MockMarkerOutlet` class lets you test whether your application appropriately calls its methods without actually doing anything. Set this mock in your test code like this:
 
 ```typescript
-import { TimeMarkerOutletImpl, MockTimeMarkerOutlet } from '@neurodevs/node-lsl'
+import { EventMarkerOutlet, MockMarkerOutlet } from '@neurodevs/node-lsl'
 
 // In your tests / beforeEach
-TimeMarkerOutletImpl.Class = MockTimeMarkerOutlet
+EventMarkerOutlet.Class = MockMarkerOutlet
 
-const mock = TimeMarkerOutletImpl.Outlet()
+const mock = EventMarkerOutlet.Create()
 
 // Do something in your application that should start the outlet
 

@@ -1,6 +1,8 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
-import LslOutletImpl, { LslOutletOptions } from '../components/LslOutlet'
 import { StreamInfo } from '../components/LslStreamInfo'
+import LslStreamOutlet, {
+    LslOutletOptions,
+} from '../components/LslStreamOutlet'
 import { LslSample } from '../nodeLsl.types'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
@@ -8,17 +10,17 @@ import {
     TestChannelFormat,
 } from '../testDoubles/consts'
 
-import FakeStreamInfo from '../testDoubles/FakeStreamInfo'
 import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
+import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo'
 import AbstractLslTest from './AbstractLslTest'
 
-export default class LslOutletTest extends AbstractLslTest {
+export default class LslStreamOutletTest extends AbstractLslTest {
     private static randomOutletOptions: LslOutletOptions
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        delete LslOutletImpl.Class
+        delete LslStreamOutlet.Class
 
         this.randomOutletOptions = generateRandomOutletOptions()
 
@@ -30,7 +32,7 @@ export default class LslOutletTest extends AbstractLslTest {
     protected static async throwsWithMissingRequiredParams() {
         const err = await assert.doesThrowAsync(
             //@ts-ignore
-            async () => await LslOutletImpl.Create()
+            async () => await LslStreamOutlet.Create()
         )
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
             parameters: [
@@ -55,7 +57,7 @@ export default class LslOutletTest extends AbstractLslTest {
 
     @test()
     protected static async allowsZeroSampleRate() {
-        await this.Outlet({ sampleRate: 0 })
+        await this.LslStreamOutlet({ sampleRate: 0 })
     }
 
     @test()
@@ -75,7 +77,7 @@ export default class LslOutletTest extends AbstractLslTest {
 
     @test()
     protected static async throwsWithInvalidChunkSize() {
-        await this.Outlet({ chunkSize: 0 })
+        await this.LslStreamOutlet({ chunkSize: 0 })
         await this.assertThrowsInvalidChunkSize(-1)
         await this.assertThrowsInvalidChunkSize(-1.5)
         await this.assertThrowsInvalidChunkSize(1.5)
@@ -83,7 +85,7 @@ export default class LslOutletTest extends AbstractLslTest {
 
     @test()
     protected static async throwsWithInvalidMaxBuffered() {
-        await this.Outlet({ maxBuffered: 0 })
+        await this.LslStreamOutlet({ maxBuffered: 0 })
         await this.assertThrowsInvalidMaxBuffered(-1)
         await this.assertThrowsInvalidMaxBuffered(-1.5)
         await this.assertThrowsInvalidMaxBuffered(1.5)
@@ -94,7 +96,9 @@ export default class LslOutletTest extends AbstractLslTest {
         for (let unsupportedType of TEST_UNSUPPORTED_CHANNEL_FORMATS) {
             await assert.doesThrowAsync(
                 async () =>
-                    await this.Outlet({ channelFormat: unsupportedType }),
+                    await this.LslStreamOutlet({
+                        channelFormat: unsupportedType,
+                    }),
                 `This method currently does not support the ${unsupportedType} type! Please implement it.`
             )
         }
@@ -103,7 +107,9 @@ export default class LslOutletTest extends AbstractLslTest {
     @test()
     protected static async supportsAllKnownChannelFormats() {
         for (const format of TEST_SUPPORTED_CHANNEL_FORMATS) {
-            await this.Outlet({ channelFormat: format as TestChannelFormat })
+            await this.LslStreamOutlet({
+                channelFormat: format as TestChannelFormat,
+            })
         }
     }
 
@@ -172,7 +178,7 @@ export default class LslOutletTest extends AbstractLslTest {
 
     @test()
     protected static async constructionCreatesStreamInfo() {
-        await this.Outlet()
+        await this.LslStreamOutlet()
 
         assert.isEqualDeep(FakeStreamInfo.callsToConstructor[0], {
             channelNames: this.randomOutletOptions.channelNames,
@@ -187,15 +193,15 @@ export default class LslOutletTest extends AbstractLslTest {
 
     @test()
     protected static async canOverrideClassInstantiatedInFactory() {
-        LslOutletImpl.Class = CheckingOutlet
-        const instance = await this.Outlet()
+        LslStreamOutlet.Class = CheckingOutlet
+        const instance = await this.LslStreamOutlet()
 
         assert.isInstanceOf(instance, CheckingOutlet)
     }
 
     @test()
     protected static async canDestroyOutlet() {
-        const outlet = await this.Outlet()
+        const outlet = await this.LslStreamOutlet()
         outlet.destroy()
 
         assert.isEqual(this.fakeLiblsl.destroyOutletHitCount, 1)
@@ -214,7 +220,7 @@ export default class LslOutletTest extends AbstractLslTest {
     @test()
     protected static async waitsForTenMsAfterConstructionBeforeReturning() {
         const startMs = Date.now()
-        await this.Outlet({ waitAfterConstructionMs: 10 })
+        await this.LslStreamOutlet({ waitAfterConstructionMs: 10 })
         const endMs = Date.now()
 
         assert.isAbove(endMs - startMs, 10)
@@ -250,7 +256,7 @@ export default class LslOutletTest extends AbstractLslTest {
         parameters: string[]
     ) {
         const err = await assert.doesThrowAsync(
-            async () => await this.Outlet(options)
+            async () => await this.LslStreamOutlet(options)
         )
         errorAssert.assertError(err, 'INVALID_PARAMETERS', {
             parameters,
@@ -258,22 +264,22 @@ export default class LslOutletTest extends AbstractLslTest {
     }
 
     private static async StringOutlet() {
-        return await this.Outlet({ channelFormat: 'string' })
+        return await this.LslStreamOutlet({ channelFormat: 'string' })
     }
 
     private static async FloatOutlet() {
-        return await this.Outlet({ channelFormat: 'float32' })
+        return await this.LslStreamOutlet({ channelFormat: 'float32' })
     }
 
-    private static async Outlet(options?: Partial<LslOutletOptions>) {
-        return await LslOutletImpl.Create({
+    private static async LslStreamOutlet(options?: Partial<LslOutletOptions>) {
+        return await LslStreamOutlet.Create({
             ...this.randomOutletOptions,
             ...options,
         })
     }
 }
 
-class CheckingOutlet extends LslOutletImpl {
+class CheckingOutlet extends LslStreamOutlet {
     public constructor(info: StreamInfo, options: LslOutletOptions) {
         super(info, options)
     }

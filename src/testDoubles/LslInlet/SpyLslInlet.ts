@@ -1,7 +1,9 @@
-import LslInlet, { LslInletOptions } from '../components/LslInlet'
-import { StreamInfo } from '../components/LslStreamInfo'
+import { StreamInfo } from '../../components/LslStreamInfo'
+import LslStreamInlet, {
+    LslInletOptions,
+} from '../../components/LslStreamInlet'
 
-export class SpyLslInlet extends LslInlet {
+export class SpyLslInlet extends LslStreamInlet {
     public constructor(info: StreamInfo, options: LslInletOptions) {
         super(info, options)
     }

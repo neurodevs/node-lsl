@@ -1,7 +1,8 @@
 import { assert } from '@sprucelabs/test-utils'
-import { DurationMarker, LslSample, TimeMarkerOutlet } from '..'
+import { MarkerOutlet } from '../../components/EventMarkerOutlet'
+import { DurationMarker, LslSample } from '../../nodeLsl.types'
 
-export default class MockTimeMarkerOutlet implements TimeMarkerOutlet {
+export default class MockMarkerOutlet implements MarkerOutlet {
     private didPushMarkers = false
     private pushedMarkers?: DurationMarker[]
     private didPushSamples = false

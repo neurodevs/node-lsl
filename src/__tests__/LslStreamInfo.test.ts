@@ -1,16 +1,16 @@
 import { test, assert, generateId, errorAssert } from '@sprucelabs/test-utils'
 import LslStreamInfo, { StreamInfoOptions } from '../components/LslStreamInfo'
 import { CHANNEL_FORMATS } from '../consts'
-import SpyLslStreamInfo from '../testDoubles/SpyLslStreamInfo'
+import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo'
 import AbstractLslTest from './AbstractLslTest'
 
 export default class LslStreamInfoTest extends AbstractLslTest {
-    private static instance: SpyLslStreamInfo
+    private static instance: SpyStreamInfo
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setSpyLslStreamInfo()
+        this.setSpyStreamInfo()
 
         this.instance = this.LslStreamInfo()
     }
@@ -191,13 +191,6 @@ export default class LslStreamInfoTest extends AbstractLslTest {
         )
     }
 
-    private static LslStreamInfo(options?: Partial<StreamInfoOptions>) {
-        return LslStreamInfo.Create({
-            ...this.defaultOptions,
-            ...options,
-        }) as SpyLslStreamInfo
-    }
-
     private static readonly defaultOptions = {
         name: generateId(),
         type: generateId(),
@@ -206,4 +199,11 @@ export default class LslStreamInfoTest extends AbstractLslTest {
         channelFormat: 'float32',
         sampleRate: 100 * Math.random(),
     } as StreamInfoOptions
+
+    private static LslStreamInfo(options?: Partial<StreamInfoOptions>) {
+        return LslStreamInfo.Create({
+            ...this.defaultOptions,
+            ...options,
+        }) as SpyStreamInfo
+    }
 }

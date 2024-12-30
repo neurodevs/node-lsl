@@ -7,10 +7,10 @@ import {
     assertValidSampleRate,
 } from '../assertions'
 import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from '../nodeLsl.types'
-import LiblslImpl from './Liblsl'
+import LiblslAdapter from './LiblslAdapter'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
-export default class LslOutletImpl implements LslOutlet {
+export default class LslStreamOutlet implements LslOutlet {
     public static Class?: LslOutletConstructor
 
     private info: StreamInfo
@@ -141,7 +141,7 @@ export default class LslOutletImpl implements LslOutlet {
     }
 
     private get lsl() {
-        return LiblslImpl.getInstance()
+        return LiblslAdapter.getInstance()
     }
 
     private static async wait(waitMs: number) {

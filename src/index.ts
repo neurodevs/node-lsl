@@ -1,35 +1,44 @@
 export * from './nodeLsl.types'
 
-export { default as LiblslImpl } from './components/Liblsl'
-export * from './components/Liblsl'
+// Liblsl
+
+export { default as LiblslAdapter } from './components/LiblslAdapter'
+export * from './components/LiblslAdapter'
+
+export { default as FakeLiblsl } from './testDoubles/Liblsl/FakeLiblsl'
+export * from './testDoubles/Liblsl/FakeLiblsl'
+
+// LslStreamInfo
 
 export { default as LslStreamInfo } from './components/LslStreamInfo'
 export * from './components/LslStreamInfo'
 
-export { default as SpyLslStreamInfo } from './testDoubles/SpyLslStreamInfo'
-export * from './testDoubles/SpyLslStreamInfo'
+export { default as SpyStreamInfo } from './testDoubles/StreamInfo/SpyStreamInfo'
+export * from './testDoubles/StreamInfo/SpyStreamInfo'
 
-export { default as FakeStreamInfo } from './testDoubles/FakeStreamInfo'
+export { default as FakeStreamInfo } from './testDoubles/StreamInfo/FakeStreamInfo'
+export * from './testDoubles/StreamInfo/FakeStreamInfo'
 
-export { default as LslOutletImpl } from './components/LslOutlet'
-export * from './components/LslOutlet'
+// LslStreamOutlet
 
-export { default as TimeMarkerOutletImpl } from './components/TimeMarkerOutlet'
-export * from './components/TimeMarkerOutlet'
+export { default as LslStreamOutlet } from './components/LslStreamOutlet'
+export * from './components/LslStreamOutlet'
 
-export { default as FakeLiblsl } from './testDoubles/FakeLiblsl'
-export * from './testDoubles/FakeLiblsl'
+export { default as FakeLslOutlet } from './testDoubles/LslOutlet/FakeLslOutlet'
+export * from './testDoubles/LslOutlet/FakeLslOutlet'
 
-export { default as FakeLslOutlet } from './testDoubles/FakeLslOutlet'
-export * from './testDoubles/FakeLslOutlet'
+// EventMarkerOutlet
 
-export { default as FakeTimeMarkerOutlet } from './testDoubles/FakeTimeMarkerOutlet'
-export * from './testDoubles/FakeTimeMarkerOutlet'
+export { default as EventMarkerOutlet } from './components/EventMarkerOutlet'
+export * from './components/EventMarkerOutlet'
 
-export { default as MockTimeMarkerOutlet } from './testDoubles/MockTimeMarkerOutlet'
-export * from './testDoubles/MockTimeMarkerOutlet'
+export { default as FakeMarkerOutlet } from './testDoubles/MarkerOutlet/FakeMarkerOutlet'
+export * from './testDoubles/MarkerOutlet/FakeMarkerOutlet'
 
-export { default as SpyTimeMarkerOutlet } from './testDoubles/SpyTimeMarkerOutlet'
-export * from './testDoubles/SpyTimeMarkerOutlet'
+export { default as MockMarkerOutlet } from './testDoubles/MarkerOutlet/MockMarkerOutlet'
+export * from './testDoubles/MarkerOutlet/MockMarkerOutlet'
+
+export { default as SpyMarkerOutlet } from './testDoubles/MarkerOutlet/SpyMarkerOutlet'
+export * from './testDoubles/MarkerOutlet/SpyMarkerOutlet'
 
 export { default as generateRandomOutletOptions } from './testDoubles/generateRandomOutletOptions'

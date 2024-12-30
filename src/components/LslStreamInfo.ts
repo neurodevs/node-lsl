@@ -2,7 +2,7 @@ import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
 import { CHANNEL_FORMATS_MAP } from '../consts'
 import { BoundStreamInfo, ChannelFormat } from '../nodeLsl.types'
-import LiblslImpl from './Liblsl'
+import LiblslAdapter from './LiblslAdapter'
 
 export default class LslStreamInfo implements StreamInfo {
     public static Class?: StreamInfoConstructor
@@ -79,7 +79,7 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     private get lsl() {
-        return LiblslImpl.getInstance()
+        return LiblslAdapter.getInstance()
     }
 
     private readonly defaultName = `lsl-stream-info-${generateId()}`

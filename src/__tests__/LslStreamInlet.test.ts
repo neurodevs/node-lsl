@@ -1,10 +1,10 @@
 import { test, assert, errorAssert } from '@sprucelabs/test-utils'
-import LslInlet, { LslInletOptions } from '../components/LslInlet'
-import FakeStreamInfo from '../testDoubles/FakeStreamInfo'
-import { SpyLslInlet } from '../testDoubles/SpyLslInlet'
+import LslStreamInlet, { LslInletOptions } from '../components/LslStreamInlet'
+import { SpyLslInlet } from '../testDoubles/LslInlet/SpyLslInlet'
+import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo'
 import AbstractLslTest from './AbstractLslTest'
 
-export default class LslInletTest extends AbstractLslTest {
+export default class LslStreamInletTest extends AbstractLslTest {
     private static instance: SpyLslInlet
 
     protected static async beforeEach() {
@@ -13,11 +13,11 @@ export default class LslInletTest extends AbstractLslTest {
         this.setSpyLslInlet()
         this.setFakeStreamInfo()
 
-        this.instance = this.LslInlet()
+        this.instance = this.LslStreamInlet()
     }
 
     @test()
-    protected static async canCreateLslInlet() {
+    protected static async canCreateLslStreamInlet() {
         assert.isTruthy(this.instance, 'Instance should be created!')
     }
 
@@ -25,7 +25,7 @@ export default class LslInletTest extends AbstractLslTest {
     protected static async throwsWithMissingRequiredOptions() {
         const err = assert.doesThrow(
             // @ts-ignore
-            () => LslInlet.Create()
+            () => LslStreamInlet.Create()
         )
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
             parameters: [
@@ -56,7 +56,7 @@ export default class LslInletTest extends AbstractLslTest {
 
     @test()
     protected static async uniqueNameHasSetPrefix() {
-        const instance = this.LslInlet({ name: undefined })
+        const instance = this.LslStreamInlet({ name: undefined })
 
         assert.doesInclude(
             instance.getName(),
@@ -82,7 +82,7 @@ export default class LslInletTest extends AbstractLslTest {
         )
     }
 
-    private static LslInlet(options?: Partial<LslInletOptions>) {
+    private static LslStreamInlet(options?: Partial<LslInletOptions>) {
         const defaultOptions = {
             channelNames: this.channelNames,
             channelFormat: 'float32',
@@ -94,6 +94,6 @@ export default class LslInletTest extends AbstractLslTest {
             maxBuffered: this.maxBuffered,
             ...options,
         } as LslInletOptions
-        return LslInlet.Create(defaultOptions) as SpyLslInlet
+        return LslStreamInlet.Create(defaultOptions) as SpyLslInlet
     }
 }

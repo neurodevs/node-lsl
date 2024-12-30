@@ -1,9 +1,9 @@
 import { FuncObj, FieldType } from 'ffi-rs'
-import { StreamInlet } from './components/LslInlet'
-import { LslOutlet } from './components/LslOutlet'
+import { LslInlet } from './components/LslStreamInlet'
+import { LslOutlet } from './components/LslStreamOutlet'
 import { CHANNEL_FORMATS } from './consts'
 
-export type StreamFixuture = LslOutlet | StreamInlet
+export type StreamFixuture = LslOutlet | LslInlet
 
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 
