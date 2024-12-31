@@ -2,8 +2,8 @@ export * from './nodeLsl.types'
 
 // Liblsl
 
-export { default as LiblslAdapter } from './components/LiblslAdapter'
-export * from './components/LiblslAdapter'
+export { default as LiblslAdapter } from './adapters/LiblslAdapter'
+export * from './adapters/LiblslAdapter'
 
 export { default as FakeLiblsl } from './testDoubles/Liblsl/FakeLiblsl'
 export * from './testDoubles/Liblsl/FakeLiblsl'

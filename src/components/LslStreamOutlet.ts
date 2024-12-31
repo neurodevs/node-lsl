@@ -7,7 +7,7 @@ import {
     assertValidSampleRate,
 } from '../assertions'
 import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from '../nodeLsl.types'
-import LiblslAdapter from './LiblslAdapter'
+import LiblslAdapter from '../adapters/LiblslAdapter'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
 export default class LslStreamOutlet implements LslOutlet {

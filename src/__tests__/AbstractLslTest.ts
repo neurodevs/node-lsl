@@ -1,6 +1,6 @@
 import AbstractSpruceTest, { generateId } from '@sprucelabs/test-utils'
 import EventMarkerOutlet from '../components/EventMarkerOutlet'
-import LiblslAdapter from '../components/LiblslAdapter'
+import LiblslAdapter from '../adapters/LiblslAdapter'
 import LslStreamInfo from '../components/LslStreamInfo'
 import LslStreamInlet from '../components/LslStreamInlet'
 
