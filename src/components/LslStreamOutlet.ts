@@ -1,4 +1,5 @@
 import { assertOptions } from '@sprucelabs/schema'
+import LiblslAdapter from '../adapters/LiblslAdapter'
 import {
     assertValidChannelCount,
     assertValidChannelFormat,
@@ -7,7 +8,6 @@ import {
     assertValidSampleRate,
 } from '../assertions'
 import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from '../nodeLsl.types'
-import LiblslAdapter from '../adapters/LiblslAdapter'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
 export default class LslStreamOutlet implements LslOutlet {
