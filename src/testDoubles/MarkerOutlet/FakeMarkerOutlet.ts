@@ -1,5 +1,5 @@
 import { MarkerOutlet } from '../../components/EventMarkerOutlet'
-import { DurationMarker } from '../../nodeLsl.types'
+import { DurationMarker } from '../../types'
 
 export default class FakeMarkerOutlet implements MarkerOutlet {
     public static callsToPushMarker: string[] = []

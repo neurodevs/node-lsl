@@ -1,7 +1,7 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
 import LiblslAdapter from '../adapters/LiblslAdapter'
-import { ChannelFormat } from '../nodeLsl.types'
+import { ChannelFormat } from '../types'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
 export default class LslStreamInlet implements LslInlet {

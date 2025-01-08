@@ -1,4 +1,4 @@
-export * from './nodeLsl.types'
+export * from './types'
 
 // Liblsl
 

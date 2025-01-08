@@ -12,7 +12,7 @@ import {
     PushSampleStringTimestampOptions,
     CreateInletOptions,
     DestroyInletOptions,
-} from '../nodeLsl.types'
+} from '../types'
 
 export default class LiblslAdapter implements Liblsl {
     private static instance?: Liblsl

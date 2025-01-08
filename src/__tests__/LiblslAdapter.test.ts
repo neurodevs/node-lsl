@@ -12,7 +12,7 @@ import {
     Liblsl,
     LiblslBindings,
     LslChannel,
-} from '../nodeLsl.types'
+} from '../types'
 import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl'
 import AbstractLslTest from './AbstractLslTest'
 

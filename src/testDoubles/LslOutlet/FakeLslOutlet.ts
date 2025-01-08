@@ -1,6 +1,6 @@
 import { StreamInfo } from '../../components/LslStreamInfo'
 import { LslOutlet, LslOutletOptions } from '../../components/LslStreamOutlet'
-import { LslSample } from '../../nodeLsl.types'
+import { LslSample } from '../../types'
 
 export default class FakeLslOutlet implements LslOutlet {
     public static callsToConstructor: CallToConstructor[] = []

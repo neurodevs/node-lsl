@@ -1,4 +1,4 @@
-import { DurationMarker } from '../nodeLsl.types'
+import { DurationMarker } from '../types'
 import LslStreamOutlet, { LslOutletOptions, LslOutlet } from './LslStreamOutlet'
 
 export default class EventMarkerOutlet implements MarkerOutlet {

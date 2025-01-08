@@ -1,5 +1,5 @@
 import { StreamInfo, StreamInfoOptions } from '../../components/LslStreamInfo'
-import { BoundStreamInfo } from '../../nodeLsl.types'
+import { BoundStreamInfo } from '../../types'
 
 export default class FakeStreamInfo implements StreamInfo {
     public static callsToConstructor: StreamInfoOptions[] = []

@@ -3,7 +3,7 @@ import { StreamInfo } from '../components/LslStreamInfo'
 import LslStreamOutlet, {
     LslOutletOptions,
 } from '../components/LslStreamOutlet'
-import { LslSample } from '../nodeLsl.types'
+import { LslSample } from '../types'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
