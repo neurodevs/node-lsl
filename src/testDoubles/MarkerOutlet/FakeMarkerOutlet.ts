@@ -2,31 +2,33 @@ import { MarkerOutlet } from '../../components/EventMarkerOutlet'
 import { DurationMarker } from '../../nodeLsl.types'
 
 export default class FakeMarkerOutlet implements MarkerOutlet {
-    public static pushMarkersCalls: DurationMarker[][]
-    public static numStopCalls: number
-    public static numDestroyCalls: number
+    public static callsToPushMarker: string[] = []
+    public static callsToPushMarkers: DurationMarker[][] = []
+    public static numCallsToStop = 0
+    public static numCallsToDestroy = 0
 
-    public constructor() {
-        FakeMarkerOutlet.pushMarkersCalls = []
-        FakeMarkerOutlet.numStopCalls = 0
-        FakeMarkerOutlet.numDestroyCalls = 0
+    public constructor() {}
+
+    public pushMarker(markerName: string) {
+        FakeMarkerOutlet.callsToPushMarker.push(markerName)
     }
 
     public async pushMarkers(markers: DurationMarker[]) {
-        FakeMarkerOutlet.pushMarkersCalls.push(markers)
+        FakeMarkerOutlet.callsToPushMarkers.push(markers)
     }
 
     public stop() {
-        FakeMarkerOutlet.numStopCalls++
+        FakeMarkerOutlet.numCallsToStop++
     }
 
     public destroy() {
-        FakeMarkerOutlet.numDestroyCalls++
+        FakeMarkerOutlet.numCallsToDestroy++
     }
 
     public static resetTestDouble() {
-        this.pushMarkersCalls = []
-        this.numStopCalls = 0
-        this.numDestroyCalls = 0
+        this.callsToPushMarker = []
+        this.callsToPushMarkers = []
+        this.numCallsToStop = 0
+        this.numCallsToDestroy = 0
     }
 }

@@ -131,6 +131,14 @@ export default class EventMarkerOutletTest extends AbstractLslTest {
             assert.fail('Should not have been called')
     }
 
+    @test()
+    protected static async pushMarkerCallsPushSampleOnMarkerOutlet() {
+        const markerName = generateId()
+        this.instance.pushMarker(markerName)
+
+        assert.isEqual(FakeLslOutlet.callsToPushSample[0][0], markerName)
+    }
+
     private static get lslOutlet() {
         return this.instance.getLslOutlet()
     }

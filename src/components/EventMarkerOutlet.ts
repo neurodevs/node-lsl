@@ -35,18 +35,27 @@ export default class EventMarkerOutlet implements MarkerOutlet {
         return new (this.Class ?? this)(outlet)
     }
 
+    public pushMarker(markerName: string) {
+        this.pushMarkerToOutlet(markerName)
+    }
+
     public async pushMarkers(markers: DurationMarker[]) {
         this.isPlaying = true
 
         for (let marker of markers) {
-            this.lslOutlet.pushSample([marker.name])
+            const { name, durationMs } = marker
+            this.pushMarkerToOutlet(name)
 
-            await this.wait(marker.durationMs)
+            await this.wait(durationMs)
 
             if (!this.isPlaying) {
                 return
             }
         }
+    }
+
+    private pushMarkerToOutlet(markerName: string) {
+        this.lslOutlet.pushSample([markerName])
     }
 
     protected async wait(durationMs: number) {
@@ -66,6 +75,7 @@ export default class EventMarkerOutlet implements MarkerOutlet {
 }
 
 export interface MarkerOutlet {
+    pushMarker(markerName: string): void
     pushMarkers(markers: DurationMarker[]): Promise<void>
     stop(): void
 }

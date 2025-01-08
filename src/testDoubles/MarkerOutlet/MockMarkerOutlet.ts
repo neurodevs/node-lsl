@@ -8,8 +8,17 @@ export default class MockMarkerOutlet implements MarkerOutlet {
     private didPushSamples = false
     private pushedSamples?: LslSample[]
 
-    public stop() {}
-    public destroy() {}
+    public stop() {
+        throw new Error('Method not implemented.')
+    }
+
+    public destroy() {
+        throw new Error('Method not implemented.')
+    }
+
+    public pushMarker(_markerName: string) {
+        throw new Error('Method not implemented.')
+    }
 
     public pushSample(sample: LslSample) {
         if (!this.didPushSamples) {
