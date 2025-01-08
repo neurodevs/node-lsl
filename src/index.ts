@@ -41,4 +41,9 @@ export * from './testDoubles/MarkerOutlet/MockMarkerOutlet'
 export { default as SpyMarkerOutlet } from './testDoubles/MarkerOutlet/SpyMarkerOutlet'
 export * from './testDoubles/MarkerOutlet/SpyMarkerOutlet'
 
+export { default as ThrowingMarkerOutlet } from './testDoubles/MarkerOutlet/ThrowingMarkerOutlet'
+export * from './testDoubles/MarkerOutlet/ThrowingMarkerOutlet'
+
+// Utils
+
 export { default as generateRandomOutletOptions } from './testDoubles/generateRandomOutletOptions'
