@@ -97,16 +97,22 @@ export default class LslStreamOutlet implements LslOutlet {
     }
 
     private getPushMethod() {
-        if (!(this.channelFormat in this.methodMap)) {
-            this.throwUnsupportedFormat()
-        }
+        this.validateChannelFormat()
         return this.methodMap[this.channelFormat]
     }
 
-    private throwUnsupportedFormat() {
-        throw new Error(
-            `This method currently does not support the ${this.channelFormat} type! Please implement it.`
-        )
+    private validateChannelFormat() {
+        if (!(this.channelFormat in this.methodMap)) {
+            this.throwUnsupportedChannelFormat()
+        }
+    }
+
+    private throwUnsupportedChannelFormat() {
+        throw new Error(this.unsupportedChannelMessage)
+    }
+
+    private get unsupportedChannelMessage() {
+        return `This method currently does not support the ${this.channelFormat} type! Please implement it.`
     }
 
     private readonly methodMap: Record<string, keyof Liblsl> = {
