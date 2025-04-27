@@ -99,17 +99,17 @@ export default class LslStreamOutlet implements LslOutlet {
     private getPushMethod() {
         const channelFormat = this.channelFormat
 
-        const methodMap: Record<string, keyof Liblsl> = {
-            float32: 'pushSampleFloatTimestamp',
-            string: 'pushSampleStringTimestamp',
-        }
-
-        if (!(channelFormat in methodMap)) {
+        if (!(channelFormat in this.methodMap)) {
             throw new Error(
                 `This method currently does not support the ${channelFormat} type! Please implement it.`
             )
         }
-        return methodMap[channelFormat]
+        return this.methodMap[channelFormat]
+    }
+
+    private readonly methodMap: Record<string, keyof Liblsl> = {
+        float32: 'pushSampleFloatTimestamp',
+        string: 'pushSampleStringTimestamp',
     }
 
     private get channelNames() {
