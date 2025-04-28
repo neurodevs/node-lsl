@@ -78,8 +78,9 @@ export default class LslStreamOutlet implements LslOutlet {
     }
 
     private setPushSampleType() {
-        const pushMethod = this.getPushMethod()
-        this.pushSampleByType = this.lsl[pushMethod].bind(this.lsl)
+        this.validateChannelFormat()
+
+        this.pushSampleByType = this.lsl[this.pushMethod].bind(this.lsl)
     }
 
     public destroy() {
@@ -96,8 +97,7 @@ export default class LslStreamOutlet implements LslOutlet {
         })
     }
 
-    private getPushMethod() {
-        this.validateChannelFormat()
+    private get pushMethod() {
         return this.methodMap[this.channelFormat]
     }
 
