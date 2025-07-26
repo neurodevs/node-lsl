@@ -1,5 +1,5 @@
 import { assert } from '@sprucelabs/test-utils'
-import { MarkerOutlet } from '../../components/EventMarkerOutlet'
+import { MarkerOutlet } from '../../modules/EventMarkerOutlet'
 import { DurationMarker, LslSample } from '../../types'
 
 export default class MockMarkerOutlet implements MarkerOutlet {

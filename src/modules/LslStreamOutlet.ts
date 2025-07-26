@@ -1,5 +1,5 @@
 import { assertOptions } from '@sprucelabs/schema'
-import LiblslAdapter from '../adapters/LiblslAdapter'
+import LiblslAdapter from './LiblslAdapter'
 import {
     assertValidChannelCount,
     assertValidChannelFormat,

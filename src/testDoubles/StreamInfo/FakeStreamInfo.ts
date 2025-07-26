@@ -1,4 +1,4 @@
-import { StreamInfo, StreamInfoOptions } from '../../components/LslStreamInfo'
+import { StreamInfo, StreamInfoOptions } from '../../modules/LslStreamInfo'
 import { BoundStreamInfo } from '../../types'
 
 export default class FakeStreamInfo implements StreamInfo {

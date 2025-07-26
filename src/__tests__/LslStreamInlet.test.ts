@@ -1,5 +1,5 @@
 import { test, assert, errorAssert } from '@sprucelabs/test-utils'
-import LslStreamInlet, { LslInletOptions } from '../components/LslStreamInlet'
+import LslStreamInlet, { LslInletOptions } from '../modules/LslStreamInlet'
 import { SpyLslInlet } from '../testDoubles/LslInlet/SpyLslInlet'
 import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo'
 import AbstractLslTest from './AbstractLslTest'

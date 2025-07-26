@@ -1,6 +1,6 @@
 import { test, assert, generateId, errorAssert } from '@sprucelabs/test-utils'
-import LslStreamInfo, { StreamInfoOptions } from '../components/LslStreamInfo'
 import { CHANNEL_FORMATS } from '../consts'
+import LslStreamInfo, { StreamInfoOptions } from '../modules/LslStreamInfo'
 import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo'
 import AbstractLslTest from './AbstractLslTest'
 

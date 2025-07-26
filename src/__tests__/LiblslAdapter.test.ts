@@ -1,7 +1,7 @@
 import { randomInt } from 'crypto'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { DataType, OpenParams } from 'ffi-rs'
-import LiblslAdapter from '../adapters/LiblslAdapter'
+import LiblslAdapter from '../modules/LiblslAdapter'
 import {
     BoundChild,
     BoundDescription,

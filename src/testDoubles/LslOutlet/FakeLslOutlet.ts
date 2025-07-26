@@ -1,5 +1,5 @@
-import { StreamInfo } from '../../components/LslStreamInfo'
-import { LslOutlet, LslOutletOptions } from '../../components/LslStreamOutlet'
+import { StreamInfo } from '../../modules/LslStreamInfo'
+import { LslOutlet, LslOutletOptions } from '../../modules/LslStreamOutlet'
 import { LslSample } from '../../types'
 
 export default class FakeLslOutlet implements LslOutlet {

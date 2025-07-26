@@ -2,16 +2,16 @@ export * from './types'
 
 // Liblsl
 
-export { default as LiblslAdapter } from './adapters/LiblslAdapter'
-export * from './adapters/LiblslAdapter'
+export { default as LiblslAdapter } from './modules/LiblslAdapter'
+export * from './modules/LiblslAdapter'
 
 export { default as FakeLiblsl } from './testDoubles/Liblsl/FakeLiblsl'
 export * from './testDoubles/Liblsl/FakeLiblsl'
 
 // LslStreamInfo
 
-export { default as LslStreamInfo } from './components/LslStreamInfo'
-export * from './components/LslStreamInfo'
+export { default as LslStreamInfo } from './modules/LslStreamInfo'
+export * from './modules/LslStreamInfo'
 
 export { default as SpyStreamInfo } from './testDoubles/StreamInfo/SpyStreamInfo'
 export * from './testDoubles/StreamInfo/SpyStreamInfo'
@@ -21,16 +21,16 @@ export * from './testDoubles/StreamInfo/FakeStreamInfo'
 
 // LslStreamOutlet
 
-export { default as LslStreamOutlet } from './components/LslStreamOutlet'
-export * from './components/LslStreamOutlet'
+export { default as LslStreamOutlet } from './modules/LslStreamOutlet'
+export * from './modules/LslStreamOutlet'
 
 export { default as FakeLslOutlet } from './testDoubles/LslOutlet/FakeLslOutlet'
 export * from './testDoubles/LslOutlet/FakeLslOutlet'
 
 // EventMarkerOutlet
 
-export { default as EventMarkerOutlet } from './components/EventMarkerOutlet'
-export * from './components/EventMarkerOutlet'
+export { default as EventMarkerOutlet } from './modules/EventMarkerOutlet'
+export * from './modules/EventMarkerOutlet'
 
 export { default as FakeMarkerOutlet } from './testDoubles/MarkerOutlet/FakeMarkerOutlet'
 export * from './testDoubles/MarkerOutlet/FakeMarkerOutlet'
