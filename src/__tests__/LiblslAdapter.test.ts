@@ -2,6 +2,7 @@ import { randomInt } from 'crypto'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { DataType, OpenParams } from 'ffi-rs'
 import LiblslAdapter from '../modules/LiblslAdapter'
+import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl'
 import {
     BoundChild,
     BoundDescription,
@@ -13,7 +14,6 @@ import {
     LiblslBindings,
     LslChannel,
 } from '../types'
-import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl'
 import AbstractLslTest from './AbstractLslTest'
 
 export default class LiblslAdapterTest extends AbstractLslTest {
