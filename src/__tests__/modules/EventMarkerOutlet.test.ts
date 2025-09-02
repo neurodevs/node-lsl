@@ -1,11 +1,11 @@
 import { randomInt } from 'crypto'
 import { assert, generateId, test } from '@sprucelabs/test-utils'
-import EventMarkerOutlet from '../modules/EventMarkerOutlet'
-import { LslOutletOptions } from '../modules/LslStreamOutlet'
-import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
-import FakeLslOutlet from '../testDoubles/LslOutlet/FakeLslOutlet'
-import SpyMarkerOutlet from '../testDoubles/MarkerOutlet/SpyMarkerOutlet'
-import AbstractLslTest from './AbstractLslTest'
+import EventMarkerOutlet from '../../modules/EventMarkerOutlet'
+import { LslOutletOptions } from '../../modules/LslStreamOutlet'
+import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions'
+import FakeLslOutlet from '../../testDoubles/LslOutlet/FakeLslOutlet'
+import SpyMarkerOutlet from '../../testDoubles/MarkerOutlet/SpyMarkerOutlet'
+import AbstractLslTest from '../AbstractLslTest'
 
 export default class EventMarkerOutletTest extends AbstractLslTest {
     private static instance: SpyMarkerOutlet

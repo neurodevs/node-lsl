@@ -1,8 +1,8 @@
 import { test, assert, generateId, errorAssert } from '@sprucelabs/test-utils'
-import { CHANNEL_FORMATS } from '../consts'
-import LslStreamInfo, { StreamInfoOptions } from '../modules/LslStreamInfo'
-import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo'
-import AbstractLslTest from './AbstractLslTest'
+import { CHANNEL_FORMATS } from '../../consts'
+import LslStreamInfo, { StreamInfoOptions } from '../../modules/LslStreamInfo'
+import SpyStreamInfo from '../../testDoubles/StreamInfo/SpyStreamInfo'
+import AbstractLslTest from '../AbstractLslTest'
 
 export default class LslStreamInfoTest extends AbstractLslTest {
     private static instance: SpyStreamInfo

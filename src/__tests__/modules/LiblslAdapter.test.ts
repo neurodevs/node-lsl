@@ -1,8 +1,8 @@
 import { randomInt } from 'crypto'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { DataType, OpenParams } from 'ffi-rs'
-import LiblslAdapter from '../modules/LiblslAdapter'
-import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl'
+import LiblslAdapter from '../../modules/LiblslAdapter'
+import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl'
 import {
     BoundChild,
     BoundDescription,
@@ -13,8 +13,8 @@ import {
     Liblsl,
     LiblslBindings,
     LslChannel,
-} from '../types'
-import AbstractLslTest from './AbstractLslTest'
+} from '../../types'
+import AbstractLslTest from '../AbstractLslTest'
 
 export default class LiblslAdapterTest extends AbstractLslTest {
     private static lsl: Liblsl
@@ -77,7 +77,7 @@ export default class LiblslAdapterTest extends AbstractLslTest {
         }
 
         LiblslAdapter.ffiRsDefine = (options) => {
-            this.ffiRsDefineOptions = options
+            this.ffiRsDefineOptions = options as FfiRsDefineOptions
             if (this.shouldThrowWhenCreatingBindings) {
                 throw new Error('Failed to create bindings!')
             }

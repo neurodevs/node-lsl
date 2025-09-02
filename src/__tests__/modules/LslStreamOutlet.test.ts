@@ -1,16 +1,16 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
-import { StreamInfo } from '../modules/LslStreamInfo'
-import LslStreamOutlet, { LslOutletOptions } from '../modules/LslStreamOutlet'
+import { StreamInfo } from '../../modules/LslStreamInfo'
+import LslStreamOutlet, { LslOutletOptions } from '../../modules/LslStreamOutlet'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
     TestChannelFormat,
-} from '../testDoubles/consts'
+} from '../../testDoubles/consts'
 
-import generateRandomOutletOptions from '../testDoubles/generateRandomOutletOptions'
-import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo'
-import { LslSample } from '../types'
-import AbstractLslTest from './AbstractLslTest'
+import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions'
+import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo'
+import { LslSample } from '../../types'
+import AbstractLslTest from '../AbstractLslTest'
 
 export default class LslStreamOutletTest extends AbstractLslTest {
     private static randomOutletOptions: LslOutletOptions
