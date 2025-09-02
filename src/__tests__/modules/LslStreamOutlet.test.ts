@@ -1,6 +1,8 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { StreamInfo } from '../../modules/LslStreamInfo'
-import LslStreamOutlet, { LslOutletOptions } from '../../modules/LslStreamOutlet'
+import LslStreamOutlet, {
+    LslOutletOptions,
+} from '../../modules/LslStreamOutlet'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
