@@ -19,6 +19,14 @@ export * from './testDoubles/StreamInfo/SpyStreamInfo'
 export { default as FakeStreamInfo } from './testDoubles/StreamInfo/FakeStreamInfo'
 export * from './testDoubles/StreamInfo/FakeStreamInfo'
 
+// LslStreamInlet
+
+export { default as LslStreamInlet } from './modules/LslStreamInlet'
+export * from './modules/LslStreamInlet'
+
+export { default as FakeLslInlet } from './testDoubles/LslInlet/FakeLslInlet'
+export * from './testDoubles/LslInlet/FakeLslInlet'
+
 // LslStreamOutlet
 
 export { default as LslStreamOutlet } from './modules/LslStreamOutlet'
