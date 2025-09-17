@@ -3,7 +3,7 @@ import { LslOutlet, LslOutletOptions } from '../../modules/LslStreamOutlet'
 import { LslSample } from '../../types'
 
 export default class FakeLslOutlet implements LslOutlet {
-    public static callsToConstructor: CallToConstructor[] = []
+    public static callsToConstructor: CallToOutletConstructor[] = []
     public static callsToPushSample: LslSample[] = []
     public static numCallsToDestroy = 0
 
@@ -26,7 +26,7 @@ export default class FakeLslOutlet implements LslOutlet {
     }
 }
 
-export interface CallToConstructor {
+export interface CallToOutletConstructor {
     info: StreamInfo
     options: LslOutletOptions
 }
