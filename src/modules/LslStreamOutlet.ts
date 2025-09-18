@@ -120,28 +120,48 @@ export default class LslStreamOutlet implements LslOutlet {
         this.lsl.destroyOutlet({ outlet: this.outlet })
     }
 
-    private get channelNames() {
+    public get name() {
+        return this.options.name
+    }
+
+    public get type() {
+        return this.options.type
+    }
+
+    public get sourceId() {
+        return this.options.sourceId
+    }
+
+    public get channelNames() {
         return this.options.channelNames
     }
 
-    private get channelCount() {
+    public get channelCount() {
         return this.channelNames.length
     }
 
-    private get channelFormat() {
+    public get channelFormat() {
         return this.options.channelFormat
     }
 
-    private get sampleRate() {
+    public get sampleRate() {
         return this.options.sampleRate
     }
 
-    private get chunkSize() {
+    public get chunkSize() {
         return this.options.chunkSize
     }
 
-    private get maxBuffered() {
+    public get maxBuffered() {
         return this.options.maxBuffered
+    }
+
+    public get manufacturer() {
+        return this.options.manufacturer
+    }
+
+    public get unit() {
+        return this.options.unit
     }
 
     private get boundStreamInfo() {
@@ -164,6 +184,16 @@ export default class LslStreamOutlet implements LslOutlet {
 export interface LslOutlet {
     pushSample(sample: LslSample): void
     destroy(): void
+    readonly name: string
+    readonly type: string
+    readonly sourceId: string
+    readonly channelNames: string[]
+    readonly channelFormat: ChannelFormat
+    readonly sampleRate: number
+    readonly chunkSize: number
+    readonly maxBuffered: number
+    readonly manufacturer: string
+    readonly unit: string
 }
 
 export type LslOutletConstructor = new (
