@@ -1,3 +1,5 @@
+import { randomInt } from 'crypto'
+import { generateId } from '@sprucelabs/test-utils'
 import { StreamInfo } from '../../modules/LslStreamInfo'
 import { LslOutlet, LslOutletOptions } from '../../modules/LslStreamOutlet'
 import { LslSample } from '../../types'
@@ -7,9 +9,9 @@ export default class FakeLslOutlet implements LslOutlet {
     public static callsToPushSample: LslSample[] = []
     public static numCallsToDestroy = 0
 
-    public options: LslOutletOptions
+    public options?: LslOutletOptions
 
-    public constructor(info: StreamInfo, options: LslOutletOptions) {
+    public constructor(info?: StreamInfo, options?: LslOutletOptions) {
         FakeLslOutlet.callsToConstructor.push({ info, options })
         this.options = options
     }
@@ -23,19 +25,19 @@ export default class FakeLslOutlet implements LslOutlet {
     }
 
     public get name() {
-        return this.options.name
+        return this.options?.name ?? generateId()
     }
 
     public get type() {
-        return this.options.type
+        return this.options?.type ?? generateId()
     }
 
     public get sourceId() {
-        return this.options.sourceId
+        return this.options?.sourceId ?? generateId()
     }
 
     public get channelNames() {
-        return this.options.channelNames
+        return this.options?.channelNames ?? [generateId()]
     }
 
     public get channelCount() {
@@ -43,27 +45,27 @@ export default class FakeLslOutlet implements LslOutlet {
     }
 
     public get channelFormat() {
-        return this.options.channelFormat
+        return this.options?.channelFormat ?? 'float32'
     }
 
     public get sampleRate() {
-        return this.options.sampleRate
+        return this.options?.sampleRate ?? randomInt(1, 1000)
     }
 
     public get chunkSize() {
-        return this.options.chunkSize
+        return this.options?.chunkSize ?? randomInt(1, 1000)
     }
 
     public get maxBuffered() {
-        return this.options.maxBuffered
+        return this.options?.maxBuffered ?? randomInt(1, 1000)
     }
 
     public get manufacturer() {
-        return this.options.manufacturer
+        return this.options?.manufacturer ?? generateId()
     }
 
     public get unit() {
-        return this.options.unit
+        return this.options?.unit ?? generateId()
     }
 
     public static resetTestDouble() {
@@ -74,6 +76,6 @@ export default class FakeLslOutlet implements LslOutlet {
 }
 
 export interface CallToOutletConstructor {
-    info: StreamInfo
-    options: LslOutletOptions
+    info?: StreamInfo
+    options?: LslOutletOptions
 }
