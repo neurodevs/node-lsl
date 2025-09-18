@@ -83,24 +83,6 @@ export default class LslStreamOutlet implements LslOutlet {
         this.pushSampleByType = this.lsl[this.pushMethod].bind(this.lsl)
     }
 
-    public destroy() {
-        this.lsl.destroyOutlet({ outlet: this.outlet })
-    }
-
-    public pushSample(sample: LslSample) {
-        const timestamp = this.lsl.localClock()
-
-        this.pushSampleByType({
-            outlet: this.outlet,
-            sample,
-            timestamp,
-        })
-    }
-
-    private get pushMethod() {
-        return this.methodMap[this.channelFormat]
-    }
-
     private validateChannelFormat() {
         if (!(this.channelFormat in this.methodMap)) {
             this.throwUnsupportedChannelFormat()
@@ -115,9 +97,27 @@ export default class LslStreamOutlet implements LslOutlet {
         return `This method currently does not support the ${this.channelFormat} type! Please implement it.`
     }
 
+    private get pushMethod() {
+        return this.methodMap[this.channelFormat]
+    }
+
     private readonly methodMap: Record<string, keyof Liblsl> = {
         float32: 'pushSampleFloatTimestamp',
         string: 'pushSampleStringTimestamp',
+    }
+
+    public pushSample(sample: LslSample) {
+        const timestamp = this.lsl.localClock()
+
+        this.pushSampleByType({
+            outlet: this.outlet,
+            sample,
+            timestamp,
+        })
+    }
+
+    public destroy() {
+        this.lsl.destroyOutlet({ outlet: this.outlet })
     }
 
     private get channelNames() {
@@ -162,8 +162,8 @@ export default class LslStreamOutlet implements LslOutlet {
 }
 
 export interface LslOutlet {
-    destroy(): void
     pushSample(sample: LslSample): void
+    destroy(): void
 }
 
 export type LslOutletConstructor = new (
