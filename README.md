@@ -44,21 +44,26 @@ LSL is often used to stream EEG data over a network. For example, to instantiate
 ```typescript
 import { LslStreamOutlet } from '@neurodevs/node-lsl'
 
-const instance = LslStreamOutlet.Create({
-    name: 'Muse S (2nd gen)',
-    type: 'EEG',
-    channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
-    sampleRate: 256,
-    channelFormat: 'float32',
-    sourceId: 'muse-s-eeg',
-    manufacturer: 'Interaxon Inc.',
-    unit: 'microvolt',
-    chunkSize: 12,
-    maxBuffered: 360,
-})
+async function main() {
+    const outlet = await LslStreamOutlet.Create({
+        name: 'Muse S (2nd gen)',
+        type: 'EEG',
+        channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
+        sampleRate: 256,
+        channelFormat: 'float32',
+        sourceId: 'muse-s-eeg',
+        manufacturer: 'Interaxon Inc.',
+        unit: 'microvolt',
+        chunkSize: 12,
+        maxBuffered: 360,
+    })
 
-// Must be in async function
-await instance.pushSample(...)
+    outlet.pushSample([1, 2, 3, 4, 5])
+}
+
+main().catch((error) => {
+    console.error('Error in main:', error)
+})
 ```
 
 ### EventMarkerOutlet
@@ -66,25 +71,30 @@ await instance.pushSample(...)
 LSL is also often used to push event markers that mark different phases of an experiment or session. The `pushMarkers` method pushes an event marker, waits for a specified duration, then pushes the next marker. I recommend that each event marker has a duration of at least 100 ms so that LSL receives the markers in the right order.
 
 ```typescript
-import { EventMarkerOutlet } from '@neurodevs/node-lsl'
+import EventMarkerOutlet from '../modules/EventMarkerOutlet'
 
-const instance = EventMarkerOutlet.Create()
+async function main() {
+    const outlet = await EventMarkerOutlet.Create()
 
-const markers = [
-    { name: 'phase-1-begin', durationMs: 30 * 1000 },
-    { name: 'phase-1-end', durationMs: 0.1 * 1000 },
-    { name: 'phase-2-begin', durationMs: 60 * 1000 },
-    ...
-]
+    const markers = [
+        { name: 'phase-1-begin', durationMs: 100 },
+        { name: 'phase-1-end', durationMs: 10 },
+    ]
 
-// Must be in async function, hangs until complete
-await instance.pushMarkers(markers)
-```
+    // Hangs until complete
+    await outlet.pushMarkers(markers)
 
-If you then want to stop the `EventMarkerOutlet` early, you simply do:
+    // Void promise, does not hang
+    void outlet.pushMarkers(markers)
 
-```typescript
-instance.stop()
+    // Interrupts the above pushMarkers process
+    outlet.stop()
+}
+
+main().catch((error) => {
+    console.error('Error in main:', error)
+})
+
 ```
 
 ## Test Doubles
