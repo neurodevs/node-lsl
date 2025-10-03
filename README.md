@@ -109,7 +109,8 @@ import { EventMarkerOutlet, MockMarkerOutlet } from '@neurodevs/node-lsl'
 // In your tests / beforeEach
 EventMarkerOutlet.Class = MockMarkerOutlet
 
-const mock = EventMarkerOutlet.Create()
+// Must be in async
+const mock = await EventMarkerOutlet.Create()
 
 // Do something in your application that should start the outlet
 
