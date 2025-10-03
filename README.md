@@ -77,8 +77,8 @@ async function main() {
     const outlet = await EventMarkerOutlet.Create()
 
     const markers = [
-        { name: 'phase-1-begin', durationMs: 100 },
-        { name: 'phase-1-end', durationMs: 10 },
+        { name: 'phase-1-begin', durationMs: 1000 },
+        { name: 'phase-1-end', durationMs: 100 },
     ]
 
     // Hangs until complete
