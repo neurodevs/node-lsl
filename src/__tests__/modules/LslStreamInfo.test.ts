@@ -1,4 +1,4 @@
-import { test, assert, generateId, errorAssert } from '@sprucelabs/test-utils'
+import { test, assert, generateId } from '@sprucelabs/test-utils'
 import { CHANNEL_FORMATS } from '../../consts'
 import LslStreamInfo, { StreamInfoOptions } from '../../modules/LslStreamInfo'
 import SpyStreamInfo from '../../testDoubles/StreamInfo/SpyStreamInfo'
@@ -18,17 +18,6 @@ export default class LslStreamInfoTest extends AbstractLslTest {
     @test()
     protected static async canCreateLslStreamInfo() {
         assert.isTruthy(this.instance, 'Instance should be created!')
-    }
-
-    @test()
-    protected static async throwsWithMissingRequiredOptions() {
-        const err = assert.doesThrow(
-            // @ts-ignore
-            () => LslStreamInfo.Create()
-        )
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['channelNames', 'channelFormat', 'sampleRate'],
-        })
     }
 
     @test()

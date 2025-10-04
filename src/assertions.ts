@@ -1,4 +1,3 @@
-import { SchemaError } from '@sprucelabs/schema'
 import { CHANNEL_FORMATS } from './consts'
 import { ChannelFormat } from './types'
 import {
@@ -8,52 +7,42 @@ import {
     isStringInArray,
 } from './validations'
 
-export function assertValidMaxBuffered(maxBuffered: number) {
-    if (!isPositiveIntegerOrZero(maxBuffered)) {
-        throw new SchemaError({
-            code: 'INVALID_PARAMETERS',
-            parameters: ['maxBuffered'],
-            friendlyMessage: 'Max buffered must be a positive integer or zero.',
-        })
+export function assertValidChunkSize(chunkSize: number) {
+    if (!isPositiveIntegerOrZero(chunkSize)) {
+        throw new Error(
+            `Invalid chunk size! Must be a positive integer or zero, not: ${chunkSize}.`
+        )
     }
 }
 
-export function assertValidChunkSize(chunkSize: number) {
-    if (!isPositiveIntegerOrZero(chunkSize)) {
-        throw new SchemaError({
-            code: 'INVALID_PARAMETERS',
-            parameters: ['chunkSize'],
-            friendlyMessage: 'Chunk size must be a positive integer or zero.',
-        })
+export function assertValidMaxBuffered(maxBuffered: number) {
+    if (!isPositiveIntegerOrZero(maxBuffered)) {
+        throw new Error(
+            `Invalid max buffered! Must be a positive integer or zero, not: ${maxBuffered}.`
+        )
     }
 }
 
 export function assertValidChannelFormat(channelFormat: ChannelFormat) {
     if (!isStringInArray(channelFormat, CHANNEL_FORMATS)) {
-        throw new SchemaError({
-            code: 'INVALID_PARAMETERS',
-            parameters: ['channelFormat'],
-            friendlyMessage: `Invalid `,
-        })
+        throw new Error(
+            `Invalid channel format! Must be one of: ${CHANNEL_FORMATS.join(', ')}, not ${channelFormat}.`
+        )
     }
 }
 
 export function assertValidSampleRate(sampleRate: number) {
     if (!isGreaterThanOrEqualToZero(sampleRate)) {
-        throw new SchemaError({
-            code: 'INVALID_PARAMETERS',
-            parameters: ['sampleRate'],
-            friendlyMessage: 'Sample rate must be a positive number or zero.',
-        })
+        throw new Error(
+            `Invalid sample rate! Must be a positive number or zero, not: ${sampleRate}.`
+        )
     }
 }
 
 export function assertValidChannelCount(channelCount: number) {
     if (!isPositiveInteger(channelCount)) {
-        throw new SchemaError({
-            code: 'INVALID_PARAMETERS',
-            parameters: ['channelNames'],
-            friendlyMessage: 'channelNames must have 1 or more labels.',
-        })
+        throw new Error(
+            `Invalid channel count! Must be a positive integer, not: ${channelCount}.`
+        )
     }
 }

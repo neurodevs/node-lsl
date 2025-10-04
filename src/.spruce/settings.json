@@ -6,8 +6,6 @@
     "skill"
   ],
   "installed": [
-    "test",
-    "schema",
-    "error"
+    "test"
   ]
 }

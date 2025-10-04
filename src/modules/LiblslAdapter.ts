@@ -1,6 +1,4 @@
-import { assertOptions } from '@sprucelabs/schema'
 import { DataType, define, open } from 'ffi-rs'
-import SpruceError from '../errors/SpruceError'
 import {
     Liblsl,
     LiblslBindings,
@@ -15,27 +13,28 @@ import {
 } from '../types'
 
 export default class LiblslAdapter implements Liblsl {
-    private static instance?: Liblsl
     public static ffiRsOpen = open
     public static ffiRsDefine = define
+    private static instance?: Liblsl
 
+    private path: string
     private bindings!: LiblslBindings
 
     protected constructor() {
-        const path = process.env.LIBLSL_PATH! ?? this.defaultMacOsPath
-        this.tryToLoadBindings(path)
+        this.path = process.env.LIBLSL_PATH! ?? this.defaultMacOsPath
+        this.tryToLoadBindings()
     }
 
-    private tryToLoadBindings(path: string) {
+    private tryToLoadBindings() {
         try {
-            this.bindings = this.loadBindings(path)
+            this.bindings = this.loadBindings(this.path)
         } catch (error) {
-            throw new SpruceError({
-                code: 'FAILED_TO_LOAD_LIBLSL',
-                liblslPath: path,
-                originalError: error as any,
-            })
+            throw new Error(this.generateFailedMessage(error as Error))
         }
+    }
+
+    private generateFailedMessage(error: Error) {
+        return `Loading the liblsl dylib failed! I tried to load it from ${this.path}.\n\n${error.message}\n\n`
     }
 
     public static getInstance() {
@@ -145,14 +144,7 @@ export default class LiblslAdapter implements Liblsl {
             sampleRate,
             channelFormat,
             sourceId,
-        } = assertOptions(options, [
-            'name',
-            'type',
-            'channelCount',
-            'sampleRate',
-            'channelFormat',
-            'sourceId',
-        ])
+        } = options
 
         return this.bindings.lsl_create_streaminfo([
             name,
@@ -167,7 +159,7 @@ export default class LiblslAdapter implements Liblsl {
     public appendChannelsToStreamInfo(
         options: AppendChannelsToStreamInfoOptions
     ) {
-        const { info, channels } = assertOptions(options, ['info', 'channels'])
+        const { info, channels } = options
 
         const description = this.bindings.lsl_get_desc([info])
         const parent = this.bindings.lsl_append_child([description, 'channels'])
@@ -185,47 +177,29 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public createOutlet(options: CreateOutletOptions) {
-        const { info, chunkSize, maxBuffered } = assertOptions(options, [
-            'info',
-            'chunkSize',
-            'maxBuffered',
-        ])
-
+        const { info, chunkSize, maxBuffered } = options
         return this.bindings.lsl_create_outlet([info, chunkSize, maxBuffered])
     }
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
-        const { outlet, sample, timestamp } = assertOptions(options, [
-            'outlet',
-            'sample',
-            'timestamp',
-        ])
+        const { outlet, sample, timestamp } = options
         this.bindings.lsl_push_sample_ft([outlet, sample, timestamp])
     }
 
     public pushSampleStringTimestamp(
         options: PushSampleStringTimestampOptions
     ) {
-        const { outlet, sample, timestamp } = assertOptions(options, [
-            'outlet',
-            'sample',
-            'timestamp',
-        ])
+        const { outlet, sample, timestamp } = options
         this.bindings.lsl_push_sample_strt([outlet, sample, timestamp])
     }
 
     public destroyOutlet(options: DestroyOutletOptions) {
-        const { outlet } = assertOptions(options, ['outlet'])
+        const { outlet } = options
         this.bindings.lsl_destroy_outlet([outlet])
     }
 
     public createInlet(options: CreateInletOptions) {
-        const { info, chunkSize, maxBuffered } = assertOptions(options, [
-            'info',
-            'chunkSize',
-            'maxBuffered',
-        ])
-
+        const { info, chunkSize, maxBuffered } = options
         return this.bindings.lsl_create_inlet([info, chunkSize, maxBuffered])
     }
 

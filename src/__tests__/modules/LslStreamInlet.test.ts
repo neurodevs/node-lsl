@@ -1,4 +1,4 @@
-import { test, assert, errorAssert } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
 import LslStreamInlet, { LslInletOptions } from '../../modules/LslStreamInlet'
 import { SpyLslInlet } from '../../testDoubles/LslInlet/SpyLslInlet'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo'
@@ -19,23 +19,6 @@ export default class LslStreamInletTest extends AbstractLslTest {
     @test()
     protected static async canCreateLslStreamInlet() {
         assert.isTruthy(this.instance, 'Instance should be created!')
-    }
-
-    @test()
-    protected static async throwsWithMissingRequiredOptions() {
-        const err = assert.doesThrow(
-            // @ts-ignore
-            () => LslStreamInlet.Create()
-        )
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: [
-                'channelNames',
-                'channelFormat',
-                'sampleRate',
-                'chunkSize',
-                'maxBuffered',
-            ],
-        })
     }
 
     @test()

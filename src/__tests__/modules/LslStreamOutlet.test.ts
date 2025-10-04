@@ -1,4 +1,5 @@
-import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import { test, assert, generateId } from '@sprucelabs/test-utils'
+import { CHANNEL_FORMATS } from '../../consts'
 import { StreamInfo } from '../../modules/LslStreamInfo'
 import LslStreamOutlet, {
     LslOutletOptions,
@@ -11,7 +12,7 @@ import {
 
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo'
-import { LslSample } from '../../types'
+import { ChannelFormat, LslSample } from '../../types'
 import AbstractLslTest from '../AbstractLslTest'
 
 export default class LslStreamOutletTest extends AbstractLslTest {
@@ -29,30 +30,8 @@ export default class LslStreamOutletTest extends AbstractLslTest {
     }
 
     @test()
-    protected static async throwsWithMissingRequiredParams() {
-        const err = await assert.doesThrowAsync(
-            //@ts-ignore
-            async () => await LslStreamOutlet.Create()
-        )
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: [
-                'name',
-                'type',
-                'sourceId',
-                'channelNames',
-                'channelFormat',
-                'sampleRate',
-                'chunkSize',
-                'maxBuffered',
-                'manufacturer',
-                'unit',
-            ],
-        })
-    }
-
-    @test()
-    protected static async throwsWithInvalidChannelNames() {
-        await this.assertThrowsInvalidChannelNames(0)
+    protected static async throwsWithEmptyChannelNames() {
+        await this.assertThrowsWithEmptyChannelNames()
     }
 
     @test()
@@ -68,24 +47,30 @@ export default class LslStreamOutletTest extends AbstractLslTest {
 
     @test()
     protected static async throwsWithInvalidChannelFormat() {
-        await this.assertDoesThrowInvalidParameters(
-            //@ts-ignore
-            { channelFormat: generateId() },
-            ['channelFormat']
+        await this.assertThrowsInvalidChannelFormat(
+            'invalid-format' as ChannelFormat
         )
     }
 
     @test()
-    protected static async throwsWithInvalidChunkSize() {
+    protected static async allowsZeroChunkSize() {
         await this.LslStreamOutlet({ chunkSize: 0 })
+    }
+
+    @test()
+    protected static async throwsWithInvalidChunkSize() {
         await this.assertThrowsInvalidChunkSize(-1)
         await this.assertThrowsInvalidChunkSize(-1.5)
         await this.assertThrowsInvalidChunkSize(1.5)
     }
 
     @test()
-    protected static async throwsWithInvalidMaxBuffered() {
+    protected static async allowsZeroMaxBuffered() {
         await this.LslStreamOutlet({ maxBuffered: 0 })
+    }
+
+    @test()
+    protected static async throwsWithInvalidMaxBuffered() {
         await this.assertThrowsInvalidMaxBuffered(-1)
         await this.assertThrowsInvalidMaxBuffered(-1.5)
         await this.assertThrowsInvalidMaxBuffered(1.5)
@@ -226,41 +211,57 @@ export default class LslStreamOutletTest extends AbstractLslTest {
         assert.isAbove(endMs - startMs, 10)
     }
 
-    private static async assertThrowsInvalidMaxBuffered(maxBuffered: number) {
-        await this.assertDoesThrowInvalidParameters({ maxBuffered }, [
-            'maxBuffered',
-        ])
-    }
-
-    private static async assertThrowsInvalidChunkSize(chunkSize: number) {
-        await this.assertDoesThrowInvalidParameters({ chunkSize }, [
-            'chunkSize',
-        ])
+    private static async assertThrowsWithEmptyChannelNames() {
+        await this.createAndAssertThrows(
+            'channelNames',
+            [],
+            `Invalid channel count! Must be a positive integer, not: 0.`
+        )
     }
 
     private static async assertThrowsInvalidSampleRate(sampleRate: number) {
-        await this.assertDoesThrowInvalidParameters({ sampleRate }, [
+        await this.createAndAssertThrows(
             'sampleRate',
-        ])
-    }
-
-    private static async assertThrowsInvalidChannelNames(count: number) {
-        await this.assertDoesThrowInvalidParameters(
-            { channelNames: new Array(count).fill(generateId()) },
-            ['channelNames']
+            sampleRate,
+            `Invalid sample rate! Must be a positive number or zero, not: ${sampleRate}`
         )
     }
 
-    private static async assertDoesThrowInvalidParameters(
-        options: Partial<LslOutletOptions>,
-        parameters: string[]
+    private static async assertThrowsInvalidChannelFormat(
+        channelFormat: ChannelFormat
+    ) {
+        await this.createAndAssertThrows(
+            'channelFormat',
+            channelFormat,
+            `Invalid channel format! Must be one of: ${CHANNEL_FORMATS.join(', ')}, not ${channelFormat}.`
+        )
+    }
+
+    private static async assertThrowsInvalidMaxBuffered(maxBuffered: number) {
+        await this.createAndAssertThrows(
+            'maxBuffered',
+            maxBuffered,
+            `Invalid max buffered! Must be a positive integer or zero, not: ${maxBuffered}`
+        )
+    }
+
+    private static async assertThrowsInvalidChunkSize(chunkSize: number) {
+        await this.createAndAssertThrows(
+            'chunkSize',
+            chunkSize,
+            `Invalid chunk size! Must be a positive integer or zero, not: ${chunkSize}`
+        )
+    }
+
+    private static async createAndAssertThrows(
+        option: keyof LslOutletOptions,
+        value: number | string[] | ChannelFormat,
+        expectedMessage: string
     ) {
         const err = await assert.doesThrowAsync(
-            async () => await this.LslStreamOutlet(options)
+            async () => await this.LslStreamOutlet({ [option]: value })
         )
-        errorAssert.assertError(err, 'INVALID_PARAMETERS', {
-            parameters,
-        })
+        assert.isTrue(err.message.includes(expectedMessage))
     }
 
     private static async StringOutlet() {

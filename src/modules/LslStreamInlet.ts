@@ -1,4 +1,3 @@
-import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
 import { ChannelFormat } from '../types'
 import LiblslAdapter from './LiblslAdapter'
@@ -28,13 +27,6 @@ export default class LslStreamInlet implements LslInlet {
     }
 
     public static Create(options: LslInletOptions) {
-        assertOptions(options, [
-            'channelNames',
-            'channelFormat',
-            'sampleRate',
-            'chunkSize',
-            'maxBuffered',
-        ])
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { maxBuffered, chunkSize, ...infoOptions } = options
         const info = this.LslStreamInfo(infoOptions)

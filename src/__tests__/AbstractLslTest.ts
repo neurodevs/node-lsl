@@ -55,4 +55,5 @@ export default class AbstractLslTest extends AbstractSpruceTest {
     protected static readonly channelNames = [generateId(), generateId()]
     protected static readonly chunkSize = Math.floor(Math.random() * 100)
     protected static readonly maxBuffered = Math.floor(Math.random() * 100)
+    protected static readonly sampleRate = Math.floor(Math.random() * 100)
 }

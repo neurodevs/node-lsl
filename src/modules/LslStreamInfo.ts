@@ -1,4 +1,3 @@
-import { assertOptions } from '@sprucelabs/schema'
 import { generateId } from '@sprucelabs/test-utils'
 import { CHANNEL_FORMATS_MAP } from '../consts'
 import { BoundStreamInfo, ChannelFormat } from '../types'
@@ -40,7 +39,6 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     public static Create(options: StreamInfoOptions) {
-        assertOptions(options, ['channelNames', 'channelFormat', 'sampleRate'])
         return new (this.Class ?? this)(options)
     }
 

@@ -1,5 +1,5 @@
 import { randomInt } from 'crypto'
-import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import { test, assert, generateId } from '@sprucelabs/test-utils'
 import { DataType, OpenParams } from 'ffi-rs'
 import LiblslAdapter from '../../modules/LiblslAdapter'
 import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl'
@@ -94,9 +94,13 @@ export default class LiblslAdapterTest extends AbstractLslTest {
         LiblslAdapter.resetInstance()
 
         const err = assert.doesThrow(() => LiblslAdapter.getInstance())
-        errorAssert.assertError(err, 'FAILED_TO_LOAD_LIBLSL', {
-            liblslPath: process.env.LIBLSL_PATH,
-        })
+
+        debugger
+
+        assert.isTrue(
+            err.message.includes(this.generateFailedMessage()),
+            'Did not receive the expected error!'
+        )
     }
 
     @test()
@@ -104,60 +108,6 @@ export default class LiblslAdapterTest extends AbstractLslTest {
         assert.isEqualDeep(this.ffiRsOpenOptions, {
             library: 'lsl',
             path: process.env.LIBLSL_PATH,
-        })
-    }
-
-    @test()
-    protected static throwsWhenCreateStreamInfoIsMissingRequiredParams() {
-        //@ts-ignore
-        const err = assert.doesThrow(() => this.lsl.createStreamInfo())
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: [
-                'name',
-                'type',
-                'channelCount',
-                'sampleRate',
-                'channelFormat',
-                'sourceId',
-            ],
-        })
-    }
-
-    @test()
-    protected static async throwsWhenAppendChannelsIsMissingRequiredParams() {
-        const err = assert.doesThrow(() =>
-            //@ts-ignore
-            this.lsl.appendChannelsToStreamInfo({})
-        )
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['info', 'channels'],
-        })
-    }
-
-    @test()
-    protected static async throwsWhenCreateOutletIsMissingRequiredParams() {
-        //@ts-ignore
-        const err = assert.doesThrow(() => this.lsl.createOutlet({}))
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['info', 'chunkSize', 'maxBuffered'],
-        })
-    }
-
-    @test()
-    protected static async throwsWhenPushSampleFloatTimestampIsMissingRequiredParams() {
-        //@ts-ignore
-        const err = assert.doesThrow(() => this.lsl.pushSampleFloatTimestamp())
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['outlet', 'sample', 'timestamp'],
-        })
-    }
-
-    @test()
-    protected static async throwsWhenPushSampleStringTimestampIsMissingRequiredParams() {
-        //@ts-ignore
-        const err = assert.doesThrow(() => this.lsl.pushSampleFloatTimestamp())
-        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['outlet', 'sample', 'timestamp'],
         })
     }
 
@@ -459,6 +409,10 @@ export default class LiblslAdapterTest extends AbstractLslTest {
             channelFormat: randomInt(7),
             sourceId: generateId(),
         }
+    }
+
+    private static generateFailedMessage() {
+        return `Loading the liblsl dylib failed! I tried to load it from ${process.env.LIBLSL_PATH}.`
     }
 
     private static FakeBindings() {

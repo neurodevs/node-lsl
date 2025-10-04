@@ -1,6 +1,7 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "11.4.1",
+  "version": "11.4.2",
+  "description": "Lab Streaming Layer (LSL) bindings for Node",
   "main": "build/index.js",
   "repository": {
     "type": "git",
@@ -30,6 +31,12 @@
     "watch.tsc": "tsc -w",
     "test.rs": "node build/test.js"
   },
+  "dependencies": {
+    "ffi-rs": "^1.0.98",
+    "node-gyp": "^10.2.0",
+    "ref-array-napi": "^1.2.2",
+    "ref-napi": "^3.0.3"
+  },
   "devDependencies": {
     "@sprucelabs/jest-json-reporter": "^8.0.542",
     "@sprucelabs/resolve-path-aliases": "^2.0.516",
@@ -48,7 +55,6 @@
     "tsc-watch": "^6.2.1",
     "typescript": "^5.6.3"
   },
-  "description": "Lab Streaming Layer (LSL) bindings for Node",
   "skill": {
     "namespace": "node-lsl",
     "upgradeIgnoreList": [
@@ -72,15 +78,5 @@
     "moduleNameMapper": {
       "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
     }
-  },
-  "dependencies": {
-    "@sprucelabs/error": "^6.0.541",
-    "@sprucelabs/schema": "^30.0.560",
-    "@sprucelabs/spruce-core-schemas": "^40.1.547",
-    "@sprucelabs/spruce-skill-utils": "^31.0.624",
-    "ffi-rs": "^1.0.98",
-    "node-gyp": "^10.2.0",
-    "ref-array-napi": "^1.2.2",
-    "ref-napi": "^3.0.3"
   }
 }

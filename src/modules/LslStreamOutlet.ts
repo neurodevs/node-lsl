@@ -1,4 +1,3 @@
-import { assertOptions } from '@sprucelabs/schema'
 import {
     assertValidChannelCount,
     assertValidChannelFormat,
@@ -28,19 +27,6 @@ export default class LslStreamOutlet implements LslOutlet {
     }
 
     public static async Create(options: LslOutletOptions) {
-        assertOptions(options, [
-            'name',
-            'type',
-            'sourceId',
-            'channelNames',
-            'channelFormat',
-            'sampleRate',
-            'chunkSize',
-            'maxBuffered',
-            'manufacturer',
-            'unit',
-        ])
-
         const { waitAfterConstructionMs = 10 } = options ?? {}
 
         const streamInfoOptions = {
