@@ -36,8 +36,8 @@ export default class LslStreamInlet implements LslInlet {
             'maxBuffered',
         ])
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { maxBuffered, chunkSize, ...streamInfoOptions } = options
-        const info = this.LslStreamInfo(streamInfoOptions)
+        const { maxBuffered, chunkSize, ...infoOptions } = options
+        const info = this.LslStreamInfo(infoOptions)
         return new (this.Class ?? this)(info, options)
     }
 
