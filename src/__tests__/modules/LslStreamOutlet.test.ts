@@ -261,7 +261,11 @@ export default class LslStreamOutletTest extends AbstractLslTest {
         const err = await assert.doesThrowAsync(
             async () => await this.LslStreamOutlet({ [option]: value })
         )
-        assert.isTrue(err.message.includes(expectedMessage))
+
+        assert.isTrue(
+            err.message.includes(expectedMessage),
+            'Did not receive the expected error!'
+        )
     }
 
     private static async StringOutlet() {
