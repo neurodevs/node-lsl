@@ -1,4 +1,5 @@
-import { test, assert, generateId } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { CHANNEL_FORMATS } from '../../consts'
 import { StreamInfo } from '../../modules/LslStreamInfo'
 import LslStreamOutlet, {
@@ -13,9 +14,9 @@ import {
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo'
 import { ChannelFormat, LslSample } from '../../types'
-import AbstractLslTest from '../AbstractLslTest'
+import AbstractPackageTest from '../AbstractPackageTest'
 
-export default class LslStreamOutletTest extends AbstractLslTest {
+export default class LslStreamOutletTest extends AbstractPackageTest {
     private static randomOutletOptions: LslOutletOptions
 
     protected static async beforeEach() {

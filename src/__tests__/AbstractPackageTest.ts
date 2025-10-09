@@ -1,4 +1,5 @@
-import AbstractSpruceTest, { generateId } from '@sprucelabs/test-utils'
+import AbstractSpruceTest from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import EventMarkerOutlet from '../modules/EventMarkerOutlet'
 import LiblslAdapter from '../modules/LiblslAdapter'
 import LslStreamInfo from '../modules/LslStreamInfo'
@@ -12,7 +13,7 @@ import SpyMarkerOutlet from '../testDoubles/MarkerOutlet/SpyMarkerOutlet'
 import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo'
 import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo'
 
-export default class AbstractLslTest extends AbstractSpruceTest {
+export default class AbstractPackageTest extends AbstractSpruceTest {
     protected static fakeLiblsl: FakeLiblsl
 
     protected static async beforeEach() {
@@ -46,6 +47,10 @@ export default class AbstractLslTest extends AbstractSpruceTest {
 
     protected static setSpyMarkerOutlet() {
         EventMarkerOutlet.Class = SpyMarkerOutlet
+    }
+
+    protected static generateId() {
+        return generateId()
     }
 
     protected static readonly name_ = generateId()

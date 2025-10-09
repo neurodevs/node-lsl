@@ -1,5 +1,5 @@
 import { randomInt } from 'crypto'
-import { generateId } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { StreamInfo } from '../../modules/LslStreamInfo'
 import { LslOutlet, LslOutletOptions } from '../../modules/LslStreamOutlet'
 import { LslSample } from '../../types'

@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto'
-import { test, assert, generateId } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { DataType, OpenParams } from 'ffi-rs'
 import LiblslAdapter from '../../modules/LiblslAdapter'
 import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl'
@@ -14,9 +15,9 @@ import {
     LiblslBindings,
     LslChannel,
 } from '../../types'
-import AbstractLslTest from '../AbstractLslTest'
+import AbstractPackageTest from '../AbstractPackageTest'
 
-export default class LiblslAdapterTest extends AbstractLslTest {
+export default class LiblslAdapterTest extends AbstractPackageTest {
     private static lsl: Liblsl
     private static libraryPath?: string
     private static libraryOptions?: Record<string, any>

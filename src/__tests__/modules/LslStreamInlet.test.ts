@@ -2,9 +2,9 @@ import { test, assert } from '@sprucelabs/test-utils'
 import LslStreamInlet, { LslInletOptions } from '../../modules/LslStreamInlet'
 import { SpyLslInlet } from '../../testDoubles/LslInlet/SpyLslInlet'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo'
-import AbstractLslTest from '../AbstractLslTest'
+import AbstractPackageTest from '../AbstractPackageTest'
 
-export default class LslStreamInletTest extends AbstractLslTest {
+export default class LslStreamInletTest extends AbstractPackageTest {
     private static instance: SpyLslInlet
 
     protected static async beforeEach() {

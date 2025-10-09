@@ -1,13 +1,14 @@
 import { randomInt } from 'crypto'
-import { assert, generateId, test } from '@sprucelabs/test-utils'
+import { assert, test } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import EventMarkerOutlet from '../../modules/EventMarkerOutlet'
 import { LslOutletOptions } from '../../modules/LslStreamOutlet'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions'
 import FakeLslOutlet from '../../testDoubles/LslOutlet/FakeLslOutlet'
 import SpyMarkerOutlet from '../../testDoubles/MarkerOutlet/SpyMarkerOutlet'
-import AbstractLslTest from '../AbstractLslTest'
+import AbstractPackageTest from '../AbstractPackageTest'
 
-export default class EventMarkerOutletTest extends AbstractLslTest {
+export default class EventMarkerOutletTest extends AbstractPackageTest {
     private static instance: SpyMarkerOutlet
 
     protected static async beforeEach() {

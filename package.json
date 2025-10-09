@@ -38,6 +38,7 @@
     "ref-napi": "^3.0.3"
   },
   "devDependencies": {
+    "@neurodevs/generate-id": "^1.0.0",
     "@sprucelabs/jest-json-reporter": "^8.0.542",
     "@sprucelabs/resolve-path-aliases": "^2.0.516",
     "@sprucelabs/test": "^9.0.59",

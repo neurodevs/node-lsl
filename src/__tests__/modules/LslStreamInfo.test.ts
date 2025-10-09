@@ -1,10 +1,11 @@
-import { test, assert, generateId } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { CHANNEL_FORMATS } from '../../consts'
 import LslStreamInfo, { StreamInfoOptions } from '../../modules/LslStreamInfo'
 import SpyStreamInfo from '../../testDoubles/StreamInfo/SpyStreamInfo'
-import AbstractLslTest from '../AbstractLslTest'
+import AbstractPackageTest from '../AbstractPackageTest'
 
-export default class LslStreamInfoTest extends AbstractLslTest {
+export default class LslStreamInfoTest extends AbstractPackageTest {
     private static instance: SpyStreamInfo
 
     protected static async beforeEach() {

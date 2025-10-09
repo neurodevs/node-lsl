@@ -1,4 +1,4 @@
-import { generateId } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { ChannelFormat } from '../types'
 import LiblslAdapter from './LiblslAdapter'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
