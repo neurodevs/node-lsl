@@ -2,11 +2,22 @@
   "name": "@neurodevs/node-lsl",
   "version": "11.4.2",
   "description": "Lab Streaming Layer (LSL) bindings for Node",
-  "main": "build/index.js",
+  "keywords": [
+    "nodejs",
+    "typescript",
+    "tdd"
+  ],
+  "license": "MIT",
+  "author": "Eric Yates <hello@ericthecurious.com>",
+  "homepage": "https://github.com/neurodevs/node-lsl",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/neurodevs/node-lsl.git"
   },
+  "bugs": {
+    "url": "https://github.com/neurodevs/node-lsl/issues"
+  },
+  "main": "build/index.js",
   "scripts": {
     "build.ci": "yarn run build.tsc && yarn run build.resolve-paths && yarn run lint",
     "build.dev": "yarn run build.tsc --sourceMap ; yarn run resolve-paths.lint",
@@ -56,12 +67,6 @@
     "tsc-watch": "^6.2.1",
     "typescript": "^5.6.3"
   },
-  "skill": {
-    "namespace": "node-lsl",
-    "upgradeIgnoreList": [
-      "@sprucelabs/spruce-test-fixtures"
-    ]
-  },
   "jest": {
     "testRunner": "jest-circus/runner",
     "maxWorkers": 4,
@@ -79,5 +84,11 @@
     "moduleNameMapper": {
       "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
     }
+  },
+  "skill": {
+    "namespace": "node-lsl",
+    "upgradeIgnoreList": [
+      "@sprucelabs/spruce-test-fixtures"
+    ]
   }
 }
