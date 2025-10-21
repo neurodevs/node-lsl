@@ -39,7 +39,7 @@
             },
             "presentation": {
                 "reveal": "always",
-                "panel": "dedicated",
+                "panel": "dedicated"
             },
             "problemMatcher": []
         },
@@ -87,6 +87,18 @@
                 "panel": "new",
                 "clear": false
             }
+        },
+        {
+            "label": "ndx",
+            "type": "shell",
+            "command": "ndx ${input:ndxCommand}",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "clear": false
+            }
         }
     ],
     "inputs": [
@@ -106,6 +118,12 @@
             "id": "optionsCommand",
             "description": "optionsCommand",
             "default": "add",
+            "type": "promptString"
+        },
+        {
+            "id": "ndxCommand",
+            "description": "ndx command",
+            "default": "create.module",
             "type": "promptString"
         }
     ]
