@@ -3,15 +3,15 @@ import { ChannelFormat } from '../types'
 import LiblslAdapter from './LiblslAdapter'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
-export default class LslStreamInlet implements LslInlet {
-    public static Class?: LslInletConstructor
+export default class LslStreamInlet implements StreamInlet {
+    public static Class?: StreamInletConstructor
 
     protected name: string
     protected info: StreamInfo
     private chunkSize: number
     private maxBuffered: number
 
-    protected constructor(info: StreamInfo, options: LslInletOptions) {
+    protected constructor(info: StreamInfo, options: StreamInletOptions) {
         const {
             name = this.defaultName,
             chunkSize,
@@ -23,17 +23,17 @@ export default class LslStreamInlet implements LslInlet {
         this.maxBuffered = maxBuffered
         this.name = name
 
-        this.createLslInlet()
+        this.createStreamInlet()
     }
 
-    public static Create(options: LslInletOptions) {
+    public static Create(options: StreamInletOptions) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { maxBuffered, chunkSize, ...infoOptions } = options
         const info = this.LslStreamInfo(infoOptions)
         return new (this.Class ?? this)(info, options)
     }
 
-    private createLslInlet() {
+    private createStreamInlet() {
         this.lsl.createInlet({
             info: this.boundStreamInfo,
             chunkSize: this.chunkSize,
@@ -56,14 +56,14 @@ export default class LslStreamInlet implements LslInlet {
     }
 }
 
-export interface LslInlet {}
+export interface StreamInlet {}
 
-export type LslInletConstructor = new (
+export type StreamInletConstructor = new (
     info: StreamInfo,
-    options: LslInletOptions
-) => LslInlet
+    options: StreamInletOptions
+) => StreamInlet
 
-export interface LslInletOptions {
+export interface StreamInletOptions {
     sampleRate: number
     channelNames: string[]
     channelFormat: ChannelFormat

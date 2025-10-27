@@ -1,7 +1,7 @@
-import EventMarkerOutlet from '../impl/EventMarkerOutlet'
+import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet'
 
 async function main() {
-    const outlet = await EventMarkerOutlet.Create()
+    const outlet = await LslEventMarkerOutlet.Create()
 
     const markers = [
         { name: 'phase-1-begin', durationMs: 100 },

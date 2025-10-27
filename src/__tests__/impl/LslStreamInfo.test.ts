@@ -17,8 +17,8 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async canCreateLslStreamInfo() {
-        assert.isTruthy(this.instance, 'Instance should be created!')
+    protected static async createsInstance() {
+        assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
     @test()

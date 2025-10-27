@@ -2,20 +2,20 @@ export * from './types'
 
 // EventMarkerOutlet
 
-export { default as EventMarkerOutlet } from './impl/EventMarkerOutlet'
-export * from './impl/EventMarkerOutlet'
+export { default as EventMarkerOutlet } from './impl/LslEventMarkerOutlet'
+export * from './impl/LslEventMarkerOutlet'
 
-export { default as FakeMarkerOutlet } from './testDoubles/MarkerOutlet/FakeMarkerOutlet'
-export * from './testDoubles/MarkerOutlet/FakeMarkerOutlet'
+export { default as FakeMarkerOutlet } from './testDoubles/EventMarkerOutlet/FakeEventMarkerOutlet'
+export * from './testDoubles/EventMarkerOutlet/FakeEventMarkerOutlet'
 
-export { default as MockMarkerOutlet } from './testDoubles/MarkerOutlet/MockMarkerOutlet'
-export * from './testDoubles/MarkerOutlet/MockMarkerOutlet'
+export { default as MockMarkerOutlet } from './testDoubles/EventMarkerOutlet/MockEventMarkerOutlet'
+export * from './testDoubles/EventMarkerOutlet/MockEventMarkerOutlet'
 
-export { default as SpyMarkerOutlet } from './testDoubles/MarkerOutlet/SpyMarkerOutlet'
-export * from './testDoubles/MarkerOutlet/SpyMarkerOutlet'
+export { default as SpyMarkerOutlet } from './testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet'
+export * from './testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet'
 
-export { default as ThrowingMarkerOutlet } from './testDoubles/MarkerOutlet/ThrowingMarkerOutlet'
-export * from './testDoubles/MarkerOutlet/ThrowingMarkerOutlet'
+export { default as ThrowingMarkerOutlet } from './testDoubles/EventMarkerOutlet/ThrowingEventMarkerOutlet'
+export * from './testDoubles/EventMarkerOutlet/ThrowingEventMarkerOutlet'
 
 // Liblsl
 
@@ -25,7 +25,7 @@ export * from './impl/LiblslAdapter'
 export { default as FakeLiblsl } from './testDoubles/Liblsl/FakeLiblsl'
 export * from './testDoubles/Liblsl/FakeLiblsl'
 
-// LslStreamInfo
+// StreamInfo
 
 export { default as LslStreamInfo } from './impl/LslStreamInfo'
 export * from './impl/LslStreamInfo'
@@ -36,29 +36,29 @@ export * from './testDoubles/StreamInfo/SpyStreamInfo'
 export { default as FakeStreamInfo } from './testDoubles/StreamInfo/FakeStreamInfo'
 export * from './testDoubles/StreamInfo/FakeStreamInfo'
 
-// LslStreamInlet
+// StreamInlet
 
 export { default as LslStreamInlet } from './impl/LslStreamInlet'
 export * from './impl/LslStreamInlet'
 
-export { default as FakeLslInlet } from './testDoubles/LslInlet/FakeLslInlet'
-export * from './testDoubles/LslInlet/FakeLslInlet'
+export { default as FakeStreamInlet } from './testDoubles/StreamInlet/FakeStreamInlet'
+export * from './testDoubles/StreamInlet/FakeStreamInlet'
 
-// LslStreamOutlet
+// StreamOutlet
 
 export { default as LslStreamOutlet } from './impl/LslStreamOutlet'
 export * from './impl/LslStreamOutlet'
 
-export { default as FakeLslOutlet } from './testDoubles/LslOutlet/FakeLslOutlet'
-export * from './testDoubles/LslOutlet/FakeLslOutlet'
+export { default as FakeStreamOutlet } from './testDoubles/StreamOutlet/FakeStreamOutlet'
+export * from './testDoubles/StreamOutlet/FakeStreamOutlet'
 
-// LslTransportBridge
+// StreamTransportBridge
 
 export { default as LslWebSocketBridge } from './impl/LslWebSocketBridge'
 export * from './impl/LslWebSocketBridge'
 
-export { default as FakeLslTransportBridge } from './testDoubles/LslTransportBridge/FakeLslTransportBridge'
-export * from './testDoubles/LslTransportBridge/FakeLslTransportBridge'
+export { default as FakeStreamTransportBridge } from './testDoubles/StreamTransportBridge/FakeStreamTransportBridge'
+export * from './testDoubles/StreamTransportBridge/FakeStreamTransportBridge'
 
 // Utils
 

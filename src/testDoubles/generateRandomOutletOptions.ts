@@ -1,6 +1,6 @@
 import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
-import { LslOutletOptions } from '../impl/LslStreamOutlet'
+import { StreamOutletOptions } from '../impl/LslStreamOutlet'
 import { TEST_SUPPORTED_CHANNEL_FORMATS } from './consts'
 
 export default function generateRandomOutletOptions() {
@@ -17,5 +17,5 @@ export default function generateRandomOutletOptions() {
         unit: generateId(),
         chunkSize: randomInt(0, 10),
         maxBuffered: randomInt(0, 10),
-    } as LslOutletOptions
+    } as StreamOutletOptions
 }

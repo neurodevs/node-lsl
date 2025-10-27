@@ -1,8 +1,8 @@
 import { StreamInfo } from '../../impl/LslStreamInfo'
-import LslStreamInlet, { LslInletOptions } from '../../impl/LslStreamInlet'
+import LslStreamInlet, { StreamInletOptions } from '../../impl/LslStreamInlet'
 
-export class SpyLslInlet extends LslStreamInlet {
-    public constructor(info: StreamInfo, options: LslInletOptions) {
+export class SpyStreamInlet extends LslStreamInlet {
+    public constructor(info: StreamInfo, options: StreamInletOptions) {
         super(info, options)
     }
 

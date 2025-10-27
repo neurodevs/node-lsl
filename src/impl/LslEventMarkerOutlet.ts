@@ -1,19 +1,22 @@
 import { DurationMarker } from '../types'
-import LslStreamOutlet, { LslOutletOptions, LslOutlet } from './LslStreamOutlet'
+import LslStreamOutlet, {
+    StreamOutletOptions,
+    StreamOutlet,
+} from './LslStreamOutlet'
 
-export default class EventMarkerOutlet implements MarkerOutlet {
-    public static Class?: MarkerOutletConstructor
+export default class LslEventMarkerOutlet implements EventMarkerOutlet {
+    public static Class?: EventMarkerOutletConstructor
 
-    protected lslOutlet: LslOutlet
+    protected streamOutlet: StreamOutlet
     private isPlaying = false
     private waitResolve?: () => void
     private timeout?: any
 
-    protected constructor(lslOutlet: LslOutlet) {
-        this.lslOutlet = lslOutlet
+    protected constructor(outlet: StreamOutlet) {
+        this.streamOutlet = outlet
     }
 
-    public static async Create(options?: Partial<LslOutletOptions>) {
+    public static async Create(options?: Partial<StreamOutletOptions>) {
         const defaultOptions = {
             name: 'Event markers',
             type: 'Markers',
@@ -25,7 +28,7 @@ export default class EventMarkerOutlet implements MarkerOutlet {
             unit: 'N/A',
             chunkSize: 0,
             maxBuffered: 0,
-        } as LslOutletOptions
+        } as StreamOutletOptions
 
         const outlet = await LslStreamOutlet.Create({
             ...defaultOptions,
@@ -55,7 +58,7 @@ export default class EventMarkerOutlet implements MarkerOutlet {
     }
 
     private pushMarkerToOutlet(markerName: string) {
-        this.lslOutlet.pushSample([markerName])
+        this.streamOutlet.pushSample([markerName])
     }
 
     protected async wait(durationMs: number) {
@@ -74,10 +77,12 @@ export default class EventMarkerOutlet implements MarkerOutlet {
     }
 }
 
-export interface MarkerOutlet {
+export interface EventMarkerOutlet {
     pushMarker(markerName: string): void
     pushMarkers(markers: DurationMarker[]): Promise<void>
     stop(): void
 }
 
-export type MarkerOutletConstructor = new (lslOutlet: LslOutlet) => MarkerOutlet
+export type EventMarkerOutletConstructor = new (
+    outlet: StreamOutlet
+) => EventMarkerOutlet

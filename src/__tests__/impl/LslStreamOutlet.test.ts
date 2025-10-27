@@ -2,7 +2,9 @@ import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
 import { CHANNEL_FORMATS } from '../../consts'
 import { StreamInfo } from '../../impl/LslStreamInfo'
-import LslStreamOutlet, { LslOutletOptions } from '../../impl/LslStreamOutlet'
+import LslStreamOutlet, {
+    StreamOutletOptions,
+} from '../../impl/LslStreamOutlet'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
@@ -15,7 +17,7 @@ import { ChannelFormat, LslSample } from '../../types'
 import AbstractPackageTest from '../AbstractPackageTest'
 
 export default class LslStreamOutletTest extends AbstractPackageTest {
-    private static randomOutletOptions: LslOutletOptions
+    private static randomOutletOptions: StreamOutletOptions
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -253,7 +255,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     private static async createAndAssertThrows(
-        option: keyof LslOutletOptions,
+        option: keyof StreamOutletOptions,
         value: number | string[] | ChannelFormat,
         expectedMessage: string
     ) {
@@ -275,7 +277,9 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         return await this.LslStreamOutlet({ channelFormat: 'float32' })
     }
 
-    private static async LslStreamOutlet(options?: Partial<LslOutletOptions>) {
+    private static async LslStreamOutlet(
+        options?: Partial<StreamOutletOptions>
+    ) {
         return await LslStreamOutlet.Create({
             ...this.randomOutletOptions,
             ...options,
@@ -284,7 +288,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 }
 
 class CheckingOutlet extends LslStreamOutlet {
-    public constructor(info: StreamInfo, options: LslOutletOptions) {
+    public constructor(info: StreamInfo, options: StreamOutletOptions) {
         super(info, options)
     }
 }

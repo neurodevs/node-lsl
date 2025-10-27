@@ -1,5 +1,5 @@
-export default class LslWebSocketBridge implements LslTransportBridge {
-    public static Class?: LslTransportBridgeConstructor
+export default class LslWebSocketBridge implements StreamTransportBridge {
+    public static Class?: StreamTransportBridgeConstructor
 
     protected constructor() {}
 
@@ -8,6 +8,6 @@ export default class LslWebSocketBridge implements LslTransportBridge {
     }
 }
 
-export interface LslTransportBridge {}
+export interface StreamTransportBridge {}
 
-export type LslTransportBridgeConstructor = new () => LslTransportBridge
+export type StreamTransportBridgeConstructor = new () => StreamTransportBridge

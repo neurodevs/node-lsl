@@ -1,7 +1,7 @@
-import { MarkerOutlet } from '../../impl/EventMarkerOutlet'
+import { EventMarkerOutlet } from '../../impl/LslEventMarkerOutlet'
 import { DurationMarker } from '../../types'
 
-export default class ThrowingMarkerOutlet implements MarkerOutlet {
+export default class ThrowingEventMarkerOutlet implements EventMarkerOutlet {
     private errorMsg = 'Intentional throwing: '
 
     public constructor() {

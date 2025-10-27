@@ -1,24 +1,24 @@
 import { test, assert } from '@sprucelabs/test-utils'
-import LslStreamInlet, { LslInletOptions } from '../../impl/LslStreamInlet'
-import { SpyLslInlet } from '../../testDoubles/LslInlet/SpyLslInlet'
+import LslStreamInlet, { StreamInletOptions } from '../../impl/LslStreamInlet'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo'
+import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet'
 import AbstractPackageTest from '../AbstractPackageTest'
 
 export default class LslStreamInletTest extends AbstractPackageTest {
-    private static instance: SpyLslInlet
+    private static instance: SpyStreamInlet
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setSpyLslInlet()
+        this.setSpyStreamInlet()
         this.setFakeStreamInfo()
 
         this.instance = this.LslStreamInlet()
     }
 
     @test()
-    protected static async canCreateLslStreamInlet() {
-        assert.isTruthy(this.instance, 'Instance should be created!')
+    protected static async createsInstance() {
+        assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
     @test()
@@ -49,7 +49,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async callsBindingsToCreateLslInlet() {
+    protected static async callsBindingsToCreateStreamInlet() {
         const fakeInfo = this.instance.getStreamInfo()
 
         assert.isTruthy(fakeInfo, 'Should have created stream info!')
@@ -65,7 +65,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
     }
 
-    private static LslStreamInlet(options?: Partial<LslInletOptions>) {
+    private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
         const defaultOptions = {
             channelNames: this.channelNames,
             channelFormat: 'float32',
@@ -76,7 +76,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             chunkSize: this.chunkSize,
             maxBuffered: this.maxBuffered,
             ...options,
-        } as LslInletOptions
-        return LslStreamInlet.Create(defaultOptions) as SpyLslInlet
+        } as StreamInletOptions
+        return LslStreamInlet.Create(defaultOptions) as SpyStreamInlet
     }
 }

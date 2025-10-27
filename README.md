@@ -6,7 +6,7 @@ Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series
 - [Installation](#installation)
 - [Usage](#usage)
   - [LslStreamOutlet](#lslstreamoutlet)
-  - [EventMarkerOutlet](#eventmarkeroutlet) 
+  - [LslEventMarkerOutlet](#lsleventmarkeroutlet) 
 - [Test Doubles](#test-doubles)
 
 ## Overview
@@ -66,15 +66,15 @@ main().catch((error) => {
 })
 ```
 
-### EventMarkerOutlet
+### LslEventMarkerOutlet
 
 LSL is also often used to push event markers that mark different phases of an experiment or session. The `pushMarkers` method pushes an event marker, waits for a specified duration, then pushes the next marker. I recommend that each event marker has a duration of at least 100 ms so that LSL receives the markers in the right order.
 
 ```typescript
-import EventMarkerOutlet from '../modules/EventMarkerOutlet'
+import { LslEventMarkerOutlet } from '@neurodevs/node-lsl'
 
 async function main() {
-    const outlet = await EventMarkerOutlet.Create()
+    const outlet = await LslEventMarkerOutlet.Create()
 
     const markers = [
         { name: 'phase-1-begin', durationMs: 1000 },
@@ -94,23 +94,22 @@ async function main() {
 main().catch((error) => {
     console.error('Error in main:', error)
 })
-
 ```
 
 ## Test Doubles
 
 This package was developed using test-driven development (TDD). If you also follow TDD, you'll likely want test doubles to fake or mock certain behaviors for these classes.
 
-For example, the `MockMarkerOutlet` class lets you test whether your application appropriately calls its methods without actually doing anything. Set this mock in your test code like this:
+For example, the `MockEventMarkerOutlet` class lets you test whether your application appropriately calls its methods without actually doing anything. Set this mock in your test code like this:
 
 ```typescript
-import { EventMarkerOutlet, MockMarkerOutlet } from '@neurodevs/node-lsl'
+import { LslEventMarkerOutlet, MockEventMarkerOutlet } from '@neurodevs/node-lsl'
 
 // In your tests / beforeEach
-EventMarkerOutlet.Class = MockMarkerOutlet
+LslEventMarkerOutlet.Class = MockEventMarkerOutlet
 
 // Must be in async
-const mock = await EventMarkerOutlet.Create()
+const mock = await LslEventMarkerOutlet.Create()
 
 // Do something in your application that should start the outlet
 

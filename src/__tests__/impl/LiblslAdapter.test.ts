@@ -18,7 +18,7 @@ import {
 import AbstractPackageTest from '../AbstractPackageTest'
 
 export default class LiblslAdapterTest extends AbstractPackageTest {
-    private static lsl: Liblsl
+    private static instance: Liblsl
     private static libraryPath?: string
     private static libraryOptions?: Record<string, any>
     private static fakeBindings: LiblslBindings
@@ -86,7 +86,12 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         }
 
         LiblslAdapter.resetInstance()
-        this.lsl = LiblslAdapter.getInstance()
+        this.instance = LiblslAdapter.getInstance()
+    }
+
+    @test()
+    protected static async createsInstance() {
+        assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
     @test()
@@ -214,7 +219,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     @test()
     protected static async canCreateStreamInfoWithRequiredParams() {
         const options = this.generateRandomCreateStreamInfoOptions()
-        const actual = this.lsl.createStreamInfo(options)
+        const actual = this.instance.createStreamInfo(options)
 
         assert.isEqual(actual, this.fakeStreamInfo)
         assert.isEqualDeep(this.createStreamInfoParams, Object.values(options))
@@ -236,7 +241,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             sample: expected,
             timestamp,
         }
-        this.lsl.pushSampleFloatTimestamp(options)
+        this.instance.pushSampleFloatTimestamp(options)
 
         assert.isEqualDeep(this.pushSampleFloatTimestampParams, [
             this.fakeOutlet,
@@ -254,7 +259,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             sample: expected,
             timestamp,
         }
-        this.lsl.pushSampleStringTimestamp(options)
+        this.instance.pushSampleStringTimestamp(options)
         assert.isEqual(
             this.pushSampleStringTimestampParams?.[0],
             this.fakeOutlet
@@ -268,7 +273,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const info = this.createRandomStreamInfo()
         const channel: LslChannel = this.generateRandomChannelValues()
 
-        this.lsl.appendChannelsToStreamInfo({
+        this.instance.appendChannelsToStreamInfo({
             info,
             channels: [channel],
         })
@@ -305,7 +310,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const channel1 = this.generateRandomChannelValues()
         const channel2 = this.generateRandomChannelValues()
 
-        this.lsl.appendChannelsToStreamInfo({
+        this.instance.appendChannelsToStreamInfo({
             info,
             channels: [channel1, channel2],
         })
@@ -325,23 +330,23 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     protected static async canDestroyOutlet() {
         const outlet = this.createRandomOutlet()
         const options = { outlet }
-        this.lsl.destroyOutlet(options)
+        this.instance.destroyOutlet(options)
 
         assert.isEqualDeep(this.destroyOutletParams, Object.values(options))
     }
 
     @test()
     protected static async callingLocalClockTwiceReturnsDifferentTimestamps() {
-        const t1 = this.lsl.localClock()
+        const t1 = this.instance.localClock()
         await this.wait(10)
-        const t2 = this.lsl.localClock()
+        const t2 = this.instance.localClock()
         assert.isNotEqual(t1, t2)
     }
 
     @test()
     protected static async localClockBindingReceivesEmptyArray() {
         delete this.localClockParams
-        this.lsl.localClock()
+        this.instance.localClock()
         assert.isEqualDeep(this.localClockParams, [])
     }
 
@@ -350,7 +355,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         delete process.env.LIBLSL_PATH
 
         LiblslAdapter.resetInstance()
-        this.lsl = LiblslAdapter.getInstance()
+        this.instance = LiblslAdapter.getInstance()
 
         assert.isEqual(
             this.ffiRsOpenOptions?.path,
@@ -366,20 +371,20 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     private static createRandomStreamInfo() {
-        return this.lsl.createStreamInfo(
+        return this.instance.createStreamInfo(
             this.generateRandomCreateStreamInfoOptions()
         )
     }
 
     private static createRandomOutlet() {
         const options = this.createRandomOptions()
-        const outlet = this.lsl.createOutlet(options)
+        const outlet = this.instance.createOutlet(options)
         return { options, outlet }
     }
 
     private static createRandomInlet() {
         const options = this.createRandomOptions()
-        const inlet = this.lsl.createInlet(options)
+        const inlet = this.instance.createInlet(options)
         return { options, inlet }
     }
 

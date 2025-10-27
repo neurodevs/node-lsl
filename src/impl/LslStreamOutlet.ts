@@ -9,24 +9,24 @@ import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from '../types'
 import LiblslAdapter from './LiblslAdapter'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
-export default class LslStreamOutlet implements LslOutlet {
-    public static Class?: LslOutletConstructor
+export default class LslStreamOutlet implements StreamOutlet {
+    public static Class?: StreamOutletConstructor
 
     private info: StreamInfo
-    private options: LslOutletOptions
+    private options: StreamOutletOptions
     private outlet!: BoundOutlet
     private pushSampleByType!: (options: any) => void
 
-    protected constructor(info: StreamInfo, options: LslOutletOptions) {
+    protected constructor(info: StreamInfo, options: StreamOutletOptions) {
         this.info = info
         this.options = options
 
         this.validateOptions()
-        this.createLslOutlet()
+        this.createStreamOutlet()
         this.setPushSampleType()
     }
 
-    public static async Create(options: LslOutletOptions) {
+    public static async Create(options: StreamOutletOptions) {
         const { waitAfterConstructionMs = 10 } = options ?? {}
 
         const streamInfoOptions = {
@@ -55,7 +55,7 @@ export default class LslStreamOutlet implements LslOutlet {
         assertValidMaxBuffered(this.maxBuffered)
     }
 
-    private createLslOutlet() {
+    private createStreamOutlet() {
         this.outlet = this.lsl.createOutlet({
             info: this.boundStreamInfo,
             chunkSize: this.chunkSize,
@@ -167,7 +167,7 @@ export default class LslStreamOutlet implements LslOutlet {
     }
 }
 
-export interface LslOutlet {
+export interface StreamOutlet {
     pushSample(sample: LslSample): void
     destroy(): void
     readonly name: string
@@ -182,12 +182,12 @@ export interface LslOutlet {
     readonly unit: string
 }
 
-export type LslOutletConstructor = new (
+export type StreamOutletConstructor = new (
     info: StreamInfo,
-    options: LslOutletOptions
-) => LslOutlet
+    options: StreamOutletOptions
+) => StreamOutlet
 
-export interface LslOutletOptions {
+export interface StreamOutletOptions {
     name: string
     type: string
     sourceId: string

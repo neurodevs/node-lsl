@@ -1,27 +1,31 @@
 import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
 import { StreamInfo } from '../../impl/LslStreamInfo'
-import { LslOutlet, LslOutletOptions } from '../../impl/LslStreamOutlet'
+import { StreamOutlet, StreamOutletOptions } from '../../impl/LslStreamOutlet'
 import { LslSample } from '../../types'
 
-export default class FakeLslOutlet implements LslOutlet {
-    public static callsToConstructor: CallToOutletConstructor[] = []
+export default class FakeStreamOutlet implements StreamOutlet {
+    public static callsToConstructor: {
+        info?: StreamInfo
+        options?: StreamOutletOptions
+    }[] = []
+
     public static callsToPushSample: LslSample[] = []
     public static numCallsToDestroy = 0
 
-    public options?: LslOutletOptions
+    public options?: StreamOutletOptions
 
-    public constructor(info?: StreamInfo, options?: LslOutletOptions) {
-        FakeLslOutlet.callsToConstructor.push({ info, options })
+    public constructor(info?: StreamInfo, options?: StreamOutletOptions) {
+        FakeStreamOutlet.callsToConstructor.push({ info, options })
         this.options = options
     }
 
     public destroy() {
-        FakeLslOutlet.numCallsToDestroy++
+        FakeStreamOutlet.numCallsToDestroy++
     }
 
     public pushSample(sample: LslSample) {
-        FakeLslOutlet.callsToPushSample.push(sample)
+        FakeStreamOutlet.callsToPushSample.push(sample)
     }
 
     public get name() {
@@ -69,13 +73,8 @@ export default class FakeLslOutlet implements LslOutlet {
     }
 
     public static resetTestDouble() {
-        FakeLslOutlet.callsToConstructor = []
-        FakeLslOutlet.callsToPushSample = []
-        FakeLslOutlet.numCallsToDestroy = 0
+        FakeStreamOutlet.callsToConstructor = []
+        FakeStreamOutlet.callsToPushSample = []
+        FakeStreamOutlet.numCallsToDestroy = 0
     }
-}
-
-export interface CallToOutletConstructor {
-    info?: StreamInfo
-    options?: LslOutletOptions
 }

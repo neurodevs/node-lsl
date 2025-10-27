@@ -1,7 +1,7 @@
-import { MarkerOutlet } from '../../impl/EventMarkerOutlet'
+import { EventMarkerOutlet } from '../../impl/LslEventMarkerOutlet'
 import { DurationMarker } from '../../types'
 
-export default class FakeMarkerOutlet implements MarkerOutlet {
+export default class FakeEventMarkerOutlet implements EventMarkerOutlet {
     public static callsToPushMarker: string[] = []
     public static callsToPushMarkers: DurationMarker[][] = []
     public static numCallsToStop = 0
@@ -10,19 +10,19 @@ export default class FakeMarkerOutlet implements MarkerOutlet {
     public constructor() {}
 
     public pushMarker(markerName: string) {
-        FakeMarkerOutlet.callsToPushMarker.push(markerName)
+        FakeEventMarkerOutlet.callsToPushMarker.push(markerName)
     }
 
     public async pushMarkers(markers: DurationMarker[]) {
-        FakeMarkerOutlet.callsToPushMarkers.push(markers)
+        FakeEventMarkerOutlet.callsToPushMarkers.push(markers)
     }
 
     public stop() {
-        FakeMarkerOutlet.numCallsToStop++
+        FakeEventMarkerOutlet.numCallsToStop++
     }
 
     public destroy() {
-        FakeMarkerOutlet.numCallsToDestroy++
+        FakeEventMarkerOutlet.numCallsToDestroy++
     }
 
     public static resetTestDouble() {

@@ -1,29 +1,34 @@
 import { randomInt } from 'crypto'
 import { assert, test } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
-import EventMarkerOutlet from '../../impl/EventMarkerOutlet'
-import { LslOutletOptions } from '../../impl/LslStreamOutlet'
+import LslEventMarkerOutlet from '../../impl/LslEventMarkerOutlet'
+import { StreamOutletOptions } from '../../impl/LslStreamOutlet'
+import SpyEventMarkerOutlet from '../../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions'
-import FakeLslOutlet from '../../testDoubles/LslOutlet/FakeLslOutlet'
-import SpyMarkerOutlet from '../../testDoubles/MarkerOutlet/SpyMarkerOutlet'
+import FakeStreamOutlet from '../../testDoubles/StreamOutlet/FakeStreamOutlet'
 import AbstractPackageTest from '../AbstractPackageTest'
 
 export default class EventMarkerOutletTest extends AbstractPackageTest {
-    private static instance: SpyMarkerOutlet
+    private static instance: SpyEventMarkerOutlet
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeLiblsl()
-        this.setFakeLslOutlet()
-        this.setSpyMarkerOutlet()
+        this.setFakeStreamOutlet()
+        this.setSpyEventMarkerOutlet()
 
         this.instance = await this.EventMarkerOutlet()
     }
 
     @test()
+    protected static async createsInstance() {
+        assert.isTruthy(this.instance, 'Failed to create instance!')
+    }
+
+    @test()
     protected static async loadsWithEventMarkerSpecificOptions() {
-        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[0].options, {
+        assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[0].options, {
             name: 'Event markers',
             type: 'Markers',
             channelNames: ['Markers'],
@@ -42,7 +47,10 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         const options = generateRandomOutletOptions()
         await this.EventMarkerOutlet(options)
 
-        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[1].options, options)
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToConstructor[1].options,
+            options
+        )
     }
 
     @test()
@@ -53,7 +61,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         const marker = markers[0]
 
         assert.isEqual(
-            FakeLslOutlet.callsToPushSample[0][0],
+            FakeStreamOutlet.callsToPushSample[0][0],
             marker.name,
             'Pushed the wrong marker!'
         )
@@ -65,7 +73,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
     protected static async pushingTwoMarkersIncrementsHitCountAndWaitTimeTwice() {
         const markers = await this.pushTotalMarkers(2)
 
-        assert.isEqual(FakeLslOutlet.callsToPushSample.length, 2)
+        assert.isEqual(FakeStreamOutlet.callsToPushSample.length, 2)
 
         assert.isEqual(
             this.instance.totalWaitTimeMs,
@@ -79,7 +87,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
     protected static async canStopEventMarkersMidPush(bailIdx: number) {
         let hitCount = 0
 
-        const outlet = this.instance.getLslOutlet()
+        const outlet = this.instance.getStreamOutlet()
 
         outlet.pushSample = () => {
             hitCount += 1
@@ -99,7 +107,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
 
         let hitCount = 0
 
-        const outlet = this.instance.getLslOutlet()
+        const outlet = this.instance.getStreamOutlet()
 
         outlet.pushSample = () => {
             hitCount++
@@ -128,7 +136,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         void this.pushTotalMarkers(2, 100)
         this.instance.stop()
 
-        this.lslOutlet.pushSample = () =>
+        this.streamOutlet.pushSample = () =>
             assert.fail('Should not have been called')
     }
 
@@ -137,15 +145,15 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         const markerName = generateId()
         this.instance.pushMarker(markerName)
 
-        assert.isEqual(FakeLslOutlet.callsToPushSample[0][0], markerName)
+        assert.isEqual(FakeStreamOutlet.callsToPushSample[0][0], markerName)
     }
 
-    private static get lslOutlet() {
-        return this.instance.getLslOutlet()
+    private static get streamOutlet() {
+        return this.instance.getStreamOutlet()
     }
 
     private static async setupOutlet() {
-        EventMarkerOutlet.Class = EventMarkerOutlet as any
+        LslEventMarkerOutlet.Class = LslEventMarkerOutlet as any
         this.instance = await this.EventMarkerOutlet()
     }
 
@@ -167,8 +175,10 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
     }
 
     private static async EventMarkerOutlet(
-        options?: Partial<LslOutletOptions>
+        options?: Partial<StreamOutletOptions>
     ) {
-        return (await EventMarkerOutlet.Create(options)) as SpyMarkerOutlet
+        return (await LslEventMarkerOutlet.Create(
+            options
+        )) as SpyEventMarkerOutlet
     }
 }

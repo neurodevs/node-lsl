@@ -1,17 +1,17 @@
 import AbstractSpruceTest from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
-import EventMarkerOutlet from '../impl/EventMarkerOutlet'
 import LiblslAdapter from '../impl/LiblslAdapter'
+import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet'
 import LslStreamInfo from '../impl/LslStreamInfo'
 import LslStreamInlet from '../impl/LslStreamInlet'
 
 import LslStreamOutlet from '../impl/LslStreamOutlet'
+import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet'
 import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl'
-import { SpyLslInlet } from '../testDoubles/LslInlet/SpyLslInlet'
-import FakeLslOutlet from '../testDoubles/LslOutlet/FakeLslOutlet'
-import SpyMarkerOutlet from '../testDoubles/MarkerOutlet/SpyMarkerOutlet'
 import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo'
 import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo'
+import { SpyStreamInlet } from '../testDoubles/StreamInlet/SpyStreamInlet'
+import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet'
 
 export default class AbstractPackageTest extends AbstractSpruceTest {
     protected static fakeLiblsl: FakeLiblsl
@@ -36,17 +36,17 @@ export default class AbstractPackageTest extends AbstractSpruceTest {
         FakeStreamInfo.resetTestDouble()
     }
 
-    protected static setSpyLslInlet() {
-        LslStreamInlet.Class = SpyLslInlet
+    protected static setSpyStreamInlet() {
+        LslStreamInlet.Class = SpyStreamInlet
     }
 
-    protected static setFakeLslOutlet() {
-        LslStreamOutlet.Class = FakeLslOutlet
-        FakeLslOutlet.resetTestDouble()
+    protected static setFakeStreamOutlet() {
+        LslStreamOutlet.Class = FakeStreamOutlet
+        FakeStreamOutlet.resetTestDouble()
     }
 
-    protected static setSpyMarkerOutlet() {
-        EventMarkerOutlet.Class = SpyMarkerOutlet
+    protected static setSpyEventMarkerOutlet() {
+        LslEventMarkerOutlet.Class = SpyEventMarkerOutlet
     }
 
     protected static generateId() {
