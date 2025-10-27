@@ -18,7 +18,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         this.setFakeStreamOutlet()
         this.setSpyEventMarkerOutlet()
 
-        this.instance = await this.EventMarkerOutlet()
+        this.instance = await this.LslEventMarkerOutlet()
     }
 
     @test()
@@ -45,7 +45,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
     @test()
     protected static async canOverrideDefaultOptions() {
         const options = generateRandomOutletOptions()
-        await this.EventMarkerOutlet(options)
+        await this.LslEventMarkerOutlet(options)
 
         assert.isEqualDeep(
             FakeStreamOutlet.callsToConstructor[1].options,
@@ -154,7 +154,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
 
     private static async setupOutlet() {
         LslEventMarkerOutlet.Class = LslEventMarkerOutlet as any
-        this.instance = await this.EventMarkerOutlet()
+        this.instance = await this.LslEventMarkerOutlet()
     }
 
     private static async pushTotalMarkers(total: number, durationMs?: number) {
@@ -174,7 +174,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         }
     }
 
-    private static async EventMarkerOutlet(
+    private static async LslEventMarkerOutlet(
         options?: Partial<StreamOutletOptions>
     ) {
         return (await LslEventMarkerOutlet.Create(
