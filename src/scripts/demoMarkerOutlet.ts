@@ -1,4 +1,4 @@
-import EventMarkerOutlet from '../modules/EventMarkerOutlet'
+import EventMarkerOutlet from '../impl/EventMarkerOutlet'
 
 async function main() {
     const outlet = await EventMarkerOutlet.Create()

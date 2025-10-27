@@ -2,8 +2,8 @@ export * from './types'
 
 // EventMarkerOutlet
 
-export { default as EventMarkerOutlet } from './modules/EventMarkerOutlet'
-export * from './modules/EventMarkerOutlet'
+export { default as EventMarkerOutlet } from './impl/EventMarkerOutlet'
+export * from './impl/EventMarkerOutlet'
 
 export { default as FakeMarkerOutlet } from './testDoubles/MarkerOutlet/FakeMarkerOutlet'
 export * from './testDoubles/MarkerOutlet/FakeMarkerOutlet'
@@ -19,16 +19,16 @@ export * from './testDoubles/MarkerOutlet/ThrowingMarkerOutlet'
 
 // Liblsl
 
-export { default as LiblslAdapter } from './modules/LiblslAdapter'
-export * from './modules/LiblslAdapter'
+export { default as LiblslAdapter } from './impl/LiblslAdapter'
+export * from './impl/LiblslAdapter'
 
 export { default as FakeLiblsl } from './testDoubles/Liblsl/FakeLiblsl'
 export * from './testDoubles/Liblsl/FakeLiblsl'
 
 // LslStreamInfo
 
-export { default as LslStreamInfo } from './modules/LslStreamInfo'
-export * from './modules/LslStreamInfo'
+export { default as LslStreamInfo } from './impl/LslStreamInfo'
+export * from './impl/LslStreamInfo'
 
 export { default as SpyStreamInfo } from './testDoubles/StreamInfo/SpyStreamInfo'
 export * from './testDoubles/StreamInfo/SpyStreamInfo'
@@ -38,16 +38,16 @@ export * from './testDoubles/StreamInfo/FakeStreamInfo'
 
 // LslStreamInlet
 
-export { default as LslStreamInlet } from './modules/LslStreamInlet'
-export * from './modules/LslStreamInlet'
+export { default as LslStreamInlet } from './impl/LslStreamInlet'
+export * from './impl/LslStreamInlet'
 
 export { default as FakeLslInlet } from './testDoubles/LslInlet/FakeLslInlet'
 export * from './testDoubles/LslInlet/FakeLslInlet'
 
 // LslStreamOutlet
 
-export { default as LslStreamOutlet } from './modules/LslStreamOutlet'
-export * from './modules/LslStreamOutlet'
+export { default as LslStreamOutlet } from './impl/LslStreamOutlet'
+export * from './impl/LslStreamOutlet'
 
 export { default as FakeLslOutlet } from './testDoubles/LslOutlet/FakeLslOutlet'
 export * from './testDoubles/LslOutlet/FakeLslOutlet'

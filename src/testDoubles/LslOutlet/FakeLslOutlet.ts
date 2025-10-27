@@ -1,7 +1,7 @@
 import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
-import { StreamInfo } from '../../modules/LslStreamInfo'
-import { LslOutlet, LslOutletOptions } from '../../modules/LslStreamOutlet'
+import { StreamInfo } from '../../impl/LslStreamInfo'
+import { LslOutlet, LslOutletOptions } from '../../impl/LslStreamOutlet'
 import { LslSample } from '../../types'
 
 export default class FakeLslOutlet implements LslOutlet {

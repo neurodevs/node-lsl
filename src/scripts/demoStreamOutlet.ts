@@ -1,4 +1,4 @@
-import LslStreamOutlet from '../modules/LslStreamOutlet'
+import LslStreamOutlet from '../impl/LslStreamOutlet'
 
 async function main() {
     const instance = await LslStreamOutlet.Create({

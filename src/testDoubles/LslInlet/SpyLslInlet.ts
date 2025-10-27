@@ -1,5 +1,5 @@
-import { StreamInfo } from '../../modules/LslStreamInfo'
-import LslStreamInlet, { LslInletOptions } from '../../modules/LslStreamInlet'
+import { StreamInfo } from '../../impl/LslStreamInfo'
+import LslStreamInlet, { LslInletOptions } from '../../impl/LslStreamInlet'
 
 export class SpyLslInlet extends LslStreamInlet {
     public constructor(info: StreamInfo, options: LslInletOptions) {

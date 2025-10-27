@@ -1,7 +1,7 @@
 import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
 import { CHANNEL_FORMATS } from '../../consts'
-import LslStreamInfo, { StreamInfoOptions } from '../../modules/LslStreamInfo'
+import LslStreamInfo, { StreamInfoOptions } from '../../impl/LslStreamInfo'
 import SpyStreamInfo from '../../testDoubles/StreamInfo/SpyStreamInfo'
 import AbstractPackageTest from '../AbstractPackageTest'
 

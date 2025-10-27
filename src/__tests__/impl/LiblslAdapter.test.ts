@@ -2,7 +2,7 @@ import { randomInt } from 'crypto'
 import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
 import { DataType, OpenParams } from 'ffi-rs'
-import LiblslAdapter from '../../modules/LiblslAdapter'
+import LiblslAdapter from '../../impl/LiblslAdapter'
 import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl'
 import {
     BoundChild,

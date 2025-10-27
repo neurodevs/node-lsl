@@ -1,10 +1,8 @@
 import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
 import { CHANNEL_FORMATS } from '../../consts'
-import { StreamInfo } from '../../modules/LslStreamInfo'
-import LslStreamOutlet, {
-    LslOutletOptions,
-} from '../../modules/LslStreamOutlet'
+import { StreamInfo } from '../../impl/LslStreamInfo'
+import LslStreamOutlet, { LslOutletOptions } from '../../impl/LslStreamOutlet'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,

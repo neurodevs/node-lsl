@@ -1,4 +1,4 @@
-import { MarkerOutlet } from '../../modules/EventMarkerOutlet'
+import { MarkerOutlet } from '../../impl/EventMarkerOutlet'
 import { DurationMarker } from '../../types'
 
 export default class FakeMarkerOutlet implements MarkerOutlet {

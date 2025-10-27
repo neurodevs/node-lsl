@@ -1,5 +1,5 @@
-import { StreamInfo } from '../../modules/LslStreamInfo'
-import { LslInlet, LslInletOptions } from '../../modules/LslStreamInlet'
+import { StreamInfo } from '../../impl/LslStreamInfo'
+import { LslInlet, LslInletOptions } from '../../impl/LslStreamInlet'
 
 export default class FakeLslInlet implements LslInlet {
     public static callsToConstructor: CallToInletConstructor[] = []

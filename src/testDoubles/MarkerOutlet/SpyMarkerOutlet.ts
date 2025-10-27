@@ -1,5 +1,5 @@
-import EventMarkerOutlet from '../../modules/EventMarkerOutlet'
-import { LslOutlet } from '../../modules/LslStreamOutlet'
+import EventMarkerOutlet from '../../impl/EventMarkerOutlet'
+import { LslOutlet } from '../../impl/LslStreamOutlet'
 
 export default class SpyMarkerOutlet extends EventMarkerOutlet {
     public totalWaitTimeMs: number
