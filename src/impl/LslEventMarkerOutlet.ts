@@ -7,13 +7,13 @@ import LslStreamOutlet, {
 export default class LslEventMarkerOutlet implements EventMarkerOutlet {
     public static Class?: EventMarkerOutletConstructor
 
-    protected streamOutlet: StreamOutlet
+    protected outlet: StreamOutlet
     private isPlaying = false
     private waitResolve?: () => void
     private timeout?: any
 
     protected constructor(outlet: StreamOutlet) {
-        this.streamOutlet = outlet
+        this.outlet = outlet
     }
 
     public static async Create(options?: Partial<StreamOutletOptions>) {
@@ -58,7 +58,7 @@ export default class LslEventMarkerOutlet implements EventMarkerOutlet {
     }
 
     private pushMarkerToOutlet(markerName: string) {
-        this.streamOutlet.pushSample([markerName])
+        this.outlet.pushSample([markerName])
     }
 
     protected async wait(durationMs: number) {

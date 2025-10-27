@@ -15,7 +15,7 @@ export default class SpyEventMarkerOutlet extends LslEventMarkerOutlet {
     }
 
     public getStreamOutlet() {
-        return this.streamOutlet
+        return this.outlet
     }
 
     public resetTestDouble() {
