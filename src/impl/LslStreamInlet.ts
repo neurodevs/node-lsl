@@ -1,5 +1,5 @@
 import generateId from '@neurodevs/generate-id'
-import { ChannelFormat } from '../types'
+import { BoundInlet, ChannelFormat } from '../types'
 import LiblslAdapter from './LiblslAdapter'
 import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
 
@@ -8,6 +8,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     protected name: string
     protected info: StreamInfo
+    protected inlet!: BoundInlet
     private chunkSize: number
     private maxBuffered: number
 
@@ -34,7 +35,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private createStreamInlet() {
-        this.lsl.createInlet({
+        this.inlet = this.lsl.createInlet({
             info: this.boundStreamInfo,
             chunkSize: this.chunkSize,
             maxBuffered: this.maxBuffered,
@@ -51,12 +52,18 @@ export default class LslStreamInlet implements StreamInlet {
 
     private readonly defaultName = `lsl-inlet-${generateId()}`
 
+    public flushSamples() {
+        this.lsl.flushInlet({ inlet: this.inlet })
+    }
+
     private static LslStreamInfo(options: StreamInfoOptions) {
         return LslStreamInfo.Create(options)
     }
 }
 
-export interface StreamInlet {}
+export interface StreamInlet {
+    flushSamples(): void
+}
 
 export type StreamInletConstructor = new (
     info: StreamInfo,

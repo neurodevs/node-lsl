@@ -65,6 +65,17 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async flushSamplesCallsLslBinding() {
+        this.instance.flushSamples()
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastFlushInletOptions,
+            { inlet: this.instance.getBoundInlet() },
+            'Should have called flushInlet!'
+        )
+    }
+
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
         const defaultOptions = {
             channelNames: this.channelNames,
