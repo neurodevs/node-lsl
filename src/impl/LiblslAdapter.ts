@@ -10,6 +10,7 @@ import {
     PushSampleStringTimestampOptions,
     CreateInletOptions,
     DestroyInletOptions,
+    FlushInletOptions,
 } from '../types'
 
 export default class LiblslAdapter implements Liblsl {
@@ -206,6 +207,11 @@ export default class LiblslAdapter implements Liblsl {
     public createInlet(options: CreateInletOptions) {
         const { info, chunkSize, maxBuffered } = options
         return this.bindings.lsl_create_inlet([info, chunkSize, maxBuffered])
+    }
+
+    public flushInlet(options: FlushInletOptions) {
+        const { inlet } = options
+        this.bindings.lsl_flush_inlet([inlet])
     }
 
     public destroyInlet(_options: DestroyInletOptions) {}

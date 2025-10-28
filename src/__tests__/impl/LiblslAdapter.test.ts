@@ -24,7 +24,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static fakeBindings: LiblslBindings
     private static fakeStreamInfo: BoundStreamInfo
     private static fakeOutlet: BoundOutlet
-    private static fakeInlet: BoundInlet
+    private static fakeInlet: BoundInlet = {}
     private static fakeDesc: BoundDescription
     private static fakeChildNamedChannels: BoundChild
     private static createStreamInfoParams?: any[]
@@ -32,6 +32,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static createOutletParams?: any[]
     private static destroyOutletParams?: any[]
     private static createInletParams?: any[]
+    private static flushInletParams?: any[]
     private static destroyInletParams?: any[]
     private static localClockParams?: any[]
     private static pushSampleFloatTimestampParams?: any[]
@@ -100,8 +101,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         LiblslAdapter.resetInstance()
 
         const err = assert.doesThrow(() => LiblslAdapter.getInstance())
-
-        debugger
 
         assert.isTrue(
             err.message.includes(this.generateFailedMessage()),
@@ -375,6 +374,18 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         assert.isEqual(inlet, this.fakeInlet)
     }
 
+    @test()
+    protected static async flushInletCallsBinding() {
+        const { inlet } = this.createRandomInlet()
+        this.instance.flushInlet({ inlet })
+
+        assert.isEqualDeep(
+            this.flushInletParams,
+            [inlet],
+            'Should have called flushInlet with expected params!'
+        )
+    }
+
     private static createRandomStreamInfo() {
         return this.instance.createStreamInfo(
             this.generateRandomCreateStreamInfoOptions()
@@ -448,6 +459,10 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             lsl_create_inlet: (params: any[]) => {
                 this.createInletParams = params
                 return this.fakeInlet
+            },
+            lsl_flush_inlet: (params: any[]) => {
+                this.flushInletParams = params
+                return 0
             },
             lsl_destroy_inlet: (params: any[]) => {
                 this.destroyInletParams = params

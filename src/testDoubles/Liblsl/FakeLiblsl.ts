@@ -10,6 +10,7 @@ import {
     CreateInletOptions,
     DestroyInletOptions,
     BoundInlet,
+    FlushInletOptions,
 } from '../../types'
 
 export default class FakeLiblsl implements Liblsl {
@@ -22,12 +23,14 @@ export default class FakeLiblsl implements Liblsl {
     public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
     public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
     public lastCreateInletOptions?: CreateInletOptions
+    public lastFlushInletOptions?: FlushInletOptions
     public lastDestroyInletOptions?: DestroyInletOptions
 
     public createStreamInfoHitCount = 0
     public createOutletHitCount = 0
     public destroyOutletHitCount = 0
     public createInletHitCount = 0
+    public flushInletHitCount = 0
     public destroyInletHitCount = 0
     public localClockHitCount = 0
     public pushSampleStringTimestampHitCount = 0
@@ -69,6 +72,11 @@ export default class FakeLiblsl implements Liblsl {
         this.createInletHitCount++
         this.lastCreateInletOptions = options
         return {} as BoundInlet
+    }
+
+    public flushInlet(options: FlushInletOptions) {
+        this.flushInletHitCount++
+        this.lastFlushInletOptions = options
     }
 
     public destroyInlet(options: DestroyInletOptions) {

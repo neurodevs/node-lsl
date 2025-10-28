@@ -20,6 +20,7 @@ export interface Liblsl {
     pushSampleStringTimestamp(options: PushSampleStringTimestampOptions): void
     destroyOutlet(options: DestroyOutletOptions): void
     createInlet(options: CreateInletOptions): BoundInlet
+    flushInlet(options: FlushInletOptions): void
     destroyInlet(options: DestroyInletOptions): void
     localClock(): number
 }
@@ -76,6 +77,10 @@ export interface CreateInletOptions {
     maxBuffered: number
 }
 
+export interface FlushInletOptions {
+    inlet: BoundInlet
+}
+
 export interface DestroyInletOptions {}
 
 export interface LiblslBindings {
@@ -88,6 +93,7 @@ export interface LiblslBindings {
     lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): void
     lsl_destroy_outlet(args: [BoundOutlet]): void
     lsl_create_inlet(args: any): BoundInlet
+    lsl_flush_inlet(args: [BoundInlet]): void
     lsl_destroy_inlet(args: any): void
     lsl_local_clock(args: []): number
     lsl_get_desc(args: [BoundStreamInfo]): BoundDescription
