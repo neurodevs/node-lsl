@@ -76,26 +76,6 @@ export default class LiblslAdapter implements Liblsl {
                 retType: DataType.External,
                 paramsType: [DataType.External, DataType.I32, DataType.I32],
             },
-            lsl_destroy_outlet: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [DataType.External],
-            },
-            lsl_create_inlet: {
-                library: 'lsl',
-                retType: DataType.External,
-                paramsType: [DataType.External, DataType.I32, DataType.I32],
-            },
-            lsl_destroy_inlet: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [DataType.External],
-            },
-            lsl_local_clock: {
-                library: 'lsl',
-                retType: DataType.Double,
-                paramsType: [],
-            },
             lsl_push_sample_ft: {
                 library: 'lsl',
                 retType: DataType.Void,
@@ -113,6 +93,26 @@ export default class LiblslAdapter implements Liblsl {
                     DataType.StringArray,
                     DataType.Double,
                 ],
+            },
+            lsl_destroy_outlet: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
+            },
+            lsl_create_inlet: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External, DataType.I32, DataType.I32],
+            },
+            lsl_flush_inlet: {
+                library: 'lsl',
+                retType: DataType.I32,
+                paramsType: [DataType.External],
+            },
+            lsl_destroy_inlet: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
             },
             lsl_get_desc: {
                 library: 'lsl',
@@ -132,6 +132,11 @@ export default class LiblslAdapter implements Liblsl {
                     DataType.String,
                     DataType.String,
                 ],
+            },
+            lsl_local_clock: {
+                library: 'lsl',
+                retType: DataType.Double,
+                paramsType: [],
             },
         }) as unknown as LiblslBindings
     }
