@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "12.0.3",
+  "version": "12.0.4",
   "description": "Lab Streaming Layer (LSL) bindings for Node",
   "type": "module",
   "keywords": [
@@ -51,7 +51,7 @@
     "ref-napi": "^3.0.3"
   },
   "devDependencies": {
-    "@neurodevs/node-tdd": "^0.2.0",
+    "@neurodevs/node-tdd": "^0.2.2",
     "@types/ffi-napi": "^4.0.10",
     "@types/node": "^22.9.0",
     "chokidar-cli": "^3.0.0",
