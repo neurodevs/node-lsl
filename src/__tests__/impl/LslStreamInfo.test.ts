@@ -1,4 +1,3 @@
-import generateId from '@neurodevs/generate-id'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import { CHANNEL_FORMATS } from '../../consts.js'
@@ -47,7 +46,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
     @test()
     protected static async canManuallySetName() {
-        const name = generateId()
+        const name = this.generateId()
         const instance = this.LslStreamInfo({ name })
 
         assert.isEqual(
@@ -71,7 +70,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
     @test()
     protected static async canManuallySetType() {
-        const type = generateId()
+        const type = this.generateId()
         const instance = this.LslStreamInfo({ type })
 
         assert.isEqual(
@@ -95,7 +94,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
     @test()
     protected static async canManuallySetSourceId() {
-        const sourceId = generateId()
+        const sourceId = this.generateId()
         const instance = this.LslStreamInfo({ sourceId })
 
         assert.isEqual(
@@ -116,7 +115,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
     @test()
     protected static async canManuallySetUnits() {
-        const units = generateId()
+        const units = this.generateId()
         const instance = this.LslStreamInfo({ units })
 
         assert.isEqual(
@@ -142,9 +141,9 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         )
 
         const options = {
-            name: generateId(),
-            type: generateId(),
-            sourceId: generateId(),
+            name: this.generateId(),
+            type: this.generateId(),
+            sourceId: this.generateId(),
             channelCount: this.channelNames.length,
             channelFormat: CHANNEL_FORMATS[randomChannelIdx],
             sampleRate: 100 * Math.random(),
@@ -183,9 +182,9 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     }
 
     private static readonly defaultOptions = {
-        name: generateId(),
-        type: generateId(),
-        sourceId: generateId(),
+        name: this.generateId(),
+        type: this.generateId(),
+        sourceId: this.generateId(),
         channelNames: this.channelNames,
         channelFormat: 'float32',
         sampleRate: 100 * Math.random(),

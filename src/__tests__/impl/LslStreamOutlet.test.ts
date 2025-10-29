@@ -1,4 +1,3 @@
-import generateId from '@neurodevs/generate-id'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import { CHANNEL_FORMATS } from '../../consts.js'
@@ -125,7 +124,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 
     @test()
     protected static async canPushStringSampleToLsl() {
-        const sample = [generateId()]
+        const sample = [this.generateId()]
         const outlet = await this.StringOutlet()
 
         outlet.pushSample(sample)
@@ -146,7 +145,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     @test()
     protected static async pushingStringTwiceGivesDifferentTimestamps() {
         const outlet = await this.StringOutlet()
-        const sample = [generateId()]
+        const sample = [this.generateId()]
 
         outlet.pushSample(sample)
         const t1 =

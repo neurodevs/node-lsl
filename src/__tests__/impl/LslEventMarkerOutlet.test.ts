@@ -1,5 +1,4 @@
 import { randomInt } from 'crypto'
-import generateId from '@neurodevs/generate-id'
 import { assert, test } from '@neurodevs/node-tdd'
 
 import LslEventMarkerOutlet from '../../impl/LslEventMarkerOutlet.js'
@@ -143,7 +142,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
 
     @test()
     protected static async pushMarkerCallsPushSampleOnMarkerOutlet() {
-        const markerName = generateId()
+        const markerName = this.generateId()
         this.instance.pushMarker(markerName)
 
         assert.isEqual(FakeStreamOutlet.callsToPushSample[0][0], markerName)
@@ -170,7 +169,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
 
     private static generateDurationMarker(durationMs?: number) {
         return {
-            name: generateId(),
+            name: this.generateId(),
             durationMs: durationMs ?? randomInt(100, 1000),
         }
     }

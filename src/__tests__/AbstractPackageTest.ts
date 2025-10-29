@@ -1,11 +1,9 @@
-import generateId from '@neurodevs/generate-id'
 import AbstractModuleTest from '@neurodevs/node-tdd'
 
 import LiblslAdapter from '../impl/LiblslAdapter.js'
 import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
 import LslStreamInlet from '../impl/LslStreamInlet.js'
-
 import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
 import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl.js'
@@ -50,15 +48,16 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LslEventMarkerOutlet.Class = SpyEventMarkerOutlet
     }
 
-    protected static generateId() {
-        return generateId()
-    }
+    protected static readonly name_ = this.generateId()
+    protected static readonly type = this.generateId()
+    protected static readonly sourceId = this.generateId()
+    protected static readonly units = this.generateId()
 
-    protected static readonly name_ = generateId()
-    protected static readonly type = generateId()
-    protected static readonly sourceId = generateId()
-    protected static readonly units = generateId()
-    protected static readonly channelNames = [generateId(), generateId()]
+    protected static readonly channelNames = [
+        this.generateId(),
+        this.generateId(),
+    ]
+
     protected static readonly chunkSize = Math.floor(Math.random() * 100)
     protected static readonly maxBuffered = Math.floor(Math.random() * 100)
     protected static readonly sampleRate = Math.floor(Math.random() * 100)

@@ -1,5 +1,4 @@
 import { randomInt } from 'crypto'
-import generateId from '@neurodevs/generate-id'
 import { test, assert } from '@neurodevs/node-tdd'
 import { DataType, OpenParams } from 'ffi-rs'
 
@@ -61,7 +60,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         this.appendChildParams = []
         this.appendChildValueParams = []
 
-        process.env.LIBLSL_PATH = generateId()
+        process.env.LIBLSL_PATH = this.generateId()
 
         this.fakeStreamInfo = {}
         this.fakeDesc = {}
@@ -257,7 +256,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async canPushStringSample() {
-        const expected = [generateId()]
+        const expected = [this.generateId()]
         const timestamp = randomInt(100)
         const options = {
             outlet: this.fakeOutlet,
@@ -417,20 +416,20 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     private static generateRandomChannelValues() {
         return {
-            label: generateId(),
-            type: generateId(),
-            unit: generateId(),
+            label: this.generateId(),
+            type: this.generateId(),
+            unit: this.generateId(),
         }
     }
 
     private static generateRandomCreateStreamInfoOptions() {
         return {
-            name: generateId(),
-            type: generateId(),
+            name: this.generateId(),
+            type: this.generateId(),
             channelCount: randomInt(1, 10),
             sampleRate: randomInt(100),
             channelFormat: randomInt(7),
-            sourceId: generateId(),
+            sourceId: this.generateId(),
         }
     }
 
