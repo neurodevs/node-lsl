@@ -1,20 +1,20 @@
-import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
-import { CHANNEL_FORMATS } from '../../consts'
-import { StreamInfo } from '../../impl/LslStreamInfo'
+import { test, assert } from '@neurodevs/node-tdd'
+
+import { CHANNEL_FORMATS } from '../../consts.js'
+import { StreamInfo } from '../../impl/LslStreamInfo.js'
 import LslStreamOutlet, {
     StreamOutletOptions,
-} from '../../impl/LslStreamOutlet'
+} from '../../impl/LslStreamOutlet.js'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
     TestChannelFormat,
-} from '../../testDoubles/consts'
-
-import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions'
-import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo'
-import { ChannelFormat, LslSample } from '../../types'
-import AbstractPackageTest from '../AbstractPackageTest'
+} from '../../testDoubles/consts.js'
+import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
+import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
+import { ChannelFormat, LslSample } from '../../types.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamOutletTest extends AbstractPackageTest {
     private static randomOutletOptions: StreamOutletOptions

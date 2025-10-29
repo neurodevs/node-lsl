@@ -1,5 +1,5 @@
-import { StreamInfo, StreamInfoOptions } from '../../impl/LslStreamInfo'
-import { BoundStreamInfo } from '../../types'
+import { StreamInfo, StreamInfoOptions } from '../../impl/LslStreamInfo.js'
+import { BoundStreamInfo } from '../../types.js'
 
 export default class FakeStreamInfo implements StreamInfo {
     public static callsToConstructor: StreamInfoOptions[] = []

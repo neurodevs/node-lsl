@@ -1,9 +1,11 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import { test, assert } from '@neurodevs/node-tdd'
+
 import LslWebSocketBridge, {
     StreamTransportBridge,
-} from '../../impl/LslWebSocketBridge'
+} from '../../impl/LslWebSocketBridge.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
-export default class LslWebSocketBridgeTest extends AbstractSpruceTest {
+export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     private static instance: StreamTransportBridge
 
     protected static async beforeEach() {

@@ -1,6 +1,7 @@
-import { assert } from '@sprucelabs/test-utils'
-import { EventMarkerOutlet } from '../../impl/LslEventMarkerOutlet'
-import { DurationMarker, LslSample } from '../../types'
+import { assert } from '@neurodevs/node-tdd'
+
+import { EventMarkerOutlet } from '../../impl/LslEventMarkerOutlet.js'
+import { DurationMarker, LslSample } from '../../types.js'
 
 export default class MockEventMarkerOutlet implements EventMarkerOutlet {
     private didPushMarkers = false

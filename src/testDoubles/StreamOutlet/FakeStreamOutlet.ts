@@ -1,8 +1,12 @@
 import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
-import { StreamInfo } from '../../impl/LslStreamInfo'
-import { StreamOutlet, StreamOutletOptions } from '../../impl/LslStreamOutlet'
-import { LslSample } from '../../types'
+
+import { StreamInfo } from '../../impl/LslStreamInfo.js'
+import {
+    StreamOutlet,
+    StreamOutletOptions,
+} from '../../impl/LslStreamOutlet.js'
+import { LslSample } from '../../types.js'
 
 export default class FakeStreamOutlet implements StreamOutlet {
     public static callsToConstructor: {

@@ -11,7 +11,7 @@ import {
     DestroyInletOptions,
     BoundInlet,
     FlushInletOptions,
-} from '../../types'
+} from '../../types.js'
 
 export default class FakeLiblsl implements Liblsl {
     public outlet: BoundOutlet = {} as BoundOutlet

@@ -1,5 +1,5 @@
-import LslEventMarkerOutlet from '../../impl/LslEventMarkerOutlet'
-import { StreamOutlet } from '../../impl/LslStreamOutlet'
+import LslEventMarkerOutlet from '../../impl/LslEventMarkerOutlet.js'
+import { StreamOutlet } from '../../impl/LslStreamOutlet.js'
 
 export default class SpyEventMarkerOutlet extends LslEventMarkerOutlet {
     public totalWaitTimeMs: number

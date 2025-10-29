@@ -1,4 +1,4 @@
-import { StreamTransportBridge } from '../../impl/LslWebSocketBridge'
+import { StreamTransportBridge } from '../../impl/LslWebSocketBridge.js'
 
 export default class FakeStreamTransportBridge
     implements StreamTransportBridge

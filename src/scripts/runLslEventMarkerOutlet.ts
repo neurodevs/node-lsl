@@ -1,4 +1,4 @@
-import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet'
+import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
 
 async function main() {
     const outlet = await LslEventMarkerOutlet.Create()

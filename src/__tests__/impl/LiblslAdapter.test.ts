@@ -1,9 +1,10 @@
 import { randomInt } from 'crypto'
-import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
+import { test, assert } from '@neurodevs/node-tdd'
 import { DataType, OpenParams } from 'ffi-rs'
-import LiblslAdapter from '../../impl/LiblslAdapter'
-import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl'
+
+import LiblslAdapter from '../../impl/LiblslAdapter.js'
+import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import {
     BoundChild,
     BoundDescription,
@@ -14,8 +15,8 @@ import {
     Liblsl,
     LiblslBindings,
     LslChannel,
-} from '../../types'
-import AbstractPackageTest from '../AbstractPackageTest'
+} from '../../types.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LiblslAdapterTest extends AbstractPackageTest {
     private static instance: Liblsl

@@ -1,8 +1,10 @@
-import { test, assert } from '@sprucelabs/test-utils'
-import LslStreamInlet, { StreamInletOptions } from '../../impl/LslStreamInlet'
-import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo'
-import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet'
-import AbstractPackageTest from '../AbstractPackageTest'
+import { test, assert } from '@neurodevs/node-tdd'
+import LslStreamInlet, {
+    StreamInletOptions,
+} from '../../impl/LslStreamInlet.js'
+import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
+import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamInletTest extends AbstractPackageTest {
     private static instance: SpyStreamInlet

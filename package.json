@@ -1,7 +1,8 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "12.0.0",
+  "version": "12.0.1",
   "description": "Lab Streaming Layer (LSL) bindings for Node",
+  "type": "module",
   "keywords": [
     "nodejs",
     "typescript",
@@ -49,11 +50,8 @@
     "ref-napi": "^3.0.3"
   },
   "devDependencies": {
-    "@neurodevs/generate-id": "^1.0.0",
-    "@sprucelabs/jest-json-reporter": "^8.0.542",
-    "@sprucelabs/resolve-path-aliases": "^2.0.516",
-    "@sprucelabs/test": "^9.0.59",
-    "@sprucelabs/test-utils": "^5.1.502",
+    "@neurodevs/generate-id": "^1.0.8",
+    "@neurodevs/node-tdd": "^0.1.2",
     "@types/ffi-napi": "^4.0.10",
     "@types/node": "^22.9.0",
     "chokidar-cli": "^3.0.0",

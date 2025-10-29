@@ -1,5 +1,5 @@
-import { StreamInfo } from '../../impl/LslStreamInfo'
-import { StreamInlet, StreamInletOptions } from '../../impl/LslStreamInlet'
+import { StreamInfo } from '../../impl/LslStreamInfo.js'
+import { StreamInlet, StreamInletOptions } from '../../impl/LslStreamInlet.js'
 
 export default class FakeStreamInlet implements StreamInlet {
     public static callsToConstructor: {

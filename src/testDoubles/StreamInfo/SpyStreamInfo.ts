@@ -1,4 +1,4 @@
-import LslStreamInfo, { StreamInfoOptions } from '../../impl/LslStreamInfo'
+import LslStreamInfo, { StreamInfoOptions } from '../../impl/LslStreamInfo.js'
 
 export default class SpyStreamInfo extends LslStreamInfo {
     public constructor(options: StreamInfoOptions) {

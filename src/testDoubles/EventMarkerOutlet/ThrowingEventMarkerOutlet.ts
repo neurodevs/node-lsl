@@ -1,5 +1,5 @@
-import { EventMarkerOutlet } from '../../impl/LslEventMarkerOutlet'
-import { DurationMarker } from '../../types'
+import { EventMarkerOutlet } from '../../impl/LslEventMarkerOutlet.js'
+import { DurationMarker } from '../../types.js'
 
 export default class ThrowingEventMarkerOutlet implements EventMarkerOutlet {
     private errorMsg = 'Intentional throwing: '

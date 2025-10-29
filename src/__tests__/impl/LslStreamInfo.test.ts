@@ -1,9 +1,10 @@
-import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
-import { CHANNEL_FORMATS } from '../../consts'
-import LslStreamInfo, { StreamInfoOptions } from '../../impl/LslStreamInfo'
-import SpyStreamInfo from '../../testDoubles/StreamInfo/SpyStreamInfo'
-import AbstractPackageTest from '../AbstractPackageTest'
+import { test, assert } from '@neurodevs/node-tdd'
+
+import { CHANNEL_FORMATS } from '../../consts.js'
+import LslStreamInfo, { StreamInfoOptions } from '../../impl/LslStreamInfo.js'
+import SpyStreamInfo from '../../testDoubles/StreamInfo/SpyStreamInfo.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamInfoTest extends AbstractPackageTest {
     private static instance: SpyStreamInfo

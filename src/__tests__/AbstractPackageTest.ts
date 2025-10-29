@@ -1,19 +1,20 @@
-import AbstractSpruceTest from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
-import LiblslAdapter from '../impl/LiblslAdapter'
-import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet'
-import LslStreamInfo from '../impl/LslStreamInfo'
-import LslStreamInlet from '../impl/LslStreamInlet'
+import AbstractModuleTest from '@neurodevs/node-tdd'
 
-import LslStreamOutlet from '../impl/LslStreamOutlet'
-import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet'
-import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl'
-import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo'
-import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo'
-import { SpyStreamInlet } from '../testDoubles/StreamInlet/SpyStreamInlet'
-import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet'
+import LiblslAdapter from '../impl/LiblslAdapter.js'
+import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
+import LslStreamInfo from '../impl/LslStreamInfo.js'
+import LslStreamInlet from '../impl/LslStreamInlet.js'
 
-export default class AbstractPackageTest extends AbstractSpruceTest {
+import LslStreamOutlet from '../impl/LslStreamOutlet.js'
+import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
+import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl.js'
+import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo.js'
+import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo.js'
+import { SpyStreamInlet } from '../testDoubles/StreamInlet/SpyStreamInlet.js'
+import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
+
+export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
 
     protected static async beforeEach() {

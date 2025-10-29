@@ -1,11 +1,11 @@
-import { CHANNEL_FORMATS } from './consts'
-import { ChannelFormat } from './types'
+import { CHANNEL_FORMATS } from './consts.js'
+import { ChannelFormat } from './types.js'
 import {
     isGreaterThanOrEqualToZero,
     isPositiveInteger,
     isPositiveIntegerOrZero,
     isStringInArray,
-} from './validations'
+} from './validations.js'
 
 export function assertValidChunkSize(chunkSize: number) {
     if (!isPositiveIntegerOrZero(chunkSize)) {

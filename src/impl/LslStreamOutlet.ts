@@ -4,10 +4,13 @@ import {
     assertValidChunkSize,
     assertValidMaxBuffered,
     assertValidSampleRate,
-} from '../assertions'
-import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from '../types'
-import LiblslAdapter from './LiblslAdapter'
-import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
+} from '../assertions.js'
+import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from '../types.js'
+import LiblslAdapter from './LiblslAdapter.js'
+import LslStreamInfo, {
+    StreamInfo,
+    StreamInfoOptions,
+} from './LslStreamInfo.js'
 
 export default class LslStreamOutlet implements StreamOutlet {
     public static Class?: StreamOutletConstructor

@@ -1,4 +1,5 @@
 import { DataType, define, open } from 'ffi-rs'
+
 import {
     Liblsl,
     LiblslBindings,
@@ -11,7 +12,7 @@ import {
     CreateInletOptions,
     DestroyInletOptions,
     FlushInletOptions,
-} from '../types'
+} from '../types.js'
 
 export default class LiblslAdapter implements Liblsl {
     public static ffiRsOpen = open

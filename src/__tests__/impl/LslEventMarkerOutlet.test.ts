@@ -1,12 +1,13 @@
 import { randomInt } from 'crypto'
-import { assert, test } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
-import LslEventMarkerOutlet from '../../impl/LslEventMarkerOutlet'
-import { StreamOutletOptions } from '../../impl/LslStreamOutlet'
-import SpyEventMarkerOutlet from '../../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet'
-import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions'
-import FakeStreamOutlet from '../../testDoubles/StreamOutlet/FakeStreamOutlet'
-import AbstractPackageTest from '../AbstractPackageTest'
+import { assert, test } from '@neurodevs/node-tdd'
+
+import LslEventMarkerOutlet from '../../impl/LslEventMarkerOutlet.js'
+import { StreamOutletOptions } from '../../impl/LslStreamOutlet.js'
+import SpyEventMarkerOutlet from '../../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
+import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
+import FakeStreamOutlet from '../../testDoubles/StreamOutlet/FakeStreamOutlet.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class EventMarkerOutletTest extends AbstractPackageTest {
     private static instance: SpyEventMarkerOutlet

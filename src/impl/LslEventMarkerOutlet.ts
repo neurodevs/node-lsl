@@ -1,8 +1,8 @@
-import { DurationMarker } from '../types'
+import { DurationMarker } from '../types.js'
 import LslStreamOutlet, {
     StreamOutletOptions,
     StreamOutlet,
-} from './LslStreamOutlet'
+} from './LslStreamOutlet.js'
 
 export default class LslEventMarkerOutlet implements EventMarkerOutlet {
     public static Class?: EventMarkerOutletConstructor

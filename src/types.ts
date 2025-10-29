@@ -1,7 +1,8 @@
 import { FuncObj, FieldType } from 'ffi-rs'
-import { CHANNEL_FORMATS } from './consts'
-import { StreamInlet } from './impl/LslStreamInlet'
-import { StreamOutlet } from './impl/LslStreamOutlet'
+
+import { CHANNEL_FORMATS } from './consts.js'
+import { StreamInlet } from './impl/LslStreamInlet.js'
+import { StreamOutlet } from './impl/LslStreamOutlet.js'
 
 export type StreamFixuture = StreamOutlet | StreamInlet
 

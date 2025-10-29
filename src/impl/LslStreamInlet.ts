@@ -1,7 +1,11 @@
 import generateId from '@neurodevs/generate-id'
-import { BoundInlet, ChannelFormat } from '../types'
-import LiblslAdapter from './LiblslAdapter'
-import LslStreamInfo, { StreamInfo, StreamInfoOptions } from './LslStreamInfo'
+
+import { BoundInlet, ChannelFormat } from '../types.js'
+import LiblslAdapter from './LiblslAdapter.js'
+import LslStreamInfo, {
+    StreamInfo,
+    StreamInfoOptions,
+} from './LslStreamInfo.js'
 
 export default class LslStreamInlet implements StreamInlet {
     public static Class?: StreamInletConstructor

@@ -1,7 +1,8 @@
 import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
-import { StreamOutletOptions } from '../impl/LslStreamOutlet'
-import { TEST_SUPPORTED_CHANNEL_FORMATS } from './consts'
+
+import { StreamOutletOptions } from '../impl/LslStreamOutlet.js'
+import { TEST_SUPPORTED_CHANNEL_FORMATS } from './consts.js'
 
 export default function generateRandomOutletOptions() {
     const randomChannelIdx = randomInt(TEST_SUPPORTED_CHANNEL_FORMATS.length)
