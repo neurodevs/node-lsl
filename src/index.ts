@@ -2,19 +2,19 @@ export * from './types.js'
 
 // EventMarkerOutlet
 
-export { default as EventMarkerOutlet } from './impl/LslEventMarkerOutlet.js'
+export { default as LslEventMarkerOutlet } from './impl/LslEventMarkerOutlet.js'
 export * from './impl/LslEventMarkerOutlet.js'
 
-export { default as FakeMarkerOutlet } from './testDoubles/EventMarkerOutlet/FakeEventMarkerOutlet.js'
+export { default as FakeEventMarkerOutlet } from './testDoubles/EventMarkerOutlet/FakeEventMarkerOutlet.js'
 export * from './testDoubles/EventMarkerOutlet/FakeEventMarkerOutlet.js'
 
-export { default as MockMarkerOutlet } from './testDoubles/EventMarkerOutlet/MockEventMarkerOutlet.js'
+export { default as MockEventMarkerOutlet } from './testDoubles/EventMarkerOutlet/MockEventMarkerOutlet.js'
 export * from './testDoubles/EventMarkerOutlet/MockEventMarkerOutlet.js'
 
-export { default as SpyMarkerOutlet } from './testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
+export { default as SpyEventMarkerOutlet } from './testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
 export * from './testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
 
-export { default as ThrowingMarkerOutlet } from './testDoubles/EventMarkerOutlet/ThrowingEventMarkerOutlet.js'
+export { default as ThrowingEventMarkerOutlet } from './testDoubles/EventMarkerOutlet/ThrowingEventMarkerOutlet.js'
 export * from './testDoubles/EventMarkerOutlet/ThrowingEventMarkerOutlet.js'
 
 // Liblsl
