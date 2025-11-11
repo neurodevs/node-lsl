@@ -32,6 +32,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static createOutletParams?: any[]
     private static destroyOutletParams?: any[]
     private static createInletParams?: any[]
+    private static pullChunkParams?: any[]
     private static flushInletParams?: any[]
     private static destroyInletParams?: any[]
     private static localClockParams?: any[]
@@ -182,6 +183,20 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 library: 'lsl',
                 retType: DataType.External,
                 paramsType: [DataType.External, DataType.I32, DataType.I32],
+            },
+            lsl_pull_chunk_f: {
+                library: 'lsl',
+                retType: DataType.Double,
+                paramsType: [
+                    DataType.External,
+                    DataType.FloatArray,
+                    DataType.DoubleArray,
+                    DataType.I32Array,
+                    DataType.I32,
+                    DataType.I32,
+                    DataType.Double,
+                    DataType.External,
+                ],
             },
             lsl_flush_inlet: {
                 library: 'lsl',
@@ -375,6 +390,29 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async pullChunkCallsBinding() {
+        const { inlet } = this.createRandomInlet()
+
+        const options = {
+            inlet,
+            dataBuffer: [],
+            timestampBuffer: [],
+            dataBufferElements: 0,
+            timestampBufferElements: 0,
+            timeout: 0.0,
+            errcode: 0,
+        }
+
+        this.instance.pullChunk(options)
+
+        assert.isEqualDeep(
+            this.pullChunkParams,
+            Object.values(options),
+            'Should have called pullChunk with expected params!'
+        )
+    }
+
+    @test()
     protected static async flushInletCallsBinding() {
         const { inlet } = this.createRandomInlet()
         this.instance.flushInlet({ inlet })
@@ -471,6 +509,10 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             lsl_create_inlet: (params: any[]) => {
                 this.createInletParams = params
                 return this.fakeInlet
+            },
+            lsl_pull_chunk_f: (params: any[]) => {
+                this.pullChunkParams = params
+                return 0
             },
             lsl_flush_inlet: (params: any[]) => {
                 this.flushInletParams = params

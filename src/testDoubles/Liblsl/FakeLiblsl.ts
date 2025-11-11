@@ -11,6 +11,7 @@ import {
     DestroyInletOptions,
     BoundInlet,
     FlushInletOptions,
+    PullChunkOptions,
 } from '../../types.js'
 
 export default class FakeLiblsl implements Liblsl {
@@ -23,6 +24,7 @@ export default class FakeLiblsl implements Liblsl {
     public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
     public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
     public lastCreateInletOptions?: CreateInletOptions
+    public lastPullChunkOptions?: PullChunkOptions
     public lastFlushInletOptions?: FlushInletOptions
     public lastDestroyInletOptions?: DestroyInletOptions
 
@@ -72,6 +74,11 @@ export default class FakeLiblsl implements Liblsl {
         this.createInletHitCount++
         this.lastCreateInletOptions = options
         return {} as BoundInlet
+    }
+
+    public pullChunk(options: PullChunkOptions) {
+        this.lastPullChunkOptions = options
+        return 0
     }
 
     public flushInlet(options: FlushInletOptions) {

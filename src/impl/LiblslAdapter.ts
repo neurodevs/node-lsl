@@ -12,6 +12,7 @@ import {
     CreateInletOptions,
     DestroyInletOptions,
     FlushInletOptions,
+    PullChunkOptions,
 } from '../types.js'
 
 export default class LiblslAdapter implements Liblsl {
@@ -105,6 +106,20 @@ export default class LiblslAdapter implements Liblsl {
                 library: 'lsl',
                 retType: DataType.External,
                 paramsType: [DataType.External, DataType.I32, DataType.I32],
+            },
+            lsl_pull_chunk_f: {
+                library: 'lsl',
+                retType: DataType.Double,
+                paramsType: [
+                    DataType.External,
+                    DataType.FloatArray,
+                    DataType.DoubleArray,
+                    DataType.I32Array,
+                    DataType.I32,
+                    DataType.I32,
+                    DataType.Double,
+                    DataType.External,
+                ],
             },
             lsl_flush_inlet: {
                 library: 'lsl',
@@ -208,6 +223,28 @@ export default class LiblslAdapter implements Liblsl {
     public createInlet(options: CreateInletOptions) {
         const { info, chunkSize, maxBuffered } = options
         return this.bindings.lsl_create_inlet([info, chunkSize, maxBuffered])
+    }
+
+    public pullChunk(options: PullChunkOptions) {
+        const {
+            inlet,
+            dataBuffer,
+            timestampBuffer,
+            dataBufferElements,
+            timestampBufferElements,
+            timeout,
+            errcode,
+        } = options
+
+        return this.bindings.lsl_pull_chunk_f([
+            inlet,
+            dataBuffer,
+            timestampBuffer,
+            dataBufferElements,
+            timestampBufferElements,
+            timeout,
+            errcode,
+        ])
     }
 
     public flushInlet(options: FlushInletOptions) {
