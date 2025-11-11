@@ -78,6 +78,17 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async destroyCallsLslBinding() {
+        this.instance.destroy()
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastDestroyInletOptions,
+            { inlet: this.instance.getBoundInlet() },
+            'Should have called destroyInlet!'
+        )
+    }
+
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
         const defaultOptions = {
             channelNames: this.channelNames,

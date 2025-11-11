@@ -8,6 +8,7 @@ export default class FakeStreamInlet implements StreamInlet {
     }[] = []
 
     public static numCallsToFlushSamples = 0
+    public static numCallsToDestroy = 0
 
     public constructor(info?: StreamInfo, options?: StreamInletOptions) {
         FakeStreamInlet.callsToConstructor.push({
@@ -20,8 +21,13 @@ export default class FakeStreamInlet implements StreamInlet {
         FakeStreamInlet.numCallsToFlushSamples++
     }
 
+    public destroy() {
+        FakeStreamInlet.numCallsToDestroy++
+    }
+
     public static resetTestDouble() {
         FakeStreamInlet.callsToConstructor = []
         FakeStreamInlet.numCallsToFlushSamples = 0
+        FakeStreamInlet.numCallsToDestroy = 0
     }
 }

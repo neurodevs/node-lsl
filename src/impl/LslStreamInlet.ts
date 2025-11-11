@@ -60,6 +60,10 @@ export default class LslStreamInlet implements StreamInlet {
         this.lsl.flushInlet({ inlet: this.inlet })
     }
 
+    public destroy() {
+        this.lsl.destroyInlet({ inlet: this.inlet })
+    }
+
     private static LslStreamInfo(options: StreamInfoOptions) {
         return LslStreamInfo.Create(options)
     }
@@ -67,6 +71,7 @@ export default class LslStreamInlet implements StreamInlet {
 
 export interface StreamInlet {
     flushSamples(): void
+    destroy(): void
 }
 
 export type StreamInletConstructor = new (
