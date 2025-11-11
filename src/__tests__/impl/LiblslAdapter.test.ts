@@ -386,6 +386,18 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async destroyInletCallsBinding() {
+        const { inlet } = this.createRandomInlet()
+        this.instance.destroyInlet({ inlet })
+
+        assert.isEqualDeep(
+            this.destroyInletParams,
+            [inlet],
+            'Should have called destroyInlet with expected params!'
+        )
+    }
+
     private static createRandomStreamInfo() {
         return this.instance.createStreamInfo(
             this.generateRandomCreateStreamInfoOptions()

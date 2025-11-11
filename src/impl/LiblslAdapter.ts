@@ -215,7 +215,10 @@ export default class LiblslAdapter implements Liblsl {
         this.bindings.lsl_flush_inlet([inlet])
     }
 
-    public destroyInlet(_options: DestroyInletOptions) {}
+    public destroyInlet(options: DestroyInletOptions) {
+        const { inlet } = options
+        this.bindings.lsl_destroy_inlet([inlet])
+    }
 
     public localClock() {
         return this.bindings.lsl_local_clock([])

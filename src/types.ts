@@ -82,7 +82,9 @@ export interface FlushInletOptions {
     inlet: BoundInlet
 }
 
-export interface DestroyInletOptions {}
+export interface DestroyInletOptions {
+    inlet: BoundInlet
+}
 
 export interface LiblslBindings {
     lsl_create_streaminfo(
