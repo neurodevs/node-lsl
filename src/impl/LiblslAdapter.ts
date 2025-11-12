@@ -16,12 +16,15 @@ import {
 } from '../types.js'
 
 export default class LiblslAdapter implements Liblsl {
-    public static ffiRsOpen = open
-    public static ffiRsDefine = define
+    public static open = open
+    public static define = define
+
     private static instance?: Liblsl
 
     private path: string
     private bindings!: LiblslBindings
+
+    private readonly defaultMacOsPath = `/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib`
 
     protected constructor() {
         this.path = process.env.LIBLSL_PATH! ?? this.defaultMacOsPath
@@ -30,14 +33,16 @@ export default class LiblslAdapter implements Liblsl {
 
     private tryToLoadBindings() {
         try {
-            this.bindings = this.loadBindings(this.path)
+            this.loadBindings()
         } catch (error) {
-            throw new Error(this.generateFailedMessage(error as Error))
+            this.throwFailedToLoadLiblsl(error as Error)
         }
     }
 
-    private generateFailedMessage(error: Error) {
-        return `Loading the liblsl dylib failed! I tried to load it from ${this.path}.\n\n${error.message}\n\n`
+    private throwFailedToLoadLiblsl(error: Error) {
+        throw new Error(
+            `Loading the liblsl dylib failed! I tried to load it from ${this.path}.\n\n${error.message}\n\n`
+        )
     }
 
     public static getInstance() {
@@ -55,107 +60,20 @@ export default class LiblslAdapter implements Liblsl {
         delete this.instance
     }
 
-    private loadBindings(liblslPath: string) {
-        LiblslAdapter.ffiRsOpen({
-            library: 'lsl',
-            path: liblslPath,
-        })
+    private loadBindings() {
+        this.openLiblsl()
+        this.bindings = this.defineLiblslBindings()
+    }
 
-        return LiblslAdapter.ffiRsDefine({
-            lsl_create_streaminfo: {
-                library: 'lsl',
-                retType: DataType.External,
-                paramsType: [
-                    DataType.String,
-                    DataType.String,
-                    DataType.I32,
-                    DataType.Double,
-                    DataType.I32,
-                    DataType.String,
-                ],
-            },
-            lsl_create_outlet: {
-                library: 'lsl',
-                retType: DataType.External,
-                paramsType: [DataType.External, DataType.I32, DataType.I32],
-            },
-            lsl_push_sample_ft: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [
-                    DataType.External,
-                    DataType.FloatArray,
-                    DataType.Double,
-                ],
-            },
-            lsl_push_sample_strt: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [
-                    DataType.External,
-                    DataType.StringArray,
-                    DataType.Double,
-                ],
-            },
-            lsl_destroy_outlet: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [DataType.External],
-            },
-            lsl_create_inlet: {
-                library: 'lsl',
-                retType: DataType.External,
-                paramsType: [DataType.External, DataType.I32, DataType.I32],
-            },
-            lsl_pull_chunk_f: {
-                library: 'lsl',
-                retType: DataType.Double,
-                paramsType: [
-                    DataType.External,
-                    DataType.FloatArray,
-                    DataType.DoubleArray,
-                    DataType.I32Array,
-                    DataType.I32,
-                    DataType.I32,
-                    DataType.Double,
-                    DataType.External,
-                ],
-            },
-            lsl_flush_inlet: {
-                library: 'lsl',
-                retType: DataType.I32,
-                paramsType: [DataType.External],
-            },
-            lsl_destroy_inlet: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [DataType.External],
-            },
-            lsl_get_desc: {
-                library: 'lsl',
-                retType: DataType.External,
-                paramsType: [DataType.External],
-            },
-            lsl_append_child: {
-                library: 'lsl',
-                retType: DataType.External,
-                paramsType: [DataType.External, DataType.String],
-            },
-            lsl_append_child_value: {
-                library: 'lsl',
-                retType: DataType.External,
-                paramsType: [
-                    DataType.External,
-                    DataType.String,
-                    DataType.String,
-                ],
-            },
-            lsl_local_clock: {
-                library: 'lsl',
-                retType: DataType.Double,
-                paramsType: [],
-            },
-        }) as unknown as LiblslBindings
+    private openLiblsl() {
+        this.open({
+            library: 'lsl',
+            path: this.path,
+        })
+    }
+
+    private defineLiblslBindings() {
+        return this.define(this.liblslFuncs) as unknown as LiblslBindings
     }
 
     public createStreamInfo(options: CreateStreamInfoOptions) {
@@ -261,6 +179,109 @@ export default class LiblslAdapter implements Liblsl {
         return this.bindings.lsl_local_clock([])
     }
 
-    private readonly defaultMacOsPath =
-        '/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib'
+    private get open() {
+        return LiblslAdapter.open
+    }
+
+    private get define() {
+        return LiblslAdapter.define
+    }
+
+    private get liblslFuncs() {
+        return {
+            lsl_create_streaminfo: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [
+                    DataType.String,
+                    DataType.String,
+                    DataType.I32,
+                    DataType.Double,
+                    DataType.I32,
+                    DataType.String,
+                ],
+            },
+            lsl_create_outlet: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External, DataType.I32, DataType.I32],
+            },
+            lsl_push_sample_ft: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [
+                    DataType.External,
+                    DataType.FloatArray,
+                    DataType.Double,
+                ],
+            },
+            lsl_push_sample_strt: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [
+                    DataType.External,
+                    DataType.StringArray,
+                    DataType.Double,
+                ],
+            },
+            lsl_destroy_outlet: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
+            },
+            lsl_create_inlet: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External, DataType.I32, DataType.I32],
+            },
+            lsl_pull_chunk_f: {
+                library: 'lsl',
+                retType: DataType.Double,
+                paramsType: [
+                    DataType.External,
+                    DataType.FloatArray,
+                    DataType.DoubleArray,
+                    DataType.I32Array,
+                    DataType.I32,
+                    DataType.I32,
+                    DataType.Double,
+                    DataType.External,
+                ],
+            },
+            lsl_flush_inlet: {
+                library: 'lsl',
+                retType: DataType.I32,
+                paramsType: [DataType.External],
+            },
+            lsl_destroy_inlet: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
+            },
+            lsl_get_desc: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External],
+            },
+            lsl_append_child: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [DataType.External, DataType.String],
+            },
+            lsl_append_child_value: {
+                library: 'lsl',
+                retType: DataType.External,
+                paramsType: [
+                    DataType.External,
+                    DataType.String,
+                    DataType.String,
+                ],
+            },
+            lsl_local_clock: {
+                library: 'lsl',
+                retType: DataType.Double,
+                paramsType: [],
+            },
+        }
+    }
 }

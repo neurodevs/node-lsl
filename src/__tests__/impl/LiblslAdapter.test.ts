@@ -75,11 +75,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         this.appendChildHitCount = 0
 
         delete this.ffiRsOpenOptions
-        LiblslAdapter.ffiRsOpen = (options) => {
+        LiblslAdapter.open = (options) => {
             this.ffiRsOpenOptions = options
         }
 
-        LiblslAdapter.ffiRsDefine = (options) => {
+        LiblslAdapter.define = (options) => {
             this.ffiRsDefineOptions = options as FfiRsDefineOptions
             if (this.shouldThrowWhenCreatingBindings) {
                 throw new Error('Failed to create bindings!')
