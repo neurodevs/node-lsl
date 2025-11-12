@@ -97,6 +97,13 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async startPullingSetsIsRunningToTrue() {
+        this.instance.startPulling()
+
+        assert.isTrue(this.instance.isRunning, 'isRunning should be true!')
+    }
+
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
         const defaultOptions = {
             channelNames: this.channelNames,

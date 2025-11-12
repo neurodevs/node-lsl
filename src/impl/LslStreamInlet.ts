@@ -18,6 +18,8 @@ export default class LslStreamInlet implements StreamInlet {
     private chunkSize: number
     private maxBuffered: number
 
+    private readonly defaultName = `lsl-inlet-${generateId()}`
+
     protected constructor(info: StreamInfo, options: StreamInletOptions) {
         const {
             name = this.defaultName,
@@ -42,21 +44,15 @@ export default class LslStreamInlet implements StreamInlet {
 
     private createStreamInlet() {
         this.inlet = this.lsl.createInlet({
-            info: this.boundStreamInfo,
+            info: this.info.boundStreamInfo,
             chunkSize: this.chunkSize,
             maxBuffered: this.maxBuffered,
         })
     }
 
-    private get boundStreamInfo() {
-        return this.info.boundStreamInfo
+    public startPulling() {
+        this.isRunning = true
     }
-
-    private get lsl() {
-        return LiblslAdapter.getInstance()
-    }
-
-    private readonly defaultName = `lsl-inlet-${generateId()}`
 
     public flushSamples() {
         this.lsl.flushInlet({ inlet: this.inlet })
@@ -66,12 +62,17 @@ export default class LslStreamInlet implements StreamInlet {
         this.lsl.destroyInlet({ inlet: this.inlet })
     }
 
+    private get lsl() {
+        return LiblslAdapter.getInstance()
+    }
+
     private static LslStreamInfo(options: StreamInfoOptions) {
         return LslStreamInfo.Create(options)
     }
 }
 
 export interface StreamInlet {
+    startPulling(): void
     flushSamples(): void
     destroy(): void
     isRunning: boolean
