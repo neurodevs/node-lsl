@@ -54,6 +54,10 @@ export default class LslStreamInlet implements StreamInlet {
         this.isRunning = true
     }
 
+    public stopPulling() {
+        this.isRunning = false
+    }
+
     public flushSamples() {
         this.lsl.flushInlet({ inlet: this.inlet })
     }
@@ -73,6 +77,7 @@ export default class LslStreamInlet implements StreamInlet {
 
 export interface StreamInlet {
     startPulling(): void
+    stopPulling(): void
     flushSamples(): void
     destroy(): void
     isRunning: boolean

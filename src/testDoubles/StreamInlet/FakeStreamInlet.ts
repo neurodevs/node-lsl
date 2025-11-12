@@ -8,6 +8,7 @@ export default class FakeStreamInlet implements StreamInlet {
     }[] = []
 
     public static numCallsToStartPulling = 0
+    public static numCallsToStopPulling = 0
     public static numCallsToFlushSamples = 0
     public static numCallsToDestroy = 0
 
@@ -23,6 +24,11 @@ export default class FakeStreamInlet implements StreamInlet {
     public startPulling() {
         FakeStreamInlet.numCallsToStartPulling++
         this.isRunning = true
+    }
+
+    public stopPulling() {
+        FakeStreamInlet.numCallsToStopPulling++
+        this.isRunning = false
     }
 
     public flushSamples() {

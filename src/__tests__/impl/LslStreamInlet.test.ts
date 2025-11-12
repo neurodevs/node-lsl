@@ -73,7 +73,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastFlushInletOptions,
-            { inlet: this.instance.getBoundInlet() },
+            { inlet: this.boundInlet },
             'Should have called flushInlet!'
         )
     }
@@ -84,24 +84,45 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastDestroyInletOptions,
-            { inlet: this.instance.getBoundInlet() },
+            { inlet: this.boundInlet },
             'Should have called destroyInlet!'
         )
     }
 
     @test()
     protected static async exposesIsRunningFieldThatIsFalseAtFirst() {
-        assert.isFalse(
-            this.instance.isRunning,
-            'isRunning should be false at first!'
-        )
+        assert.isFalse(this.isRunning, 'isRunning should be false at first!')
     }
 
     @test()
     protected static async startPullingSetsIsRunningToTrue() {
-        this.instance.startPulling()
+        this.startPulling()
 
-        assert.isTrue(this.instance.isRunning, 'isRunning should be true!')
+        assert.isTrue(this.isRunning, 'isRunning should be true!')
+    }
+
+    @test()
+    protected static async stopPullingSetsIsRunningToFalse() {
+        this.startPulling()
+        this.stopPulling()
+
+        assert.isFalse(this.isRunning, 'isRunning should be false!')
+    }
+
+    private static startPulling() {
+        this.instance.startPulling()
+    }
+
+    private static stopPulling() {
+        this.instance.stopPulling()
+    }
+
+    private static get isRunning() {
+        return this.instance.isRunning
+    }
+
+    private static get boundInlet() {
+        return this.instance.getBoundInlet()
     }
 
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
