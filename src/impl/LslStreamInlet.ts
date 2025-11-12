@@ -10,6 +10,8 @@ import LslStreamInfo, {
 export default class LslStreamInlet implements StreamInlet {
     public static Class?: StreamInletConstructor
 
+    public isRunning = false
+
     protected name: string
     protected info: StreamInfo
     protected inlet!: BoundInlet
@@ -72,6 +74,7 @@ export default class LslStreamInlet implements StreamInlet {
 export interface StreamInlet {
     flushSamples(): void
     destroy(): void
+    isRunning: boolean
 }
 
 export type StreamInletConstructor = new (

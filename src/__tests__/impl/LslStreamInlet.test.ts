@@ -89,6 +89,14 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async exposesIsRunningFieldThatIsFalseAtFirst() {
+        assert.isFalse(
+            this.instance.isRunning,
+            'isRunning should be false at first!'
+        )
+    }
+
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
         const defaultOptions = {
             channelNames: this.channelNames,

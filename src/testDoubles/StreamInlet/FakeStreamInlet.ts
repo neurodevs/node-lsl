@@ -10,6 +10,8 @@ export default class FakeStreamInlet implements StreamInlet {
     public static numCallsToFlushSamples = 0
     public static numCallsToDestroy = 0
 
+    public isRunning = false
+
     public constructor(info?: StreamInfo, options?: StreamInletOptions) {
         FakeStreamInlet.callsToConstructor.push({
             info,
