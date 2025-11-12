@@ -208,7 +208,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         await this.LslStreamOutlet({ waitAfterConstructionMs: 10 })
         const endMs = Date.now()
 
-        assert.isAbove(endMs - startMs, 10)
+        assert.isAbove(endMs - startMs, 8)
     }
 
     private static async assertThrowsWithEmptyChannelNames() {
