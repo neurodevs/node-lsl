@@ -21,6 +21,7 @@ export interface Liblsl {
     pushSampleStringTimestamp(options: PushSampleStringTimestampOptions): void
     destroyOutlet(options: DestroyOutletOptions): void
     createInlet(options: CreateInletOptions): BoundInlet
+    pullSample(options: PullSampleOptions): number
     pullChunk(options: PullChunkOptions): number
     flushInlet(options: FlushInletOptions): void
     destroyInlet(options: DestroyInletOptions): void
@@ -77,6 +78,14 @@ export interface CreateInletOptions {
     info: BoundStreamInfo
     chunkSize: number
     maxBuffered: number
+}
+
+export interface PullSampleOptions {
+    inlet: BoundInlet
+    dataBuffer: Buffer<ArrayBuffer>
+    dataBufferElements: number
+    timeout: number
+    errcode: Int32Array
 }
 
 export interface PullChunkOptions {

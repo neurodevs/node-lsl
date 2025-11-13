@@ -12,9 +12,15 @@ import {
     BoundInlet,
     FlushInletOptions,
     PullChunkOptions,
+    PullSampleOptions,
 } from '../../types.js'
 
 export default class FakeLiblsl implements Liblsl {
+    public static fakeSamples: Float32Array[] = [
+        new Float32Array([1, 2, 3]),
+        new Float32Array([4, 5, 6]),
+    ]
+
     public static fakeChunks: Float32Array[] = [
         new Float32Array([1, 2, 3, 4, 5, 6]),
         new Float32Array([1, 2, 3, 4, 5, 6]),
@@ -25,6 +31,7 @@ export default class FakeLiblsl implements Liblsl {
         new Float64Array([7, 8]),
     ]
 
+    public fakeSamples = FakeLiblsl.fakeSamples.slice()
     public fakeChunks = FakeLiblsl.fakeChunks.slice()
     public fakeTimestamps = FakeLiblsl.fakeTimestamps.slice()
 
@@ -37,6 +44,7 @@ export default class FakeLiblsl implements Liblsl {
     public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
     public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
     public lastCreateInletOptions?: CreateInletOptions
+    public lastPullSampleOptions?: PullSampleOptions
     public lastPullChunkOptions?: PullChunkOptions
     public lastFlushInletOptions?: FlushInletOptions
     public lastDestroyInletOptions?: DestroyInletOptions
@@ -87,6 +95,27 @@ export default class FakeLiblsl implements Liblsl {
         this.createInletHitCount++
         this.lastCreateInletOptions = options
         return {} as BoundInlet
+    }
+
+    public pullSample(options: PullSampleOptions) {
+        this.lastPullSampleOptions = options
+
+        const { dataBuffer } = options
+
+        const chunk = this.fakeChunks.shift()
+
+        if (chunk) {
+            const dataView = new Float32Array(
+                dataBuffer.buffer,
+                dataBuffer.byteOffset,
+                dataBuffer.byteLength / 4
+            )
+            dataView.set(chunk)
+
+            return 1
+        }
+
+        return 0
     }
 
     public pullChunk(options: PullChunkOptions) {
@@ -145,6 +174,7 @@ export default class FakeLiblsl implements Liblsl {
         this.localClockHitCount = 0
         this.pushSampleStringTimestampHitCount = 0
 
+        this.fakeSamples = FakeLiblsl.fakeSamples.slice()
         this.fakeChunks = FakeLiblsl.fakeChunks.slice()
         this.fakeTimestamps = FakeLiblsl.fakeTimestamps.slice()
     }

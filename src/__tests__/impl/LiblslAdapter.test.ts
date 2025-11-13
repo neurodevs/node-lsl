@@ -381,6 +381,58 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async pullSampleCallsBinding() {
+        const { inlet } = this.createRandomInlet()
+
+        const dataBuffer = Buffer.alloc(0)
+        const dataBufferElements = 0
+        const timeout = 0.0
+        const errcode = new Int32Array(1)
+
+        this.instance.pullSample({
+            inlet,
+            dataBuffer,
+            dataBufferElements,
+            timeout,
+            errcode,
+        })
+
+        const dataPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [dataBuffer],
+        })[0]
+
+        const errcodePtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [errcode],
+        })[0]
+
+        assert.isEqualDeep(
+            this.ffiRsLoadOptions,
+            {
+                library: 'lsl',
+                funcName: 'lsl_pull_sample_f',
+                retType: DataType.Double,
+                paramsType: [
+                    DataType.External,
+                    DataType.External,
+                    DataType.I32,
+                    DataType.Double,
+                    DataType.External,
+                ],
+                paramsValue: [
+                    inlet,
+                    dataPtr,
+                    dataBufferElements,
+                    timeout,
+                    errcodePtr,
+                ],
+            },
+            'Did not call pullSample with expected options!'
+        )
+    }
+
+    @test()
     protected static async pullChunkCallsBinding() {
         const { inlet } = this.createRandomInlet()
 
@@ -441,7 +493,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     errcodePtr,
                 ],
             },
-            'Should have called pullChunk with expected params!'
+            'Did not call pullChunk with expected options!'
         )
     }
 

@@ -13,6 +13,7 @@ import {
     DestroyInletOptions,
     FlushInletOptions,
     PullChunkOptions,
+    PullSampleOptions,
 } from '../types.js'
 
 export default class LiblslAdapter implements Liblsl {
@@ -142,6 +143,41 @@ export default class LiblslAdapter implements Liblsl {
     public createInlet(options: CreateInletOptions) {
         const { info, chunkSize, maxBuffered } = options
         return this.bindings.lsl_create_inlet([info, chunkSize, maxBuffered])
+    }
+
+    public pullSample(options: PullSampleOptions) {
+        const { inlet, dataBuffer, dataBufferElements, timeout, errcode } =
+            options
+
+        const dataPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [dataBuffer],
+        })[0]
+
+        const errcodePtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [errcode],
+        })[0]
+
+        return this.load({
+            library: 'lsl',
+            funcName: 'lsl_pull_sample_f',
+            retType: DataType.Double,
+            paramsType: [
+                DataType.External,
+                DataType.External,
+                DataType.I32,
+                DataType.Double,
+                DataType.External,
+            ],
+            paramsValue: [
+                inlet,
+                dataPtr,
+                dataBufferElements,
+                timeout,
+                errcodePtr,
+            ],
+        })
     }
 
     public pullChunk(options: PullChunkOptions) {
