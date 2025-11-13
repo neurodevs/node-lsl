@@ -140,10 +140,29 @@ export default class LslStreamInletTest extends AbstractPackageTest {
                 inlet: this.boundInlet,
                 dataBufferPtr: inlet['dataBufferPtr'],
                 dataBufferElements: this.channelCount,
-                timeout: 1.0,
+                timeout: 0,
                 errcodePtr: inlet['errcodePtr'],
             },
             'Should have called pullSample!'
+        )
+    }
+
+    @test()
+    protected static async callsPullChunkIfChunkSizeIsNotOne() {
+        await this.startThenStop()
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastPullChunkOptions,
+            {
+                inlet: this.boundInlet,
+                dataBufferPtr: this.instance['dataBufferPtr'],
+                timestampBufferPtr: this.instance['timestampBufferPtr'],
+                dataBufferElements: this.chunkSize * this.channelCount,
+                timestampBufferElements: this.chunkSize,
+                timeout: 0,
+                errcodePtr: this.instance['errcodePtr'],
+            },
+            'Should have called pullChunk!'
         )
     }
 
