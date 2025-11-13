@@ -19,6 +19,10 @@ export default class LslStreamInlet implements StreamInlet {
     private chunkSize: number
     private maxBuffered: number
     private onChunk?: (samples: Float32Array, timestamps: Float64Array) => void
+    private pullByChunkSize: () => {
+        samples: Float32Array | undefined
+        timestamps: Float64Array | undefined
+    }
 
     private dataBuffer!: Buffer<ArrayBuffer>
     private timestampBuffer!: Buffer<ArrayBuffer>
@@ -40,6 +44,12 @@ export default class LslStreamInlet implements StreamInlet {
         this.maxBuffered = maxBuffered
         this.onChunk = onChunk
         this.name = name
+
+        if (this.chunkSize === 1) {
+            this.pullByChunkSize = this.pullSample
+        } else {
+            this.pullByChunkSize = this.pullChunk
+        }
 
         this.createStreamInlet()
     }
@@ -83,7 +93,7 @@ export default class LslStreamInlet implements StreamInlet {
             return
         }
 
-        const { samples, timestamps } = this.pullChunk()
+        const { samples, timestamps } = this.pullByChunkSize()
 
         if (samples && timestamps) {
             this.onChunk(samples, timestamps)
@@ -92,6 +102,18 @@ export default class LslStreamInlet implements StreamInlet {
         setImmediate(() => {
             void this.pullOnLoop()
         })
+    }
+
+    private pullSample() {
+        this.lsl.pullSample({
+            inlet: this.inlet,
+            dataBuffer: this.dataBuffer,
+            dataBufferElements: this.channelCount,
+            timeout: 1.0,
+            errcode: new Int32Array(1),
+        })
+
+        return { samples: undefined, timestamps: undefined }
     }
 
     private pullChunk() {

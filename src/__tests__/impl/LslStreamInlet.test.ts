@@ -135,7 +135,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         ]
 
         this.startPulling()
-        await this.wait(1)
+        await this.wait(10)
 
         assert.isEqualDeep(
             this.callsToOnChunk,
@@ -144,6 +144,27 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
 
         this.stopPulling()
+    }
+
+    @test()
+    protected static async callsPullSampleIfChunkSizeIsOne() {
+        const inlet = this.LslStreamInlet({ chunkSize: 1 })
+
+        inlet.startPulling()
+        await this.wait(10)
+        inlet.stopPulling()
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastPullSampleOptions,
+            {
+                inlet: this.boundInlet,
+                dataBuffer: inlet['dataBuffer'],
+                dataBufferElements: this.channelCount,
+                timeout: 1.0,
+                errcode: new Int32Array(1),
+            },
+            'Should have called pullSample!'
+        )
     }
 
     private static startPulling() {
@@ -167,6 +188,10 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         timestamps: Float64Array
     ) => {
         this.callsToOnChunk.push({ chunk, timestamps })
+    }
+
+    private static get channelCount() {
+        return this.channelNames.length
     }
 
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {

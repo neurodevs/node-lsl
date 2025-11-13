@@ -102,15 +102,15 @@ export default class FakeLiblsl implements Liblsl {
 
         const { dataBuffer } = options
 
-        const chunk = this.fakeChunks.shift()
+        const sample = this.fakeSamples.shift()
 
-        if (chunk) {
+        if (sample) {
             const dataView = new Float32Array(
                 dataBuffer.buffer,
                 dataBuffer.byteOffset,
                 dataBuffer.byteLength / 4
             )
-            dataView.set(chunk)
+            dataView.set(sample)
 
             return 1
         }
