@@ -102,7 +102,7 @@ export default class LslStreamInlet implements StreamInlet {
             dataBufferElements: this.chunkSize * this.channelCount,
             timestampBufferElements: this.chunkSize,
             timeout: 1.0,
-            errcode: 0,
+            errcode: new Int32Array(1),
         })
 
         if (firstTimestamp) {

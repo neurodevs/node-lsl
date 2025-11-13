@@ -86,7 +86,7 @@ export interface PullChunkOptions {
     dataBufferElements: number
     timestampBufferElements: number
     timeout: number
-    errcode: number
+    errcode: Int32Array
 }
 
 export interface FlushInletOptions {
@@ -107,7 +107,6 @@ export interface LiblslBindings {
     lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): void
     lsl_destroy_outlet(args: [BoundOutlet]): void
     lsl_create_inlet(args: any): BoundInlet
-    lsl_pull_chunk_f(args: any): number
     lsl_flush_inlet(args: [BoundInlet]): void
     lsl_destroy_inlet(args: any): void
     lsl_local_clock(args: []): number

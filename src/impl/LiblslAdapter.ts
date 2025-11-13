@@ -1,4 +1,4 @@
-import { DataType, define, open } from 'ffi-rs'
+import { createPointer, DataType, define, load, open } from 'ffi-rs'
 
 import {
     Liblsl,
@@ -18,6 +18,7 @@ import {
 export default class LiblslAdapter implements Liblsl {
     public static open = open
     public static define = define
+    public static load = load
 
     private static instance?: Liblsl
 
@@ -154,15 +155,44 @@ export default class LiblslAdapter implements Liblsl {
             errcode,
         } = options
 
-        return this.bindings.lsl_pull_chunk_f([
-            inlet,
-            dataBuffer,
-            timestampBuffer,
-            dataBufferElements,
-            timestampBufferElements,
-            timeout,
-            errcode,
-        ])
+        const dataPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [dataBuffer],
+        })[0]
+
+        const timestampPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [timestampBuffer],
+        })[0]
+
+        const errcodePtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [errcode],
+        })[0]
+
+        return this.load({
+            library: 'lsl',
+            funcName: 'lsl_pull_chunk_f',
+            retType: DataType.Double,
+            paramsType: [
+                DataType.External,
+                DataType.External,
+                DataType.External,
+                DataType.I32,
+                DataType.I32,
+                DataType.Double,
+                DataType.External,
+            ],
+            paramsValue: [
+                inlet,
+                dataPtr,
+                timestampPtr,
+                dataBufferElements,
+                timestampBufferElements,
+                timeout,
+                errcodePtr,
+            ],
+        })
     }
 
     public flushInlet(options: FlushInletOptions) {
@@ -185,6 +215,10 @@ export default class LiblslAdapter implements Liblsl {
 
     private get define() {
         return LiblslAdapter.define
+    }
+
+    private get load() {
+        return LiblslAdapter.load
     }
 
     private get liblslFuncs() {
@@ -233,20 +267,6 @@ export default class LiblslAdapter implements Liblsl {
                 library: 'lsl',
                 retType: DataType.External,
                 paramsType: [DataType.External, DataType.I32, DataType.I32],
-            },
-            lsl_pull_chunk_f: {
-                library: 'lsl',
-                retType: DataType.Double,
-                paramsType: [
-                    DataType.External,
-                    DataType.FloatArray,
-                    DataType.DoubleArray,
-                    DataType.I32Array,
-                    DataType.I32,
-                    DataType.I32,
-                    DataType.Double,
-                    DataType.External,
-                ],
             },
             lsl_flush_inlet: {
                 library: 'lsl',

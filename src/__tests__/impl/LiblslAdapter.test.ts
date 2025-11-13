@@ -1,6 +1,6 @@
 import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
-import { DataType, OpenParams } from 'ffi-rs'
+import { createPointer, DataType, OpenParams } from 'ffi-rs'
 
 import LiblslAdapter from '../../impl/LiblslAdapter.js'
 import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
@@ -32,7 +32,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static createOutletParams?: any[]
     private static destroyOutletParams?: any[]
     private static createInletParams?: any[]
-    private static pullChunkParams?: any[]
     private static flushInletParams?: any[]
     private static destroyInletParams?: any[]
     private static localClockParams?: any[]
@@ -45,6 +44,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static appendChildHitCount: number
     private static ffiRsOpenOptions?: OpenParams
     private static ffiRsDefineOptions: FfiRsDefineOptions
+    private static ffiRsLoadOptions?: Record<string, any>
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -85,6 +85,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 throw new Error('Failed to create bindings!')
             }
             return this.fakeBindings as any
+        }
+
+        LiblslAdapter.load = (options) => {
+            this.ffiRsLoadOptions = options
+            return {} as any
         }
 
         LiblslAdapter.resetInstance()
@@ -183,20 +188,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 library: 'lsl',
                 retType: DataType.External,
                 paramsType: [DataType.External, DataType.I32, DataType.I32],
-            },
-            lsl_pull_chunk_f: {
-                library: 'lsl',
-                retType: DataType.Double,
-                paramsType: [
-                    DataType.External,
-                    DataType.FloatArray,
-                    DataType.DoubleArray,
-                    DataType.I32Array,
-                    DataType.I32,
-                    DataType.I32,
-                    DataType.Double,
-                    DataType.External,
-                ],
             },
             lsl_flush_inlet: {
                 library: 'lsl',
@@ -393,21 +384,63 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     protected static async pullChunkCallsBinding() {
         const { inlet } = this.createRandomInlet()
 
-        const options = {
-            inlet,
-            dataBuffer: Buffer.alloc(0),
-            timestampBuffer: Buffer.alloc(0),
-            dataBufferElements: 0,
-            timestampBufferElements: 0,
-            timeout: 0.0,
-            errcode: 0,
-        }
+        const dataBuffer = Buffer.alloc(0)
+        const timestampBuffer = Buffer.alloc(0)
+        const dataBufferElements = 0
+        const timestampBufferElements = 0
+        const timeout = 0.0
+        const errcode = new Int32Array(1)
 
-        this.instance.pullChunk(options)
+        this.instance.pullChunk({
+            inlet,
+            dataBuffer,
+            timestampBuffer,
+            dataBufferElements,
+            timestampBufferElements,
+            timeout,
+            errcode,
+        })
+
+        const dataPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [dataBuffer],
+        })[0]
+
+        const timestampPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [timestampBuffer],
+        })[0]
+
+        const errcodePtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [errcode],
+        })[0]
 
         assert.isEqualDeep(
-            this.pullChunkParams,
-            Object.values(options),
+            this.ffiRsLoadOptions,
+            {
+                library: 'lsl',
+                funcName: 'lsl_pull_chunk_f',
+                retType: DataType.Double,
+                paramsType: [
+                    DataType.External,
+                    DataType.External,
+                    DataType.External,
+                    DataType.I32,
+                    DataType.I32,
+                    DataType.Double,
+                    DataType.External,
+                ],
+                paramsValue: [
+                    inlet,
+                    dataPtr,
+                    timestampPtr,
+                    dataBufferElements,
+                    timestampBufferElements,
+                    timeout,
+                    errcodePtr,
+                ],
+            },
             'Should have called pullChunk with expected params!'
         )
     }
@@ -509,10 +542,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             lsl_create_inlet: (params: any[]) => {
                 this.createInletParams = params
                 return this.fakeInlet
-            },
-            lsl_pull_chunk_f: (params: any[]) => {
-                this.pullChunkParams = params
-                return 0
             },
             lsl_flush_inlet: (params: any[]) => {
                 this.flushInletParams = params
