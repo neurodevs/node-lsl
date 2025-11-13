@@ -81,8 +81,8 @@ export interface CreateInletOptions {
 
 export interface PullChunkOptions {
     inlet: BoundInlet
-    dataBuffer: number[]
-    timestampBuffer: number[]
+    dataBuffer: Buffer<ArrayBuffer>
+    timestampBuffer: Buffer<ArrayBuffer>
     dataBufferElements: number
     timestampBufferElements: number
     timeout: number

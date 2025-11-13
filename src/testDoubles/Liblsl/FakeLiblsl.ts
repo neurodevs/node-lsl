@@ -15,6 +15,19 @@ import {
 } from '../../types.js'
 
 export default class FakeLiblsl implements Liblsl {
+    public static fakeChunks: Float32Array[] = [
+        new Float32Array([1, 2, 3, 4, 5, 6]),
+        new Float32Array([1, 2, 3, 4, 5, 6]),
+    ]
+
+    public static fakeTimestamps: Float64Array[] = [
+        new Float64Array([7, 8]),
+        new Float64Array([7, 8]),
+    ]
+
+    public fakeChunks = FakeLiblsl.fakeChunks.slice()
+    public fakeTimestamps = FakeLiblsl.fakeTimestamps.slice()
+
     public outlet: BoundOutlet = {} as BoundOutlet
     public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
 
@@ -78,6 +91,30 @@ export default class FakeLiblsl implements Liblsl {
 
     public pullChunk(options: PullChunkOptions) {
         this.lastPullChunkOptions = options
+
+        const { dataBuffer, timestampBuffer } = options
+
+        const chunk = this.fakeChunks.shift()
+        const timestamps = this.fakeTimestamps.shift()
+
+        if (chunk && timestamps) {
+            const dataView = new Float32Array(
+                dataBuffer.buffer,
+                dataBuffer.byteOffset,
+                dataBuffer.byteLength / 4
+            )
+            dataView.set(chunk)
+
+            const timestampView = new Float64Array(
+                timestampBuffer.buffer,
+                timestampBuffer.byteOffset,
+                timestampBuffer.byteLength / 8
+            )
+            timestampView.set(timestamps)
+
+            return 1
+        }
+
         return 0
     }
 
@@ -107,5 +144,8 @@ export default class FakeLiblsl implements Liblsl {
         this.destroyOutletHitCount = 0
         this.localClockHitCount = 0
         this.pushSampleStringTimestampHitCount = 0
+
+        this.fakeChunks = FakeLiblsl.fakeChunks.slice()
+        this.fakeTimestamps = FakeLiblsl.fakeTimestamps.slice()
     }
 }

@@ -2,6 +2,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 import LslStreamInlet, {
     StreamInletOptions,
 } from '../../impl/LslStreamInlet.js'
+import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
 import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
@@ -9,11 +10,18 @@ import AbstractPackageTest from '../AbstractPackageTest.js'
 export default class LslStreamInletTest extends AbstractPackageTest {
     private static instance: SpyStreamInlet
 
+    private static callsToOnChunk: {
+        chunk: Float32Array
+        timestamps: Float64Array
+    }[]
+
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setSpyStreamInlet()
         this.setFakeStreamInfo()
+
+        this.callsToOnChunk = []
 
         this.instance = this.LslStreamInlet()
     }
@@ -97,16 +105,45 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     @test()
     protected static async startPullingSetsIsRunningToTrue() {
         this.startPulling()
+        await this.wait(10)
 
         assert.isTrue(this.isRunning, 'isRunning should be true!')
+
+        this.stopPulling()
     }
 
     @test()
     protected static async stopPullingSetsIsRunningToFalse() {
         this.startPulling()
+        await this.wait(10)
         this.stopPulling()
 
         assert.isFalse(this.isRunning, 'isRunning should be false!')
+    }
+
+    @test()
+    protected static async callsOnChunkForAvailableChunks() {
+        const expected = [
+            {
+                chunk: FakeLiblsl.fakeChunks[0],
+                timestamps: FakeLiblsl.fakeTimestamps[0],
+            },
+            {
+                chunk: FakeLiblsl.fakeChunks[1],
+                timestamps: FakeLiblsl.fakeTimestamps[1],
+            },
+        ]
+
+        this.startPulling()
+        await this.wait(1)
+
+        assert.isEqualDeep(
+            this.callsToOnChunk,
+            expected,
+            'Did not call onChunk as expected!'
+        )
+
+        this.stopPulling()
     }
 
     private static startPulling() {
@@ -125,18 +162,27 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         return this.instance.getBoundInlet()
     }
 
+    private static onChunk = (
+        chunk: Float32Array,
+        timestamps: Float64Array
+    ) => {
+        this.callsToOnChunk.push({ chunk, timestamps })
+    }
+
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
         const defaultOptions = {
+            sampleRate: 0,
             channelNames: this.channelNames,
             channelFormat: 'float32',
-            sampleRate: 0,
+            chunkSize: this.chunkSize,
+            maxBuffered: this.maxBuffered,
+            onChunk: this.onChunk,
             name: this.name_,
             type: this.type,
             sourceId: this.sourceId,
-            chunkSize: this.chunkSize,
-            maxBuffered: this.maxBuffered,
             ...options,
         } as StreamInletOptions
+
         return LslStreamInlet.Create(defaultOptions) as SpyStreamInlet
     }
 }

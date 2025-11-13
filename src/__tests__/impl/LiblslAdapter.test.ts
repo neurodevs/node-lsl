@@ -395,8 +395,8 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
         const options = {
             inlet,
-            dataBuffer: [],
-            timestampBuffer: [],
+            dataBuffer: Buffer.alloc(0),
+            timestampBuffer: Buffer.alloc(0),
             dataBufferElements: 0,
             timestampBufferElements: 0,
             timeout: 0.0,
