@@ -100,18 +100,9 @@ export default class FakeLiblsl implements Liblsl {
     public pullSample(options: PullSampleOptions) {
         this.lastPullSampleOptions = options
 
-        const { dataBuffer } = options
-
         const sample = this.fakeSamples.shift()
 
         if (sample) {
-            const dataView = new Float32Array(
-                dataBuffer.buffer,
-                dataBuffer.byteOffset,
-                dataBuffer.byteLength / 4
-            )
-            dataView.set(sample)
-
             return 1
         }
 
@@ -121,26 +112,10 @@ export default class FakeLiblsl implements Liblsl {
     public pullChunk(options: PullChunkOptions) {
         this.lastPullChunkOptions = options
 
-        const { dataBuffer, timestampBuffer } = options
-
         const chunk = this.fakeChunks.shift()
         const timestamps = this.fakeTimestamps.shift()
 
         if (chunk && timestamps) {
-            const dataView = new Float32Array(
-                dataBuffer.buffer,
-                dataBuffer.byteOffset,
-                dataBuffer.byteLength / 4
-            )
-            dataView.set(chunk)
-
-            const timestampView = new Float64Array(
-                timestampBuffer.buffer,
-                timestampBuffer.byteOffset,
-                timestampBuffer.byteLength / 8
-            )
-            timestampView.set(timestamps)
-
             return 1
         }
 

@@ -1,4 +1,4 @@
-import { createPointer, DataType, define, load, open } from 'ffi-rs'
+import { DataType, define, load, open } from 'ffi-rs'
 
 import {
     Liblsl,
@@ -146,18 +146,13 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public pullSample(options: PullSampleOptions) {
-        const { inlet, dataBuffer, dataBufferElements, timeout, errcode } =
-            options
-
-        const dataPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [dataBuffer],
-        })[0]
-
-        const errcodePtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [errcode],
-        })[0]
+        const {
+            inlet,
+            dataBufferPtr,
+            dataBufferElements,
+            timeout,
+            errcodePtr,
+        } = options
 
         return this.load({
             library: 'lsl',
@@ -172,7 +167,7 @@ export default class LiblslAdapter implements Liblsl {
             ],
             paramsValue: [
                 inlet,
-                dataPtr,
+                dataBufferPtr,
                 dataBufferElements,
                 timeout,
                 errcodePtr,
@@ -183,28 +178,13 @@ export default class LiblslAdapter implements Liblsl {
     public pullChunk(options: PullChunkOptions) {
         const {
             inlet,
-            dataBuffer,
-            timestampBuffer,
+            dataBufferPtr,
+            timestampBufferPtr,
             dataBufferElements,
             timestampBufferElements,
             timeout,
-            errcode,
+            errcodePtr,
         } = options
-
-        const dataPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [dataBuffer],
-        })[0]
-
-        const timestampPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [timestampBuffer],
-        })[0]
-
-        const errcodePtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [errcode],
-        })[0]
 
         return this.load({
             library: 'lsl',
@@ -221,8 +201,8 @@ export default class LiblslAdapter implements Liblsl {
             ],
             paramsValue: [
                 inlet,
-                dataPtr,
-                timestampPtr,
+                dataBufferPtr,
+                timestampBufferPtr,
                 dataBufferElements,
                 timestampBufferElements,
                 timeout,

@@ -387,25 +387,24 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const dataBuffer = Buffer.alloc(0)
         const dataBufferElements = 0
         const timeout = 0.0
-        const errcode = new Int32Array(1)
 
-        this.instance.pullSample({
-            inlet,
-            dataBuffer,
-            dataBufferElements,
-            timeout,
-            errcode,
-        })
-
-        const dataPtr = createPointer({
+        const dataBufferPtr = createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [dataBuffer],
         })[0]
 
         const errcodePtr = createPointer({
             paramsType: [DataType.U8Array],
-            paramsValue: [errcode],
+            paramsValue: [new Int32Array(1)],
         })[0]
+
+        this.instance.pullSample({
+            inlet,
+            dataBufferPtr,
+            dataBufferElements,
+            timeout,
+            errcodePtr,
+        })
 
         assert.isEqualDeep(
             this.ffiRsLoadOptions,
@@ -422,7 +421,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 ],
                 paramsValue: [
                     inlet,
-                    dataPtr,
+                    dataBufferPtr,
                     dataBufferElements,
                     timeout,
                     errcodePtr,
@@ -441,32 +440,31 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const dataBufferElements = 0
         const timestampBufferElements = 0
         const timeout = 0.0
-        const errcode = new Int32Array(1)
 
-        this.instance.pullChunk({
-            inlet,
-            dataBuffer,
-            timestampBuffer,
-            dataBufferElements,
-            timestampBufferElements,
-            timeout,
-            errcode,
-        })
-
-        const dataPtr = createPointer({
+        const dataBufferPtr = createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [dataBuffer],
         })[0]
 
-        const timestampPtr = createPointer({
+        const timestampBufferPtr = createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [timestampBuffer],
         })[0]
 
         const errcodePtr = createPointer({
             paramsType: [DataType.U8Array],
-            paramsValue: [errcode],
+            paramsValue: [new Int32Array(1)],
         })[0]
+
+        this.instance.pullChunk({
+            inlet,
+            dataBufferPtr,
+            timestampBufferPtr,
+            dataBufferElements,
+            timestampBufferElements,
+            timeout,
+            errcodePtr,
+        })
 
         assert.isEqualDeep(
             this.ffiRsLoadOptions,
@@ -485,8 +483,8 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 ],
                 paramsValue: [
                     inlet,
-                    dataPtr,
-                    timestampPtr,
+                    dataBufferPtr,
+                    timestampBufferPtr,
                     dataBufferElements,
                     timestampBufferElements,
                     timeout,

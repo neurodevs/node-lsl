@@ -2,7 +2,6 @@ import { test, assert } from '@neurodevs/node-tdd'
 import LslStreamInlet, {
     StreamInletOptions,
 } from '../../impl/LslStreamInlet.js'
-import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
 import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
@@ -114,57 +113,45 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async stopPullingSetsIsRunningToFalse() {
-        this.startPulling()
-        await this.wait(10)
-        this.stopPulling()
+        await this.startThenStop()
 
         assert.isFalse(this.isRunning, 'isRunning should be false!')
     }
 
     @test()
     protected static async callsOnChunkForAvailableChunks() {
-        const expected = [
-            {
-                chunk: FakeLiblsl.fakeChunks[0],
-                timestamps: FakeLiblsl.fakeTimestamps[0],
-            },
-            {
-                chunk: FakeLiblsl.fakeChunks[1],
-                timestamps: FakeLiblsl.fakeTimestamps[1],
-            },
-        ]
+        await this.startThenStop()
 
-        this.startPulling()
-        await this.wait(10)
-
-        assert.isEqualDeep(
-            this.callsToOnChunk,
-            expected,
+        assert.isEqual(
+            this.callsToOnChunk.length,
+            2,
             'Did not call onChunk as expected!'
         )
-
-        this.stopPulling()
     }
 
     @test()
     protected static async callsPullSampleIfChunkSizeIsOne() {
         const inlet = this.LslStreamInlet({ chunkSize: 1 })
-
-        inlet.startPulling()
-        await this.wait(10)
-        inlet.stopPulling()
+        await this.startThenStop(inlet)
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastPullSampleOptions,
             {
                 inlet: this.boundInlet,
-                dataBuffer: inlet['dataBuffer'],
+                dataBufferPtr: inlet['dataBufferPtr'],
                 dataBufferElements: this.channelCount,
                 timeout: 1.0,
-                errcode: new Int32Array(1),
+                errcodePtr: inlet['errcodePtr'],
             },
             'Should have called pullSample!'
         )
+    }
+
+    private static async startThenStop(inlet?: SpyStreamInlet) {
+        const instance = inlet || this.instance
+        instance.startPulling()
+        await this.wait(10)
+        instance.stopPulling()
     }
 
     private static startPulling() {

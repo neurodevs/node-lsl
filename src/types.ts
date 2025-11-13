@@ -1,4 +1,4 @@
-import { FuncObj, FieldType } from 'ffi-rs'
+import { FuncObj, FieldType, JsExternal } from 'ffi-rs'
 
 import { CHANNEL_FORMATS } from './consts.js'
 import { StreamInlet } from './impl/LslStreamInlet.js'
@@ -82,20 +82,20 @@ export interface CreateInletOptions {
 
 export interface PullSampleOptions {
     inlet: BoundInlet
-    dataBuffer: Buffer<ArrayBuffer>
+    dataBufferPtr: JsExternal
     dataBufferElements: number
     timeout: number
-    errcode: Int32Array
+    errcodePtr: JsExternal
 }
 
 export interface PullChunkOptions {
     inlet: BoundInlet
-    dataBuffer: Buffer<ArrayBuffer>
-    timestampBuffer: Buffer<ArrayBuffer>
+    dataBufferPtr: JsExternal
+    timestampBufferPtr: JsExternal
     dataBufferElements: number
     timestampBufferElements: number
     timeout: number
-    errcode: Int32Array
+    errcodePtr: JsExternal
 }
 
 export interface FlushInletOptions {

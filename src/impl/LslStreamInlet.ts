@@ -1,5 +1,6 @@
 import generateId from '@neurodevs/generate-id'
 
+import { createPointer, DataType, JsExternal } from 'ffi-rs'
 import { BoundInlet, ChannelFormat } from '../types.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import LslStreamInfo, {
@@ -26,6 +27,9 @@ export default class LslStreamInlet implements StreamInlet {
 
     private dataBuffer!: Buffer<ArrayBuffer>
     private timestampBuffer!: Buffer<ArrayBuffer>
+    private dataBufferPtr!: JsExternal
+    private timestampBufferPtr!: JsExternal
+    private errcodePtr!: JsExternal
 
     private readonly defaultName = `lsl-inlet-${generateId()}`
 
@@ -72,20 +76,41 @@ export default class LslStreamInlet implements StreamInlet {
     public startPulling() {
         this.isRunning = true
 
-        this.dataBuffer = this.createDataBuffer()
-        this.timestampBuffer = this.createTimestampBuffer()
+        this.createDataBuffer()
+        this.createTimestampBuffer()
+        this.createPointers()
 
         void this.pullOnLoop()
     }
 
     private createDataBuffer() {
         const bytesPerFloat = 4
-        return Buffer.alloc(bytesPerFloat * this.chunkSize * this.channelCount)
+
+        this.dataBuffer = Buffer.alloc(
+            bytesPerFloat * this.chunkSize * this.channelCount
+        )
     }
 
     private createTimestampBuffer() {
         const bytesPerDouble = 8
-        return Buffer.alloc(bytesPerDouble * this.chunkSize)
+        this.timestampBuffer = Buffer.alloc(bytesPerDouble * this.chunkSize)
+    }
+
+    private createPointers() {
+        this.dataBufferPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.dataBuffer],
+        })[0]
+
+        this.timestampBufferPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.timestampBuffer],
+        })[0]
+
+        this.errcodePtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [new Int32Array(1)],
+        })[0]
     }
 
     private async pullOnLoop() {
@@ -107,10 +132,10 @@ export default class LslStreamInlet implements StreamInlet {
     private pullSample() {
         this.lsl.pullSample({
             inlet: this.inlet,
-            dataBuffer: this.dataBuffer,
+            dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
             timeout: 1.0,
-            errcode: new Int32Array(1),
+            errcodePtr: this.errcodePtr,
         })
 
         return { samples: undefined, timestamps: undefined }
@@ -119,12 +144,12 @@ export default class LslStreamInlet implements StreamInlet {
     private pullChunk() {
         const firstTimestamp = this.lsl.pullChunk({
             inlet: this.inlet,
-            dataBuffer: this.dataBuffer,
-            timestampBuffer: this.timestampBuffer,
+            dataBufferPtr: this.dataBufferPtr,
+            timestampBufferPtr: this.timestampBufferPtr,
             dataBufferElements: this.chunkSize * this.channelCount,
             timestampBufferElements: this.chunkSize,
             timeout: 1.0,
-            errcode: new Int32Array(1),
+            errcodePtr: this.errcodePtr,
         })
 
         if (firstTimestamp) {

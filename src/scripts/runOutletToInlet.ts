@@ -1,6 +1,7 @@
 import LslStreamInlet from '../impl/LslStreamInlet.js'
 import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 
+console.log('Creating outlet...')
 const outlet = await LslStreamOutlet.Create({
     name: 'TestOutlet',
     type: 'TEST',
@@ -14,6 +15,7 @@ const outlet = await LslStreamOutlet.Create({
     manufacturer: 'test',
 })
 
+console.log('Creating inlet...')
 const inlet = LslStreamInlet.Create({
     name: 'TestOutlet',
     type: 'TEST',
@@ -28,12 +30,16 @@ const inlet = LslStreamInlet.Create({
     },
 })
 
+console.log('Start pulling...')
 inlet.startPulling()
 
+console.log('Waiting for 100 ms...')
 await new Promise((resolve) => setTimeout(resolve, 100))
 
+console.log('Pushing samples...')
 for (let i = 0; i < 1000; i++) {
     const sample = [i, i, i]
+    console.log('\t', sample)
     outlet.pushSample(sample)
     await new Promise((resolve) => setTimeout(resolve, 10))
 }
