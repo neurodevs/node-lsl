@@ -3,13 +3,13 @@ import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 
 const outlet = await LslStreamOutlet.Create({
     name: 'TestOutlet',
-    channelNames: ['Ch1', 'Ch2', 'Ch3'],
-    sampleRate: 100,
-    channelFormat: 'float32',
+    type: 'TEST',
     sourceId: 'TestOutletID',
+    sampleRate: 100,
+    channelNames: ['Ch1', 'Ch2', 'Ch3'],
+    channelFormat: 'float32',
     chunkSize: 1,
     maxBuffered: 360,
-    type: 'TEST',
     unit: 'test',
     manufacturer: 'test',
 })
@@ -18,8 +18,8 @@ const inlet = LslStreamInlet.Create({
     name: 'TestOutlet',
     type: 'TEST',
     sourceId: 'TestOutletID',
-    channelNames: ['Ch1', 'Ch2', 'Ch3'],
     sampleRate: 100,
+    channelNames: ['Ch1', 'Ch2', 'Ch3'],
     channelFormat: 'float32',
     chunkSize: 1,
     maxBuffered: 360,
