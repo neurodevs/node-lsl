@@ -151,7 +151,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
                 dataBufferPtr: inlet['dataBufferPtr'],
                 dataBufferElements: this.channelCount,
                 timeout: 0,
-                errcodePtr: inlet['errcodePtr'],
+                errcodePtr: inlet['errorCodeBufferPtr'],
             },
             'Should have called pullSample!'
         )
@@ -170,7 +170,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
                 dataBufferElements: this.chunkSize * this.channelCount,
                 timestampBufferElements: this.chunkSize,
                 timeout: 0,
-                errcodePtr: this.instance['errcodePtr'],
+                errcodePtr: this.instance['errorCodeBufferPtr'],
             },
             'Should have called pullChunk!'
         )
