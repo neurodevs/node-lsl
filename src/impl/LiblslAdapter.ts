@@ -1,4 +1,4 @@
-import { DataType, define, load, open } from 'ffi-rs'
+import { DataType, define, load, open, unwrapPointer } from 'ffi-rs'
 
 import {
     Liblsl,
@@ -167,10 +167,10 @@ export default class LiblslAdapter implements Liblsl {
             ],
             paramsValue: [
                 inlet,
-                dataBufferPtr,
+                unwrapPointer([dataBufferPtr])[0],
                 dataBufferElements,
                 timeout,
-                errcodePtr,
+                unwrapPointer([errcodePtr])[0],
             ],
         })
     }
@@ -201,12 +201,12 @@ export default class LiblslAdapter implements Liblsl {
             ],
             paramsValue: [
                 inlet,
-                dataBufferPtr,
-                timestampBufferPtr,
+                unwrapPointer([dataBufferPtr])[0],
+                unwrapPointer([timestampBufferPtr])[0],
                 dataBufferElements,
                 timestampBufferElements,
                 timeout,
-                errcodePtr,
+                unwrapPointer([errcodePtr])[0],
             ],
         })
     }
