@@ -37,9 +37,19 @@ console.log('Waiting for 100 ms...')
 await new Promise((resolve) => setTimeout(resolve, 100))
 
 console.log('Pushing samples...')
-for (let i = 0; i < 1000; i++) {
+for (let i = 0; i < 300; i++) {
     const sample = [i, i, i]
     console.log('\t', sample)
     outlet.pushSample(sample)
     await new Promise((resolve) => setTimeout(resolve, 10))
+}
+
+await new Promise((resolve) => setTimeout(resolve, 1000))
+
+console.log('Pushing more samples...')
+for (let i = 0; i < 30; i++) {
+    const sample = [i, i, i]
+    console.log('\t', sample)
+    outlet.pushSample(sample)
+    await new Promise((resolve) => setTimeout(resolve, 100))
 }
