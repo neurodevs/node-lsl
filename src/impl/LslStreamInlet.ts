@@ -130,13 +130,25 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private pullSample() {
-        this.lsl.pullSample({
+        const timestamp = this.lsl.pullSample({
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
             timeout: 0,
             errcodePtr: this.errcodePtr,
         })
+
+        if (timestamp) {
+            const samples = new Float32Array(
+                this.dataBuffer.buffer,
+                this.dataBuffer.byteOffset,
+                this.chunkSize * this.channelCount
+            )
+
+            const timestamps = new Float64Array([timestamp])
+
+            return { samples, timestamps }
+        }
 
         return { samples: undefined, timestamps: undefined }
     }

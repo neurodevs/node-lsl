@@ -119,7 +119,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async callsOnChunkForAvailableChunks() {
+    protected static async callsOnChunkForChunkSizeNotOne() {
         await this.startThenStop()
 
         assert.isEqual(
@@ -130,9 +130,19 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async callsOnChunkForChunkSizeOne() {
+        await this.runChunkSizeOne()
+
+        assert.isEqual(
+            this.callsToOnChunk.length,
+            2,
+            'Did not call onChunk as expected!'
+        )
+    }
+
+    @test()
     protected static async callsPullSampleIfChunkSizeIsOne() {
-        const inlet = this.LslStreamInlet({ chunkSize: 1 })
-        await this.startThenStop(inlet)
+        const inlet = await this.runChunkSizeOne()
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastPullSampleOptions,
@@ -164,6 +174,12 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             },
             'Should have called pullChunk!'
         )
+    }
+
+    private static async runChunkSizeOne() {
+        const inlet = this.LslStreamInlet({ chunkSize: 1 })
+        await this.startThenStop(inlet)
+        return inlet
     }
 
     private static async startThenStop(inlet?: SpyStreamInlet) {
