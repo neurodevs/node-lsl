@@ -10,7 +10,6 @@ const outlet = await LslStreamOutlet.Create({
     channelNames: ['Ch1', 'Ch2', 'Ch3'],
     channelFormat: 'float32',
     chunkSize: 1,
-    maxBufferedMs: 360,
     unit: 'test',
     manufacturer: 'test',
 })
@@ -24,7 +23,6 @@ const inlet = LslStreamInlet.Create({
     channelNames: ['Ch1', 'Ch2', 'Ch3'],
     channelFormat: 'float32',
     chunkSize: 1,
-    maxBufferedMs: 360,
     onData: (samples, timestamps) => {
         console.log('Received samples:', samples, 'at timestamps:', timestamps)
     },
