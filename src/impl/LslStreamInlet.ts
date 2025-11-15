@@ -144,19 +144,17 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private async pullOnLoop() {
-        if (!this.isRunning || !this.onData) {
-            return
+        if (this.isRunning) {
+            const { samples, timestamps } = this.pullDataMethod()
+
+            if (samples && timestamps) {
+                this.onData(samples, timestamps)
+            }
+
+            setImmediate(() => {
+                void this.pullOnLoop()
+            })
         }
-
-        const { samples, timestamps } = this.pullDataMethod()
-
-        if (samples && timestamps) {
-            this.onData(samples, timestamps)
-        }
-
-        setImmediate(() => {
-            void this.pullOnLoop()
-        })
     }
 
     private pullSample() {
