@@ -208,6 +208,20 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async defaultsMaxBufferedToSixMinutesInSeconds() {
+        await this.runInletWithOptions({
+            maxBuffered: undefined,
+        })
+
+        const sixMinutesInSeconds = 360
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastCreateInletOptions?.maxBuffered,
+            sixMinutesInSeconds
+        )
+    }
+
     private static async runChunkSizeOne() {
         return await this.runInletWithOptions({
             chunkSize: 1,

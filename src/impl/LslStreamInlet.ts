@@ -41,6 +41,7 @@ export default class LslStreamInlet implements StreamInlet {
     private errorCodeBufferPtr!: JsExternal
 
     private readonly defaultName = `lsl-inlet-${generateId()}`
+    private readonly sixMinutesInSeconds = 360
 
     protected constructor(info: StreamInfo, options: StreamInletOptions) {
         const {
@@ -57,7 +58,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.channelNames = channelNames
         this.channelCount = this.channelNames.length
         this.chunkSize = chunkSize
-        this.maxBuffered = maxBuffered
+        this.maxBuffered = maxBuffered ?? this.sixMinutesInSeconds
         this.onData = onData
         this.timeoutMs = timeoutMs
 
@@ -268,11 +269,11 @@ export interface StreamInletOptions {
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number
-    maxBuffered: number
     onData: (
         samples: Float32Array,
         timestamps: Float64Array
     ) => void | Promise<void>
+    maxBuffered?: number
     timeoutMs?: number
     name?: string
     type?: string
