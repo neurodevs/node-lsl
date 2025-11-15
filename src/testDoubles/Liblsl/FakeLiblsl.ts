@@ -1,3 +1,5 @@
+import generateId from '@neurodevs/generate-id'
+
 import {
     BoundOutlet,
     BoundStreamInfo,
@@ -30,6 +32,8 @@ export default class FakeLiblsl implements Liblsl {
         new Float64Array([7, 8]),
         new Float64Array([7, 8]),
     ]
+
+    public liblslPath: string = generateId()
 
     public fakeSamples = FakeLiblsl.fakeSamples.slice()
     public fakeChunks = FakeLiblsl.fakeChunks.slice()

@@ -74,7 +74,9 @@ export default class LslStreamOutlet implements StreamOutlet {
     private setPushSampleType() {
         this.validateChannelFormat()
 
-        this.pushSampleByType = this.lsl[this.pushMethod].bind(this.lsl)
+        this.pushSampleByType = (
+            this.lsl[this.pushMethod] as (options: unknown) => void
+        ).bind(this.lsl)
     }
 
     private validateChannelFormat() {

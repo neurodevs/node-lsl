@@ -1,6 +1,7 @@
 import generateId from '@neurodevs/generate-id'
-
 import { createPointer, DataType, JsExternal, unwrapPointer } from 'ffi-rs'
+
+import handleError from '../handleError.js'
 import { BoundInlet, ChannelFormat, Liblsl } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import LslStreamInfo, {
@@ -211,7 +212,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private callPullChunkBinding() {
-        return this.lsl.pullChunk({
+        const firstTimestamp = this.lsl.pullChunk({
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
             timestampBufferPtr: this.timestampBufferPtr,
@@ -220,6 +221,13 @@ export default class LslStreamInlet implements StreamInlet {
             timeout: this.timeoutMs / 1000,
             errcodePtr: this.errorCodeBufferPtr,
         })
+        this.handleErrorCodeIfPresent()
+
+        return firstTimestamp
+    }
+
+    private handleErrorCodeIfPresent() {
+        handleError(this.errorCodeBuffer.readInt32LE(0))
     }
 
     private convertTimestampBufferToDoubleArray() {

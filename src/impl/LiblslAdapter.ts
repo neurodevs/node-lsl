@@ -9,13 +9,13 @@ export default class LiblslAdapter implements Liblsl {
 
     private static instance?: Liblsl
 
-    private path: string
+    public liblslPath: string
     private bindings!: LiblslBindings
 
     private readonly defaultMacOsPath = `/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib`
 
     protected constructor() {
-        this.path = process.env.LIBLSL_PATH! ?? this.defaultMacOsPath
+        this.liblslPath = process.env.LIBLSL_PATH! ?? this.defaultMacOsPath
         this.tryToLoadBindings()
     }
 
@@ -29,7 +29,7 @@ export default class LiblslAdapter implements Liblsl {
 
     private throwFailedToLoadLiblsl(error: Error) {
         throw new Error(
-            `Loading the liblsl dylib failed! I tried to load it from ${this.path}.\n\n${error.message}\n\n`
+            `Loading the liblsl dylib failed! I tried to load it from ${this.liblslPath}.\n\n${error.message}\n\n`
         )
     }
 
@@ -56,7 +56,7 @@ export default class LiblslAdapter implements Liblsl {
     private openLiblsl() {
         this.open({
             library: 'lsl',
-            path: this.path,
+            path: this.liblslPath,
         })
     }
 
@@ -317,7 +317,10 @@ export default class LiblslAdapter implements Liblsl {
         }
     }
 }
+
 export interface Liblsl {
+    liblslPath: string
+
     createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 
