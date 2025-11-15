@@ -269,10 +269,7 @@ export interface StreamInletOptions {
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number
-    onData: (
-        samples: Float32Array,
-        timestamps: Float64Array
-    ) => void | Promise<void>
+    onData: OnDataCallback
     maxBuffered?: number
     timeoutMs?: number
     name?: string
@@ -281,3 +278,8 @@ export interface StreamInletOptions {
     manufacturer?: string
     units?: string
 }
+
+export type OnDataCallback = (
+    samples: Float32Array,
+    timestamps: Float64Array
+) => void | Promise<void>
