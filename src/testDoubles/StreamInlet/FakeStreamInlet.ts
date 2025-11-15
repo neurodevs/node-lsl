@@ -9,7 +9,7 @@ export default class FakeStreamInlet implements StreamInlet {
 
     public static numCallsToStartPulling = 0
     public static numCallsToStopPulling = 0
-    public static numCallsToFlushSamples = 0
+    public static numCallsToFlushQueue = 0
     public static numCallsToDestroy = 0
 
     public isRunning = false
@@ -31,8 +31,8 @@ export default class FakeStreamInlet implements StreamInlet {
         this.isRunning = false
     }
 
-    public flushSamples() {
-        FakeStreamInlet.numCallsToFlushSamples++
+    public flushQueue() {
+        FakeStreamInlet.numCallsToFlushQueue++
     }
 
     public destroy() {
@@ -42,7 +42,7 @@ export default class FakeStreamInlet implements StreamInlet {
     public static resetTestDouble() {
         FakeStreamInlet.callsToConstructor = []
         FakeStreamInlet.numCallsToStartPulling = 0
-        FakeStreamInlet.numCallsToFlushSamples = 0
+        FakeStreamInlet.numCallsToFlushQueue = 0
         FakeStreamInlet.numCallsToDestroy = 0
     }
 }

@@ -218,7 +218,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.isRunning = false
     }
 
-    public flushSamples() {
+    public flushQueue() {
         this.lsl.flushInlet({ inlet: this.inlet })
     }
 
@@ -238,7 +238,7 @@ export default class LslStreamInlet implements StreamInlet {
 export interface StreamInlet {
     startPulling(): void
     stopPulling(): void
-    flushSamples(): void
+    flushQueue(): void
     destroy(): void
     isRunning: boolean
 }

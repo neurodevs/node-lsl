@@ -75,8 +75,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async flushSamplesCallsLslBinding() {
-        this.instance.flushSamples()
+    protected static async flushQueueCallsLslBinding() {
+        this.instance.flushQueue()
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastFlushInletOptions,
