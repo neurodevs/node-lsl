@@ -20,6 +20,7 @@ export default class LslStreamInlet implements StreamInlet {
     private chunkSize: number
     private maxBuffered: number
     private onData: (samples: Float32Array, timestamps: Float64Array) => void
+    private timeoutMs?: number
 
     private pullDataMethod: () => {
         samples: Float32Array | undefined
@@ -43,11 +44,12 @@ export default class LslStreamInlet implements StreamInlet {
 
     protected constructor(info: StreamInfo, options: StreamInletOptions) {
         const {
+            name = this.defaultName,
             channelNames,
             chunkSize,
             maxBuffered,
             onData,
-            name = this.defaultName,
+            timeoutMs,
         } = options ?? {}
 
         this.info = info
@@ -57,6 +59,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.chunkSize = chunkSize
         this.maxBuffered = maxBuffered
         this.onData = onData
+        this.timeoutMs = timeoutMs
 
         if (this.chunkSize === 1) {
             this.pullDataMethod = this.pullSample
@@ -181,7 +184,7 @@ export default class LslStreamInlet implements StreamInlet {
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
-            timeout: 0,
+            timeout: this.timeoutMs ? this.timeoutMs / 1000 : 0,
             errcodePtr: this.errorCodeBufferPtr,
         })
     }
@@ -270,6 +273,7 @@ export interface StreamInletOptions {
         samples: Float32Array,
         timestamps: Float64Array
     ) => void | Promise<void>
+    timeoutMs?: number
     name?: string
     type?: string
     sourceId?: string

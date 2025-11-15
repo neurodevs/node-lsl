@@ -176,8 +176,32 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async passesTimeoutMsOptionToPullSample() {
+        const timeoutMs = 1000 * Math.random()
+
+        await this.runInletWithOptions({
+            chunkSize: 1,
+            timeoutMs,
+        })
+
+        assert.isEqual(
+            this.fakeLiblsl.lastPullSampleOptions?.timeout,
+            timeoutMs / 1000,
+            'Did not pass timeoutMs!'
+        )
+    }
+
     private static async runChunkSizeOne() {
-        const inlet = this.LslStreamInlet({ chunkSize: 1 })
+        return await this.runInletWithOptions({
+            chunkSize: 1,
+        })
+    }
+
+    private static async runInletWithOptions(
+        options?: Partial<StreamInletOptions>
+    ) {
+        const inlet = this.LslStreamInlet(options)
         await this.startThenStop(inlet)
         return inlet
     }
