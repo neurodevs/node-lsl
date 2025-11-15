@@ -147,7 +147,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public get maxBufferedMs() {
-        return this.options.maxBufferedMs
+        return this.options.maxBufferedMs ?? 360 * 1000
     }
 
     public get manufacturer() {
@@ -203,8 +203,8 @@ export interface StreamOutletOptions {
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number
-    maxBufferedMs: number
     manufacturer: string
     unit: string
+    maxBufferedMs?: number
     waitAfterConstructionMs?: number
 }

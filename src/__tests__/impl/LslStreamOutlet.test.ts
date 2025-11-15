@@ -211,6 +211,17 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         assert.isAbove(endMs - startMs, 8)
     }
 
+    @test()
+    protected static async defaultsMaxBufferedMsToSixMinutesInSeconds() {
+        const outlet = await this.LslStreamOutlet({ maxBufferedMs: undefined })
+
+        assert.isEqualDeep(
+            outlet['maxBufferedMs'],
+            360 * 1000,
+            'Did not set maxBufferedMs as 6 minutes!'
+        )
+    }
+
     private static async assertThrowsWithEmptyChannelNames() {
         await this.createAndAssertThrows(
             'channelNames',
