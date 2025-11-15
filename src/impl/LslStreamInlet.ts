@@ -1,7 +1,7 @@
 import generateId from '@neurodevs/generate-id'
 
 import { createPointer, DataType, JsExternal, unwrapPointer } from 'ffi-rs'
-import { BoundInlet, ChannelFormat } from '../types.js'
+import { BoundInlet, ChannelFormat, Liblsl } from '../types.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import LslStreamInfo, {
     StreamInfo,
@@ -13,10 +13,10 @@ export default class LslStreamInlet implements StreamInlet {
 
     public isRunning = false
 
-    protected name: string
     protected info: StreamInfo
-    protected inlet!: BoundInlet
+    protected name: string
     private channelNames: string[]
+    private channelCount: number
     private chunkSize: number
     private maxBuffered: number
     private onData: (samples: Float32Array, timestamps: Float64Array) => void
@@ -25,6 +25,10 @@ export default class LslStreamInlet implements StreamInlet {
         samples: Float32Array | undefined
         timestamps: Float64Array | undefined
     }
+
+    private lsl: Liblsl
+
+    protected inlet!: BoundInlet
 
     private dataBuffer!: Buffer<ArrayBuffer>
     private dataBufferPtr!: JsExternal
@@ -47,11 +51,12 @@ export default class LslStreamInlet implements StreamInlet {
         } = options ?? {}
 
         this.info = info
+        this.name = name
         this.channelNames = channelNames
+        this.channelCount = this.channelNames.length
         this.chunkSize = chunkSize
         this.maxBuffered = maxBuffered
         this.onData = onData
-        this.name = name
 
         if (this.chunkSize === 1) {
             this.pullDataMethod = this.pullSample
@@ -59,7 +64,9 @@ export default class LslStreamInlet implements StreamInlet {
             this.pullDataMethod = this.pullChunk
         }
 
-        this.createStreamInlet()
+        this.lsl = this.getLiblslSingleton()
+
+        this.createBoundInlet()
     }
 
     public static Create(options: StreamInletOptions) {
@@ -69,7 +76,7 @@ export default class LslStreamInlet implements StreamInlet {
         return new (this.Class ?? this)(info, options)
     }
 
-    private createStreamInlet() {
+    private createBoundInlet() {
         this.inlet = this.lsl.createInlet({
             info: this.info.boundStreamInfo,
             chunkSize: this.chunkSize,
@@ -80,13 +87,13 @@ export default class LslStreamInlet implements StreamInlet {
     public startPulling() {
         this.isRunning = true
 
-        this.createBuffers()
-        this.createPointers()
+        this.createWriteableBuffers()
+        this.createPointersToBuffers()
 
         void this.pullOnLoop()
     }
 
-    private createBuffers() {
+    private createWriteableBuffers() {
         this.createDataBuffer()
         this.createTimestampBuffer()
         this.createErrorCodeBuffer()
@@ -110,7 +117,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.errorCodeBuffer = Buffer.alloc(bytesPerInt)
     }
 
-    private createPointers() {
+    private createPointersToBuffers() {
         this.createDataBufferPtr()
         this.createTimestampBufferPtr()
         this.createErrorCodeBufferPtr()
@@ -158,31 +165,49 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private pullSample() {
-        const timestamp = this.lsl.pullSample({
+        const timestamp = this.callPullSampleBinding()
+
+        if (timestamp) {
+            return {
+                samples: this.convertDataBufferToFloatArray(),
+                timestamps: new Float64Array([timestamp]),
+            }
+        }
+        return { samples: undefined, timestamps: undefined }
+    }
+
+    private callPullSampleBinding() {
+        return this.lsl.pullSample({
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
             timeout: 0,
             errcodePtr: this.errorCodeBufferPtr,
         })
+    }
 
-        if (timestamp) {
-            const samples = new Float32Array(
-                this.dataBuffer.buffer,
-                this.dataBuffer.byteOffset,
-                this.channelCount
-            )
-
-            const timestamps = new Float64Array([timestamp])
-
-            return { samples, timestamps }
-        }
-
-        return { samples: undefined, timestamps: undefined }
+    private convertDataBufferToFloatArray() {
+        return new Float32Array(
+            this.dataBuffer.buffer,
+            this.dataBuffer.byteOffset,
+            this.chunkSize * this.channelCount
+        )
     }
 
     private pullChunk() {
-        const firstTimestamp = this.lsl.pullChunk({
+        const firstTimestamp = this.callPullChunkBinding()
+
+        if (firstTimestamp) {
+            return {
+                samples: this.convertDataBufferToFloatArray(),
+                timestamps: this.convertTimestampBufferToDoubleArray(),
+            }
+        }
+        return { samples: undefined, timestamps: undefined }
+    }
+
+    private callPullChunkBinding() {
+        return this.lsl.pullChunk({
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
             timestampBufferPtr: this.timestampBufferPtr,
@@ -191,27 +216,14 @@ export default class LslStreamInlet implements StreamInlet {
             timeout: 0,
             errcodePtr: this.errorCodeBufferPtr,
         })
-
-        if (firstTimestamp) {
-            const samples = new Float32Array(
-                this.dataBuffer.buffer,
-                this.dataBuffer.byteOffset,
-                this.chunkSize * this.channelCount
-            )
-
-            const timestamps = new Float64Array(
-                this.timestampBuffer.buffer,
-                this.timestampBuffer.byteOffset,
-                this.chunkSize
-            )
-
-            return { samples, timestamps }
-        }
-        return { samples: undefined, timestamps: undefined }
     }
 
-    private get channelCount() {
-        return this.channelNames.length
+    private convertTimestampBufferToDoubleArray() {
+        return new Float64Array(
+            this.timestampBuffer.buffer,
+            this.timestampBuffer.byteOffset,
+            this.chunkSize
+        )
     }
 
     public stopPulling() {
@@ -226,7 +238,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.lsl.destroyInlet({ inlet: this.inlet })
     }
 
-    private get lsl() {
+    private getLiblslSingleton() {
         return LiblslAdapter.getInstance()
     }
 
@@ -254,7 +266,10 @@ export interface StreamInletOptions {
     channelFormat: ChannelFormat
     chunkSize: number
     maxBuffered: number
-    onData: (samples: Float32Array, timestamps: Float64Array) => void
+    onData: (
+        samples: Float32Array,
+        timestamps: Float64Array
+    ) => void | Promise<void>
     name?: string
     type?: string
     sourceId?: string
