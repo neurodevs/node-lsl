@@ -5,7 +5,7 @@ async function main() {
         name: 'Muse S (2nd gen)',
         type: 'EEG',
         channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
-        sampleRate: 256,
+        sampleRateHz: 256,
         channelFormat: 'float32',
         sourceId: 'muse-s-eeg',
         manufacturer: 'Interaxon Inc.',

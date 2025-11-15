@@ -20,7 +20,7 @@ export default class LslEventMarkerOutlet implements EventMarkerOutlet {
             name: 'Event markers',
             type: 'Markers',
             channelNames: ['Markers'],
-            sampleRate: 0,
+            sampleRateHz: 0,
             channelFormat: 'string',
             sourceId: 'event-markers',
             manufacturer: 'N/A',

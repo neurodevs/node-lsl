@@ -146,7 +146,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
             sourceId: this.generateId(),
             channelCount: this.channelNames.length,
             channelFormat: CHANNEL_FORMATS[randomChannelIdx],
-            sampleRate: 100 * Math.random(),
+            sampleRateHz: 100 * Math.random(),
         }
 
         this.LslStreamInfo(options)
@@ -187,7 +187,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         sourceId: this.generateId(),
         channelNames: this.channelNames,
         channelFormat: 'float32',
-        sampleRate: 100 * Math.random(),
+        sampleRateHz: 100 * Math.random(),
     } as StreamInfoOptions
 
     private static LslStreamInfo(options?: Partial<StreamInfoOptions>) {

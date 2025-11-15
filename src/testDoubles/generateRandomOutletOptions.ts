@@ -11,7 +11,7 @@ export default function generateRandomOutletOptions() {
         name: generateId(),
         type: generateId(),
         channelNames: new Array(randomInt(1, 10)).fill(generateId()),
-        sampleRate: Math.random() * 10,
+        sampleRateHz: Math.random() * 10,
         channelFormat: TEST_SUPPORTED_CHANNEL_FORMATS[randomChannelIdx],
         sourceId: generateId(),
         manufacturer: generateId(),

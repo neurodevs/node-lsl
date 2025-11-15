@@ -37,7 +37,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 channelNames: this.channelNames,
                 channelFormat: 'float32',
-                sampleRate: 0,
+                sampleRateHz: 0,
                 name: this.name_,
                 type: this.type,
                 sourceId: this.sourceId,
@@ -254,7 +254,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
         const defaultOptions = {
-            sampleRate: 0,
+            sampleRateHz: 0,
             channelNames: this.channelNames,
             channelFormat: 'float32',
             chunkSize: this.chunkSize,

@@ -69,7 +69,7 @@ export default class LiblslAdapter implements Liblsl {
             name,
             type,
             channelCount,
-            sampleRate,
+            sampleRateHz,
             channelFormat,
             sourceId,
         } = options
@@ -78,7 +78,7 @@ export default class LiblslAdapter implements Liblsl {
             name,
             type,
             channelCount,
-            sampleRate,
+            sampleRateHz,
             channelFormat,
             sourceId,
         ])
@@ -329,7 +329,7 @@ export interface CreateStreamInfoOptions {
     name: string
     type: string
     channelCount: number
-    sampleRate: number
+    sampleRateHz: number
     channelFormat: number
     sourceId: string
     manufacturer?: string

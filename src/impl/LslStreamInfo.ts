@@ -14,16 +14,16 @@ export default class LslStreamInfo implements StreamInfo {
     protected streamInfo!: BoundStreamInfo
     private channelNames: string[]
     private channelFormat: ChannelFormat
-    private sampleRate: number
+    private sampleRateHz: number
 
     protected constructor(options: StreamInfoOptions) {
         const {
-            channelNames,
-            channelFormat,
-            sampleRate,
             name = this.defaultName,
             type = this.defaultType,
             sourceId = this.defaultSourceId,
+            channelNames,
+            channelFormat,
+            sampleRateHz,
             units = this.defaultUnits,
         } = options
 
@@ -32,8 +32,8 @@ export default class LslStreamInfo implements StreamInfo {
         this.sourceId = sourceId
         this.channelNames = channelNames
         this.channelFormat = channelFormat
+        this.sampleRateHz = sampleRateHz
         this.units = units
-        this.sampleRate = sampleRate
 
         this.createStreamInfo()
         this.appendChannelsToStreamInfo()
@@ -50,7 +50,7 @@ export default class LslStreamInfo implements StreamInfo {
             sourceId: this.sourceId,
             channelCount: this.channelCount,
             channelFormat: this.lslChannelFormat,
-            sampleRate: this.sampleRate,
+            sampleRateHz: this.sampleRateHz,
         })
     }
 
@@ -96,7 +96,7 @@ type StreamInfoConstructor = new (options: StreamInfoOptions) => StreamInfo
 export interface StreamInfoOptions {
     channelNames: string[]
     channelFormat: ChannelFormat
-    sampleRate: number
+    sampleRateHz: number
     name?: string
     type?: string
     sourceId?: string

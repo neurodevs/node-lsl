@@ -1,5 +1,5 @@
-import { CHANNEL_FORMATS } from './consts.js'
 import { ChannelFormat } from 'impl/LiblslAdapter.js'
+import { CHANNEL_FORMATS } from './consts.js'
 import {
     isGreaterThanOrEqualToZero,
     isPositiveInteger,
@@ -31,10 +31,10 @@ export function assertValidChannelFormat(channelFormat: ChannelFormat) {
     }
 }
 
-export function assertValidSampleRate(sampleRate: number) {
-    if (!isGreaterThanOrEqualToZero(sampleRate)) {
+export function assertValidSampleRateHz(sampleRateHz: number) {
+    if (!isGreaterThanOrEqualToZero(sampleRateHz)) {
         throw new Error(
-            `Invalid sample rate! Must be a positive number or zero, not: ${sampleRate}.`
+            `Invalid sample rate! Must be a positive number or zero, not: ${sampleRateHz}.`
         )
     }
 }

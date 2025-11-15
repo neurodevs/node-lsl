@@ -576,7 +576,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             name: this.generateId(),
             type: this.generateId(),
             channelCount: randomInt(1, 10),
-            sampleRate: randomInt(100),
+            sampleRateHz: randomInt(100),
             channelFormat: randomInt(7),
             sourceId: this.generateId(),
         }

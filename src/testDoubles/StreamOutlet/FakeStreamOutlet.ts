@@ -56,8 +56,8 @@ export default class FakeStreamOutlet implements StreamOutlet {
         return this.options?.channelFormat ?? 'float32'
     }
 
-    public get sampleRate() {
-        return this.options?.sampleRate ?? randomInt(1, 1000)
+    public get sampleRateHz() {
+        return this.options?.sampleRateHz ?? randomInt(1, 1000)
     }
 
     public get chunkSize() {

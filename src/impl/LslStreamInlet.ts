@@ -264,9 +264,9 @@ export type StreamInletConstructor = new (
 ) => StreamInlet
 
 export interface StreamInletOptions {
-    sampleRate: number
     channelNames: string[]
     channelFormat: ChannelFormat
+    sampleRateHz: number
     chunkSize: number
     maxBuffered: number
     onData: (

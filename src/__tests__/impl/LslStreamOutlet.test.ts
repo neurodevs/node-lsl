@@ -1,5 +1,6 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
+import { ChannelFormat, LslSample } from 'impl/LiblslAdapter.js'
 import { CHANNEL_FORMATS } from '../../consts.js'
 import { StreamInfo } from '../../impl/LslStreamInfo.js'
 import LslStreamOutlet, {
@@ -12,7 +13,6 @@ import {
 } from '../../testDoubles/consts.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
-import { ChannelFormat, LslSample } from 'impl/LiblslAdapter.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamOutletTest extends AbstractPackageTest {
@@ -35,14 +35,14 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async allowsZeroSampleRate() {
-        await this.LslStreamOutlet({ sampleRate: 0 })
+    protected static async allowsZeroSampleRateHz() {
+        await this.LslStreamOutlet({ sampleRateHz: 0 })
     }
 
     @test()
-    protected static async throwsWithInvalidSampleRate() {
-        await this.assertThrowsInvalidSampleRate(-1)
-        await this.assertThrowsInvalidSampleRate(-1.5)
+    protected static async throwsWithInvalidSampleRateHz() {
+        await this.assertThrowsInvalidSampleRateHz(-1)
+        await this.assertThrowsInvalidSampleRateHz(-1.5)
     }
 
     @test()
@@ -168,7 +168,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         assert.isEqualDeep(FakeStreamInfo.callsToConstructor[0], {
             channelNames: this.randomOutletOptions.channelNames,
             channelFormat: this.randomOutletOptions.channelFormat,
-            sampleRate: this.randomOutletOptions.sampleRate,
+            sampleRateHz: this.randomOutletOptions.sampleRateHz,
             name: this.randomOutletOptions.name,
             type: this.randomOutletOptions.type,
             sourceId: this.randomOutletOptions.sourceId,
@@ -219,11 +219,11 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         )
     }
 
-    private static async assertThrowsInvalidSampleRate(sampleRate: number) {
+    private static async assertThrowsInvalidSampleRateHz(sampleRateHz: number) {
         await this.createAndAssertThrows(
-            'sampleRate',
-            sampleRate,
-            `Invalid sample rate! Must be a positive number or zero, not: ${sampleRate}`
+            'sampleRateHz',
+            sampleRateHz,
+            `Invalid sample rate! Must be a positive number or zero, not: ${sampleRateHz}`
         )
     }
 

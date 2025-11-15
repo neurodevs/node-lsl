@@ -3,9 +3,14 @@ import {
     assertValidChannelFormat,
     assertValidChunkSize,
     assertValidMaxBuffered,
-    assertValidSampleRate,
+    assertValidSampleRateHz,
 } from '../assertions.js'
-import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from './LiblslAdapter.js'
+import {
+    ChannelFormat,
+    BoundOutlet,
+    Liblsl,
+    LslSample,
+} from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import LslStreamInfo, {
     StreamInfo,
@@ -32,17 +37,17 @@ export default class LslStreamOutlet implements StreamOutlet {
     public static async Create(options: StreamOutletOptions) {
         const { waitAfterConstructionMs = 10 } = options ?? {}
 
-        const streamInfoOptions = {
+        const infoOptions = {
             channelNames: options.channelNames,
             channelFormat: options.channelFormat,
-            sampleRate: options.sampleRate,
+            sampleRateHz: options.sampleRateHz,
             name: options.name,
             type: options.type,
             sourceId: options.sourceId,
             units: options.unit,
         }
 
-        const info = this.LslStreamInfo(streamInfoOptions)
+        const info = this.LslStreamInfo(infoOptions)
         const instance = new (this.Class ?? this)(info, options)
 
         await this.wait(waitAfterConstructionMs)
@@ -52,7 +57,7 @@ export default class LslStreamOutlet implements StreamOutlet {
 
     private validateOptions() {
         assertValidChannelCount(this.channelCount)
-        assertValidSampleRate(this.sampleRate)
+        assertValidSampleRateHz(this.sampleRateHz)
         assertValidChannelFormat(this.channelFormat)
         assertValidChunkSize(this.chunkSize)
         assertValidMaxBuffered(this.maxBuffered)
@@ -133,8 +138,8 @@ export default class LslStreamOutlet implements StreamOutlet {
         return this.options.channelFormat
     }
 
-    public get sampleRate() {
-        return this.options.sampleRate
+    public get sampleRateHz() {
+        return this.options.sampleRateHz
     }
 
     public get chunkSize() {
@@ -178,7 +183,7 @@ export interface StreamOutlet {
     readonly sourceId: string
     readonly channelNames: string[]
     readonly channelFormat: ChannelFormat
-    readonly sampleRate: number
+    readonly sampleRateHz: number
     readonly chunkSize: number
     readonly maxBuffered: number
     readonly manufacturer: string
@@ -196,7 +201,7 @@ export interface StreamOutletOptions {
     sourceId: string
     channelNames: string[]
     channelFormat: ChannelFormat
-    sampleRate: number
+    sampleRateHz: number
     chunkSize: number
     maxBuffered: number
     manufacturer: string
