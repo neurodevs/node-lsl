@@ -222,6 +222,17 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async defaultsManufacturerToNA() {
+        const outlet = await this.LslStreamOutlet({ manufacturer: undefined })
+
+        assert.isEqualDeep(
+            outlet['manufacturer'],
+            'N/A',
+            'Did not set manufacturer as N/A!'
+        )
+    }
+
     private static async assertThrowsWithEmptyChannelNames() {
         await this.createAndAssertThrows(
             'channelNames',
