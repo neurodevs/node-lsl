@@ -1,18 +1,16 @@
-import LiblslAdapter from './impl/LiblslAdapter.js'
-
 export default function handleError(errorCode: number) {
     switch (errorCode) {
         case 0:
             return
         case -1:
-            throw new Error(`The operation failed due to a timeout!`)
+            throw new Error(`The liblsl operation failed due to a timeout!`)
         case -2:
-            throw new Error(`The stream has been lost!`)
+            throw new Error(`The liblsl stream has been lost!`)
         case -3:
-            throw new Error(`An argument was incorrectly specified!`)
+            throw new Error(`A liblsl argument was incorrectly specified!`)
+        case -4:
+            throw new Error(`An internal liblsl error has occurred!`)
         default:
-            throw new Error(
-                `An unknown error occurred in the liblsl library! ${LiblslAdapter.getInstance().liblslPath}`
-            )
+            throw new Error(`An unknown liblsl error has occurred!`)
     }
 }

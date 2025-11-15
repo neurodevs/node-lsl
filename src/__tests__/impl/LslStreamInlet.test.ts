@@ -226,7 +226,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     protected static async throwsWithUnknownErrorCode() {
         await this.assertThrowsWithErrorCode(
             -999,
-            `An unknown error occurred in the liblsl library! ${this.fakeLiblsl.liblslPath}`
+            `An unknown liblsl error has occurred!`
         )
     }
 
@@ -234,20 +234,31 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     protected static async throwsWithErrorCodeNegativeOne() {
         await this.assertThrowsWithErrorCode(
             -1,
-            `The operation failed due to a timeout!`
+            `The liblsl operation failed due to a timeout!`
         )
     }
 
     @test()
     protected static async throwsWithErrorCodeNegativeTwo() {
-        await this.assertThrowsWithErrorCode(-2, `The stream has been lost!`)
+        await this.assertThrowsWithErrorCode(
+            -2,
+            `The liblsl stream has been lost!`
+        )
     }
 
     @test()
     protected static async throwsWithErrorCodeNegativeThree() {
         await this.assertThrowsWithErrorCode(
             -3,
-            'An argument was incorrectly specified!'
+            'A liblsl argument was incorrectly specified!'
+        )
+    }
+
+    @test()
+    protected static async throwsWithErrorCodeNegativeFour() {
+        await this.assertThrowsWithErrorCode(
+            -4,
+            'An internal liblsl error has occurred!'
         )
     }
 
