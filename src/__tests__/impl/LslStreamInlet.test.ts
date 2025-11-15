@@ -188,7 +188,23 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqual(
             this.fakeLiblsl.lastPullSampleOptions?.timeout,
             timeoutMs / 1000,
-            'Did not pass timeoutMs!'
+            'Did not pass timeoutMs to pullSample!'
+        )
+    }
+
+    @test()
+    protected static async passesTimeoutMsOptionToPullChunk() {
+        const timeoutMs = 1000 * Math.random()
+
+        await this.runInletWithOptions({
+            chunkSize: this.chunkSize,
+            timeoutMs,
+        })
+
+        assert.isEqual(
+            this.fakeLiblsl.lastPullChunkOptions?.timeout,
+            timeoutMs / 1000,
+            'Did not pass timeoutMs to pullChunk!'
         )
     }
 
