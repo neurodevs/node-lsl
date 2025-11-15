@@ -54,7 +54,6 @@ const outlet = await LslStreamOutlet.Create({
     manufacturer: 'Interaxon Inc.',
     unit: 'microvolt',
     chunkSize: 12,
-    maxBuffered: 360,
 })
 
 outlet.pushSample([1, 2, 3, 4, 5])

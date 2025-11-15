@@ -244,7 +244,13 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     @test()
     protected static async canCreateOutletWithRequiredParams() {
         const { options, outlet } = this.createRandomOutlet()
-        assert.isEqualDeep(this.createOutletParams, Object.values(options))
+
+        const expected = {
+            ...options,
+            maxBufferedMs: options.maxBufferedMs / 1000,
+        }
+
+        assert.isEqualDeep(this.createOutletParams, Object.values(expected))
         assert.isEqual(outlet, this.fakeOutlet)
     }
 
@@ -382,7 +388,13 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     @test()
     protected static async canCreateInletWithRequiredParams() {
         const { options, inlet } = this.createRandomInlet()
-        assert.isEqualDeep(this.createInletParams, Object.values(options))
+
+        const expected = {
+            ...options,
+            maxBufferedMs: options.maxBufferedMs / 1000,
+        }
+
+        assert.isEqualDeep(this.createInletParams, Object.values(expected))
         assert.isEqual(inlet, this.fakeInlet)
     }
 
@@ -558,7 +570,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const options = {
             info,
             chunkSize: randomInt(10),
-            maxBuffered: randomInt(10),
+            maxBufferedMs: randomInt(10),
         }
         return options
     }

@@ -38,7 +38,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
             manufacturer: 'N/A',
             unit: 'N/A',
             chunkSize: 0,
-            maxBuffered: 0,
+            maxBufferedMs: 0,
         })
     }
 

@@ -105,8 +105,13 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public createOutlet(options: CreateOutletOptions) {
-        const { info, chunkSize, maxBuffered } = options
-        return this.bindings.lsl_create_outlet([info, chunkSize, maxBuffered])
+        const { info, chunkSize, maxBufferedMs } = options
+
+        return this.bindings.lsl_create_outlet([
+            info,
+            chunkSize,
+            maxBufferedMs / 1000,
+        ])
     }
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
@@ -127,8 +132,13 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public createInlet(options: CreateInletOptions) {
-        const { info, chunkSize, maxBuffered } = options
-        return this.bindings.lsl_create_inlet([info, chunkSize, maxBuffered])
+        const { info, chunkSize, maxBufferedMs } = options
+
+        return this.bindings.lsl_create_inlet([
+            info,
+            chunkSize,
+            maxBufferedMs / 1000,
+        ])
     }
 
     public pullSample(options: PullSampleOptions) {
@@ -344,7 +354,7 @@ export interface AppendChannelsToStreamInfoOptions {
 export interface CreateOutletOptions {
     info: BoundStreamInfo
     chunkSize: number
-    maxBuffered: number
+    maxBufferedMs: number
 }
 
 export interface PushSampleFloatTimestampOptions {
@@ -366,7 +376,7 @@ export interface DestroyOutletOptions {
 export interface CreateInletOptions {
     info: BoundStreamInfo
     chunkSize: number
-    maxBuffered: number
+    maxBufferedMs: number
 }
 
 export interface PullSampleOptions {

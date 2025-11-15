@@ -1,12 +1,12 @@
 import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
 
+import { LslSample } from 'impl/LiblslAdapter.js'
 import { StreamInfo } from '../../impl/LslStreamInfo.js'
 import {
     StreamOutlet,
     StreamOutletOptions,
 } from '../../impl/LslStreamOutlet.js'
-import { LslSample } from 'impl/LiblslAdapter.js'
 
 export default class FakeStreamOutlet implements StreamOutlet {
     public static callsToConstructor: {
@@ -64,8 +64,8 @@ export default class FakeStreamOutlet implements StreamOutlet {
         return this.options?.chunkSize ?? randomInt(1, 1000)
     }
 
-    public get maxBuffered() {
-        return this.options?.maxBuffered ?? randomInt(1, 1000)
+    public get maxBufferedMs() {
+        return this.options?.maxBufferedMs ?? randomInt(1, 1000)
     }
 
     public get manufacturer() {

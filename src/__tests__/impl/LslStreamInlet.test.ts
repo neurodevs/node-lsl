@@ -68,7 +68,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 info: fakeInfo.boundStreamInfo,
                 chunkSize: this.chunkSize,
-                maxBuffered: this.maxBuffered,
+                maxBufferedMs: this.maxBufferedMs / 1000,
             },
             'Should have called createInlet!'
         )
@@ -209,15 +209,15 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async defaultsMaxBufferedToSixMinutesInSeconds() {
+    protected static async defaultsMaxBufferedMsToSixMinutesInSeconds() {
         await this.runInletWithOptions({
-            maxBuffered: undefined,
+            maxBufferedMs: undefined,
         })
 
         const sixMinutesInSeconds = 360
 
         assert.isEqualDeep(
-            this.fakeLiblsl.lastCreateInletOptions?.maxBuffered,
+            this.fakeLiblsl.lastCreateInletOptions?.maxBufferedMs,
             sixMinutesInSeconds
         )
     }
@@ -272,7 +272,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             channelNames: this.channelNames,
             channelFormat: 'float32',
             chunkSize: this.chunkSize,
-            maxBuffered: this.maxBuffered,
+            maxBufferedMs: this.maxBufferedMs,
             onData: this.onData,
             name: this.name_,
             type: this.type,

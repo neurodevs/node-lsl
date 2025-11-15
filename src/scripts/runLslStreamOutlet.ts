@@ -11,7 +11,7 @@ async function main() {
         manufacturer: 'Interaxon Inc.',
         unit: 'microvolt',
         chunkSize: 12,
-        maxBuffered: 360,
+        maxBufferedMs: 360,
     })
 
     instance.pushSample([1, 2, 3, 4, 5])

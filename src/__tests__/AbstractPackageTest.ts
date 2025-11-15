@@ -64,6 +64,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     }
 
     protected static readonly chunkSize = 2
-    protected static readonly maxBuffered = Math.floor(Math.random() * 100)
     protected static readonly sampleRateHz = Math.floor(Math.random() * 100)
+    protected static readonly maxBufferedMs = Math.floor(Math.random() * 1000)
 }

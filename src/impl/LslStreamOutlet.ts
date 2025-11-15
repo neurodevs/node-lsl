@@ -2,7 +2,7 @@ import {
     assertValidChannelCount,
     assertValidChannelFormat,
     assertValidChunkSize,
-    assertValidMaxBuffered,
+    assertValidMaxBufferedMs,
     assertValidSampleRateHz,
 } from '../assertions.js'
 import {
@@ -60,14 +60,14 @@ export default class LslStreamOutlet implements StreamOutlet {
         assertValidSampleRateHz(this.sampleRateHz)
         assertValidChannelFormat(this.channelFormat)
         assertValidChunkSize(this.chunkSize)
-        assertValidMaxBuffered(this.maxBuffered)
+        assertValidMaxBufferedMs(this.maxBufferedMs)
     }
 
     private createStreamOutlet() {
         this.outlet = this.lsl.createOutlet({
             info: this.boundStreamInfo,
             chunkSize: this.chunkSize,
-            maxBuffered: this.maxBuffered,
+            maxBufferedMs: this.maxBufferedMs,
         })
     }
 
@@ -146,8 +146,8 @@ export default class LslStreamOutlet implements StreamOutlet {
         return this.options.chunkSize
     }
 
-    public get maxBuffered() {
-        return this.options.maxBuffered
+    public get maxBufferedMs() {
+        return this.options.maxBufferedMs
     }
 
     public get manufacturer() {
@@ -185,7 +185,7 @@ export interface StreamOutlet {
     readonly channelFormat: ChannelFormat
     readonly sampleRateHz: number
     readonly chunkSize: number
-    readonly maxBuffered: number
+    readonly maxBufferedMs: number
     readonly manufacturer: string
     readonly unit: string
 }
@@ -203,7 +203,7 @@ export interface StreamOutletOptions {
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number
-    maxBuffered: number
+    maxBufferedMs: number
     manufacturer: string
     unit: string
     waitAfterConstructionMs?: number

@@ -26,7 +26,7 @@ export default class LslEventMarkerOutlet implements EventMarkerOutlet {
             manufacturer: 'N/A',
             unit: 'N/A',
             chunkSize: 0,
-            maxBuffered: 0,
+            maxBufferedMs: 0,
         } as StreamOutletOptions
 
         const outlet = await LslStreamOutlet.Create({

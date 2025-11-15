@@ -18,9 +18,9 @@ export default class LslStreamInlet implements StreamInlet {
     private channelNames: string[]
     private channelCount: number
     private chunkSize: number
-    private maxBuffered: number
     private onData: (samples: Float32Array, timestamps: Float64Array) => void
-    private timeoutMs?: number
+    private maxBufferedMs: number
+    private timeoutMs: number
 
     private pullDataMethod: () => {
         samples: Float32Array | undefined
@@ -41,14 +41,14 @@ export default class LslStreamInlet implements StreamInlet {
     private errorCodeBufferPtr!: JsExternal
 
     private readonly defaultName = `lsl-inlet-${generateId()}`
-    private readonly sixMinutesInSeconds = 360
+    private readonly sixMinutesInMs = 360 * 1000
 
     protected constructor(info: StreamInfo, options: StreamInletOptions) {
         const {
             name = this.defaultName,
             channelNames,
             chunkSize,
-            maxBuffered,
+            maxBufferedMs,
             onData,
             timeoutMs,
         } = options ?? {}
@@ -58,9 +58,9 @@ export default class LslStreamInlet implements StreamInlet {
         this.channelNames = channelNames
         this.channelCount = this.channelNames.length
         this.chunkSize = chunkSize
-        this.maxBuffered = maxBuffered ?? this.sixMinutesInSeconds
         this.onData = onData
-        this.timeoutMs = timeoutMs
+        this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
+        this.timeoutMs = timeoutMs ?? 0
 
         if (this.chunkSize === 1) {
             this.pullDataMethod = this.pullSample
@@ -75,7 +75,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     public static Create(options: StreamInletOptions) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { maxBuffered, chunkSize, onData, ...infoOptions } = options
+        const { maxBufferedMs, chunkSize, onData, ...infoOptions } = options
         const info = this.LslStreamInfo(infoOptions)
         return new (this.Class ?? this)(info, options)
     }
@@ -84,7 +84,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.inlet = this.lsl.createInlet({
             info: this.info.boundStreamInfo,
             chunkSize: this.chunkSize,
-            maxBuffered: this.maxBuffered,
+            maxBufferedMs: this.maxBufferedMs / 1000,
         })
     }
 
@@ -185,7 +185,7 @@ export default class LslStreamInlet implements StreamInlet {
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
-            timeout: this.timeoutMs ? this.timeoutMs / 1000 : 0,
+            timeout: this.timeoutMs / 1000,
             errcodePtr: this.errorCodeBufferPtr,
         })
     }
@@ -217,7 +217,7 @@ export default class LslStreamInlet implements StreamInlet {
             timestampBufferPtr: this.timestampBufferPtr,
             dataBufferElements: this.chunkSize * this.channelCount,
             timestampBufferElements: this.chunkSize,
-            timeout: this.timeoutMs ? this.timeoutMs / 1000 : 0,
+            timeout: this.timeoutMs / 1000,
             errcodePtr: this.errorCodeBufferPtr,
         })
     }
@@ -270,7 +270,7 @@ export interface StreamInletOptions {
     sampleRateHz: number
     chunkSize: number
     onData: OnDataCallback
-    maxBuffered?: number
+    maxBufferedMs?: number
     timeoutMs?: number
     name?: string
     type?: string

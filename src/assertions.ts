@@ -15,10 +15,10 @@ export function assertValidChunkSize(chunkSize: number) {
     }
 }
 
-export function assertValidMaxBuffered(maxBuffered: number) {
-    if (!isPositiveIntegerOrZero(maxBuffered)) {
+export function assertValidMaxBufferedMs(maxBufferedMs: number) {
+    if (!isPositiveIntegerOrZero(maxBufferedMs)) {
         throw new Error(
-            `Invalid max buffered! Must be a positive integer or zero, not: ${maxBuffered}.`
+            `Invalid max buffered! Must be a positive integer or zero, not: ${maxBufferedMs}.`
         )
     }
 }

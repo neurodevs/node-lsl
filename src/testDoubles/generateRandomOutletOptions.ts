@@ -17,6 +17,6 @@ export default function generateRandomOutletOptions() {
         manufacturer: generateId(),
         unit: generateId(),
         chunkSize: randomInt(0, 10),
-        maxBuffered: randomInt(0, 10),
+        maxBufferedMs: randomInt(0, 10),
     } as StreamOutletOptions
 }

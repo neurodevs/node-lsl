@@ -65,15 +65,15 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async allowsZeroMaxBuffered() {
-        await this.LslStreamOutlet({ maxBuffered: 0 })
+    protected static async allowsZeroMaxBufferedMs() {
+        await this.LslStreamOutlet({ maxBufferedMs: 0 })
     }
 
     @test()
-    protected static async throwsWithInvalidMaxBuffered() {
-        await this.assertThrowsInvalidMaxBuffered(-1)
-        await this.assertThrowsInvalidMaxBuffered(-1.5)
-        await this.assertThrowsInvalidMaxBuffered(1.5)
+    protected static async throwsWithInvalidMaxBufferedMs() {
+        await this.assertThrowsInvalidMaxBufferedMs(-1)
+        await this.assertThrowsInvalidMaxBufferedMs(-1.5)
+        await this.assertThrowsInvalidMaxBufferedMs(1.5)
     }
 
     @test()
@@ -115,7 +115,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         assert.isEqualDeep(this.fakeLiblsl.lastCreateOutletOptions, {
             info: this.fakeLiblsl.streamInfo,
             chunkSize: this.randomOutletOptions.chunkSize,
-            maxBuffered: this.randomOutletOptions.maxBuffered,
+            maxBufferedMs: this.randomOutletOptions.maxBufferedMs,
         })
         assert.isNumber(
             this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.timestamp
@@ -237,11 +237,13 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         )
     }
 
-    private static async assertThrowsInvalidMaxBuffered(maxBuffered: number) {
+    private static async assertThrowsInvalidMaxBufferedMs(
+        maxBufferedMs: number
+    ) {
         await this.createAndAssertThrows(
-            'maxBuffered',
-            maxBuffered,
-            `Invalid max buffered! Must be a positive integer or zero, not: ${maxBuffered}`
+            'maxBufferedMs',
+            maxBufferedMs,
+            `Invalid max buffered! Must be a positive integer or zero, not: ${maxBufferedMs}`
         )
     }
 
