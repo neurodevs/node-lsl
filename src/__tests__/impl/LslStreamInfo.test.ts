@@ -173,7 +173,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
                 info: this.instance.getStreamInfo(),
                 channels: this.channelNames.map((label: string) => ({
                     label,
-                    unit: this.units,
+                    units: this.units,
                     type: this.type,
                 })),
             },

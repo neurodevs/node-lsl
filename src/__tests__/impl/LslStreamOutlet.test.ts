@@ -172,7 +172,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
             name: this.randomOutletOptions.name,
             type: this.randomOutletOptions.type,
             sourceId: this.randomOutletOptions.sourceId,
-            units: this.randomOutletOptions.unit,
+            units: this.randomOutletOptions.units,
         })
     }
 
@@ -234,14 +234,9 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async defaultsUnitToNA() {
-        const outlet = await this.LslStreamOutlet({ unit: undefined })
-
-        assert.isEqualDeep(
-            outlet['unit'],
-            'N/A',
-            'Did not set manufacturer as N/A!'
-        )
+    protected static async defaultsUnitsToNA() {
+        const outlet = await this.LslStreamOutlet({ units: undefined })
+        assert.isEqualDeep(outlet['units'], 'N/A', 'Did not set units as N/A!')
     }
 
     private static async assertThrowsWithEmptyChannelNames() {

@@ -31,14 +31,14 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[0].options, {
             name: 'Event markers',
             type: 'Markers',
-            channelNames: ['Markers'],
-            sampleRateHz: 0,
-            channelFormat: 'string',
             sourceId: 'event-markers',
-            manufacturer: 'N/A',
-            unit: 'N/A',
+            channelNames: ['Markers'],
+            channelFormat: 'string',
+            sampleRateHz: 0,
             chunkSize: 0,
             maxBufferedMs: 0,
+            manufacturer: 'N/A',
+            units: 'N/A',
         })
     }
 

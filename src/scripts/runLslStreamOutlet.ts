@@ -9,7 +9,7 @@ async function main() {
         channelFormat: 'float32',
         sourceId: 'muse-s-eeg',
         manufacturer: 'Interaxon Inc.',
-        unit: 'microvolt',
+        units: 'microvolt',
         chunkSize: 12,
     })
 

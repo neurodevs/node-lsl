@@ -12,7 +12,7 @@ import {
     BoundInlet,
     FlushInletOptions,
     PullChunkOptions,
-    PullSampleOptions
+    PullSampleOptions,
 } from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {

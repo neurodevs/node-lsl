@@ -322,7 +322,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         assert.isEqual(this.appendChildValueParams[2][1], 'type')
 
         assert.isEqual(this.appendChildValueParams[0][2], channel.label)
-        assert.isEqual(this.appendChildValueParams[1][2], channel.unit)
+        assert.isEqual(this.appendChildValueParams[1][2], channel.units)
         assert.isEqual(this.appendChildValueParams[2][2], channel.type)
     }
 
@@ -344,7 +344,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         assert.isEqual(this.appendChildParams?.[2][1], 'channel')
 
         assert.isEqual(this.appendChildValueParams[3][2], channel2.label)
-        assert.isEqual(this.appendChildValueParams[4][2], channel2.unit)
+        assert.isEqual(this.appendChildValueParams[4][2], channel2.units)
         assert.isEqual(this.appendChildValueParams[5][2], channel2.type)
     }
 
@@ -579,7 +579,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         return {
             label: this.generateId(),
             type: this.generateId(),
-            unit: this.generateId(),
+            units: this.generateId(),
         }
     }
 

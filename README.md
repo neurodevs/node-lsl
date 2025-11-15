@@ -47,12 +47,10 @@ import { LslStreamOutlet } from '@neurodevs/node-lsl'
 const outlet = await LslStreamOutlet.Create({
     name: 'Muse S (2nd gen)',
     type: 'EEG',
-    channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
-    sampleRateHz: 256,
-    channelFormat: 'float32',
     sourceId: 'muse-s-eeg',
-    manufacturer: 'Interaxon Inc.',
-    unit: 'microvolt',
+    channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
+    channelFormat: 'float32',
+    sampleRateHz: 256,
     chunkSize: 12,
 })
 

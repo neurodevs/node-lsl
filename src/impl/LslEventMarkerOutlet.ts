@@ -24,7 +24,7 @@ export default class LslEventMarkerOutlet implements EventMarkerOutlet {
             channelFormat: 'string',
             sourceId: 'event-markers',
             manufacturer: 'N/A',
-            unit: 'N/A',
+            units: 'N/A',
             chunkSize: 0,
             maxBufferedMs: 0,
         } as StreamOutletOptions

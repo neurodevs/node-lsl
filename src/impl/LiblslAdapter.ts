@@ -99,7 +99,7 @@ export default class LiblslAdapter implements Liblsl {
                 'label',
                 channel.label,
             ])
-            this.bindings.lsl_append_child_value([child, 'unit', channel.unit])
+            this.bindings.lsl_append_child_value([child, 'unit', channel.units])
             this.bindings.lsl_append_child_value([child, 'type', channel.type])
         }
     }
@@ -343,7 +343,7 @@ export interface CreateStreamInfoOptions {
     channelFormat: number
     sourceId: string
     manufacturer?: string
-    unit?: string
+    units?: string
 }
 
 export interface AppendChannelsToStreamInfoOptions {
@@ -427,7 +427,7 @@ export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 
 export interface LslChannel {
     label: string
-    unit: string
+    units: string
     type: string
 }
 

@@ -72,8 +72,8 @@ export default class FakeStreamOutlet implements StreamOutlet {
         return this.options?.manufacturer ?? generateId()
     }
 
-    public get unit() {
-        return this.options?.unit ?? generateId()
+    public get units() {
+        return this.options?.units ?? generateId()
     }
 
     public static resetTestDouble() {

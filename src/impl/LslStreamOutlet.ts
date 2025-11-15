@@ -44,7 +44,7 @@ export default class LslStreamOutlet implements StreamOutlet {
             name: options.name,
             type: options.type,
             sourceId: options.sourceId,
-            units: options.unit,
+            units: options.units,
         }
 
         const info = this.LslStreamInfo(infoOptions)
@@ -154,8 +154,8 @@ export default class LslStreamOutlet implements StreamOutlet {
         return this.options.manufacturer ?? 'N/A'
     }
 
-    public get unit() {
-        return this.options.unit ?? 'N/A'
+    public get units() {
+        return this.options.units ?? 'N/A'
     }
 
     private get boundStreamInfo() {
@@ -187,7 +187,7 @@ export interface StreamOutlet {
     readonly chunkSize: number
     readonly maxBufferedMs: number
     readonly manufacturer: string
-    readonly unit: string
+    readonly units: string
 }
 
 export type StreamOutletConstructor = new (
@@ -205,6 +205,6 @@ export interface StreamOutletOptions {
     chunkSize: number
     maxBufferedMs?: number
     manufacturer?: string
-    unit?: string
+    units?: string
     waitAfterConstructionMs?: number
 }

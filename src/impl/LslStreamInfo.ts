@@ -59,7 +59,7 @@ export default class LslStreamInfo implements StreamInfo {
             info: this.streamInfo,
             channels: this.channelNames.map((label: string) => ({
                 label,
-                unit: this.units,
+                units: this.units,
                 type: this.type,
             })),
         })

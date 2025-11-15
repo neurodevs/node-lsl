@@ -10,7 +10,7 @@ const outlet = await LslStreamOutlet.Create({
     channelNames: ['Ch1', 'Ch2', 'Ch3'],
     channelFormat: 'float32',
     chunkSize: 1,
-    unit: 'test',
+    units: 'test',
     manufacturer: 'test',
 })
 

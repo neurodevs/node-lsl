@@ -15,7 +15,7 @@ export default function generateRandomOutletOptions() {
         channelFormat: TEST_SUPPORTED_CHANNEL_FORMATS[randomChannelIdx],
         sourceId: generateId(),
         manufacturer: generateId(),
-        unit: generateId(),
+        units: generateId(),
         chunkSize: randomInt(0, 10),
         maxBufferedMs: randomInt(0, 10),
     } as StreamOutletOptions
