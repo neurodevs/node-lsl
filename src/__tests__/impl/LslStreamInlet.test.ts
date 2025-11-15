@@ -1,5 +1,4 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import LiblslAdapter from '../../impl/LiblslAdapter.js'
 import LslStreamInlet, {
     StreamInletOptions,
 } from '../../impl/LslStreamInlet.js'
@@ -225,24 +224,36 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async throwsWithUnknownErrorCode() {
-        await this.startThenStop()
-
-        this.instance['errorCodeBuffer'].writeInt32LE(-999)
-
-        assert.doesThrow(() => {
-            this.instance['handleErrorCodeIfPresent']()
-        }, `An unknown error occurred in the liblsl library! ${this.fakeLiblsl.liblslPath}`)
+        await this.assertThrowsWithErrorCode(
+            -999,
+            `An unknown error occurred in the liblsl library! ${this.fakeLiblsl.liblslPath}`
+        )
     }
 
     @test()
     protected static async throwsWithErrorCodeNegativeOne() {
+        await this.assertThrowsWithErrorCode(
+            -1,
+            `The operation failed due to a timeout!`
+        )
+    }
+
+    @test()
+    protected static async throwsWithErrorCodeNegativeTwo() {
+        await this.assertThrowsWithErrorCode(-2, `The stream has been lost!`)
+    }
+
+    private static async assertThrowsWithErrorCode(
+        errorCode: number,
+        message: string
+    ) {
         await this.startThenStop()
 
-        this.instance['errorCodeBuffer'].writeInt32LE(-1)
+        this.instance['errorCodeBuffer'].writeInt32LE(errorCode)
 
         assert.doesThrow(() => {
             this.instance['handleErrorCodeIfPresent']()
-        }, `The operation failed due to a timeout!`)
+        }, message)
     }
 
     private static async runChunkSizeOne() {
@@ -287,10 +298,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         timestamps: Float64Array
     ) => {
         this.callsToOnData.push({ samples, timestamps })
-    }
-
-    private static get lsl() {
-        return LiblslAdapter.getInstance()
     }
 
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
