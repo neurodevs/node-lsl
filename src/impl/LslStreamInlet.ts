@@ -19,9 +19,9 @@ export default class LslStreamInlet implements StreamInlet {
     private channelNames: string[]
     private chunkSize: number
     private maxBuffered: number
-    private onChunk?: (samples: Float32Array, timestamps: Float64Array) => void
+    private onData: (samples: Float32Array, timestamps: Float64Array) => void
 
-    private pullByChunkSize: () => {
+    private pullDataMethod: () => {
         samples: Float32Array | undefined
         timestamps: Float64Array | undefined
     }
@@ -42,7 +42,7 @@ export default class LslStreamInlet implements StreamInlet {
             channelNames,
             chunkSize,
             maxBuffered,
-            onChunk,
+            onData,
             name = this.defaultName,
         } = options ?? {}
 
@@ -50,13 +50,13 @@ export default class LslStreamInlet implements StreamInlet {
         this.channelNames = channelNames
         this.chunkSize = chunkSize
         this.maxBuffered = maxBuffered
-        this.onChunk = onChunk
+        this.onData = onData
         this.name = name
 
         if (this.chunkSize === 1) {
-            this.pullByChunkSize = this.pullSample
+            this.pullDataMethod = this.pullSample
         } else {
-            this.pullByChunkSize = this.pullChunk
+            this.pullDataMethod = this.pullChunk
         }
 
         this.createStreamInlet()
@@ -64,7 +64,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     public static Create(options: StreamInletOptions) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { maxBuffered, chunkSize, onChunk, ...infoOptions } = options
+        const { maxBuffered, chunkSize, onData, ...infoOptions } = options
         const info = this.LslStreamInfo(infoOptions)
         return new (this.Class ?? this)(info, options)
     }
@@ -144,14 +144,14 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private async pullOnLoop() {
-        if (!this.isRunning || !this.onChunk) {
+        if (!this.isRunning || !this.onData) {
             return
         }
 
-        const { samples, timestamps } = this.pullByChunkSize()
+        const { samples, timestamps } = this.pullDataMethod()
 
         if (samples && timestamps) {
-            this.onChunk(samples, timestamps)
+            this.onData(samples, timestamps)
         }
 
         setImmediate(() => {
@@ -256,7 +256,7 @@ export interface StreamInletOptions {
     channelFormat: ChannelFormat
     chunkSize: number
     maxBuffered: number
-    onChunk?: (samples: Float32Array, timestamps: Float64Array) => void
+    onData: (samples: Float32Array, timestamps: Float64Array) => void
     name?: string
     type?: string
     sourceId?: string

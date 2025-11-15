@@ -9,8 +9,8 @@ import AbstractPackageTest from '../AbstractPackageTest.js'
 export default class LslStreamInletTest extends AbstractPackageTest {
     private static instance: SpyStreamInlet
 
-    private static callsToOnChunk: {
-        chunk: Float32Array
+    private static callsToOnData: {
+        samples: Float32Array
         timestamps: Float64Array
     }[]
 
@@ -20,7 +20,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         this.setSpyStreamInlet()
         this.setFakeStreamInfo()
 
-        this.callsToOnChunk = []
+        this.callsToOnData = []
 
         this.instance = this.LslStreamInlet()
     }
@@ -119,24 +119,24 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async callsOnChunkForChunkSizeNotOne() {
+    protected static async callsOnDataForChunkSizeNotOne() {
         await this.startThenStop()
 
         assert.isEqual(
-            this.callsToOnChunk.length,
+            this.callsToOnData.length,
             2,
-            'Did not call onChunk as expected!'
+            'Did not call onData as expected!'
         )
     }
 
     @test()
-    protected static async callsOnChunkForChunkSizeOne() {
+    protected static async callsOnDataForChunkSizeOne() {
         await this.runChunkSizeOne()
 
         assert.isEqual(
-            this.callsToOnChunk.length,
+            this.callsToOnData.length,
             2,
-            'Did not call onChunk as expected!'
+            'Did not call onData as expected!'
         )
     }
 
@@ -205,11 +205,11 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         return this.instance.getBoundInlet()
     }
 
-    private static onChunk = (
-        chunk: Float32Array,
+    private static onData = (
+        samples: Float32Array,
         timestamps: Float64Array
     ) => {
-        this.callsToOnChunk.push({ chunk, timestamps })
+        this.callsToOnData.push({ samples, timestamps })
     }
 
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
@@ -219,7 +219,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             channelFormat: 'float32',
             chunkSize: this.chunkSize,
             maxBuffered: this.maxBuffered,
-            onChunk: this.onChunk,
+            onData: this.onData,
             name: this.name_,
             type: this.type,
             sourceId: this.sourceId,

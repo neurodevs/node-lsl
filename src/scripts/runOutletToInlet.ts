@@ -25,7 +25,7 @@ const inlet = LslStreamInlet.Create({
     channelFormat: 'float32',
     chunkSize: 1,
     maxBuffered: 360,
-    onChunk: (samples, timestamps) => {
+    onData: (samples, timestamps) => {
         console.log('Received samples:', samples, 'at timestamps:', timestamps)
     },
 })
