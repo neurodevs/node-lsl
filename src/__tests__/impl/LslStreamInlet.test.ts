@@ -243,6 +243,14 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         await this.assertThrowsWithErrorCode(-2, `The stream has been lost!`)
     }
 
+    @test()
+    protected static async throwsWithErrorCodeNegativeThree() {
+        await this.assertThrowsWithErrorCode(
+            -3,
+            'An argument was incorrectly specified!'
+        )
+    }
+
     private static async assertThrowsWithErrorCode(
         errorCode: number,
         message: string
