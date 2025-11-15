@@ -1,5 +1,5 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import { PullChunkOptions } from '../../impl/LiblslAdapter.js'
+import LiblslAdapter from '../../impl/LiblslAdapter.js'
 import LslStreamInlet, {
     StreamInletOptions,
 } from '../../impl/LslStreamInlet.js'
@@ -227,13 +227,22 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     protected static async throwsWithUnknownErrorCode() {
         await this.startThenStop()
 
-        this.instance['lsl'].pullChunk = (_options: PullChunkOptions) => 0
+        this.instance['errorCodeBuffer'].writeInt32LE(-999)
 
-        assert.doesThrowAsync(async () => {
-            this.instance['errorCodeBuffer'].writeInt32LE(-999)
-            this.startPulling()
-            await this.wait(1000)
-        }, `An unspecified error occurred in the liblsl library! ${this.fakeLiblsl.liblslPath}`)
+        assert.doesThrow(() => {
+            this.instance['handleErrorCodeIfPresent']()
+        }, `An unknown error occurred in the liblsl library! ${this.fakeLiblsl.liblslPath}`)
+    }
+
+    @test()
+    protected static async throwsWithErrorCodeNegativeOne() {
+        await this.startThenStop()
+
+        this.instance['errorCodeBuffer'].writeInt32LE(-1)
+
+        assert.doesThrow(() => {
+            this.instance['handleErrorCodeIfPresent']()
+        }, `The operation failed due to a timeout!`)
     }
 
     private static async runChunkSizeOne() {
@@ -278,6 +287,10 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         timestamps: Float64Array
     ) => {
         this.callsToOnData.push({ samples, timestamps })
+    }
+
+    private static get lsl() {
+        return LiblslAdapter.getInstance()
     }
 
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {

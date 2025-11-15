@@ -15,7 +15,7 @@ export default class LiblslAdapter implements Liblsl {
     private readonly defaultMacOsPath = `/opt/homebrew/Cellar/lsl/1.16.2/lib/liblsl.1.16.2.dylib`
 
     protected constructor() {
-        this.liblslPath = process.env.LIBLSL_PATH! ?? this.defaultMacOsPath
+        this.liblslPath = process.env.LIBLSL_PATH ?? this.defaultMacOsPath
         this.tryToLoadBindings()
     }
 

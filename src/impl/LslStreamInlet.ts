@@ -158,6 +158,7 @@ export default class LslStreamInlet implements StreamInlet {
     private async pullOnLoop() {
         if (this.isRunning) {
             const { samples, timestamps } = this.pullDataMethod()
+            this.handleErrorCodeIfPresent()
 
             if (samples && timestamps) {
                 this.onData(samples, timestamps)
@@ -212,7 +213,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private callPullChunkBinding() {
-        const firstTimestamp = this.lsl.pullChunk({
+        return this.lsl.pullChunk({
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
             timestampBufferPtr: this.timestampBufferPtr,
@@ -221,13 +222,6 @@ export default class LslStreamInlet implements StreamInlet {
             timeout: this.timeoutMs / 1000,
             errcodePtr: this.errorCodeBufferPtr,
         })
-        this.handleErrorCodeIfPresent()
-
-        return firstTimestamp
-    }
-
-    private handleErrorCodeIfPresent() {
-        handleError(this.errorCodeBuffer.readInt32LE(0))
     }
 
     private convertTimestampBufferToDoubleArray() {
@@ -236,6 +230,10 @@ export default class LslStreamInlet implements StreamInlet {
             this.timestampBuffer.byteOffset,
             this.chunkSize
         )
+    }
+
+    private handleErrorCodeIfPresent() {
+        handleError(this.errorCodeBuffer.readInt32LE(0))
     }
 
     public stopPulling() {
