@@ -1,20 +1,26 @@
 import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
-import { createPointer, DataType, OpenParams, unwrapPointer } from 'ffi-rs'
+import {
+    createPointer,
+    DataType,
+    FieldType,
+    FuncObj,
+    OpenParams,
+    unwrapPointer,
+} from 'ffi-rs'
 
-import LiblslAdapter from '../../impl/LiblslAdapter.js'
-import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import {
     BoundChild,
     BoundDescription,
     BoundInlet,
     BoundOutlet,
     BoundStreamInfo,
-    FfiRsDefineOptions,
     Liblsl,
     LiblslBindings,
     LslChannel,
-} from '../../types.js'
+} from 'impl/LiblslAdapter.js'
+import LiblslAdapter from '../../impl/LiblslAdapter.js'
+import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LiblslAdapterTest extends AbstractPackageTest {
@@ -632,3 +638,5 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         }
     }
 }
+
+export type FfiRsDefineOptions = FuncObj<FieldType, boolean | undefined>

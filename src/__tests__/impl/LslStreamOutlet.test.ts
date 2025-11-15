@@ -12,7 +12,7 @@ import {
 } from '../../testDoubles/consts.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
-import { ChannelFormat, LslSample } from '../../types.js'
+import { ChannelFormat, LslSample } from 'impl/LiblslAdapter.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamOutletTest extends AbstractPackageTest {

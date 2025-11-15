@@ -1,5 +1,5 @@
 import { CHANNEL_FORMATS } from './consts.js'
-import { ChannelFormat } from './types.js'
+import { ChannelFormat } from 'impl/LiblslAdapter.js'
 import {
     isGreaterThanOrEqualToZero,
     isPositiveInteger,

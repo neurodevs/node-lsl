@@ -1,5 +1,3 @@
-export * from './types.js'
-
 // EventMarkerOutlet
 
 export { default as LslEventMarkerOutlet } from './impl/LslEventMarkerOutlet.js'

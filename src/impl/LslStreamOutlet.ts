@@ -5,7 +5,7 @@ import {
     assertValidMaxBuffered,
     assertValidSampleRate,
 } from '../assertions.js'
-import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from '../types.js'
+import { ChannelFormat, BoundOutlet, Liblsl, LslSample } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import LslStreamInfo, {
     StreamInfo,

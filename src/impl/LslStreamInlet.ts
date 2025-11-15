@@ -1,7 +1,7 @@
 import generateId from '@neurodevs/generate-id'
 
 import { createPointer, DataType, JsExternal, unwrapPointer } from 'ffi-rs'
-import { BoundInlet, ChannelFormat, Liblsl } from '../types.js'
+import { BoundInlet, ChannelFormat, Liblsl } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import LslStreamInfo, {
     StreamInfo,

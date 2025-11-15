@@ -6,7 +6,7 @@ import {
     StreamOutlet,
     StreamOutletOptions,
 } from '../../impl/LslStreamOutlet.js'
-import { LslSample } from '../../types.js'
+import { LslSample } from 'impl/LiblslAdapter.js'
 
 export default class FakeStreamOutlet implements StreamOutlet {
     public static callsToConstructor: {

@@ -12,8 +12,8 @@ import {
     BoundInlet,
     FlushInletOptions,
     PullChunkOptions,
-    PullSampleOptions,
-} from '../../types.js'
+    PullSampleOptions
+} from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {
     public static fakeSamples: Float32Array[] = [

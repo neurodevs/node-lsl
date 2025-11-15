@@ -1,7 +1,7 @@
 import generateId from '@neurodevs/generate-id'
 
 import { CHANNEL_FORMATS_MAP } from '../consts.js'
-import { BoundStreamInfo, ChannelFormat } from '../types.js'
+import { BoundStreamInfo, ChannelFormat } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 
 export default class LslStreamInfo implements StreamInfo {
