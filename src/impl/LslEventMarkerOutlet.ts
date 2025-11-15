@@ -1,4 +1,3 @@
-import { DurationMarker } from '../types.js'
 import LslStreamOutlet, {
     StreamOutletOptions,
     StreamOutlet,
@@ -86,3 +85,8 @@ export interface EventMarkerOutlet {
 export type EventMarkerOutletConstructor = new (
     outlet: StreamOutlet
 ) => EventMarkerOutlet
+
+export interface DurationMarker {
+    name: string
+    durationMs: number
+}

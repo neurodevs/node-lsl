@@ -1,5 +1,7 @@
-import { EventMarkerOutlet } from '../../impl/LslEventMarkerOutlet.js'
-import { DurationMarker } from '../../types.js'
+import {
+    DurationMarker,
+    EventMarkerOutlet,
+} from '../../impl/LslEventMarkerOutlet.js'
 
 export default class FakeEventMarkerOutlet implements EventMarkerOutlet {
     public static callsToPushMarker: string[] = []

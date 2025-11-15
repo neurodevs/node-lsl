@@ -1,7 +1,10 @@
 import { assert } from '@neurodevs/node-tdd'
 
-import { EventMarkerOutlet } from '../../impl/LslEventMarkerOutlet.js'
-import { DurationMarker, LslSample } from '../../types.js'
+import {
+    DurationMarker,
+    EventMarkerOutlet,
+} from '../../impl/LslEventMarkerOutlet.js'
+import { LslSample } from '../../types.js'
 
 export default class MockEventMarkerOutlet implements EventMarkerOutlet {
     private didPushMarkers = false

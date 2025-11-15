@@ -8,23 +8,21 @@ export type StreamFixuture = StreamOutlet | StreamInlet
 
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
 
-export interface DurationMarker {
-    name: string
-    durationMs: number
-}
-
 export interface Liblsl {
     createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
+
     createOutlet(options: CreateOutletOptions): BoundOutlet
     pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions): void
     pushSampleStringTimestamp(options: PushSampleStringTimestampOptions): void
     destroyOutlet(options: DestroyOutletOptions): void
+
     createInlet(options: CreateInletOptions): BoundInlet
     pullSample(options: PullSampleOptions): number
     pullChunk(options: PullChunkOptions): number
     flushInlet(options: FlushInletOptions): void
     destroyInlet(options: DestroyInletOptions): void
+
     localClock(): number
 }
 
@@ -43,14 +41,6 @@ export interface AppendChannelsToStreamInfoOptions {
     info: BoundStreamInfo
     channels: LslChannel[]
 }
-
-export interface LslChannel {
-    label: string
-    unit: string
-    type: string
-}
-
-export type LslSample = (number | string | undefined)[]
 
 export interface CreateOutletOptions {
     info: BoundStreamInfo
@@ -123,6 +113,14 @@ export interface LiblslBindings {
     lsl_append_child(args: [BoundDescription, string]): BoundChild
     lsl_append_child_value(args: [BoundChild, string, string]): void
 }
+
+export interface LslChannel {
+    label: string
+    unit: string
+    type: string
+}
+
+export type LslSample = (number | string | undefined)[]
 
 export interface BoundStreamInfo {}
 export interface BoundOutlet {}
