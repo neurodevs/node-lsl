@@ -155,7 +155,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public get unit() {
-        return this.options.unit
+        return this.options.unit ?? 'N/A'
     }
 
     private get boundStreamInfo() {
@@ -203,8 +203,8 @@ export interface StreamOutletOptions {
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number
-    unit: string
     maxBufferedMs?: number
     manufacturer?: string
+    unit?: string
     waitAfterConstructionMs?: number
 }
