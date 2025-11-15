@@ -167,10 +167,10 @@ export default class LiblslAdapter implements Liblsl {
             ],
             paramsValue: [
                 inlet,
-                unwrapPointer([dataBufferPtr])[0],
+                dataBufferPtr,
                 dataBufferElements,
                 timeout,
-                unwrapPointer([errcodePtr])[0],
+                errcodePtr,
             ],
         })
     }

@@ -59,6 +59,10 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.generateId(),
     ]
 
+    protected static get channelCount() {
+        return this.channelNames.length
+    }
+
     protected static readonly chunkSize = 2
     protected static readonly maxBuffered = Math.floor(Math.random() * 100)
     protected static readonly sampleRate = Math.floor(Math.random() * 100)

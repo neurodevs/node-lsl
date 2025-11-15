@@ -1,6 +1,6 @@
 import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
-import { createPointer, DataType, OpenParams } from 'ffi-rs'
+import { createPointer, DataType, OpenParams, unwrapPointer } from 'ffi-rs'
 
 import LiblslAdapter from '../../impl/LiblslAdapter.js'
 import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
@@ -384,19 +384,23 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     protected static async pullSampleCallsBinding() {
         const { inlet } = this.createRandomInlet()
 
-        const dataBuffer = Buffer.alloc(0)
-        const dataBufferElements = 0
+        const dataBuffer = Buffer.alloc(4 * this.channelCount)
+        const dataBufferElements = this.channelCount
         const timeout = 0.0
 
-        const dataBufferPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [dataBuffer],
-        })[0]
+        const dataBufferPtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [dataBuffer],
+            })
+        )[0]
 
-        const errcodePtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [new Int32Array(1)],
-        })[0]
+        const errcodePtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [new Int32Array(1)],
+            })
+        )[0]
 
         this.instance.pullSample({
             inlet,
@@ -435,26 +439,32 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     protected static async pullChunkCallsBinding() {
         const { inlet } = this.createRandomInlet()
 
-        const dataBuffer = Buffer.alloc(0)
-        const timestampBuffer = Buffer.alloc(0)
-        const dataBufferElements = 0
-        const timestampBufferElements = 0
+        const dataBuffer = Buffer.alloc(4 * this.chunkSize * this.channelCount)
+        const timestampBuffer = Buffer.alloc(8 * this.chunkSize)
+        const dataBufferElements = this.chunkSize * this.channelCount
+        const timestampBufferElements = this.chunkSize
         const timeout = 0.0
 
-        const dataBufferPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [dataBuffer],
-        })[0]
+        const dataBufferPtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [dataBuffer],
+            })
+        )[0]
 
-        const timestampBufferPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [timestampBuffer],
-        })[0]
+        const timestampBufferPtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [timestampBuffer],
+            })
+        )[0]
 
-        const errcodePtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [new Int32Array(1)],
-        })[0]
+        const errcodePtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [new Int32Array(1)],
+            })
+        )[0]
 
         this.instance.pullChunk({
             inlet,

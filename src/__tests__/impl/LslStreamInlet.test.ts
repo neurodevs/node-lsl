@@ -212,10 +212,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         this.callsToOnChunk.push({ chunk, timestamps })
     }
 
-    private static get channelCount() {
-        return this.channelNames.length
-    }
-
     private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
         const defaultOptions = {
             sampleRate: 0,

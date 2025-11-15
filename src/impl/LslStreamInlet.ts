@@ -1,6 +1,6 @@
 import generateId from '@neurodevs/generate-id'
 
-import { createPointer, DataType, JsExternal } from 'ffi-rs'
+import { createPointer, DataType, JsExternal, unwrapPointer } from 'ffi-rs'
 import { BoundInlet, ChannelFormat } from '../types.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import LslStreamInfo, {
@@ -117,24 +117,30 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private createDataBufferPtr() {
-        this.dataBufferPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [this.dataBuffer],
-        })[0]
+        this.dataBufferPtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [this.dataBuffer],
+            })
+        )[0]
     }
 
     private createTimestampBufferPtr() {
-        this.timestampBufferPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [this.timestampBuffer],
-        })[0]
+        this.timestampBufferPtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [this.timestampBuffer],
+            })
+        )[0]
     }
 
     private createErrorCodeBufferPtr() {
-        this.errorCodeBufferPtr = createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [this.errorCodeBuffer],
-        })[0]
+        this.errorCodeBufferPtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [this.errorCodeBuffer],
+            })
+        )[0]
     }
 
     private async pullOnLoop() {
