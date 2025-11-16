@@ -5,6 +5,7 @@ import {
     assertValidMaxBufferedMs,
     assertValidSampleRateHz,
 } from '../assertions.js'
+import handleError, { LslErrorCode } from '../handleError.js'
 import {
     ChannelFormat,
     BoundOutlet,
@@ -23,7 +24,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     private info: StreamInfo
     private options: StreamOutletOptions
     private outlet!: BoundOutlet
-    private pushSampleMethod!: (options: unknown) => void
+    private pushSampleMethod!: (options: unknown) => LslErrorCode
 
     protected constructor(info: StreamInfo, options: StreamOutletOptions) {
         this.info = info
@@ -75,7 +76,7 @@ export default class LslStreamOutlet implements StreamOutlet {
         this.validateChannelFormat()
 
         this.pushSampleMethod = (
-            this.lsl[this.pushMethod] as (options: unknown) => void
+            this.lsl[this.pushMethod] as (options: unknown) => LslErrorCode
         ).bind(this.lsl)
     }
 
@@ -105,11 +106,13 @@ export default class LslStreamOutlet implements StreamOutlet {
     public pushSample(sample: LslSample) {
         const timestamp = this.lsl.localClock()
 
-        this.pushSampleMethod({
-            outlet: this.outlet,
-            sample,
-            timestamp,
-        })
+        handleError(
+            this.pushSampleMethod({
+                outlet: this.outlet,
+                sample,
+                timestamp,
+            })
+        )
     }
 
     public destroy() {

@@ -14,3 +14,11 @@ export default function handleError(errorCode: number) {
             throw new Error(`An unknown liblsl error has occurred!`)
     }
 }
+
+export enum LslErrorCode {
+    Ok = 0,
+    Timeout = -1,
+    Lost = -2,
+    BadArgument = -3,
+    InternalError = -4,
+}

@@ -24,6 +24,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeLiblsl() {
         this.fakeLiblsl = new FakeLiblsl()
         LiblslAdapter.setInstance(this.fakeLiblsl)
+
+        FakeLiblsl.fakeErrorCode = 0
     }
 
     protected static setSpyStreamInfo() {

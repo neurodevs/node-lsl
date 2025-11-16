@@ -1,6 +1,7 @@
 import { DataType, define, JsExternal, load, open, unwrapPointer } from 'ffi-rs'
 
 import { CHANNEL_FORMATS } from '../consts.js'
+import { LslErrorCode } from '../handleError.js'
 
 export default class LiblslAdapter implements Liblsl {
     public static open = open
@@ -116,14 +117,14 @@ export default class LiblslAdapter implements Liblsl {
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
         const { outlet, sample, timestamp } = options
-        this.bindings.lsl_push_sample_ft([outlet, sample, timestamp])
+        return this.bindings.lsl_push_sample_ft([outlet, sample, timestamp])
     }
 
     public pushSampleStringTimestamp(
         options: PushSampleStringTimestampOptions
     ) {
         const { outlet, sample, timestamp } = options
-        this.bindings.lsl_push_sample_strt([outlet, sample, timestamp])
+        return this.bindings.lsl_push_sample_strt([outlet, sample, timestamp])
     }
 
     public destroyOutlet(options: DestroyOutletOptions) {
@@ -254,7 +255,7 @@ export default class LiblslAdapter implements Liblsl {
             },
             lsl_push_sample_ft: {
                 library: 'lsl',
-                retType: DataType.Void,
+                retType: DataType.I32,
                 paramsType: [
                     DataType.External,
                     DataType.FloatArray,
@@ -263,7 +264,7 @@ export default class LiblslAdapter implements Liblsl {
             },
             lsl_push_sample_strt: {
                 library: 'lsl',
-                retType: DataType.Void,
+                retType: DataType.I32,
                 paramsType: [
                     DataType.External,
                     DataType.StringArray,
@@ -325,8 +326,15 @@ export interface Liblsl {
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 
     createOutlet(options: CreateOutletOptions): BoundOutlet
-    pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions): void
-    pushSampleStringTimestamp(options: PushSampleStringTimestampOptions): void
+
+    pushSampleFloatTimestamp(
+        options: PushSampleFloatTimestampOptions
+    ): LslErrorCode
+
+    pushSampleStringTimestamp(
+        options: PushSampleStringTimestampOptions
+    ): LslErrorCode
+
     destroyOutlet(options: DestroyOutletOptions): void
 
     createInlet(options: CreateInletOptions): BoundInlet
@@ -414,8 +422,8 @@ export interface LiblslBindings {
     ): BoundStreamInfo
 
     lsl_create_outlet(args: [BoundStreamInfo, number, number]): BoundOutlet
-    lsl_push_sample_ft(args: [BoundOutlet, LslSample, number]): void
-    lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): void
+    lsl_push_sample_ft(args: [BoundOutlet, LslSample, number]): LslErrorCode
+    lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): LslErrorCode
     lsl_destroy_outlet(args: [BoundOutlet]): void
     lsl_create_inlet(args: any): BoundInlet
     lsl_flush_inlet(args: [BoundInlet]): void

@@ -169,7 +169,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             lsl_push_sample_ft: {
                 library: 'lsl',
-                retType: DataType.Void,
+                retType: DataType.I32,
                 paramsType: [
                     DataType.External,
                     DataType.FloatArray,
@@ -178,7 +178,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             lsl_push_sample_strt: {
                 library: 'lsl',
-                retType: DataType.Void,
+                retType: DataType.I32,
                 paramsType: [
                     DataType.External,
                     DataType.StringArray,
@@ -610,9 +610,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             lsl_push_sample_ft: (params: any[]) => {
                 this.pushSampleFloatTimestampParams = params
+                return 0
             },
             lsl_push_sample_strt: (params: any[]) => {
                 this.pushSampleStringTimestampParams = params
+                return 0
             },
             lsl_destroy_outlet: (params: any[]) => {
                 this.destroyOutletParams = params

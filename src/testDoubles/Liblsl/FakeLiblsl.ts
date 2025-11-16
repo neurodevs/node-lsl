@@ -33,6 +33,8 @@ export default class FakeLiblsl implements Liblsl {
         new Float64Array([7, 8]),
     ]
 
+    public static fakeErrorCode = 0
+
     public liblslPath: string = generateId()
 
     public fakeSamples = FakeLiblsl.fakeSamples.slice()
@@ -76,6 +78,7 @@ export default class FakeLiblsl implements Liblsl {
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
         this.lastPushSampleFloatTimestampOptions = options
+        return FakeLiblsl.fakeErrorCode
     }
 
     public pushSampleStringTimestamp(
@@ -83,6 +86,7 @@ export default class FakeLiblsl implements Liblsl {
     ) {
         this.lastPushSampleStringTimestampOptions = options
         this.pushSampleStringTimestampHitCount++
+        return FakeLiblsl.fakeErrorCode
     }
 
     public createOutlet(options: CreateOutletOptions) {

@@ -12,6 +12,7 @@ import {
     TestChannelFormat,
 } from '../../testDoubles/consts.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
+import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
@@ -237,6 +238,62 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     protected static async defaultsUnitsToNA() {
         const outlet = await this.LslStreamOutlet({ units: undefined })
         assert.isEqualDeep(outlet['units'], 'N/A', 'Did not set units as N/A!')
+    }
+
+    @test()
+    protected static async throwsWithUnknownErrorCode() {
+        await this.assertThrowsWithErrorCode(
+            -999,
+            `An unknown liblsl error has occurred!`
+        )
+    }
+
+    @test()
+    protected static async throwsWithErrorCodeNegativeOne() {
+        await this.assertThrowsWithErrorCode(
+            -1,
+            `The liblsl operation failed due to a timeout!`
+        )
+    }
+
+    @test()
+    protected static async throwsWithErrorCodeNegativeTwo() {
+        await this.assertThrowsWithErrorCode(
+            -2,
+            `The liblsl stream has been lost!`
+        )
+    }
+
+    @test()
+    protected static async throwsWithErrorCodeNegativeThree() {
+        await this.assertThrowsWithErrorCode(
+            -3,
+            'A liblsl argument was incorrectly specified!'
+        )
+    }
+
+    @test()
+    protected static async throwsWithErrorCodeNegativeFour() {
+        await this.assertThrowsWithErrorCode(
+            -4,
+            'An internal liblsl error has occurred!'
+        )
+    }
+
+    private static async assertThrowsWithErrorCode(
+        errorCode: number,
+        message: string
+    ) {
+        FakeLiblsl.fakeErrorCode = errorCode
+
+        const outlet =
+            Math.random() > 0.5
+                ? await this.FloatOutlet()
+                : await this.StringOutlet()
+
+        assert.doesThrow(() => {
+            outlet.pushSample([1.0])
+        }, message)
     }
 
     private static async assertThrowsWithEmptyChannelNames() {
