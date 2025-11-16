@@ -233,7 +233,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private handleErrorCodeIfPresent() {
-        handleError(this.errorCodeBuffer.readInt32LE(0))
+        handleError(this.errorCodeBuffer.readInt32LE())
     }
 
     public stopPulling() {
