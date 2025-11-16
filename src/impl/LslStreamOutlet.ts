@@ -23,7 +23,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     private info: StreamInfo
     private options: StreamOutletOptions
     private outlet!: BoundOutlet
-    private pushSampleByType!: (options: any) => void
+    private pushSampleMethod!: (options: unknown) => void
 
     protected constructor(info: StreamInfo, options: StreamOutletOptions) {
         this.info = info
@@ -31,7 +31,7 @@ export default class LslStreamOutlet implements StreamOutlet {
 
         this.validateOptions()
         this.createStreamOutlet()
-        this.setPushSampleType()
+        this.setPushSampleMethod()
     }
 
     public static async Create(options: StreamOutletOptions) {
@@ -71,10 +71,10 @@ export default class LslStreamOutlet implements StreamOutlet {
         })
     }
 
-    private setPushSampleType() {
+    private setPushSampleMethod() {
         this.validateChannelFormat()
 
-        this.pushSampleByType = (
+        this.pushSampleMethod = (
             this.lsl[this.pushMethod] as (options: unknown) => void
         ).bind(this.lsl)
     }
@@ -105,7 +105,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     public pushSample(sample: LslSample) {
         const timestamp = this.lsl.localClock()
 
-        this.pushSampleByType({
+        this.pushSampleMethod({
             outlet: this.outlet,
             sample,
             timestamp,
