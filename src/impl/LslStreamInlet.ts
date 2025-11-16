@@ -175,7 +175,7 @@ export default class LslStreamInlet implements StreamInlet {
 
         if (timestamp) {
             return {
-                samples: this.convertDataBufferToFloatArray(),
+                samples: this.createFloatArrayFromDataBuffer(),
                 timestamps: new Float64Array([timestamp]),
             }
         }
@@ -192,7 +192,7 @@ export default class LslStreamInlet implements StreamInlet {
         })
     }
 
-    private convertDataBufferToFloatArray() {
+    private createFloatArrayFromDataBuffer() {
         return new Float32Array(
             this.dataBuffer.buffer,
             this.dataBuffer.byteOffset,
@@ -205,8 +205,8 @@ export default class LslStreamInlet implements StreamInlet {
 
         if (firstTimestamp) {
             return {
-                samples: this.convertDataBufferToFloatArray(),
-                timestamps: this.convertTimestampBufferToDoubleArray(),
+                samples: this.createFloatArrayFromDataBuffer(),
+                timestamps: this.createDoubleArrayFromTimestampBuffer(),
             }
         }
         return { samples: undefined, timestamps: undefined }
@@ -224,7 +224,7 @@ export default class LslStreamInlet implements StreamInlet {
         })
     }
 
-    private convertTimestampBufferToDoubleArray() {
+    private createDoubleArrayFromTimestampBuffer() {
         return new Float64Array(
             this.timestampBuffer.buffer,
             this.timestampBuffer.byteOffset,
