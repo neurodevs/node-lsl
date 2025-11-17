@@ -1,8 +1,10 @@
+import { WebSocketServer } from 'ws'
 import { ChannelFormat } from './LiblslAdapter.js'
 import LslStreamInlet, { StreamInlet } from './LslStreamInlet.js'
 
 export default class LslWebSocketBridge implements StreamTransportBridge {
     public static Class?: StreamTransportBridgeConstructor
+    public static WSS = WebSocketServer
 
     private inlet: StreamInlet
 
@@ -14,7 +16,9 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
 
     public static Create(options: StreamTransportBridgeOptions) {
         const inlet = this.LslStreamInlet(options)
-        return new (this.Class ?? this)({ ...options, inlet })
+        const wss = this.WebSocketServer()
+
+        return new (this.Class ?? this)({ ...options, inlet, wss })
     }
 
     public activate() {
@@ -34,6 +38,10 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
             ...options,
             onData: (_samples: Float32Array, _timestamps: Float64Array) => {},
         })
+    }
+
+    private static WebSocketServer() {
+        return new this.WSS({ port: 8080 })
     }
 }
 
@@ -55,4 +63,5 @@ export interface StreamTransportBridgeOptions {
 export interface StreamTransportBridgeConstructorOptions
     extends StreamTransportBridgeOptions {
     inlet: StreamInlet
+    wss: WebSocketServer
 }

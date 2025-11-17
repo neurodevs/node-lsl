@@ -1,4 +1,5 @@
 import { randomInt } from 'crypto'
+
 import { test, assert } from '@neurodevs/node-tdd'
 
 import LslWebSocketBridge, {
@@ -6,6 +7,7 @@ import LslWebSocketBridge, {
     StreamTransportBridgeOptions,
 } from '../../impl/LslWebSocketBridge.js'
 import FakeStreamInlet from '../../testDoubles/StreamInlet/FakeStreamInlet.js'
+import FakeWebSocketServer from '../../testDoubles/WebSockets/FakeWebSocketServer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslWebSocketBridgeTest extends AbstractPackageTest {
@@ -15,6 +17,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         await super.beforeEach()
 
         this.setFakeStreamInlet()
+        this.setFakeWebSocketServer()
 
         this.instance = this.LslWebSocketBridge()
     }
@@ -74,11 +77,13 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         )
     }
 
-    private static readonly baseOptions = {
-        channelNames: this.channelNames,
-        channelFormat: 'float32' as const,
-        sampleRateHz: 100 * Math.random(),
-        chunkSize: randomInt(1, 100),
+    @test()
+    protected static async createsWebSocketServer() {
+        assert.isEqualDeep(
+            FakeWebSocketServer.callsToConstructor[0],
+            { port: this.wssPort },
+            'Did not create WebSocketServer!'
+        )
     }
 
     private static activate() {
@@ -91,6 +96,15 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static destroy() {
         this.instance.destroy()
+    }
+
+    private static readonly wssPort = 8080
+
+    private static readonly baseOptions = {
+        channelNames: this.channelNames,
+        channelFormat: 'float32' as const,
+        sampleRateHz: 100 * Math.random(),
+        chunkSize: randomInt(1, 100),
     }
 
     private static LslWebSocketBridge(
