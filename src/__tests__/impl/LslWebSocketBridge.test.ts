@@ -92,13 +92,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async activateSendsDataToWebSocketClients() {
         this.activate()
 
-        const samples = new Float32Array([1, 2, 3, 4, 5, 6])
-        const timestamps = new Float64Array([7, 8])
-
-        FakeStreamInlet.callsToConstructor[0]?.options?.onData(
-            samples,
-            timestamps
-        )
+        const { samples, timestamps } = this.simulateOnDataCallback()
 
         for (const client of FakeWebSocketServer.clients) {
             const callToClient = FakeWebSocket.callsToSend.filter(
@@ -114,6 +108,22 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
                 'Did not send data to client!'
             )
         }
+    }
+
+    @test()
+    protected static async doesNotSendToClientsThatAreNotReady() {
+        for (const client of FakeWebSocketServer.clients) {
+            client.readyState = WebSocket.CONNECTING
+        }
+
+        this.activate()
+        this.simulateOnDataCallback()
+
+        assert.isEqual(
+            FakeWebSocket.callsToSend.length,
+            0,
+            'Sent data to clients that are not ready!'
+        )
     }
 
     @test()
@@ -146,6 +156,17 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static destroy() {
         this.instance.destroy()
+    }
+
+    private static simulateOnDataCallback() {
+        const samples = new Float32Array([1, 2, 3, 4, 5, 6])
+        const timestamps = new Float64Array([7, 8])
+
+        FakeStreamInlet.callsToConstructor[0]?.options?.onData(
+            samples,
+            timestamps
+        )
+        return { samples, timestamps }
     }
 
     private static readonly wssPort = 8080
