@@ -82,10 +82,8 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
         options: StreamTransportBridgeOptions,
         wss: WebSocketServer
     ) {
-        return LslStreamInlet.Create({
-            ...options,
-            onData: this.createOnDataCallback(wss),
-        })
+        const onData = this.createOnDataCallback(wss)
+        return LslStreamInlet.Create(options, onData)
     }
 
     private static WebSocketServer() {

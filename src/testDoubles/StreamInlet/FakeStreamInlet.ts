@@ -5,6 +5,7 @@ export default class FakeStreamInlet implements StreamInlet {
     public static callsToConstructor: {
         info?: StreamInfo
         options?: StreamInletOptions
+        onData?: (samples: Float32Array, timestamps: Float64Array) => void
     }[] = []
 
     public static numCallsToStartPulling = 0
@@ -16,10 +17,17 @@ export default class FakeStreamInlet implements StreamInlet {
 
     protected onData!: (samples: Float32Array, timestamps: Float64Array) => void
 
-    public constructor(info?: StreamInfo, options?: StreamInletOptions) {
+    public constructor(
+        info?: StreamInfo,
+        options?: StreamInletOptions,
+        onData?: (samples: Float32Array, timestamps: Float64Array) => void
+    ) {
+        this.onData = onData ?? (() => {})
+
         FakeStreamInlet.callsToConstructor.push({
             info,
             options,
+            onData: this.onData,
         })
     }
 

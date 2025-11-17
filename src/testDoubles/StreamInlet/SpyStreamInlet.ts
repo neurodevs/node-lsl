@@ -1,11 +1,16 @@
 import { StreamInfo } from '../../impl/LslStreamInfo.js'
 import LslStreamInlet, {
+    OnDataCallback,
     StreamInletOptions,
 } from '../../impl/LslStreamInlet.js'
 
 export class SpyStreamInlet extends LslStreamInlet {
-    public constructor(info: StreamInfo, options: StreamInletOptions) {
-        super(info, options)
+    public constructor(
+        info: StreamInfo,
+        options: StreamInletOptions,
+        onData: OnDataCallback
+    ) {
+        super(info, options, onData)
     }
 
     public getName() {

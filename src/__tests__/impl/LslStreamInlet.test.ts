@@ -318,9 +318,11 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     protected static LslStreamInlet(options?: Partial<StreamInletOptions>) {
-        return AbstractPackageTest.LslStreamInlet({
-            ...options,
-            onData: this.onData,
-        }) as SpyStreamInlet
+        return AbstractPackageTest.LslStreamInlet(
+            {
+                ...options,
+            },
+            this.onData
+        ) as SpyStreamInlet
     }
 }

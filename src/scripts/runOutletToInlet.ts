@@ -15,17 +15,19 @@ const outlet = await LslStreamOutlet.Create({
 })
 
 console.log('Creating inlet...')
-const inlet = LslStreamInlet.Create({
+
+const inletOptions = {
     name: 'TestOutlet',
     type: 'TEST',
     sourceId: 'TestOutletID',
     sampleRateHz: 100,
     channelNames: ['Ch1', 'Ch2', 'Ch3'],
-    channelFormat: 'float32',
+    channelFormat: 'float32' as const,
     chunkSize: 1,
-    onData: (samples, timestamps) => {
-        console.log('Received samples:', samples, 'at timestamps:', timestamps)
-    },
+}
+
+const inlet = LslStreamInlet.Create(inletOptions, (samples, timestamps) => {
+    console.log('Received samples:', samples, 'at timestamps:', timestamps)
 })
 
 console.log('Start pulling...')

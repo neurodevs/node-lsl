@@ -162,10 +162,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         const samples = new Float32Array([1, 2, 3, 4, 5, 6])
         const timestamps = new Float64Array([7, 8])
 
-        FakeStreamInlet.callsToConstructor[0]?.options?.onData(
-            samples,
-            timestamps
-        )
+        FakeStreamInlet.callsToConstructor[0]?.onData!(samples, timestamps)
         return { samples, timestamps }
     }
 

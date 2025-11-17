@@ -4,7 +4,10 @@ import { Server } from 'ws'
 import LiblslAdapter from '../impl/LiblslAdapter.js'
 import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
-import LslStreamInlet, { StreamInletOptions } from '../impl/LslStreamInlet.js'
+import LslStreamInlet, {
+    OnDataCallback,
+    StreamInletOptions,
+} from '../impl/LslStreamInlet.js'
 import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
 import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
@@ -88,20 +91,22 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static readonly sampleRateHz = Math.floor(Math.random() * 100)
     protected static readonly maxBufferedMs = Math.floor(Math.random() * 1000)
 
-    protected static LslStreamInlet(options?: Partial<StreamInletOptions>) {
+    protected static LslStreamInlet(
+        options: Partial<StreamInletOptions>,
+        onData: OnDataCallback
+    ) {
         const defaultOptions = {
             sampleRateHz: 0,
             channelNames: this.channelNames,
             channelFormat: 'float32',
             chunkSize: this.chunkSize,
             maxBufferedMs: this.maxBufferedMs,
-            onData: () => {},
             name: this.name_,
             type: this.type,
             sourceId: this.sourceId,
             ...options,
         } as StreamInletOptions
 
-        return LslStreamInlet.Create(defaultOptions)
+        return LslStreamInlet.Create(defaultOptions, onData)
     }
 }
