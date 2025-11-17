@@ -51,6 +51,18 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async deactivateCallsStopPullingOnInlet() {
+        this.activate()
+        this.deactivate()
+
+        assert.isEqual(
+            FakeStreamInlet.numCallsToStopPulling,
+            1,
+            'Did not call stopPulling on inlet!'
+        )
+    }
+
     private static readonly baseOptions = {
         channelNames: this.channelNames,
         channelFormat: 'float32' as const,
@@ -60,6 +72,10 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static activate() {
         this.instance.activate()
+    }
+
+    private static deactivate() {
+        this.instance.deactivate()
     }
 
     private static LslWebSocketBridge(
