@@ -86,6 +86,17 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async destroyClosesWebSocketServer() {
+        this.destroy()
+
+        assert.isEqual(
+            FakeWebSocketServer.numCallsToClose,
+            1,
+            'Did not call close on WebSocketServer!'
+        )
+    }
+
     private static activate() {
         this.instance.activate()
     }

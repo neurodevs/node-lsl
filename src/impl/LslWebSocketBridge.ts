@@ -7,11 +7,13 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     public static WSS = WebSocketServer
 
     private inlet: StreamInlet
+    private wss: WebSocketServer
 
     protected constructor(options: StreamTransportBridgeConstructorOptions) {
-        const { inlet } = options
+        const { inlet, wss } = options
 
         this.inlet = inlet
+        this.wss = wss
     }
 
     public static Create(options: StreamTransportBridgeOptions) {
@@ -30,7 +32,16 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     }
 
     public destroy() {
+        this.destroyCppBoundInlet()
+        this.closeWebSocketServer()
+    }
+
+    private destroyCppBoundInlet() {
         this.inlet.destroy()
+    }
+
+    private closeWebSocketServer() {
+        this.wss.close()
     }
 
     private static LslStreamInlet(options: StreamTransportBridgeOptions) {
