@@ -3,12 +3,13 @@ import AbstractModuleTest from '@neurodevs/node-tdd'
 import LiblslAdapter from '../impl/LiblslAdapter.js'
 import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
-import LslStreamInlet from '../impl/LslStreamInlet.js'
+import LslStreamInlet, { StreamInletOptions } from '../impl/LslStreamInlet.js'
 import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
 import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo.js'
 import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo.js'
+import FakeStreamInlet from '../testDoubles/StreamInlet/FakeStreamInlet.js'
 import { SpyStreamInlet } from '../testDoubles/StreamInlet/SpyStreamInlet.js'
 import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
 
@@ -41,6 +42,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LslStreamInlet.Class = SpyStreamInlet
     }
 
+    protected static setFakeStreamInlet() {
+        LslStreamInlet.Class = FakeStreamInlet
+        FakeStreamInlet.resetTestDouble()
+    }
+
     protected static setFakeStreamOutlet() {
         LslStreamOutlet.Class = FakeStreamOutlet
         FakeStreamOutlet.resetTestDouble()
@@ -68,4 +74,21 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static readonly chunkSize = 2
     protected static readonly sampleRateHz = Math.floor(Math.random() * 100)
     protected static readonly maxBufferedMs = Math.floor(Math.random() * 1000)
+
+    protected static LslStreamInlet(options?: Partial<StreamInletOptions>) {
+        const defaultOptions = {
+            sampleRateHz: 0,
+            channelNames: this.channelNames,
+            channelFormat: 'float32',
+            chunkSize: this.chunkSize,
+            maxBufferedMs: this.maxBufferedMs,
+            onData: () => {},
+            name: this.name_,
+            type: this.type,
+            sourceId: this.sourceId,
+            ...options,
+        } as StreamInletOptions
+
+        return LslStreamInlet.Create(defaultOptions)
+    }
 }

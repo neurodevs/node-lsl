@@ -1,7 +1,5 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import LslStreamInlet, {
-    StreamInletOptions,
-} from '../../impl/LslStreamInlet.js'
+import { StreamInletOptions } from '../../impl/LslStreamInlet.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
 import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
@@ -319,20 +317,10 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         this.callsToOnData.push({ samples, timestamps })
     }
 
-    private static LslStreamInlet(options?: Partial<StreamInletOptions>) {
-        const defaultOptions = {
-            sampleRateHz: 0,
-            channelNames: this.channelNames,
-            channelFormat: 'float32',
-            chunkSize: this.chunkSize,
-            maxBufferedMs: this.maxBufferedMs,
-            onData: this.onData,
-            name: this.name_,
-            type: this.type,
-            sourceId: this.sourceId,
+    protected static LslStreamInlet(options?: Partial<StreamInletOptions>) {
+        return AbstractPackageTest.LslStreamInlet({
             ...options,
-        } as StreamInletOptions
-
-        return LslStreamInlet.Create(defaultOptions) as SpyStreamInlet
+            onData: this.onData,
+        }) as SpyStreamInlet
     }
 }
