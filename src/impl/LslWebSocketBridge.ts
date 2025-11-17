@@ -25,6 +25,10 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
         this.inlet.stopPulling()
     }
 
+    public destroy() {
+        this.inlet.destroy()
+    }
+
     private static LslStreamInlet(options: StreamTransportBridgeOptions) {
         return LslStreamInlet.Create({
             ...options,
@@ -36,6 +40,7 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
 export interface StreamTransportBridge {
     activate(): void
     deactivate(): void
+    destroy(): void
 }
 
 export type StreamTransportBridgeConstructor = new () => StreamTransportBridge

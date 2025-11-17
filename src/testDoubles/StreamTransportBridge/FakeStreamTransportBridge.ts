@@ -6,6 +6,7 @@ export default class FakeStreamTransportBridge
     public static numCallsToConstructor = 0
     public static numCallsToActivate = 0
     public static numCallsToDeactivate = 0
+    public static numCallsToDestroy = 0
 
     public constructor() {
         FakeStreamTransportBridge.numCallsToConstructor++
@@ -19,9 +20,14 @@ export default class FakeStreamTransportBridge
         FakeStreamTransportBridge.numCallsToDeactivate++
     }
 
+    public destroy() {
+        FakeStreamTransportBridge.numCallsToDestroy++
+    }
+
     public static resetTestDouble() {
         FakeStreamTransportBridge.numCallsToConstructor = 0
         FakeStreamTransportBridge.numCallsToActivate = 0
         FakeStreamTransportBridge.numCallsToDeactivate = 0
+        FakeStreamTransportBridge.numCallsToDestroy = 0
     }
 }

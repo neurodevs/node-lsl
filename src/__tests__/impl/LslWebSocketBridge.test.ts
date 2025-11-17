@@ -63,6 +63,17 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async destroyCallsDestroyOnInlet() {
+        this.destroy()
+
+        assert.isEqual(
+            FakeStreamInlet.numCallsToDestroy,
+            1,
+            'Did not call destroy on inlet!'
+        )
+    }
+
     private static readonly baseOptions = {
         channelNames: this.channelNames,
         channelFormat: 'float32' as const,
@@ -76,6 +87,10 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static deactivate() {
         this.instance.deactivate()
+    }
+
+    private static destroy() {
+        this.instance.destroy()
     }
 
     private static LslWebSocketBridge(
