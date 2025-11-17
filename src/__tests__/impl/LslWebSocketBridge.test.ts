@@ -103,7 +103,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
         assert.doesThrow(() => {
             this.activate()
-        }, `\n\n Cannot re-activate bridge after destroying! \n\n Please create and activate a new instance. \n`)
+        }, `\n\n Cannot re-activate bridge after destroying it! \n\n Please create and activate a new instance. \n`)
     }
 
     private static activate() {

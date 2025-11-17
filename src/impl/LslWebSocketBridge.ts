@@ -32,7 +32,7 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     private throwIfBridgeIsDestroyed() {
         if (this.isDestroyed) {
             throw new Error(
-                `\n\n Cannot re-activate bridge after destroying! \n\n Please create and activate a new instance. \n`
+                `\n\n Cannot re-activate bridge after destroying it! \n\n Please create and activate a new instance. \n`
             )
         }
     }
