@@ -8,6 +8,7 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
 
     private inlet: StreamInlet
     private wss: WebSocketServer
+    private isDestroyed = false
 
     protected constructor(options: StreamTransportBridgeConstructorOptions) {
         const { inlet, wss } = options
@@ -24,16 +25,34 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     }
 
     public activate() {
+        this.throwIfBridgeIsDestroyed()
+        this.startPullingData()
+    }
+
+    private throwIfBridgeIsDestroyed() {
+        if (this.isDestroyed) {
+            throw new Error(
+                `\n\n Cannot re-activate bridge after destroying! \n\n Please create and activate a new instance. \n`
+            )
+        }
+    }
+
+    private startPullingData() {
         this.inlet.startPulling()
     }
 
     public deactivate() {
+        this.stopPullingData()
+    }
+
+    private stopPullingData() {
         this.inlet.stopPulling()
     }
 
     public destroy() {
         this.destroyCppBoundInlet()
         this.closeWebSocketServer()
+        this.isDestroyed = true
     }
 
     private destroyCppBoundInlet() {
