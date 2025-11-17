@@ -40,11 +40,26 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async activateCallsStartPullingOnInlet() {
+        this.activate()
+
+        assert.isEqual(
+            FakeStreamInlet.numCallsToStartPulling,
+            1,
+            'Did not call startPulling on inlet!'
+        )
+    }
+
     private static readonly baseOptions = {
         channelNames: this.channelNames,
         channelFormat: 'float32' as const,
         sampleRateHz: 100 * Math.random(),
         chunkSize: randomInt(1, 100),
+    }
+
+    private static activate() {
+        this.instance.activate()
     }
 
     private static LslWebSocketBridge(

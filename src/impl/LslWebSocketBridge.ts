@@ -1,14 +1,24 @@
 import { ChannelFormat } from './LiblslAdapter.js'
-import LslStreamInlet from './LslStreamInlet.js'
+import LslStreamInlet, { StreamInlet } from './LslStreamInlet.js'
 
 export default class LslWebSocketBridge implements StreamTransportBridge {
     public static Class?: StreamTransportBridgeConstructor
 
-    protected constructor(_options: StreamTransportBridgeOptions) {}
+    private inlet: StreamInlet
+
+    protected constructor(options: StreamTransportBridgeConstructorOptions) {
+        const { inlet } = options
+
+        this.inlet = inlet
+    }
 
     public static Create(options: StreamTransportBridgeOptions) {
-        this.LslStreamInlet(options)
-        return new (this.Class ?? this)(options)
+        const inlet = this.LslStreamInlet(options)
+        return new (this.Class ?? this)({ ...options, inlet })
+    }
+
+    public activate() {
+        this.inlet.startPulling()
     }
 
     private static LslStreamInlet(options: StreamTransportBridgeOptions) {
@@ -19,7 +29,9 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     }
 }
 
-export interface StreamTransportBridge {}
+export interface StreamTransportBridge {
+    activate(): void
+}
 
 export type StreamTransportBridgeConstructor = new () => StreamTransportBridge
 
@@ -28,4 +40,9 @@ export interface StreamTransportBridgeOptions {
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number
+}
+
+export interface StreamTransportBridgeConstructorOptions
+    extends StreamTransportBridgeOptions {
+    inlet: StreamInlet
 }
