@@ -65,15 +65,23 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
 
     private static createOnDataCallback(wss: WebSocketServer) {
         return (samples: Float32Array, timestamps: Float64Array) => {
-            for (const client of wss.clients) {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(
-                        JSON.stringify({
-                            samples,
-                            timestamps,
-                        })
-                    )
-                }
+            this.broadcastToClients(wss, samples, timestamps)
+        }
+    }
+
+    private static broadcastToClients(
+        wss: WebSocketServer,
+        samples: Float32Array<ArrayBufferLike>,
+        timestamps: Float64Array<ArrayBufferLike>
+    ) {
+        for (const client of wss.clients) {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(
+                    JSON.stringify({
+                        samples,
+                        timestamps,
+                    })
+                )
             }
         }
     }
