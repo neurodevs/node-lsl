@@ -65,7 +65,7 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
 
     private static createOnDataCallback(wss: WebSocketServer) {
         return (samples: Float32Array, timestamps: Float64Array) => {
-            wss.clients.forEach((client) => {
+            for (const client of wss.clients) {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send(
                         JSON.stringify({
@@ -74,7 +74,7 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
                         })
                     )
                 }
-            })
+            }
         }
     }
 
