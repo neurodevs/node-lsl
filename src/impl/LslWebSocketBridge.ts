@@ -6,7 +6,7 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     public static Class?: StreamTransportBridgeConstructor
     public static WSS = WebSocketServer
 
-    protected inlet: StreamInlet
+    private inlet: StreamInlet
     private wss: WebSocketServer
     private isDestroyed = false
 
