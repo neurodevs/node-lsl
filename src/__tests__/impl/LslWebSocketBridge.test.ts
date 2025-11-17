@@ -3,23 +3,25 @@ import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import LslWebSocketBridge, {
-    StreamTransportBridge,
     StreamTransportBridgeOptions,
 } from '../../impl/LslWebSocketBridge.js'
 import FakeStreamInlet from '../../testDoubles/StreamInlet/FakeStreamInlet.js'
+import SpyLslWebSocketBridge from '../../testDoubles/StreamTransportBridge/SpyLslWebSocketBridge.js'
+import FakeWebSocket from '../../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../../testDoubles/WebSockets/FakeWebSocketServer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslWebSocketBridgeTest extends AbstractPackageTest {
-    private static instance: StreamTransportBridge
+    private static instance: SpyLslWebSocketBridge
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeStreamInlet()
         this.setFakeWebSocketServer()
+        this.setSpyLslWebSocketBridge()
 
-        this.instance = this.LslWebSocketBridge()
+        this.instance = this.LslWebSocketBridge() as SpyLslWebSocketBridge
     }
 
     @test()
@@ -84,6 +86,34 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
             { port: this.wssPort },
             'Did not create WebSocketServer!'
         )
+    }
+
+    @test()
+    protected static async activateSendsDataToWebSocketClients() {
+        this.activate()
+
+        const samples = new Float32Array([1, 2, 3, 4, 5, 6])
+        const timestamps = new Float64Array([7, 8])
+
+        FakeStreamInlet.callsToConstructor[0]?.options?.onData(
+            samples,
+            timestamps
+        )
+
+        for (const client of FakeWebSocketServer.clients) {
+            const callToClient = FakeWebSocket.callsToSend.filter(
+                (c) => c.id === client.id
+            )[0]
+
+            assert.isEqualDeep(
+                callToClient?.data,
+                JSON.stringify({
+                    samples,
+                    timestamps,
+                }),
+                'Did not send data to client!'
+            )
+        }
     }
 
     @test()

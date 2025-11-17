@@ -288,4 +288,4 @@ export interface StreamInletOptions {
 export type OnDataCallback = (
     samples: Float32Array,
     timestamps: Float64Array
-) => void | Promise<void>
+) => void

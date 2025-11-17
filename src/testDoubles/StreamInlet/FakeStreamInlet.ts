@@ -14,6 +14,8 @@ export default class FakeStreamInlet implements StreamInlet {
 
     public isRunning = false
 
+    protected onData!: (samples: Float32Array, timestamps: Float64Array) => void
+
     public constructor(info?: StreamInfo, options?: StreamInletOptions) {
         FakeStreamInlet.callsToConstructor.push({
             info,

@@ -6,7 +6,7 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     public static Class?: StreamTransportBridgeConstructor
     public static WSS = WebSocketServer
 
-    private inlet: StreamInlet
+    protected inlet: StreamInlet
     private wss: WebSocketServer
     private isDestroyed = false
 
@@ -18,8 +18,8 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     }
 
     public static Create(options: StreamTransportBridgeOptions) {
-        const inlet = this.LslStreamInlet(options)
         const wss = this.WebSocketServer()
+        const inlet = this.LslStreamInlet(options, wss)
 
         return new (this.Class ?? this)({ ...options, inlet, wss })
     }
@@ -63,10 +63,26 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
         this.wss.close()
     }
 
-    private static LslStreamInlet(options: StreamTransportBridgeOptions) {
+    private static createOnDataCallback(wss: WebSocketServer) {
+        return (samples: Float32Array, timestamps: Float64Array) => {
+            wss.clients.forEach((client) => {
+                client.send(
+                    JSON.stringify({
+                        samples,
+                        timestamps,
+                    })
+                )
+            })
+        }
+    }
+
+    private static LslStreamInlet(
+        options: StreamTransportBridgeOptions,
+        wss: WebSocketServer
+    ) {
         return LslStreamInlet.Create({
             ...options,
-            onData: (_samples: Float32Array, _timestamps: Float64Array) => {},
+            onData: this.createOnDataCallback(wss),
         })
     }
 
@@ -81,7 +97,9 @@ export interface StreamTransportBridge {
     destroy(): void
 }
 
-export type StreamTransportBridgeConstructor = new () => StreamTransportBridge
+export type StreamTransportBridgeConstructor = new (
+    options: StreamTransportBridgeConstructorOptions
+) => StreamTransportBridge
 
 export interface StreamTransportBridgeOptions {
     channelNames: string[]
