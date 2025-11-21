@@ -61,3 +61,11 @@ export * from './testDoubles/StreamTransportBridge/FakeStreamTransportBridge.js'
 // Utils
 
 export { default as generateRandomOutletOptions } from './testDoubles/generateRandomOutletOptions.js'
+
+// WebSockets
+
+export { default as FakeWebSocket } from './testDoubles/WebSockets/FakeWebSocket.js'
+export * from './testDoubles/WebSockets/FakeWebSocket.js'
+
+export { default as FakeWebSocketServer } from './testDoubles/WebSockets/FakeWebSocketServer.js'
+export * from './testDoubles/WebSockets/FakeWebSocketServer.js'
