@@ -2,22 +2,22 @@ import { WebSocketServer } from 'ws'
 import { ChannelFormat } from './LiblslAdapter.js'
 import LslStreamInlet, { StreamInlet } from './LslStreamInlet.js'
 
-export default class LslWebSocketBridge implements StreamTransportBridge {
-    public static Class?: StreamTransportBridgeConstructor
+export default class LslWebSocketBridge implements WebSocketBridge {
+    public static Class?: WebSocketBridgeConstructor
     public static WSS = WebSocketServer
 
     private inlet: StreamInlet
     private wss: WebSocketServer
     private isDestroyed = false
 
-    protected constructor(options: StreamTransportBridgeConstructorOptions) {
+    protected constructor(options: WebSocketBridgeConstructorOptions) {
         const { inlet, wss } = options
 
         this.inlet = inlet
         this.wss = wss
     }
 
-    public static Create(options: StreamTransportBridgeOptions) {
+    public static Create(options: WebSocketBridgeOptions) {
         const { wssPort = 8080 } = options ?? {}
         const wss = this.WebSocketServer(wssPort)
         const inlet = this.LslStreamInlet(options, wss)
@@ -88,7 +88,7 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     }
 
     private static LslStreamInlet(
-        options: StreamTransportBridgeOptions,
+        options: WebSocketBridgeOptions,
         wss: WebSocketServer
     ) {
         const onData = this.createOnDataCallback(wss)
@@ -100,17 +100,17 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     }
 }
 
-export interface StreamTransportBridge {
+export interface WebSocketBridge {
     activate(): void
     deactivate(): void
     destroy(): void
 }
 
-export type StreamTransportBridgeConstructor = new (
-    options: StreamTransportBridgeConstructorOptions
-) => StreamTransportBridge
+export type WebSocketBridgeConstructor = new (
+    options: WebSocketBridgeConstructorOptions
+) => WebSocketBridge
 
-export interface StreamTransportBridgeOptions {
+export interface WebSocketBridgeOptions {
     channelNames: string[]
     channelFormat: ChannelFormat
     sampleRateHz: number
@@ -118,8 +118,8 @@ export interface StreamTransportBridgeOptions {
     wssPort?: number
 }
 
-export interface StreamTransportBridgeConstructorOptions
-    extends StreamTransportBridgeOptions {
+export interface WebSocketBridgeConstructorOptions
+    extends WebSocketBridgeOptions {
     inlet: StreamInlet
     wss: WebSocketServer
 }

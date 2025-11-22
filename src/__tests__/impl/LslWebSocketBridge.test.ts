@@ -3,10 +3,10 @@ import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import LslWebSocketBridge, {
-    StreamTransportBridgeOptions,
+    WebSocketBridgeOptions,
 } from '../../impl/LslWebSocketBridge.js'
 import FakeStreamInlet from '../../testDoubles/StreamInlet/FakeStreamInlet.js'
-import SpyLslWebSocketBridge from '../../testDoubles/StreamTransportBridge/SpyLslWebSocketBridge.js'
+import SpyLslWebSocketBridge from '../../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
 import FakeWebSocket from '../../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../../testDoubles/WebSockets/FakeWebSocketServer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
@@ -191,7 +191,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     }
 
     private static LslWebSocketBridge(
-        options?: Partial<StreamTransportBridgeOptions>
+        options?: Partial<WebSocketBridgeOptions>
     ) {
         return LslWebSocketBridge.Create({ ...this.baseOptions, ...options })
     }

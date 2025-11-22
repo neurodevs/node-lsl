@@ -1,9 +1,9 @@
 import LslWebSocketBridge, {
-    StreamTransportBridgeConstructorOptions,
+    WebSocketBridgeConstructorOptions,
 } from '../../impl/LslWebSocketBridge.js'
 
 export default class SpyLslWebSocketBridge extends LslWebSocketBridge {
-    public constructor(options: StreamTransportBridgeConstructorOptions) {
+    public constructor(options: WebSocketBridgeConstructorOptions) {
         super(options)
     }
 }

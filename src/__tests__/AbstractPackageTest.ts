@@ -17,7 +17,7 @@ import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo.js'
 import FakeStreamInlet from '../testDoubles/StreamInlet/FakeStreamInlet.js'
 import { SpyStreamInlet } from '../testDoubles/StreamInlet/SpyStreamInlet.js'
 import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
-import SpyLslWebSocketBridge from '../testDoubles/StreamTransportBridge/SpyLslWebSocketBridge.js'
+import SpyLslWebSocketBridge from '../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {

@@ -50,13 +50,13 @@ export * from './impl/LslStreamOutlet.js'
 export { default as FakeStreamOutlet } from './testDoubles/StreamOutlet/FakeStreamOutlet.js'
 export * from './testDoubles/StreamOutlet/FakeStreamOutlet.js'
 
-// StreamTransportBridge
+// WebSocketBridge
 
 export { default as LslWebSocketBridge } from './impl/LslWebSocketBridge.js'
 export * from './impl/LslWebSocketBridge.js'
 
-export { default as FakeStreamTransportBridge } from './testDoubles/StreamTransportBridge/FakeStreamTransportBridge.js'
-export * from './testDoubles/StreamTransportBridge/FakeStreamTransportBridge.js'
+export { default as FakeWebSocketBridge } from './testDoubles/WebSocketBridge/FakeWebSocketBridge.js'
+export * from './testDoubles/WebSocketBridge/FakeWebSocketBridge.js'
 
 // Utils
 
