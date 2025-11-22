@@ -146,6 +146,21 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         }, `\n\n Cannot re-activate bridge after destroying it! \n\n Please create and activate a new instance. \n`)
     }
 
+    @test()
+    protected static async acceptsOptionalWssPort() {
+        FakeWebSocketServer.resetTestDouble()
+
+        const wssPort = randomInt(1000, 9999)
+
+        this.LslWebSocketBridge({ wssPort })
+
+        assert.isEqual(
+            FakeWebSocketServer.callsToConstructor[0]?.port,
+            wssPort,
+            'Did not set port for WebSocketServer!'
+        )
+    }
+
     private static activate() {
         this.instance.activate()
     }

@@ -18,7 +18,8 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
     }
 
     public static Create(options: StreamTransportBridgeOptions) {
-        const wss = this.WebSocketServer()
+        const { wssPort = 8080 } = options ?? {}
+        const wss = this.WebSocketServer(wssPort)
         const inlet = this.LslStreamInlet(options, wss)
 
         return new (this.Class ?? this)({ ...options, inlet, wss })
@@ -94,8 +95,8 @@ export default class LslWebSocketBridge implements StreamTransportBridge {
         return LslStreamInlet.Create(options, onData)
     }
 
-    private static WebSocketServer() {
-        return new this.WSS({ port: 8080 })
+    private static WebSocketServer(wssPort: number) {
+        return new this.WSS({ port: wssPort })
     }
 }
 
@@ -114,6 +115,7 @@ export interface StreamTransportBridgeOptions {
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number
+    wssPort?: number
 }
 
 export interface StreamTransportBridgeConstructorOptions
