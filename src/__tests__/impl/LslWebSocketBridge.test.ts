@@ -31,8 +31,15 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     @test()
     protected static async createsLslStreamInlet() {
-        const { channelNames, channelFormat, sampleRateHz, chunkSize } =
-            FakeStreamInlet.callsToConstructor[0]?.options ?? {}
+        const {
+            channelNames,
+            channelFormat,
+            sampleRateHz,
+            chunkSize,
+            name,
+            type,
+            sourceId,
+        } = FakeStreamInlet.callsToConstructor[0]?.options ?? {}
 
         assert.isEqualDeep(
             {
@@ -40,6 +47,9 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
                 channelFormat,
                 sampleRateHz,
                 chunkSize,
+                name,
+                type,
+                sourceId,
             },
             this.baseOptions
         )
@@ -188,6 +198,9 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         channelFormat: 'float32' as const,
         sampleRateHz: 100 * Math.random(),
         chunkSize: randomInt(1, 100),
+        name: this.generateId(),
+        type: this.generateId(),
+        sourceId: this.generateId(),
     }
 
     private static LslWebSocketBridge(

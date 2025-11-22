@@ -115,6 +115,9 @@ export interface WebSocketBridgeOptions {
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number
+    name?: string
+    type?: string
+    sourceId?: string
     wssPort?: number
 }
 
