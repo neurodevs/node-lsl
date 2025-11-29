@@ -51,12 +51,12 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     }
 
     public destroy() {
-        this.destroyCppBoundInlet()
+        this.destroyBoundInlet()
         this.closeWebSocketServer()
         this.isDestroyed = true
     }
 
-    private destroyCppBoundInlet() {
+    private destroyBoundInlet() {
         this.inlet.destroy()
     }
 
