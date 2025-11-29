@@ -194,13 +194,13 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async destroyAlsoCallsDestroyOnStreamInfo() {
+    protected static async destroyAlsoCallsDestroyStreamInfo() {
         const outlet = await this.LslStreamOutlet()
         outlet.destroy()
 
         assert.isEqualDeep(
-            this.fakeLiblsl.lastDestroyStreamInfoOptions?.info,
-            this.fakeLiblsl.streamInfo,
+            this.fakeLiblsl.lastDestroyStreamInfoOptions,
+            { info: this.fakeLiblsl.streamInfo },
             'Did not call destroyStreamInfo on destroy!'
         )
     }

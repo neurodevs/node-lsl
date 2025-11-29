@@ -90,7 +90,18 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastDestroyInletOptions,
             { inlet: this.boundInlet },
-            'Should have called destroyInlet!'
+            'Did not destroy inlet!'
+        )
+    }
+
+    @test()
+    protected static async destroyAlsoCallsDestroyStreamInfo() {
+        this.instance.destroy()
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastDestroyStreamInfoOptions,
+            { info: this.instance.getStreamInfo().boundStreamInfo },
+            'Did not destroy stream info!'
         )
     }
 
