@@ -181,6 +181,17 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async callsBindingsToDestroyStreamInfo() {
+        this.instance.destroy()
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastDestroyStreamInfoOptions?.info,
+            this.instance.getBoundInfo(),
+            'Should have called destroyStreamInfo!'
+        )
+    }
+
     private static readonly defaultOptions = {
         name: this.generateId(),
         type: this.generateId(),
