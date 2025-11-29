@@ -21,14 +21,48 @@ import LslStreamInfo, {
 export default class LslStreamOutlet implements StreamOutlet {
     public static Class?: StreamOutletConstructor
 
+    public readonly name: string
+    public readonly type: string
+    public readonly sourceId: string
+    public readonly channelNames: string[]
+    public readonly channelFormat: ChannelFormat
+    public readonly channelCount: number
+    public readonly sampleRateHz: number
+    public readonly chunkSize: number
+    public readonly maxBufferedMs = 360 * 1000
+    public readonly manufacturer: string = 'N/A'
+    public readonly units: string = 'N/A'
+
     private info: StreamInfo
-    private options: StreamOutletOptions
     private outlet!: BoundOutlet
     private pushSampleMethod!: (options: unknown) => LslErrorCode
 
     protected constructor(info: StreamInfo, options: StreamOutletOptions) {
+        const {
+            name,
+            type,
+            sourceId,
+            channelNames,
+            channelFormat,
+            sampleRateHz,
+            chunkSize,
+            maxBufferedMs,
+            manufacturer,
+            units,
+        } = options
+
         this.info = info
-        this.options = options
+        this.name = name
+        this.type = type
+        this.sourceId = sourceId
+        this.channelNames = channelNames
+        this.channelFormat = channelFormat
+        this.channelCount = channelNames.length
+        this.sampleRateHz = sampleRateHz
+        this.chunkSize = chunkSize
+        this.maxBufferedMs = maxBufferedMs ?? this.maxBufferedMs
+        this.manufacturer = manufacturer ?? this.manufacturer
+        this.units = units ?? this.units
 
         this.validateOptions()
         this.createStreamOutlet()
@@ -38,20 +72,10 @@ export default class LslStreamOutlet implements StreamOutlet {
     public static async Create(options: StreamOutletOptions) {
         const { waitAfterConstructionMs = 10 } = options ?? {}
 
-        const infoOptions = {
-            channelNames: options.channelNames,
-            channelFormat: options.channelFormat,
-            sampleRateHz: options.sampleRateHz,
-            name: options.name,
-            type: options.type,
-            sourceId: options.sourceId,
-            units: options.units,
-        }
-
-        const info = this.LslStreamInfo(infoOptions)
+        const info = this.LslStreamInfo(options)
         const instance = new (this.Class ?? this)(info, options)
 
-        await this.wait(waitAfterConstructionMs)
+        await this.waitToAllowSetup(waitAfterConstructionMs)
 
         return instance
     }
@@ -62,6 +86,23 @@ export default class LslStreamOutlet implements StreamOutlet {
         assertValidChannelFormat(this.channelFormat)
         assertValidChunkSize(this.chunkSize)
         assertValidMaxBufferedMs(this.maxBufferedMs)
+        this.validateChannelFormat()
+    }
+
+    private validateChannelFormat() {
+        if (!this.isChannelFormatSupported) {
+            this.throwUnsupportedChannelFormat()
+        }
+    }
+
+    private get isChannelFormatSupported() {
+        return this.channelFormat in this.methodMap
+    }
+
+    private throwUnsupportedChannelFormat() {
+        throw new Error(
+            `This method currently does not support the ${this.channelFormat} type! Please implement it.`
+        )
     }
 
     private createStreamOutlet() {
@@ -72,26 +113,14 @@ export default class LslStreamOutlet implements StreamOutlet {
         })
     }
 
-    private setPushSampleMethod() {
-        this.validateChannelFormat()
+    private get boundStreamInfo() {
+        return this.info.boundStreamInfo
+    }
 
+    private setPushSampleMethod() {
         this.pushSampleMethod = (
             this.lsl[this.pushMethod] as (options: unknown) => LslErrorCode
         ).bind(this.lsl)
-    }
-
-    private validateChannelFormat() {
-        if (!(this.channelFormat in this.methodMap)) {
-            this.throwUnsupportedChannelFormat()
-        }
-    }
-
-    private throwUnsupportedChannelFormat() {
-        throw new Error(this.unsupportedChannelMessage)
-    }
-
-    private get unsupportedChannelMessage() {
-        return `This method currently does not support the ${this.channelFormat} type! Please implement it.`
     }
 
     private get pushMethod() {
@@ -106,77 +135,48 @@ export default class LslStreamOutlet implements StreamOutlet {
     public pushSample(sample: LslSample) {
         const timestamp = this.lsl.localClock()
 
-        handleError(
-            this.pushSampleMethod({
-                outlet: this.outlet,
-                sample,
-                timestamp,
-            })
-        )
+        const err = this.pushSampleMethod({
+            outlet: this.outlet,
+            sample,
+            timestamp,
+        })
+        handleError(err)
     }
 
     public destroy() {
         this.lsl.destroyOutlet({ outlet: this.outlet })
     }
 
-    public get name() {
-        return this.options.name
-    }
-
-    public get type() {
-        return this.options.type
-    }
-
-    public get sourceId() {
-        return this.options.sourceId
-    }
-
-    public get channelNames() {
-        return this.options.channelNames
-    }
-
-    public get channelCount() {
-        return this.channelNames.length
-    }
-
-    public get channelFormat() {
-        return this.options.channelFormat
-    }
-
-    public get sampleRateHz() {
-        return this.options.sampleRateHz
-    }
-
-    public get chunkSize() {
-        return this.options.chunkSize
-    }
-
-    public get maxBufferedMs() {
-        return this.options.maxBufferedMs ?? 360 * 1000
-    }
-
-    public get manufacturer() {
-        return this.options.manufacturer ?? 'N/A'
-    }
-
-    public get units() {
-        return this.options.units ?? 'N/A'
-    }
-
-    private get boundStreamInfo() {
-        return this.info.boundStreamInfo
-    }
-
     private get lsl() {
         return LiblslAdapter.getInstance()
     }
 
-    private static async wait(waitMs: number) {
-        return new Promise((resolve) => setTimeout(resolve, waitMs))
+    private static async waitToAllowSetup(waitAfterConstructionMs: number) {
+        await new Promise((resolve) =>
+            setTimeout(resolve, waitAfterConstructionMs)
+        )
     }
 
     private static LslStreamInfo(options: StreamInfoOptions) {
-        return LslStreamInfo.Create(options)
+        const {
+            channelNames,
+            channelFormat,
+            sampleRateHz,
+            name,
+            type,
+            sourceId,
+            units,
+        } = options
+
+        return LslStreamInfo.Create({
+            name,
+            type,
+            sourceId,
+            channelNames,
+            channelFormat,
+            sampleRateHz,
+            units,
+        })
     }
 }
 
