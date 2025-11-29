@@ -74,12 +74,17 @@ export default class LslEventMarkerOutlet implements EventMarkerOutlet {
         clearTimeout(this.timeout)
         this.isPlaying = false
     }
+
+    public destroy() {
+        this.outlet.destroy()
+    }
 }
 
 export interface EventMarkerOutlet {
     pushMarker(markerName: string): void
     pushMarkers(markers: DurationMarker[]): Promise<void>
     stop(): void
+    destroy(): void
 }
 
 export type EventMarkerOutletConstructor = new (

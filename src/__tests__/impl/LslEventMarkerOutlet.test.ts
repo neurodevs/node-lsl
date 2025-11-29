@@ -148,6 +148,17 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         assert.isEqual(FakeStreamOutlet.callsToPushSample[0][0], markerName)
     }
 
+    @test()
+    protected static async destroyCallsDestroyOnInternalStreamOutlet() {
+        this.instance.destroy()
+
+        assert.isEqual(
+            FakeStreamOutlet.numCallsToDestroy,
+            1,
+            'Did not call destroy on outlet!'
+        )
+    }
+
     private static get streamOutlet() {
         return this.instance.getStreamOutlet()
     }
