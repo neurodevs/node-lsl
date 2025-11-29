@@ -144,6 +144,15 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public destroy() {
+        this.destroyBoundStreamInfo()
+        this.destroyBoundOutlet()
+    }
+
+    private destroyBoundStreamInfo() {
+        this.lsl.destroyStreamInfo({ info: this.boundStreamInfo })
+    }
+
+    private destroyBoundOutlet() {
         this.lsl.destroyOutlet({ outlet: this.outlet })
     }
 
