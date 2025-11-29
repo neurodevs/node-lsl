@@ -88,7 +88,7 @@ export default class LslStreamInfo implements StreamInfo {
 }
 
 export interface StreamInfo {
-    boundStreamInfo: BoundStreamInfo
+    readonly boundStreamInfo: BoundStreamInfo
 }
 
 type StreamInfoConstructor = new (options: StreamInfoOptions) => StreamInfo
