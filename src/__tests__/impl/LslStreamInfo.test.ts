@@ -170,7 +170,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastAppendChannelsToStreamInfoOptions,
             {
-                info: this.instance.getStreamInfo(),
+                info: this.instance.getBoundInfo(),
                 channels: this.channelNames.map((label: string) => ({
                     label,
                     units: this.units,

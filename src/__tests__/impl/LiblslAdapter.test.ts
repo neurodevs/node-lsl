@@ -33,7 +33,9 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static fakeInlet: BoundInlet = {}
     private static fakeDesc: BoundDescription
     private static fakeChildNamedChannels: BoundChild
+
     private static createStreamInfoParams?: any[]
+    private static destroyStreamInfoParams?: any[]
     private static appendChildParams: any[] = []
     private static createOutletParams?: any[]
     private static destroyOutletParams?: any[]
@@ -162,6 +164,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     DataType.String,
                 ],
             },
+            lsl_destroy_streaminfo: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
+            },
             lsl_create_outlet: {
                 library: 'lsl',
                 retType: DataType.External,
@@ -233,7 +240,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async canCreateStreamInfoWithRequiredParams() {
+    protected static async createsStreamInfoWithRequiredParams() {
         const options = this.generateRandomCreateStreamInfoOptions()
         const actual = this.instance.createStreamInfo(options)
 
@@ -242,7 +249,19 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async canCreateOutletWithRequiredParams() {
+    protected static async destroysStreamInfoWithBoundInfo() {
+        const info = this.createRandomStreamInfo()
+        this.instance.destroyStreamInfo({ info })
+
+        assert.isEqualDeep(
+            this.destroyStreamInfoParams,
+            [info],
+            'Did not call destroyStreamInfo with expected params!'
+        )
+    }
+
+    @test()
+    protected static async createsOutletWithRequiredParams() {
         const { options, outlet } = this.createRandomOutlet()
 
         const expected = {
@@ -255,7 +274,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async canPushFloatSample() {
+    protected static async pushesFloatSample() {
         const expected = [1.0, 2.0, 3.0]
         const timestamp = randomInt(100)
         const options = {
@@ -273,7 +292,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async canPushStringSample() {
+    protected static async pushesStringSample() {
         const expected = [this.generateId()]
         const timestamp = randomInt(100)
         const options = {
@@ -386,7 +405,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async canCreateInletWithRequiredParams() {
+    protected static async createInletWithRequiredParams() {
         const { options, inlet } = this.createRandomInlet()
 
         const expected = {
@@ -603,6 +622,9 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             lsl_create_streaminfo: (params: any[]) => {
                 this.createStreamInfoParams = params
                 return this.fakeStreamInfo
+            },
+            lsl_destroy_streaminfo: (params: any[]) => {
+                this.destroyStreamInfoParams = params
             },
             lsl_create_outlet: (params: any[]) => {
                 this.createOutletParams = params

@@ -69,10 +69,10 @@ export default class LiblslAdapter implements Liblsl {
         const {
             name,
             type,
-            channelCount,
-            sampleRateHz,
-            channelFormat,
             sourceId,
+            channelCount,
+            channelFormat,
+            sampleRateHz,
         } = options
 
         return this.bindings.lsl_create_streaminfo([
@@ -83,6 +83,11 @@ export default class LiblslAdapter implements Liblsl {
             channelFormat,
             sourceId,
         ])
+    }
+
+    public destroyStreamInfo(options: DestroyStreamInfoOptions) {
+        const { info } = options
+        this.bindings.lsl_destroy_streaminfo([info])
     }
 
     public appendChannelsToStreamInfo(
@@ -248,6 +253,11 @@ export default class LiblslAdapter implements Liblsl {
                     DataType.String,
                 ],
             },
+            lsl_destroy_streaminfo: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
+            },
             lsl_create_outlet: {
                 library: 'lsl',
                 retType: DataType.External,
@@ -323,6 +333,7 @@ export interface Liblsl {
     liblslPath: string
 
     createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo
+    destroyStreamInfo(options: DestroyStreamInfoOptions): void
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 
     createOutlet(options: CreateOutletOptions): BoundOutlet
@@ -349,10 +360,10 @@ export interface Liblsl {
 export interface CreateStreamInfoOptions {
     name: string
     type: string
-    channelCount: number
-    sampleRateHz: number
-    channelFormat: number
     sourceId: string
+    channelCount: number
+    channelFormat: number
+    sampleRateHz: number
     manufacturer?: string
     units?: string
 }
@@ -366,6 +377,10 @@ export interface CreateOutletOptions {
     info: BoundStreamInfo
     chunkSize: number
     maxBufferedMs: number
+}
+
+export interface DestroyStreamInfoOptions {
+    info: BoundStreamInfo
 }
 
 export interface PushSampleFloatTimestampOptions {
@@ -421,6 +436,7 @@ export interface LiblslBindings {
         args: [string, string, number, number, number, string]
     ): BoundStreamInfo
 
+    lsl_destroy_streaminfo(args: [BoundStreamInfo]): void
     lsl_create_outlet(args: [BoundStreamInfo, number, number]): BoundOutlet
     lsl_push_sample_ft(args: [BoundOutlet, LslSample, number]): LslErrorCode
     lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): LslErrorCode

@@ -5,8 +5,8 @@ export default class SpyStreamInfo extends LslStreamInfo {
         super(options)
     }
 
-    public getStreamInfo() {
-        return this.streamInfo
+    public getBoundInfo() {
+        return this.boundInfo
     }
 
     public getName() {

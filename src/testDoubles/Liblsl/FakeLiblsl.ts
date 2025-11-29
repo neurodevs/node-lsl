@@ -15,6 +15,7 @@ import {
     FlushInletOptions,
     PullChunkOptions,
     PullSampleOptions,
+    DestroyStreamInfoOptions,
 } from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {
@@ -45,6 +46,7 @@ export default class FakeLiblsl implements Liblsl {
     public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
 
     public lastCreateStreamInfoOptions?: CreateStreamInfoOptions
+    public lastDestroyStreamInfoOptions?: DestroyStreamInfoOptions
     public lastAppendChannelsToStreamInfoOptions?: AppendChannelsToStreamInfoOptions
     public lastCreateOutletOptions?: CreateOutletOptions
     public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
@@ -68,6 +70,10 @@ export default class FakeLiblsl implements Liblsl {
         this.createStreamInfoHitCount++
         this.lastCreateStreamInfoOptions = options
         return this.streamInfo
+    }
+
+    public destroyStreamInfo(options: DestroyStreamInfoOptions) {
+        this.lastDestroyStreamInfoOptions = options
     }
 
     public appendChannelsToStreamInfo(
