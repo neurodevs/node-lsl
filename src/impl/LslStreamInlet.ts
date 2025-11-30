@@ -254,12 +254,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     public destroy() {
-        this.destroyBoundStreamInfo()
         this.destroyBoundInlet()
-    }
-
-    private destroyBoundStreamInfo() {
-        this.lsl.destroyStreamInfo({ info: this.boundStreamInfo })
     }
 
     private destroyBoundInlet() {

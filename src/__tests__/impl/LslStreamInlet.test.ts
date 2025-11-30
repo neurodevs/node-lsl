@@ -95,17 +95,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async destroyAlsoCallsDestroyStreamInfo() {
-        this.instance.destroy()
-
-        assert.isEqualDeep(
-            this.fakeLiblsl.lastDestroyStreamInfoOptions,
-            { info: this.instance.getStreamInfo().boundStreamInfo },
-            'Did not destroy stream info!'
-        )
-    }
-
-    @test()
     protected static async exposesIsRunningFieldThatIsFalseAtFirst() {
         assert.isFalse(this.isRunning, 'isRunning should be false at first!')
     }
