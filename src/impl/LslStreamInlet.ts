@@ -274,7 +274,7 @@ export interface StreamInlet {
     stopPulling(): void
     flushQueue(): void
     destroy(): void
-    isRunning: boolean
+    readonly isRunning: boolean
 }
 
 export type StreamInletConstructor = new (
