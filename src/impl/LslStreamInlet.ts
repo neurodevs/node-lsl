@@ -24,12 +24,12 @@ export default class LslStreamInlet implements StreamInlet {
 
     private onData: OnDataCallback
 
-    private pullDataMethod: () => {
+    protected inlet!: BoundInlet
+
+    private pullDataMethod!: () => {
         samples: Float32Array | undefined
         timestamps: Float64Array | undefined
     }
-
-    protected inlet!: BoundInlet
 
     private dataBuffer!: Buffer<ArrayBuffer>
     private dataBufferPtr!: JsExternal
@@ -65,15 +65,9 @@ export default class LslStreamInlet implements StreamInlet {
         this.chunkSize = chunkSize
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.timeoutMs = timeoutMs ?? 0
-
         this.onData = onData
 
-        if (this.chunkSize === 1) {
-            this.pullDataMethod = this.pullSample
-        } else {
-            this.pullDataMethod = this.pullChunk
-        }
-
+        this.setPullDataMethod()
         this.createBoundInlet()
     }
 
@@ -82,6 +76,14 @@ export default class LslStreamInlet implements StreamInlet {
         const { maxBufferedMs, chunkSize, ...infoOptions } = options
         const info = this.LslStreamInfo(infoOptions)
         return new (this.Class ?? this)(info, options, onData)
+    }
+
+    private setPullDataMethod() {
+        if (this.chunkSize === 1) {
+            this.pullDataMethod = this.pullSample
+        } else {
+            this.pullDataMethod = this.pullChunk
+        }
     }
 
     private createBoundInlet() {
