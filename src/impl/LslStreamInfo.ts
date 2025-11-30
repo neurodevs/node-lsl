@@ -7,14 +7,16 @@ import LiblslAdapter from './LiblslAdapter.js'
 export default class LslStreamInfo implements StreamInfo {
     public static Class?: StreamInfoConstructor
 
-    protected name: string
-    protected type: string
-    protected sourceId: string
-    protected units: string
+    public readonly name: string
+    public readonly type: string
+    public readonly sourceId: string
+    public readonly channelNames: string[]
+    public readonly channelCount: number
+    public readonly channelFormat: ChannelFormat
+    public readonly sampleRateHz: number
+    public readonly units: string
+
     protected boundInfo!: BoundStreamInfo
-    private channelNames: string[]
-    private channelFormat: ChannelFormat
-    private sampleRateHz: number
 
     private readonly defaultName = `lsl-stream-info-${generateId()}`
     private readonly defaultType = generateId()
@@ -38,6 +40,7 @@ export default class LslStreamInfo implements StreamInfo {
         this.type = type
         this.sourceId = sourceId
         this.channelNames = channelNames
+        this.channelCount = channelNames.length
         this.channelFormat = channelFormat
         this.sampleRateHz = sampleRateHz
         this.units = units
@@ -59,10 +62,6 @@ export default class LslStreamInfo implements StreamInfo {
             channelFormat: this.lslChannelFormat,
             sampleRateHz: this.sampleRateHz,
         })
-    }
-
-    private get channelCount() {
-        return this.channelNames.length
     }
 
     private get lslChannelFormat() {
@@ -91,6 +90,14 @@ export default class LslStreamInfo implements StreamInfo {
 
 export interface StreamInfo {
     destroy(): void
+    readonly name: string
+    readonly type: string
+    readonly sourceId: string
+    readonly units: string
+    readonly channelNames: string[]
+    readonly channelCount: number
+    readonly channelFormat: ChannelFormat
+    readonly sampleRateHz: number
     readonly boundStreamInfo: BoundStreamInfo
 }
 

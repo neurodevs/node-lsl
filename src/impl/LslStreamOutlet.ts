@@ -34,7 +34,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     public readonly units: string = 'N/A'
 
     private info: StreamInfo
-    private outlet!: BoundOutlet
+    private boundOutlet!: BoundOutlet
     private pushSampleMethod!: (options: unknown) => LslErrorCode
 
     private lsl = LiblslAdapter.getInstance()
@@ -108,7 +108,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     private createStreamOutlet() {
-        this.outlet = this.lsl.createOutlet({
+        this.boundOutlet = this.lsl.createOutlet({
             info: this.boundStreamInfo,
             chunkSize: this.chunkSize,
             maxBufferedMs: this.maxBufferedMs,
@@ -138,7 +138,7 @@ export default class LslStreamOutlet implements StreamOutlet {
         const timestamp = this.lsl.localClock()
 
         const err = this.pushSampleMethod({
-            outlet: this.outlet,
+            outlet: this.boundOutlet,
             sample,
             timestamp,
         })
@@ -155,7 +155,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     private destroyBoundOutlet() {
-        this.lsl.destroyOutlet({ outlet: this.outlet })
+        this.lsl.destroyOutlet({ outlet: this.boundOutlet })
     }
 
     private static async waitToAllowSetup(waitAfterConstructionMs: number) {
@@ -194,12 +194,13 @@ export interface StreamOutlet {
     readonly type: string
     readonly sourceId: string
     readonly channelNames: string[]
+    readonly channelCount: number
     readonly channelFormat: ChannelFormat
     readonly sampleRateHz: number
+    readonly units: string
     readonly chunkSize: number
     readonly maxBufferedMs: number
     readonly manufacturer: string
-    readonly units: string
 }
 
 export type StreamOutletConstructor = new (
