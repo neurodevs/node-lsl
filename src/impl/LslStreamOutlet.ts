@@ -37,6 +37,8 @@ export default class LslStreamOutlet implements StreamOutlet {
     private outlet!: BoundOutlet
     private pushSampleMethod!: (options: unknown) => LslErrorCode
 
+    private lsl = LiblslAdapter.getInstance()
+
     protected constructor(info: StreamInfo, options: StreamOutletOptions) {
         const {
             name,
@@ -154,10 +156,6 @@ export default class LslStreamOutlet implements StreamOutlet {
 
     private destroyBoundOutlet() {
         this.lsl.destroyOutlet({ outlet: this.outlet })
-    }
-
-    private get lsl() {
-        return LiblslAdapter.getInstance()
     }
 
     private static async waitToAllowSetup(waitAfterConstructionMs: number) {

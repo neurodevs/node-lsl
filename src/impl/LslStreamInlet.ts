@@ -2,7 +2,7 @@ import generateId from '@neurodevs/generate-id'
 import { createPointer, DataType, JsExternal, unwrapPointer } from 'ffi-rs'
 
 import handleError from '../handleError.js'
-import { BoundInlet, ChannelFormat, Liblsl } from './LiblslAdapter.js'
+import { BoundInlet, ChannelFormat } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import LslStreamInfo, {
     StreamInfo,
@@ -29,8 +29,6 @@ export default class LslStreamInlet implements StreamInlet {
         timestamps: Float64Array | undefined
     }
 
-    private lsl: Liblsl
-
     protected inlet!: BoundInlet
 
     private dataBuffer!: Buffer<ArrayBuffer>
@@ -44,6 +42,8 @@ export default class LslStreamInlet implements StreamInlet {
 
     private readonly defaultName = `lsl-inlet-${generateId()}`
     private readonly sixMinutesInMs = 360 * 1000
+
+    private lsl = LiblslAdapter.getInstance()
 
     protected constructor(
         info: StreamInfo,
@@ -73,8 +73,6 @@ export default class LslStreamInlet implements StreamInlet {
         } else {
             this.pullDataMethod = this.pullChunk
         }
-
-        this.lsl = this.getLiblslSingleton()
 
         this.createBoundInlet()
     }
@@ -264,10 +262,6 @@ export default class LslStreamInlet implements StreamInlet {
 
     private destroyBoundInlet() {
         this.lsl.destroyInlet({ inlet: this.inlet })
-    }
-
-    private getLiblslSingleton() {
-        return LiblslAdapter.getInstance()
     }
 
     private static LslStreamInfo(options: StreamInfoOptions) {

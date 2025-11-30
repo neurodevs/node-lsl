@@ -21,6 +21,8 @@ export default class LslStreamInfo implements StreamInfo {
     private readonly defaultSourceId = generateId()
     private readonly defaultUnits = 'N/A'
 
+    private lsl = LiblslAdapter.getInstance()
+
     protected constructor(options: StreamInfoOptions) {
         const {
             name = this.defaultName,
@@ -84,10 +86,6 @@ export default class LslStreamInfo implements StreamInfo {
 
     public get boundStreamInfo() {
         return this.boundInfo
-    }
-
-    private get lsl() {
-        return LiblslAdapter.getInstance()
     }
 }
 
