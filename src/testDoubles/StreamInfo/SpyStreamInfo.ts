@@ -1,8 +1,11 @@
 import LslStreamInfo, { StreamInfoOptions } from '../../impl/LslStreamInfo.js'
 
 export default class SpyStreamInfo extends LslStreamInfo {
+    public static numCallsToConstructor = 0
+
     public constructor(options: StreamInfoOptions) {
         super(options)
+        SpyStreamInfo.numCallsToConstructor++
     }
 
     public getBoundInfo() {
@@ -23,5 +26,9 @@ export default class SpyStreamInfo extends LslStreamInfo {
 
     public getUnits() {
         return this.units
+    }
+
+    public static resetTestDouble() {
+        SpyStreamInfo.numCallsToConstructor = 0
     }
 }

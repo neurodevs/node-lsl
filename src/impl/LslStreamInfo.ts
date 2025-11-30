@@ -7,6 +7,8 @@ import LiblslAdapter from './LiblslAdapter.js'
 export default class LslStreamInfo implements StreamInfo {
     public static Class?: StreamInfoConstructor
 
+    private static instanceCache: Record<string, StreamInfo> = {}
+
     public readonly name: string
     public readonly type: string
     public readonly sourceId: string
@@ -50,7 +52,14 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     public static Create(options: StreamInfoOptions) {
-        return new (this.Class ?? this)(options)
+        const key = JSON.stringify(options)
+        let instance = this.instanceCache[key]
+
+        if (instance === undefined) {
+            instance = new (this.Class ?? this)(options)
+            this.instanceCache[key] = instance
+        }
+        return instance
     }
 
     private createStreamInfo() {

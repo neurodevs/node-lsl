@@ -13,6 +13,8 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
         this.setSpyStreamInfo()
 
+        LslStreamInfo['instanceCache'] = {}
+
         this.instance = this.LslStreamInfo()
     }
 
@@ -23,8 +25,15 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
     @test()
     protected static async generatesUniqueNameIfNotProvided() {
-        const instance1 = this.LslStreamInfo({ name: undefined })
-        const instance2 = this.LslStreamInfo({ name: undefined })
+        const instance1 = this.LslStreamInfo({
+            name: undefined,
+            type: this.generateId(),
+        })
+
+        const instance2 = this.LslStreamInfo({
+            name: undefined,
+            type: this.generateId(),
+        })
 
         assert.isNotEqual(
             instance1.getName(),
@@ -58,8 +67,15 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
     @test()
     protected static async generatesUniqueTypeIfNotProvided() {
-        const instance1 = this.LslStreamInfo({ type: undefined })
-        const instance2 = this.LslStreamInfo({ type: undefined })
+        const instance1 = this.LslStreamInfo({
+            type: undefined,
+            name: this.generateId(),
+        })
+
+        const instance2 = this.LslStreamInfo({
+            type: undefined,
+            name: this.generateId(),
+        })
 
         assert.isNotEqual(
             instance1.getType(),
@@ -82,8 +98,15 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
     @test()
     protected static async generatesUniqueSourceIdIfNotProvided() {
-        const instance1 = this.LslStreamInfo({ sourceId: undefined })
-        const instance2 = this.LslStreamInfo({ sourceId: undefined })
+        const instance1 = this.LslStreamInfo({
+            sourceId: undefined,
+            name: this.generateId(),
+        })
+
+        const instance2 = this.LslStreamInfo({
+            sourceId: undefined,
+            name: this.generateId(),
+        })
 
         assert.isNotEqual(
             instance1.getSourceId(),
@@ -189,6 +212,17 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
             this.fakeLiblsl.lastDestroyStreamInfoOptions?.info,
             this.instance.getBoundInfo(),
             'Should have called destroyStreamInfo!'
+        )
+    }
+
+    @test()
+    protected static async cachesInfoIfPassedSameOptions() {
+        this.LslStreamInfo()
+
+        assert.isEqual(
+            SpyStreamInfo.numCallsToConstructor,
+            1,
+            'Did not cache stream info!'
         )
     }
 
