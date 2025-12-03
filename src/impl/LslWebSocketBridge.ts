@@ -12,21 +12,26 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     private inlet: StreamInlet
     private wss?: WebSocketServer
+    private sockets?: WebSocket[]
     private isDestroyed = false
 
     protected constructor(options: WebSocketBridgeConstructorOptions) {
-        const { inlet, wss } = options
+        const { inlet, wss, sockets } = options
 
         this.inlet = inlet
         this.wss = wss
+        this.sockets = sockets
     }
 
     public static Create(options: WebSocketBridgeOptions) {
-        const { localWebSocketPort, ...inletOptions } = options ?? {}
+        const { localWebSocketPort, remoteWebSocketUrls, ...inletOptions } =
+            options ?? {}
+
         const wss = this.WebSocketServer(localWebSocketPort)
+        const sockets = this.createSocketsFrom(remoteWebSocketUrls)
         const inlet = this.LslStreamInlet(inletOptions, wss)
 
-        return new (this.Class ?? this)({ ...options, inlet, wss })
+        return new (this.Class ?? this)({ ...options, inlet, wss, sockets })
     }
 
     public activate() {
@@ -90,12 +95,22 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         }
     }
 
+    private static createSocketsFrom(remoteWebSocketUrls?: string[]) {
+        return remoteWebSocketUrls
+            ? remoteWebSocketUrls.map((url) => this.WebSocket(url))
+            : undefined
+    }
+
     private static LslStreamInlet(
         options: StreamInletOptions,
         wss?: WebSocketServer
     ) {
         const onData = this.createOnDataCallback(wss)
         return LslStreamInlet.Create(options, onData)
+    }
+
+    private static WebSocket(url: string) {
+        return new this.WS(url)
     }
 
     private static WebSocketServer(localWebSocketPort?: number) {
@@ -124,10 +139,12 @@ export interface WebSocketBridgeOptions {
     type?: string
     sourceId?: string
     localWebSocketPort?: number
+    remoteWebSocketUrls?: string[]
 }
 
 export interface WebSocketBridgeConstructorOptions
     extends WebSocketBridgeOptions {
     inlet: StreamInlet
     wss?: WebSocketServer
+    sockets?: WebSocket[]
 }

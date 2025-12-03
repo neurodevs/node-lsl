@@ -18,6 +18,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         await super.beforeEach()
 
         this.setFakeStreamInlet()
+        this.setFakeWebSocket()
         this.setFakeWebSocketServer()
         this.setSpyLslWebSocketBridge()
 
@@ -157,7 +158,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async acceptsOptionallocalWebSocketPort() {
+    protected static async acceptsOptionalLocalWebSocketPort() {
         FakeWebSocketServer.resetTestDouble()
 
         const localWebSocketPort = randomInt(1000, 9999)
@@ -168,6 +169,15 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
             FakeWebSocketServer.callsToConstructor[0]?.port,
             localWebSocketPort,
             'Did not set port for WebSocketServer!'
+        )
+    }
+
+    @test()
+    protected static async createsSocketsFromRemoteUrls() {
+        assert.isEqualDeep(
+            FakeWebSocket.callsToConstructor,
+            this.remoteWebSocketUrls,
+            'Did not create WebSockets for remote URLs!'
         )
     }
 
@@ -193,6 +203,11 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static readonly localWebSocketPort = randomInt(1000, 5000)
 
+    private static readonly remoteWebSocketUrls = [
+        this.generateId(),
+        this.generateId(),
+    ]
+
     private static readonly inletOptions = {
         channelNames: this.channelNames,
         channelFormat: 'float32' as const,
@@ -206,6 +221,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     private static readonly baseOptions = {
         ...this.inletOptions,
         localWebSocketPort: this.localWebSocketPort,
+        remoteWebSocketUrls: this.remoteWebSocketUrls,
     }
 
     private static LslWebSocketBridge(

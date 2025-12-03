@@ -18,6 +18,7 @@ import FakeStreamInlet from '../testDoubles/StreamInlet/FakeStreamInlet.js'
 import { SpyStreamInlet } from '../testDoubles/StreamInlet/SpyStreamInlet.js'
 import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
 import SpyLslWebSocketBridge from '../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
+import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
@@ -68,6 +69,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static setSpyLslWebSocketBridge() {
         LslWebSocketBridge.Class = SpyLslWebSocketBridge
+    }
+
+    protected static setFakeWebSocket() {
+        LslWebSocketBridge.WS = FakeWebSocket as unknown as typeof WebSocket
+        FakeWebSocket.resetTestDouble()
     }
 
     protected static setFakeWebSocketServer() {
