@@ -1,4 +1,9 @@
-import { WebSocketBridge } from '../../impl/LslWebSocketBridge.js'
+import WebSocket, { WebSocketServer } from 'ws'
+import LslWebSocketBridge, {
+    WebSocketBridge,
+} from '../../impl/LslWebSocketBridge.js'
+import FakeWebSocket from '../WebSockets/FakeWebSocket.js'
+import FakeWebSocketServer from '../WebSockets/FakeWebSocketServer.js'
 
 export default class FakeWebSocketBridge implements WebSocketBridge {
     public static numCallsToConstructor = 0
@@ -23,9 +28,23 @@ export default class FakeWebSocketBridge implements WebSocketBridge {
     }
 
     public static resetTestDouble() {
-        FakeWebSocketBridge.numCallsToConstructor = 0
-        FakeWebSocketBridge.numCallsToActivate = 0
-        FakeWebSocketBridge.numCallsToDeactivate = 0
-        FakeWebSocketBridge.numCallsToDestroy = 0
+        this.numCallsToConstructor = 0
+        this.numCallsToActivate = 0
+        this.numCallsToDeactivate = 0
+        this.numCallsToDestroy = 0
+
+        this.setFakeWebSocket()
+        this.setFakeWebSocketServer()
+    }
+
+    private static setFakeWebSocket() {
+        LslWebSocketBridge.WS = FakeWebSocket as unknown as typeof WebSocket
+        FakeWebSocket.resetTestDouble()
+    }
+
+    private static setFakeWebSocketServer() {
+        LslWebSocketBridge.WSS =
+            FakeWebSocketServer as unknown as typeof WebSocketServer
+        FakeWebSocketServer.resetTestDouble()
     }
 }
