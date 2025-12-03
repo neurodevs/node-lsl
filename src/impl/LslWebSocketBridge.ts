@@ -21,6 +21,8 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         this.inlet = inlet
         this.localServer = localServer
         this.remoteSockets = remoteSockets
+
+        this.throwIfNoLocalServerOrRemoteSockets()
     }
 
     public static Create(options: WebSocketBridgeOptions) {
@@ -43,6 +45,14 @@ export default class LslWebSocketBridge implements WebSocketBridge {
             remoteSockets,
         })
     }
+
+    private throwIfNoLocalServerOrRemoteSockets() {
+        if (!(this.localServer || this.remoteSockets)) {
+            throw new Error(this.insufficientOptionsError)
+        }
+    }
+
+    private readonly insufficientOptionsError = `At least one of localWebSocketPort or remoteWebSocketUrls must be provided!`
 
     public activate() {
         this.throwIfBridgeIsDestroyed(this.cannotActivateMessage)

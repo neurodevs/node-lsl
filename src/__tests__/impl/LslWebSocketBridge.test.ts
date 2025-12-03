@@ -251,6 +251,16 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async throwsIfNeitherPortNorRemoteUrlsPassed() {
+        assert.doesThrow(() => {
+            this.LslWebSocketBridge({
+                localWebSocketPort: undefined,
+                remoteWebSocketUrls: undefined,
+            })
+        }, `At least one of localWebSocketPort or remoteWebSocketUrls must be provided!`)
+    }
+
     private static activate() {
         this.instance.activate()
     }
