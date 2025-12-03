@@ -25,7 +25,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     public static Create(options: WebSocketBridgeOptions) {
         const { localWebSocketPort, remoteWebSocketUrls, ...inletOptions } =
-            options ?? {}
+            options
 
         const localServer = this.WebSocketServer(localWebSocketPort)
         const remoteSockets = this.createSocketsFrom(remoteWebSocketUrls)
