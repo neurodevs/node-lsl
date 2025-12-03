@@ -12,13 +12,15 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     private inlet: StreamInlet
     private wss?: WebSocketServer
+    private sockets?: WebSocket[]
     private isDestroyed = false
 
     protected constructor(options: WebSocketBridgeConstructorOptions) {
-        const { inlet, wss } = options
+        const { inlet, wss, sockets } = options
 
         this.inlet = inlet
         this.wss = wss
+        this.sockets = sockets
     }
 
     public static Create(options: WebSocketBridgeOptions) {
@@ -29,7 +31,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         const sockets = this.createSocketsFrom(remoteWebSocketUrls)
         const inlet = this.LslStreamInlet(inletOptions, wss, sockets)
 
-        return new (this.Class ?? this)({ ...options, inlet, wss })
+        return new (this.Class ?? this)({ ...options, inlet, wss, sockets })
     }
 
     public activate() {
@@ -60,6 +62,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     public destroy() {
         this.destroyBoundInlet()
         this.closeWebSocketServerIfEnabled()
+        this.closeRemoteWebSocketsIfEnabled()
         this.isDestroyed = true
     }
 
@@ -69,6 +72,10 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     private closeWebSocketServerIfEnabled() {
         this.wss?.close()
+    }
+
+    private closeRemoteWebSocketsIfEnabled() {
+        this.sockets?.forEach((socket) => socket.close())
     }
 
     private static createOnDataCallback(
@@ -163,4 +170,5 @@ export interface WebSocketBridgeConstructorOptions
     extends WebSocketBridgeOptions {
     inlet: StreamInlet
     wss?: WebSocketServer
+    sockets?: WebSocket[]
 }
