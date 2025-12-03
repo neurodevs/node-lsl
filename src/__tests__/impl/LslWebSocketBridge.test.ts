@@ -51,7 +51,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
                 type,
                 sourceId,
             },
-            this.baseOptions
+            this.inletOptions
         )
     }
 
@@ -191,9 +191,9 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         return { samples, timestamps }
     }
 
-    private static readonly wssPort = 8080
+    private static readonly wssPort = randomInt(1000, 5000)
 
-    private static readonly baseOptions = {
+    private static readonly inletOptions = {
         channelNames: this.channelNames,
         channelFormat: 'float32' as const,
         sampleRateHz: 100 * Math.random(),
@@ -201,6 +201,11 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         name: this.generateId(),
         type: this.generateId(),
         sourceId: this.generateId(),
+    }
+
+    private static readonly baseOptions = {
+        ...this.inletOptions,
+        wssPort: this.wssPort,
     }
 
     private static LslWebSocketBridge(
