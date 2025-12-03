@@ -208,6 +208,30 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async doesNotSendToRemoteSocketsThatAreNotReady() {
+        const sockets = this.instance[
+            'remoteSockets'
+        ]! as unknown as FakeWebSocket[]
+
+        for (const socket of sockets) {
+            socket.readyState = WebSocket.CONNECTING
+        }
+
+        this.activate()
+        this.simulateOnDataCallback()
+
+        const calls = FakeWebSocket.callsToSend.filter((call) =>
+            sockets.some((socket) => socket.id === call.id)
+        )
+
+        assert.isEqual(
+            calls.length,
+            0,
+            'Sent data to sockets that are not ready!'
+        )
+    }
+
+    @test()
     protected static async destroyClosesRemoteWebSockets() {
         this.destroy()
 

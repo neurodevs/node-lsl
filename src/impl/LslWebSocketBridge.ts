@@ -118,7 +118,9 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     private static sendToSockets(remoteSockets: WebSocket[], payload: string) {
         for (const socket of remoteSockets) {
-            socket.send(payload)
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(payload)
+            }
         }
     }
 
