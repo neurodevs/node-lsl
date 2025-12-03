@@ -93,22 +93,22 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         remoteSockets?: WebSocket[]
     ) {
         return (samples: Float32Array, timestamps: Float64Array) => {
+            const payload = JSON.stringify({ samples, timestamps })
+
             if (localServer) {
-                this.broadcastToClients(localServer, samples, timestamps)
+                this.broadcastToClients(localServer, payload)
             }
+
             if (remoteSockets) {
-                this.sendToSockets(remoteSockets, samples, timestamps)
+                this.sendToSockets(remoteSockets, payload)
             }
         }
     }
 
     private static broadcastToClients(
         localServer: WebSocketServer,
-        samples: Float32Array<ArrayBufferLike>,
-        timestamps: Float64Array<ArrayBufferLike>
+        payload: string
     ) {
-        const payload = JSON.stringify({ samples, timestamps })
-
         for (const client of localServer.clients) {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(payload)
@@ -116,13 +116,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         }
     }
 
-    private static sendToSockets(
-        remoteSockets: WebSocket[],
-        samples: Float32Array,
-        timestamps: Float64Array
-    ) {
-        const payload = JSON.stringify({ samples, timestamps })
-
+    private static sendToSockets(remoteSockets: WebSocket[], payload: string) {
         for (const socket of remoteSockets) {
             socket.send(payload)
         }
