@@ -93,7 +93,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async createsWebSocketServer() {
         assert.isEqualDeep(
             FakeWebSocketServer.callsToConstructor[0],
-            { port: this.wssPort },
+            { port: this.localWebSocketPort },
             'Did not create WebSocketServer!'
         )
     }
@@ -157,16 +157,16 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async acceptsOptionalWssPort() {
+    protected static async acceptsOptionallocalWebSocketPort() {
         FakeWebSocketServer.resetTestDouble()
 
-        const wssPort = randomInt(1000, 9999)
+        const localWebSocketPort = randomInt(1000, 9999)
 
-        this.LslWebSocketBridge({ wssPort })
+        this.LslWebSocketBridge({ localWebSocketPort })
 
         assert.isEqual(
             FakeWebSocketServer.callsToConstructor[0]?.port,
-            wssPort,
+            localWebSocketPort,
             'Did not set port for WebSocketServer!'
         )
     }
@@ -191,7 +191,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         return { samples, timestamps }
     }
 
-    private static readonly wssPort = randomInt(1000, 5000)
+    private static readonly localWebSocketPort = randomInt(1000, 5000)
 
     private static readonly inletOptions = {
         channelNames: this.channelNames,
@@ -205,7 +205,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static readonly baseOptions = {
         ...this.inletOptions,
-        wssPort: this.wssPort,
+        localWebSocketPort: this.localWebSocketPort,
     }
 
     private static LslWebSocketBridge(

@@ -7,6 +7,7 @@ import LslStreamInlet, {
 
 export default class LslWebSocketBridge implements WebSocketBridge {
     public static Class?: WebSocketBridgeConstructor
+    public static WS = WebSocket
     public static WSS = WebSocketServer
 
     private inlet: StreamInlet
@@ -21,8 +22,8 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     }
 
     public static Create(options: WebSocketBridgeOptions) {
-        const { wssPort, ...inletOptions } = options ?? {}
-        const wss = this.WebSocketServer(wssPort)
+        const { localWebSocketPort, ...inletOptions } = options ?? {}
+        const wss = this.WebSocketServer(localWebSocketPort)
         const inlet = this.LslStreamInlet(inletOptions, wss)
 
         return new (this.Class ?? this)({ ...options, inlet, wss })
@@ -97,8 +98,10 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         return LslStreamInlet.Create(options, onData)
     }
 
-    private static WebSocketServer(wssPort?: number) {
-        return wssPort ? new this.WSS({ port: wssPort }) : undefined
+    private static WebSocketServer(localWebSocketPort?: number) {
+        return localWebSocketPort
+            ? new this.WSS({ port: localWebSocketPort })
+            : undefined
     }
 }
 
@@ -120,7 +123,7 @@ export interface WebSocketBridgeOptions {
     name?: string
     type?: string
     sourceId?: string
-    wssPort?: number
+    localWebSocketPort?: number
 }
 
 export interface WebSocketBridgeConstructorOptions
