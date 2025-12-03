@@ -24,8 +24,8 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     }
 
     public static Create(options: WebSocketBridgeOptions) {
-        const { localWebSocketPort, remoteWebSocketUrls, ...inletOptions } =
-            options
+        const { localWebSocketPort, remoteWebSocketUrls, ...rest } = options
+        const inletOptions: StreamInletOptions = rest
 
         const localServer = this.WebSocketServer(localWebSocketPort)
         const remoteSockets = this.createSocketsFrom(remoteWebSocketUrls)
@@ -124,9 +124,12 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         }
     }
 
-    private static createSocketsFrom(remoteWebSocketUrls?: string[]) {
+    private static createSocketsFrom(remoteWebSocketUrls?: string | string[]) {
         return remoteWebSocketUrls
-            ? remoteWebSocketUrls.map((url) => this.WebSocket(url))
+            ? (Array.isArray(remoteWebSocketUrls)
+                  ? remoteWebSocketUrls
+                  : [remoteWebSocketUrls]
+              ).map((url) => this.WebSocket(url))
             : undefined
     }
 
@@ -169,7 +172,7 @@ export interface WebSocketBridgeOptions {
     type?: string
     sourceId?: string
     localWebSocketPort?: number
-    remoteWebSocketUrls?: string[]
+    remoteWebSocketUrls?: string | string[]
 }
 
 export interface WebSocketBridgeConstructorOptions
