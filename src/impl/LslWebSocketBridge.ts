@@ -12,15 +12,13 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     private inlet: StreamInlet
     private wss?: WebSocketServer
-    private sockets?: WebSocket[]
     private isDestroyed = false
 
     protected constructor(options: WebSocketBridgeConstructorOptions) {
-        const { inlet, wss, sockets } = options
+        const { inlet, wss } = options
 
         this.inlet = inlet
         this.wss = wss
-        this.sockets = sockets
     }
 
     public static Create(options: WebSocketBridgeOptions) {
