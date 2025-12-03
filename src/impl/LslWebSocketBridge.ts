@@ -117,15 +117,6 @@ export default class LslWebSocketBridge implements WebSocketBridge {
             : undefined
     }
 
-    private static LslStreamInlet(
-        options: StreamInletOptions,
-        wss?: WebSocketServer,
-        sockets?: WebSocket[]
-    ) {
-        const onData = this.createOnDataCallback(wss, sockets)
-        return LslStreamInlet.Create(options, onData)
-    }
-
     private static WebSocket(url: string) {
         return new this.WS(url)
     }
@@ -134,6 +125,15 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         return localWebSocketPort
             ? new this.WSS({ port: localWebSocketPort })
             : undefined
+    }
+
+    private static LslStreamInlet(
+        options: StreamInletOptions,
+        wss?: WebSocketServer,
+        sockets?: WebSocket[]
+    ) {
+        const onData = this.createOnDataCallback(wss, sockets)
+        return LslStreamInlet.Create(options, onData)
     }
 }
 
@@ -162,4 +162,5 @@ export interface WebSocketBridgeOptions {
 export interface WebSocketBridgeConstructorOptions
     extends WebSocketBridgeOptions {
     inlet: StreamInlet
-    wss?: WebSocketServer}
+    wss?: WebSocketServer
+}
