@@ -45,25 +45,28 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     }
 
     public activate() {
-        this.throwIfBridgeIsDestroyed()
+        this.throwIfBridgeIsDestroyed(this.cannotActivateMessage)
         this.startPullingData()
     }
 
-    private throwIfBridgeIsDestroyed() {
+    private throwIfBridgeIsDestroyed(err: string) {
         if (this.isDestroyed) {
-            throw new Error(
-                `\n\n Cannot re-activate bridge after destroying it! \n\n Please create and activate a new instance. \n`
-            )
+            throw new Error(err)
         }
     }
+
+    private readonly cannotActivateMessage = `\n\n Cannot activate bridge after destroying it! \n\n Please create and activate a new instance. \n`
 
     private startPullingData() {
         this.inlet.startPulling()
     }
 
     public deactivate() {
+        this.throwIfBridgeIsDestroyed(this.cannotDeactivateMessage)
         this.stopPullingData()
     }
+
+    private readonly cannotDeactivateMessage = `\n\n Cannot deactivate bridge after destroying it! \n\n Please create and activate a new instance. \n`
 
     private stopPullingData() {
         this.inlet.stopPulling()
