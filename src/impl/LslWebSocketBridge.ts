@@ -1,4 +1,4 @@
-import { WebSocketServer } from 'ws'
+import WebSocket, { WebSocketServer } from 'ws'
 import { ChannelFormat } from './LiblslAdapter.js'
 import LslStreamInlet, {
     StreamInlet,

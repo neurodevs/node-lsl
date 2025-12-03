@@ -1,4 +1,5 @@
 import AbstractModuleTest from '@neurodevs/node-tdd'
+import WebSocket from 'ws'
 
 import { Server } from 'ws'
 import LiblslAdapter from '../impl/LiblslAdapter.js'
