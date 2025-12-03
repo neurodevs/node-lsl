@@ -75,14 +75,11 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         samples: Float32Array<ArrayBufferLike>,
         timestamps: Float64Array<ArrayBufferLike>
     ) {
+        const paylod = JSON.stringify({ samples, timestamps })
+
         for (const client of wss.clients) {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(
-                    JSON.stringify({
-                        samples,
-                        timestamps,
-                    })
-                )
+                client.send(paylod)
             }
         }
     }
