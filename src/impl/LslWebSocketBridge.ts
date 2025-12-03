@@ -27,9 +27,9 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
         const wss = this.WebSocketServer(localWebSocketPort)
         const sockets = this.createSocketsFrom(remoteWebSocketUrls)
-        const inlet = this.LslStreamInlet(inletOptions, wss)
+        const inlet = this.LslStreamInlet(inletOptions, wss, sockets)
 
-        return new (this.Class ?? this)({ ...options, inlet, wss, sockets })
+        return new (this.Class ?? this)({ ...options, inlet, wss })
     }
 
     public activate() {
@@ -71,10 +71,16 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         this.wss?.close()
     }
 
-    private static createOnDataCallback(wss?: WebSocketServer) {
+    private static createOnDataCallback(
+        wss?: WebSocketServer,
+        sockets?: WebSocket[]
+    ) {
         return (samples: Float32Array, timestamps: Float64Array) => {
             if (wss) {
                 this.broadcastToClients(wss, samples, timestamps)
+            }
+            if (sockets) {
+                this.sendToSockets(sockets, samples, timestamps)
             }
         }
     }
@@ -84,12 +90,24 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         samples: Float32Array<ArrayBufferLike>,
         timestamps: Float64Array<ArrayBufferLike>
     ) {
-        const paylod = JSON.stringify({ samples, timestamps })
+        const payload = JSON.stringify({ samples, timestamps })
 
         for (const client of wss.clients) {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(paylod)
+                client.send(payload)
             }
+        }
+    }
+
+    private static sendToSockets(
+        sockets: WebSocket[],
+        samples: Float32Array,
+        timestamps: Float64Array
+    ) {
+        const payload = JSON.stringify({ samples, timestamps })
+
+        for (const socket of sockets) {
+            socket.send(payload)
         }
     }
 
@@ -101,9 +119,10 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     private static LslStreamInlet(
         options: StreamInletOptions,
-        wss?: WebSocketServer
+        wss?: WebSocketServer,
+        sockets?: WebSocket[]
     ) {
-        const onData = this.createOnDataCallback(wss)
+        const onData = this.createOnDataCallback(wss, sockets)
         return LslStreamInlet.Create(options, onData)
     }
 
@@ -143,6 +162,4 @@ export interface WebSocketBridgeOptions {
 export interface WebSocketBridgeConstructorOptions
     extends WebSocketBridgeOptions {
     inlet: StreamInlet
-    wss?: WebSocketServer
-    sockets?: WebSocket[]
-}
+    wss?: WebSocketServer}

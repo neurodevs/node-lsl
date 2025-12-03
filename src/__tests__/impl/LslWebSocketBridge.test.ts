@@ -130,8 +130,14 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         this.activate()
         this.simulateOnDataCallback()
 
+        const calls = FakeWebSocket.callsToSend.filter((call) =>
+            Array.from(FakeWebSocketServer.clients).some(
+                (client) => client.id === call.id
+            )
+        )
+
         assert.isEqual(
-            FakeWebSocket.callsToSend.length,
+            calls.length,
             0,
             'Sent data to clients that are not ready!'
         )
@@ -158,17 +164,11 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async acceptsOptionalLocalWebSocketPort() {
-        FakeWebSocketServer.resetTestDouble()
-
-        const localWebSocketPort = randomInt(1000, 9999)
-
-        this.LslWebSocketBridge({ localWebSocketPort })
-
+    protected static async createsWebSocketServerFromPort() {
         assert.isEqual(
             FakeWebSocketServer.callsToConstructor[0]?.port,
-            localWebSocketPort,
-            'Did not set port for WebSocketServer!'
+            this.localWebSocketPort,
+            'Did not create WebSocketServer with port!'
         )
     }
 
@@ -179,6 +179,32 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
             this.remoteWebSocketUrls,
             'Did not create WebSockets for remote URLs!'
         )
+    }
+
+    @test()
+    protected static async activateSendsDataToRemoteSockets() {
+        this.activate()
+
+        const { samples, timestamps } = this.simulateOnDataCallback()
+
+        const expectedPayload = JSON.stringify({
+            samples,
+            timestamps,
+        })
+
+        assert.isAbove(
+            FakeWebSocket.callsToSend.length,
+            0,
+            'Did not send data to remote sockets!'
+        )
+
+        for (const call of FakeWebSocket.callsToSend) {
+            assert.isEqualDeep(
+                call.data,
+                expectedPayload,
+                'Did not send data to remote sockets!'
+            )
+        }
     }
 
     private static activate() {
