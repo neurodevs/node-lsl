@@ -73,8 +73,11 @@ export default class LslStreamInlet implements StreamInlet {
 
     public static Create(options: StreamInletOptions, onData: OnDataCallback) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { maxBufferedMs, chunkSize, ...infoOptions } = options
+        const { maxBufferedMs, chunkSize, ...rest } = options
+        const infoOptions: StreamInfoOptions = rest
+
         const info = this.LslStreamInfo(infoOptions)
+
         return new (this.Class ?? this)(info, options, onData)
     }
 
