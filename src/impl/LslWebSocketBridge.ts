@@ -13,6 +13,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     private inlet: StreamInlet
     private localServer?: WebSocketServer
     private remoteSockets?: WebSocket[]
+
     private isDestroyed = false
 
     protected constructor(options: WebSocketBridgeConstructorOptions) {
