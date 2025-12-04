@@ -1,18 +1,23 @@
 import WebSocket, { WebSocketServer } from 'ws'
 import LslWebSocketBridge, {
     WebSocketBridge,
+    WebSocketBridgeConstructorOptions,
 } from '../../impl/LslWebSocketBridge.js'
 import FakeWebSocket from '../WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../WebSockets/FakeWebSocketServer.js'
 
 export default class FakeWebSocketBridge implements WebSocketBridge {
-    public static numCallsToConstructor = 0
+    public static callsToConstructor: (
+        | WebSocketBridgeConstructorOptions
+        | undefined
+    )[] = []
+
     public static numCallsToActivate = 0
     public static numCallsToDeactivate = 0
     public static numCallsToDestroy = 0
 
-    public constructor() {
-        FakeWebSocketBridge.numCallsToConstructor++
+    public constructor(options?: WebSocketBridgeConstructorOptions) {
+        FakeWebSocketBridge.callsToConstructor.push(options)
     }
 
     public activate() {
@@ -28,7 +33,7 @@ export default class FakeWebSocketBridge implements WebSocketBridge {
     }
 
     public static resetTestDouble() {
-        this.numCallsToConstructor = 0
+        this.callsToConstructor = []
         this.numCallsToActivate = 0
         this.numCallsToDeactivate = 0
         this.numCallsToDestroy = 0
