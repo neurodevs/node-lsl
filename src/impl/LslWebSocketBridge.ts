@@ -27,11 +27,11 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     }
 
     public static Create(options: WebSocketBridgeOptions) {
-        const { localWebSocketPort, remoteWebSocketUrls, ...rest } = options
+        const { listenPort, connectUrls, ...rest } = options
         const inletOptions: StreamInletOptions = rest
 
-        const localServer = this.WebSocketServer(localWebSocketPort)
-        const remoteSockets = this.createSocketsFrom(remoteWebSocketUrls)
+        const localServer = this.WebSocketServer(listenPort)
+        const remoteSockets = this.createSocketsFrom(connectUrls)
 
         const inlet = this.LslStreamInlet(
             inletOptions,
@@ -53,7 +53,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         }
     }
 
-    private readonly insufficientOptionsError = `At least one of localWebSocketPort or remoteWebSocketUrls must be provided!`
+    private readonly insufficientOptionsError = `At least one of listenPort or connectUrls must be provided!`
 
     public activate() {
         this.throwIfBridgeIsDestroyed(this.cannotActivateMessage)
@@ -138,12 +138,11 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         }
     }
 
-    private static createSocketsFrom(remoteWebSocketUrls?: string | string[]) {
-        return remoteWebSocketUrls
-            ? (Array.isArray(remoteWebSocketUrls)
-                  ? remoteWebSocketUrls
-                  : [remoteWebSocketUrls]
-              ).map((url) => this.WebSocket(url))
+    private static createSocketsFrom(connectUrls?: string | string[]) {
+        return connectUrls
+            ? (Array.isArray(connectUrls) ? connectUrls : [connectUrls]).map(
+                  (url) => this.WebSocket(url)
+              )
             : undefined
     }
 
@@ -151,10 +150,8 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         return new this.WS(url)
     }
 
-    private static WebSocketServer(localWebSocketPort?: number) {
-        return localWebSocketPort
-            ? new this.WSS({ port: localWebSocketPort })
-            : undefined
+    private static WebSocketServer(listenPort?: number) {
+        return listenPort ? new this.WSS({ port: listenPort }) : undefined
     }
 
     private static LslStreamInlet(
@@ -185,8 +182,8 @@ export interface WebSocketBridgeOptions {
     name?: string
     type?: string
     sourceId?: string
-    localWebSocketPort?: number
-    remoteWebSocketUrls?: string | string[]
+    listenPort?: number
+    connectUrls?: string | string[]
 }
 
 export interface WebSocketBridgeConstructorOptions

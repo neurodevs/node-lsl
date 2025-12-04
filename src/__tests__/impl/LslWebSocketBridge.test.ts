@@ -94,7 +94,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async createsWebSocketServer() {
         assert.isEqualDeep(
             FakeWebSocketServer.callsToConstructor[0],
-            { port: this.localWebSocketPort },
+            { port: this.listenPort },
             'Did not create WebSocketServer!'
         )
     }
@@ -176,7 +176,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async createsWebSocketServerFromPort() {
         assert.isEqual(
             FakeWebSocketServer.callsToConstructor[0]?.port,
-            this.localWebSocketPort,
+            this.listenPort,
             'Did not create WebSocketServer with port!'
         )
     }
@@ -185,7 +185,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async createsSocketsFromRemoteUrls() {
         assert.isEqualDeep(
             FakeWebSocket.callsToConstructor,
-            this.remoteWebSocketUrls,
+            this.connectUrls,
             'Did not create WebSockets for remote URLs!'
         )
     }
@@ -246,7 +246,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
         assert.isEqual(
             FakeWebSocket.numCallsToClose,
-            this.remoteWebSocketUrls.length,
+            this.connectUrls.length,
             'Did not close remote WebSockets!'
         )
     }
@@ -255,10 +255,10 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async throwsIfNeitherPortNorRemoteUrlsPassed() {
         assert.doesThrow(() => {
             this.LslWebSocketBridge({
-                localWebSocketPort: undefined,
-                remoteWebSocketUrls: undefined,
+                listenPort: undefined,
+                connectUrls: undefined,
             })
-        }, `At least one of localWebSocketPort or remoteWebSocketUrls must be provided!`)
+        }, `At least one of listenPort or connectUrls must be provided!`)
     }
 
     private static activate() {
@@ -281,12 +281,9 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         return { samples, timestamps }
     }
 
-    private static readonly localWebSocketPort = randomInt(1000, 5000)
+    private static readonly listenPort = randomInt(1000, 5000)
 
-    private static readonly remoteWebSocketUrls = [
-        this.generateId(),
-        this.generateId(),
-    ]
+    private static readonly connectUrls = [this.generateId(), this.generateId()]
 
     private static readonly inletOptions = {
         channelNames: this.channelNames,
@@ -300,8 +297,8 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static readonly baseOptions = {
         ...this.inletOptions,
-        localWebSocketPort: this.localWebSocketPort,
-        remoteWebSocketUrls: this.remoteWebSocketUrls,
+        listenPort: this.listenPort,
+        connectUrls: this.connectUrls,
     }
 
     private static LslWebSocketBridge(
