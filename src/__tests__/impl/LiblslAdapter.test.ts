@@ -281,7 +281,14 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     @test()
     protected static async resolvesStreamInfoByProp() {
         const resultsBufferElements = 1024
-        const resultsBufferPtr = Buffer.alloc(resultsBufferElements)
+        const resultsBuffer = Buffer.alloc(resultsBufferElements)
+
+        const resultsBufferPtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [resultsBuffer],
+            })
+        )[0]
 
         const minResults = 1
         const timeoutMs = 1000

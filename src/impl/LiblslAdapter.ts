@@ -1,4 +1,12 @@
-import { DataType, define, JsExternal, load, open, unwrapPointer } from 'ffi-rs'
+import {
+    createPointer,
+    DataType,
+    define,
+    JsExternal,
+    load,
+    open,
+    unwrapPointer,
+} from 'ffi-rs'
 
 import { CHANNEL_FORMATS } from '../consts.js'
 import { LslErrorCode } from '../handleError.js'
@@ -114,7 +122,14 @@ export default class LiblslAdapter implements Liblsl {
         const { prop, value, minResults = 1, timeoutMs = 1000 } = options
 
         const resultsBufferElements = 1024
-        const resultsBufferPtr = Buffer.alloc(resultsBufferElements)
+        const resultsBuffer = Buffer.alloc(resultsBufferElements)
+
+        const resultsBufferPtr = unwrapPointer(
+            createPointer({
+                paramsType: [DataType.U8Array],
+                paramsValue: [resultsBuffer],
+            })
+        )[0]
 
         return this.bindings.lsl_resolve_byprop([
             resultsBufferPtr,
@@ -484,7 +499,7 @@ export interface LiblslBindings {
     lsl_destroy_streaminfo(args: [BoundStreamInfo]): void
 
     lsl_resolve_byprop(
-        args: [Buffer<ArrayBuffer>, number, string, string, number, number]
+        args: [JsExternal, number, string, string, number, number]
     ): number
 
     lsl_create_outlet(args: [BoundStreamInfo, number, number]): BoundOutlet
