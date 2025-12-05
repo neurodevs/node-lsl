@@ -13,8 +13,6 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
         this.setSpyStreamInfo()
 
-        LslStreamInfo['instanceCache'] = {}
-
         this.instance = this.LslStreamInfo()
     }
 
@@ -216,17 +214,6 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
             this.fakeLiblsl.lastDestroyStreamInfoOptions?.info,
             this.instance.getBoundInfo(),
             'Should have called destroyStreamInfo!'
-        )
-    }
-
-    @test()
-    protected static async cachesInfoIfPassedSameOptions() {
-        this.LslStreamInfo()
-
-        assert.isEqual(
-            SpyStreamInfo.numCallsToConstructor,
-            1,
-            'Did not cache stream info!'
         )
     }
 

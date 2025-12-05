@@ -46,8 +46,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeStreamInfo() {
         LslStreamInfo.Class = FakeStreamInfo
         FakeStreamInfo.resetTestDouble()
-
-        LslStreamInfo['instanceCache'] = {}
     }
 
     protected static setSpyStreamInlet() {
