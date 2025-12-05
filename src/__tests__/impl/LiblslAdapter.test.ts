@@ -280,8 +280,10 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async resolvesStreamInfoByProp() {
-        const resultsBufferElements = 1024
-        const resultsBuffer = Buffer.alloc(resultsBufferElements)
+        const maxResults = 1024
+        const bytesPerPointer = 8
+
+        const resultsBuffer = Buffer.alloc(maxResults * bytesPerPointer)
 
         const resultsBufferPtr = unwrapPointer(
             createPointer({
@@ -304,7 +306,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             this.resolveByPropParams,
             [
                 resultsBufferPtr,
-                resultsBufferElements,
+                maxResults,
                 this.prop,
                 this.value,
                 minResults,

@@ -121,8 +121,10 @@ export default class LiblslAdapter implements Liblsl {
     public resolveByProp(options: ResolveByPropOptions) {
         const { prop, value, minResults = 1, timeoutMs = 1000 } = options
 
-        const resultsBufferElements = 1024
-        const resultsBuffer = Buffer.alloc(resultsBufferElements)
+        const maxResults = 1024
+        const bytesPerPointer = 8
+
+        const resultsBuffer = Buffer.alloc(maxResults * bytesPerPointer)
 
         const resultsBufferPtr = unwrapPointer(
             createPointer({
@@ -133,7 +135,7 @@ export default class LiblslAdapter implements Liblsl {
 
         const numResults = this.bindings.lsl_resolve_byprop([
             resultsBufferPtr,
-            resultsBufferElements,
+            maxResults,
             prop,
             value,
             minResults,
