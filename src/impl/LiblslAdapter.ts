@@ -131,7 +131,7 @@ export default class LiblslAdapter implements Liblsl {
             })
         )[0]
 
-        return this.bindings.lsl_resolve_byprop([
+        const numResults = this.bindings.lsl_resolve_byprop([
             resultsBufferPtr,
             resultsBufferElements,
             prop,
@@ -139,6 +139,8 @@ export default class LiblslAdapter implements Liblsl {
             minResults,
             timeoutMs / 1000,
         ])
+
+        return numResults
     }
 
     public createOutlet(options: CreateOutletOptions) {
