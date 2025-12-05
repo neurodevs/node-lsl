@@ -49,6 +49,8 @@ export default class LslStreamInfo implements StreamInfo {
         if (!boundStreamInfo) {
             this.createStreamInfo()
             this.appendChannelsToStreamInfo()
+        } else {
+            this.boundInfo = boundStreamInfo
         }
     }
 

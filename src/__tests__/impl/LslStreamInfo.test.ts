@@ -230,6 +230,19 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async setsBoundStreamInfoWhenPassed() {
+        const instance = this.LslStreamInfo({
+            boundStreamInfo: this.instance.getBoundInfo(),
+        })
+
+        assert.isEqualDeep(
+            instance.getBoundInfo(),
+            this.instance.getBoundInfo(),
+            'Should have set bound stream info!'
+        )
+    }
+
     private static readonly defaultOptions = {
         name: this.generateId(),
         type: this.generateId(),
