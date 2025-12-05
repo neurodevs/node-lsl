@@ -11,6 +11,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeLiblsl()
         this.setSpyStreamInfo()
 
         this.instance = this.LslStreamInfo()

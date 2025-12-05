@@ -15,6 +15,7 @@ export default class LiblslAdapter implements Liblsl {
     public static open = open
     public static define = define
     public static load = load
+    public static alloc = Buffer.alloc
 
     private static instance?: Liblsl
 
@@ -124,7 +125,7 @@ export default class LiblslAdapter implements Liblsl {
         const maxResults = 1024
         const bytesPerPointer = 8
 
-        const resultsBuffer = Buffer.alloc(maxResults * bytesPerPointer)
+        const resultsBuffer = this.alloc(maxResults * bytesPerPointer)
 
         const resultsBufferPtr = unwrapPointer(
             createPointer({
@@ -142,7 +143,17 @@ export default class LiblslAdapter implements Liblsl {
             timeoutMs / 1000,
         ])
 
-        return numResults
+        const handles: bigint[] = []
+
+        for (let i = 0; i < numResults; i++) {
+            const handle = resultsBuffer.readBigUInt64LE(i * bytesPerPointer)
+
+            if (handle !== 0n) {
+                handles.push(handle)
+            }
+        }
+
+        return handles
     }
 
     public createOutlet(options: CreateOutletOptions) {
@@ -278,6 +289,10 @@ export default class LiblslAdapter implements Liblsl {
         return LiblslAdapter.load
     }
 
+    private get alloc() {
+        return LiblslAdapter.alloc
+    }
+
     private get liblslFuncs() {
         return {
             lsl_create_streaminfo: {
@@ -392,7 +407,7 @@ export interface Liblsl {
     destroyStreamInfo(options: DestroyStreamInfoOptions): void
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 
-    resolveByProp(options: ResolveByPropOptions): number
+    resolveByProp(options: ResolveByPropOptions): bigint[]
 
     createOutlet(options: CreateOutletOptions): BoundOutlet
 

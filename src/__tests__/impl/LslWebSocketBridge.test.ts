@@ -17,6 +17,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeLiblsl()
         this.setFakeStreamInlet()
         this.setFakeWebSocket()
         this.setFakeWebSocketServer()

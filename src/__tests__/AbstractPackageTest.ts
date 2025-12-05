@@ -27,8 +27,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static async beforeEach() {
         await super.beforeEach()
-
-        this.setFakeLiblsl()
     }
 
     protected static setFakeLiblsl() {

@@ -18,6 +18,7 @@ import {
     Liblsl,
     LiblslBindings,
     LslChannel,
+    ResolveByPropOptions,
 } from 'impl/LiblslAdapter.js'
 import LiblslAdapter from '../../impl/LiblslAdapter.js'
 import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
@@ -280,37 +281,17 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async resolvesStreamInfoByProp() {
-        const maxResults = 1024
-        const bytesPerPointer = 8
-
-        const resultsBuffer = Buffer.alloc(maxResults * bytesPerPointer)
-
-        const resultsBufferPtr = unwrapPointer(
-            createPointer({
-                paramsType: [DataType.U8Array],
-                paramsValue: [resultsBuffer],
-            })
-        )[0]
-
-        const minResults = 1
-        const timeoutMs = 1000
-
-        this.instance.resolveByProp({
-            prop: this.prop,
-            value: this.value,
-            minResults,
-            timeoutMs,
-        })
+        this.resolveByProp()
 
         assert.isEqualDeep(
             this.resolveByPropParams,
             [
-                resultsBufferPtr,
-                maxResults,
+                this.resultsBufferPtr,
+                this.maxResults,
                 this.prop,
                 this.value,
-                minResults,
-                timeoutMs / 1000,
+                this.minResults,
+                this.timeoutMs / 1000,
             ],
             'Did not call resolveByProp with expected params!'
         )
@@ -321,9 +302,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const minResults = randomInt(0, 10)
         const timeoutMs = Math.random() * 1000
 
-        this.instance.resolveByProp({
-            prop: this.prop,
-            value: this.value,
+        this.resolveByProp({
             minResults,
             timeoutMs,
         })
@@ -335,6 +314,37 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             { minResults, timeoutMs: timeoutMs / 1000 },
             'Did not call resolveByProp with expected params!'
+        )
+    }
+
+    @test()
+    protected static async returnsHandlesForResolvedStreamInfos() {
+        LiblslAdapter.alloc = (size: number) => {
+            const buffer = Buffer.alloc(size)
+
+            for (let i = 0; i < this.fakeNumResolveResults; i++) {
+                const offset = i * this.bytesPerPointer
+                buffer.writeBigUInt64LE(BigInt(i + 1), offset)
+            }
+
+            return buffer
+        }
+
+        const expectedHandles: bigint[] = []
+
+        for (let i = 0; i < this.fakeNumResolveResults; i++) {
+            expectedHandles.push(BigInt(i + 1))
+        }
+
+        const actualHandles = this.resolveByProp()
+
+        const actual = actualHandles.map((h) => h.toString())
+        const expected = expectedHandles.map((h) => h.toString())
+
+        assert.isEqualDeep(
+            actual,
+            expected,
+            'Did not receive expected resolved stream info handles!'
         )
     }
 
@@ -474,7 +484,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         delete process.env.LIBLSL_PATH
 
         LiblslAdapter.resetInstance()
-        this.instance = LiblslAdapter.getInstance()
+        this.instance = LiblslAdapter.getInstance() as FakeLiblsl
 
         assert.isEqual(
             this.ffiRsOpenOptions?.path,
@@ -659,6 +669,16 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )
     }
 
+    private static resolveByProp(options?: Partial<ResolveByPropOptions>) {
+        return this.instance.resolveByProp({
+            prop: this.prop,
+            value: this.value,
+            minResults: this.minResults,
+            timeoutMs: this.timeoutMs,
+            ...options,
+        })
+    }
+
     private static createRandomOutlet() {
         const options = this.createRandomOutletOptions()
         const outlet = this.instance.createOutlet(options)
@@ -709,8 +729,25 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         }
     }
 
+    // resolveByProp
+    private static readonly maxResults = 1024
+    private static readonly bytesPerPointer = 8
+    private static readonly minResults = 1
+    private static readonly timeoutMs = 1000
     private static readonly prop = this.generateId()
     private static readonly value = this.generateId()
+    private static readonly fakeNumResolveResults = 2
+
+    private static readonly resultsBuffer = Buffer.alloc(
+        this.maxResults * this.bytesPerPointer
+    )
+
+    private static readonly resultsBufferPtr = unwrapPointer(
+        createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.resultsBuffer],
+        })
+    )[0]
 
     private static generateFailedMessage() {
         return `Loading the liblsl dylib failed! I tried to load it from ${process.env.LIBLSL_PATH}.`
@@ -727,7 +764,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             lsl_resolve_byprop: (params: any[]) => {
                 this.resolveByPropParams = params
-                return 0
+                return this.fakeNumResolveResults
             },
             lsl_create_outlet: (params: any[]) => {
                 this.createOutletParams = params

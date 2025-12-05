@@ -15,8 +15,9 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setSpyStreamInlet()
+        this.setFakeLiblsl()
         this.setFakeStreamInfo()
+        this.setSpyStreamInlet()
 
         this.callsToOnData = []
 

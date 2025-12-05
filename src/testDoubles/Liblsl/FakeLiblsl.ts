@@ -17,9 +17,12 @@ import {
     PullSampleOptions,
     DestroyStreamInfoOptions,
     ResolveByPropOptions,
+    DestroyOutletOptions,
 } from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {
+    public static fakeResolveHandles: bigint[] = []
+
     public static fakeSamples: Float32Array[] = [
         new Float32Array([1, 2, 3]),
         new Float32Array([4, 5, 6]),
@@ -54,6 +57,7 @@ export default class FakeLiblsl implements Liblsl {
     public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
     public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
     public lastCreateInletOptions?: CreateInletOptions
+    public lastDestroyOutletOptions?: DestroyOutletOptions
     public lastPullSampleOptions?: PullSampleOptions
     public lastPullChunkOptions?: PullChunkOptions
     public lastFlushInletOptions?: FlushInletOptions
@@ -86,7 +90,7 @@ export default class FakeLiblsl implements Liblsl {
 
     public resolveByProp(options: ResolveByPropOptions) {
         this.lastResolveByPropOptions = options
-        return 0
+        return FakeLiblsl.fakeResolveHandles
     }
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
@@ -108,8 +112,9 @@ export default class FakeLiblsl implements Liblsl {
         return this.outlet
     }
 
-    public destroyOutlet() {
+    public destroyOutlet(options: DestroyOutletOptions) {
         this.destroyOutletHitCount++
+        this.lastDestroyOutletOptions = options
     }
 
     public createInlet(options: CreateInletOptions) {
