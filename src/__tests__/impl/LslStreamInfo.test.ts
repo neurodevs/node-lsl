@@ -139,7 +139,11 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     @test()
     protected static async canManuallySetUnits() {
         const units = this.generateId()
-        const instance = this.LslStreamInfo({ units })
+
+        const instance = this.LslStreamInfo({
+            units,
+            sourceId: this.generateId(),
+        })
 
         assert.isEqual(
             instance.getUnits(),

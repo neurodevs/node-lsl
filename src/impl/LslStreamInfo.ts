@@ -52,7 +52,26 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     public static Create(options: StreamInfoOptions) {
-        const key = JSON.stringify(options)
+        const {
+            name,
+            type,
+            sourceId,
+            channelNames,
+            channelFormat,
+            sampleRateHz,
+        } = options
+
+        const channelCount = channelNames.length
+
+        const key = JSON.stringify({
+            name,
+            type,
+            sourceId,
+            channelCount,
+            channelFormat,
+            sampleRateHz,
+        })
+
         let instance = this.instanceCache[key]
 
         if (instance === undefined) {
