@@ -62,7 +62,7 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     private defineLiblslBindings() {
-        return this.define(this.liblslFuncs) as unknown as LiblslBindings
+        return this.define(this.liblslFuncs) as LiblslBindings
     }
 
     public createStreamInfo(options: CreateStreamInfoOptions) {
@@ -85,11 +85,6 @@ export default class LiblslAdapter implements Liblsl {
         ])
     }
 
-    public destroyStreamInfo(options: DestroyStreamInfoOptions) {
-        const { info } = options
-        this.bindings.lsl_destroy_streaminfo([info])
-    }
-
     public appendChannelsToStreamInfo(
         options: AppendChannelsToStreamInfoOptions
     ) {
@@ -108,6 +103,27 @@ export default class LiblslAdapter implements Liblsl {
             this.bindings.lsl_append_child_value([child, 'unit', channel.units])
             this.bindings.lsl_append_child_value([child, 'type', channel.type])
         }
+    }
+
+    public destroyStreamInfo(options: DestroyStreamInfoOptions) {
+        const { info } = options
+        this.bindings.lsl_destroy_streaminfo([info])
+    }
+
+    public resolveByProp(options: ResolveByPropOptions) {
+        const { prop, value, minResults = 1, timeoutMs = 1000 } = options
+
+        const resultsBufferElements = 1024
+        const resultsBufferPtr = Buffer.alloc(resultsBufferElements)
+
+        return this.bindings.lsl_resolve_byprop([
+            resultsBufferPtr,
+            resultsBufferElements,
+            prop,
+            value,
+            minResults,
+            timeoutMs / 1000,
+        ])
     }
 
     public createOutlet(options: CreateOutletOptions) {
@@ -262,6 +278,18 @@ export default class LiblslAdapter implements Liblsl {
                 retType: DataType.Void,
                 paramsType: [DataType.External],
             },
+            lsl_resolve_byprop: {
+                library: 'lsl',
+                retType: DataType.I32,
+                paramsType: [
+                    DataType.External,
+                    DataType.I32,
+                    DataType.String,
+                    DataType.String,
+                    DataType.I32,
+                    DataType.Double,
+                ],
+            },
             lsl_create_outlet: {
                 library: 'lsl',
                 retType: DataType.External,
@@ -345,6 +373,8 @@ export interface Liblsl {
     destroyStreamInfo(options: DestroyStreamInfoOptions): void
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 
+    resolveByProp(options: ResolveByPropOptions): number
+
     createOutlet(options: CreateOutletOptions): BoundOutlet
 
     pushSampleFloatTimestamp(
@@ -382,14 +412,21 @@ export interface AppendChannelsToStreamInfoOptions {
     channels: LslChannel[]
 }
 
+export interface DestroyStreamInfoOptions {
+    info: BoundStreamInfo
+}
+
+export interface ResolveByPropOptions {
+    prop: string
+    value: string
+    minResults?: number
+    timeoutMs?: number
+}
+
 export interface CreateOutletOptions {
     info: BoundStreamInfo
     chunkSize: number
     maxBufferedMs: number
-}
-
-export interface DestroyStreamInfoOptions {
-    info: BoundStreamInfo
 }
 
 export interface PushSampleFloatTimestampOptions {
@@ -445,6 +482,11 @@ export interface LiblslBindings {
     ): BoundStreamInfo
 
     lsl_destroy_streaminfo(args: [BoundStreamInfo]): void
+
+    lsl_resolve_byprop(
+        args: [Buffer<ArrayBuffer>, number, string, string, number, number]
+    ): number
+
     lsl_create_outlet(args: [BoundStreamInfo, number, number]): BoundOutlet
     lsl_push_sample_ft(args: [BoundOutlet, LslSample, number]): LslErrorCode
     lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): LslErrorCode

@@ -36,6 +36,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     private static createStreamInfoParams?: any[]
     private static destroyStreamInfoParams?: any[]
+    private static resolveByPropParams?: any[]
     private static appendChildParams: any[] = []
     private static createOutletParams?: any[]
     private static destroyOutletParams?: any[]
@@ -169,6 +170,18 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 retType: DataType.Void,
                 paramsType: [DataType.External],
             },
+            lsl_resolve_byprop: {
+                library: 'lsl',
+                retType: DataType.I32,
+                paramsType: [
+                    DataType.External,
+                    DataType.I32,
+                    DataType.String,
+                    DataType.String,
+                    DataType.I32,
+                    DataType.Double,
+                ],
+            },
             lsl_create_outlet: {
                 library: 'lsl',
                 retType: DataType.External,
@@ -262,6 +275,37 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             this.destroyStreamInfoParams,
             [info],
             'Did not call destroyStreamInfo with expected params!'
+        )
+    }
+
+    @test()
+    protected static async resolvesStreamInfoByProp() {
+        const resultsBufferElements = 1024
+        const resultsBufferPtr = Buffer.alloc(resultsBufferElements)
+
+        const prop = this.generateId()
+        const value = this.generateId()
+        const minResults = 1
+        const timeoutMs = 1000
+
+        this.instance.resolveByProp({
+            prop,
+            value,
+            minResults,
+            timeoutMs,
+        })
+
+        assert.isEqualDeep(
+            this.resolveByPropParams,
+            [
+                resultsBufferPtr,
+                resultsBufferElements,
+                prop,
+                value,
+                minResults,
+                timeoutMs / 1000,
+            ],
+            'Did not call resolveByProp with expected params!'
         )
     }
 
@@ -648,6 +692,10 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             lsl_destroy_streaminfo: (params: any[]) => {
                 this.destroyStreamInfoParams = params
+            },
+            lsl_resolve_byprop: (params: any[]) => {
+                this.resolveByPropParams = params
+                return 0
             },
             lsl_create_outlet: (params: any[]) => {
                 this.createOutletParams = params
