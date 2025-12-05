@@ -117,22 +117,26 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private createDataBuffer() {
-        const bytesPerFloat = 4
-
         this.dataBuffer = Buffer.alloc(
-            bytesPerFloat * this.chunkSize * this.channelCount
+            this.bytesPerFloat * this.chunkSize * this.channelCount
         )
     }
 
+    private readonly bytesPerFloat = 4
+
     private createTimestampBuffer() {
-        const bytesPerDouble = 8
-        this.timestampBuffer = Buffer.alloc(bytesPerDouble * this.chunkSize)
+        this.timestampBuffer = Buffer.alloc(
+            this.bytesPerDouble * this.chunkSize
+        )
     }
 
+    private readonly bytesPerDouble = 8
+
     private createErrorCodeBuffer() {
-        const bytesPerInt = 4
-        this.errorCodeBuffer = Buffer.alloc(bytesPerInt)
+        this.errorCodeBuffer = Buffer.alloc(this.bytesPerInt)
     }
+
+    private readonly bytesPerInt = 4
 
     private createPointersToBuffers() {
         this.createDataBufferPtr()
