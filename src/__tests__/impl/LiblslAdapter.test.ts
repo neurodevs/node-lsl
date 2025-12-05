@@ -283,14 +283,12 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const resultsBufferElements = 1024
         const resultsBufferPtr = Buffer.alloc(resultsBufferElements)
 
-        const prop = this.generateId()
-        const value = this.generateId()
         const minResults = 1
         const timeoutMs = 1000
 
         this.instance.resolveByProp({
-            prop,
-            value,
+            prop: this.prop,
+            value: this.value,
             minResults,
             timeoutMs,
         })
@@ -300,11 +298,33 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             [
                 resultsBufferPtr,
                 resultsBufferElements,
-                prop,
-                value,
+                this.prop,
+                this.value,
                 minResults,
                 timeoutMs / 1000,
             ],
+            'Did not call resolveByProp with expected params!'
+        )
+    }
+
+    @test()
+    protected static async resolveByPropAcceptsOptionalArgs() {
+        const minResults = randomInt(0, 10)
+        const timeoutMs = Math.random() * 1000
+
+        this.instance.resolveByProp({
+            prop: this.prop,
+            value: this.value,
+            minResults,
+            timeoutMs,
+        })
+
+        assert.isEqualDeep(
+            {
+                minResults: this.resolveByPropParams?.[4],
+                timeoutMs: this.resolveByPropParams?.[5],
+            },
+            { minResults, timeoutMs: timeoutMs / 1000 },
             'Did not call resolveByProp with expected params!'
         )
     }
@@ -679,6 +699,9 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             sourceId: this.generateId(),
         }
     }
+
+    private static readonly prop = this.generateId()
+    private static readonly value = this.generateId()
 
     private static generateFailedMessage() {
         return `Loading the liblsl dylib failed! I tried to load it from ${process.env.LIBLSL_PATH}.`
