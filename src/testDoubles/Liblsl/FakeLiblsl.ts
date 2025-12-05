@@ -88,7 +88,7 @@ export default class FakeLiblsl implements Liblsl {
         this.lastDestroyStreamInfoOptions = options
     }
 
-    public resolveByProp(options: ResolveByPropOptions) {
+    public async resolveByProp(options: ResolveByPropOptions) {
         this.lastResolveByPropOptions = options
         return FakeLiblsl.fakeResolveHandles
     }

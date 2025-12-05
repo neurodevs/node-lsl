@@ -37,7 +37,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     private static createStreamInfoParams?: any[]
     private static destroyStreamInfoParams?: any[]
-    private static resolveByPropParams?: any[]
     private static appendChildParams: any[] = []
     private static createOutletParams?: any[]
     private static destroyOutletParams?: any[]
@@ -99,7 +98,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
         LiblslAdapter.load = (options) => {
             this.ffiRsLoadOptions = options
-            return {} as any
+            return this.fakeNumResolveResults as any
         }
 
         LiblslAdapter.resetInstance()
@@ -170,18 +169,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 library: 'lsl',
                 retType: DataType.Void,
                 paramsType: [DataType.External],
-            },
-            lsl_resolve_byprop: {
-                library: 'lsl',
-                retType: DataType.I32,
-                paramsType: [
-                    DataType.External,
-                    DataType.I32,
-                    DataType.String,
-                    DataType.String,
-                    DataType.I32,
-                    DataType.Double,
-                ],
             },
             lsl_create_outlet: {
                 library: 'lsl',
@@ -281,18 +268,32 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async resolvesStreamInfoByProp() {
-        this.resolveByProp()
+        await this.resolveByProp()
 
         assert.isEqualDeep(
-            this.resolveByPropParams,
-            [
-                this.resultsBufferPtr,
-                this.maxResults,
-                this.prop,
-                this.value,
-                this.minResults,
-                this.timeoutMs / 1000,
-            ],
+            this.ffiRsLoadOptions,
+            {
+                library: 'lsl',
+                funcName: 'lsl_resolve_byprop',
+                retType: DataType.I32,
+                paramsType: [
+                    DataType.External,
+                    DataType.I32,
+                    DataType.String,
+                    DataType.String,
+                    DataType.I32,
+                    DataType.Double,
+                ],
+                paramsValue: [
+                    this.resultsBufferPtr,
+                    this.maxResults,
+                    this.prop,
+                    this.value,
+                    this.minResults,
+                    this.timeoutMs / 1000,
+                ],
+                runInNewThread: true,
+            },
             'Did not call resolveByProp with expected params!'
         )
     }
@@ -302,15 +303,15 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const minResults = randomInt(0, 10)
         const timeoutMs = Math.random() * 1000
 
-        this.resolveByProp({
+        await this.resolveByProp({
             minResults,
             timeoutMs,
         })
 
         assert.isEqualDeep(
             {
-                minResults: this.resolveByPropParams?.[4],
-                timeoutMs: this.resolveByPropParams?.[5],
+                minResults: this.ffiRsLoadOptions?.['paramsValue']?.[4],
+                timeoutMs: this.ffiRsLoadOptions?.['paramsValue']?.[5],
             },
             { minResults, timeoutMs: timeoutMs / 1000 },
             'Did not call resolveByProp with expected params!'
@@ -336,7 +337,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             expectedHandles.push(BigInt(i + 1))
         }
 
-        const actualHandles = this.resolveByProp()
+        const actualHandles = await this.resolveByProp()
 
         const actual = actualHandles.map((h) => h.toString())
         const expected = expectedHandles.map((h) => h.toString())
@@ -669,7 +670,9 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )
     }
 
-    private static resolveByProp(options?: Partial<ResolveByPropOptions>) {
+    private static async resolveByProp(
+        options?: Partial<ResolveByPropOptions>
+    ) {
         return this.instance.resolveByProp({
             prop: this.prop,
             value: this.value,
@@ -761,10 +764,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             lsl_destroy_streaminfo: (params: any[]) => {
                 this.destroyStreamInfoParams = params
-            },
-            lsl_resolve_byprop: (params: any[]) => {
-                this.resolveByPropParams = params
-                return this.fakeNumResolveResults
             },
             lsl_create_outlet: (params: any[]) => {
                 this.createOutletParams = params

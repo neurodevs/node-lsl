@@ -119,7 +119,7 @@ export default class LiblslAdapter implements Liblsl {
         this.bindings.lsl_destroy_streaminfo([info])
     }
 
-    public resolveByProp(options: ResolveByPropOptions) {
+    public async resolveByProp(options: ResolveByPropOptions) {
         const { prop, value, minResults = 1, timeoutMs = 1000 } = options
 
         const maxResults = 1024
@@ -134,14 +134,28 @@ export default class LiblslAdapter implements Liblsl {
             })
         )[0]
 
-        const numResults = this.bindings.lsl_resolve_byprop([
-            resultsBufferPtr,
-            maxResults,
-            prop,
-            value,
-            minResults,
-            timeoutMs / 1000,
-        ])
+        const numResults = await this.load({
+            library: 'lsl',
+            funcName: 'lsl_resolve_byprop',
+            retType: DataType.I32,
+            paramsType: [
+                DataType.External,
+                DataType.I32,
+                DataType.String,
+                DataType.String,
+                DataType.I32,
+                DataType.Double,
+            ],
+            paramsValue: [
+                resultsBufferPtr,
+                maxResults,
+                prop,
+                value,
+                minResults,
+                timeoutMs / 1000,
+            ],
+            runInNewThread: true,
+        })
 
         const handles: bigint[] = []
 
@@ -312,18 +326,6 @@ export default class LiblslAdapter implements Liblsl {
                 retType: DataType.Void,
                 paramsType: [DataType.External],
             },
-            lsl_resolve_byprop: {
-                library: 'lsl',
-                retType: DataType.I32,
-                paramsType: [
-                    DataType.External,
-                    DataType.I32,
-                    DataType.String,
-                    DataType.String,
-                    DataType.I32,
-                    DataType.Double,
-                ],
-            },
             lsl_create_outlet: {
                 library: 'lsl',
                 retType: DataType.External,
@@ -407,7 +409,7 @@ export interface Liblsl {
     destroyStreamInfo(options: DestroyStreamInfoOptions): void
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 
-    resolveByProp(options: ResolveByPropOptions): bigint[]
+    resolveByProp(options: ResolveByPropOptions): Promise<bigint[]>
 
     createOutlet(options: CreateOutletOptions): BoundOutlet
 
@@ -516,11 +518,6 @@ export interface LiblslBindings {
     ): BoundStreamInfo
 
     lsl_destroy_streaminfo(args: [BoundStreamInfo]): void
-
-    lsl_resolve_byprop(
-        args: [JsExternal, number, string, string, number, number]
-    ): number
-
     lsl_create_outlet(args: [BoundStreamInfo, number, number]): BoundOutlet
     lsl_push_sample_ft(args: [BoundOutlet, LslSample, number]): LslErrorCode
     lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): LslErrorCode
