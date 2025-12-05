@@ -92,8 +92,7 @@ export default class LslStreamInlet implements StreamInlet {
     private createBoundInlet() {
         this.inlet = this.lsl.createInlet({
             info: this.boundStreamInfo,
-            chunkSize: this.chunkSize,
-            maxBufferedMs: this.maxBufferedMs / 1000,
+            maxBufferedMs: this.maxBufferedMs,
         })
     }
 

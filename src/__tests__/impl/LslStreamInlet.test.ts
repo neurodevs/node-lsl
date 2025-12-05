@@ -65,8 +65,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             this.fakeLiblsl.lastCreateInletOptions,
             {
                 info: fakeInfo.boundStreamInfo,
-                chunkSize: this.chunkSize,
-                maxBufferedMs: this.maxBufferedMs / 1000,
+                maxBufferedMs: this.maxBufferedMs,
             },
             'Should have called createInlet!'
         )
@@ -212,11 +211,11 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             maxBufferedMs: undefined,
         })
 
-        const sixMinutesInSeconds = 360
+        const sixMinutesInMs = 360 * 1000
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastCreateInletOptions?.maxBufferedMs,
-            sixMinutesInSeconds
+            sixMinutesInMs
         )
     }
 

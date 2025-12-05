@@ -138,14 +138,18 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public createInlet(options: CreateInletOptions) {
-        const { info, chunkSize, maxBufferedMs } = options
+        const { info, maxBufferedMs } = options
 
         return this.bindings.lsl_create_inlet([
             info,
-            chunkSize,
             maxBufferedMs / 1000,
+            this.maxChunkSize,
+            this.shouldRecover,
         ])
     }
+
+    private readonly maxChunkSize = 0
+    private readonly shouldRecover = 1
 
     public pullSample(options: PullSampleOptions) {
         const {
@@ -289,7 +293,12 @@ export default class LiblslAdapter implements Liblsl {
             lsl_create_inlet: {
                 library: 'lsl',
                 retType: DataType.External,
-                paramsType: [DataType.External, DataType.I32, DataType.I32],
+                paramsType: [
+                    DataType.External,
+                    DataType.I32,
+                    DataType.I32,
+                    DataType.I32,
+                ],
             },
             lsl_flush_inlet: {
                 library: 'lsl',
@@ -401,7 +410,6 @@ export interface DestroyOutletOptions {
 
 export interface CreateInletOptions {
     info: BoundStreamInfo
-    chunkSize: number
     maxBufferedMs: number
 }
 

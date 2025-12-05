@@ -200,7 +200,12 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             lsl_create_inlet: {
                 library: 'lsl',
                 retType: DataType.External,
-                paramsType: [DataType.External, DataType.I32, DataType.I32],
+                paramsType: [
+                    DataType.External,
+                    DataType.I32,
+                    DataType.I32,
+                    DataType.I32,
+                ],
             },
             lsl_flush_inlet: {
                 library: 'lsl',
@@ -407,14 +412,23 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     @test()
     protected static async createInletWithRequiredParams() {
         const { options, inlet } = this.createRandomInlet()
+        const { maxBufferedMs } = options
 
         const expected = {
             ...options,
-            maxBufferedMs: options.maxBufferedMs / 1000,
+            maxBufferedMs: maxBufferedMs / 1000,
         }
 
-        assert.isEqualDeep(this.createInletParams, Object.values(expected))
-        assert.isEqual(inlet, this.fakeInlet)
+        const maxChunkSize = 0
+        const shouldRecover = 1
+
+        assert.isEqualDeep(
+            this.createInletParams,
+            [...Object.values(expected), maxChunkSize, shouldRecover],
+            'Did not call createInlet with expected params!'
+        )
+
+        assert.isEqual(inlet, this.fakeInlet, 'Did not receive expected inlet!')
     }
 
     @test()
@@ -573,22 +587,31 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     private static createRandomOutlet() {
-        const options = this.createRandomOptions()
+        const options = this.createRandomOutletOptions()
         const outlet = this.instance.createOutlet(options)
         return { options, outlet }
     }
 
-    private static createRandomInlet() {
-        const options = this.createRandomOptions()
-        const inlet = this.instance.createInlet(options)
-        return { options, inlet }
-    }
-
-    private static createRandomOptions() {
+    private static createRandomOutletOptions() {
         const info = this.createRandomStreamInfo()
         const options = {
             info,
             chunkSize: randomInt(10),
+            maxBufferedMs: randomInt(10),
+        }
+        return options
+    }
+
+    private static createRandomInlet() {
+        const options = this.createRandomInletOptions()
+        const inlet = this.instance.createInlet(options)
+        return { options, inlet }
+    }
+
+    private static createRandomInletOptions() {
+        const info = this.createRandomStreamInfo()
+        const options = {
+            info,
             maxBufferedMs: randomInt(10),
         }
         return options
