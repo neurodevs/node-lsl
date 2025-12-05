@@ -34,6 +34,7 @@ export default class LslStreamInfo implements StreamInfo {
             channelFormat,
             sampleRateHz,
             units = this.defaultUnits,
+            boundStreamInfo,
         } = options
 
         this.name = name
@@ -45,8 +46,10 @@ export default class LslStreamInfo implements StreamInfo {
         this.sampleRateHz = sampleRateHz
         this.units = units
 
-        this.createStreamInfo()
-        this.appendChannelsToStreamInfo()
+        if (!boundStreamInfo) {
+            this.createStreamInfo()
+            this.appendChannelsToStreamInfo()
+        }
     }
 
     public static Create(options: StreamInfoOptions) {
@@ -111,4 +114,5 @@ export interface StreamInfoOptions {
     type?: string
     sourceId?: string
     units?: string
+    boundStreamInfo?: BoundStreamInfo
 }

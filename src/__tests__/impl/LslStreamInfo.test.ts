@@ -217,6 +217,19 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async doesNotCreateNewStreamInfoIfPassedBoundStreamInfo() {
+        this.LslStreamInfo({
+            boundStreamInfo: this.instance.getBoundInfo(),
+        })
+
+        assert.isEqual(
+            this.fakeLiblsl.createStreamInfoHitCount,
+            1,
+            'Should not have created new stream info!'
+        )
+    }
+
     private static readonly defaultOptions = {
         name: this.generateId(),
         type: this.generateId(),
