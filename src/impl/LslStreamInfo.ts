@@ -7,6 +7,8 @@ import LiblslAdapter from './LiblslAdapter.js'
 export default class LslStreamInfo implements StreamInfo {
     public static Class?: StreamInfoConstructor
 
+    private static instanceCache = new Map<BoundStreamInfo, StreamInfo>()
+
     public readonly name: string
     public readonly type: string
     public readonly sourceId: string
@@ -55,7 +57,16 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     public static Create(options: StreamInfoOptions) {
-        return new (this.Class ?? this)(options)
+        const instance = new (this.Class ?? this)(options)
+
+        const { boundStreamInfo: handle } = instance
+        this.instanceCache.set(handle, instance)
+
+        return instance
+    }
+
+    public static From(handle: BoundStreamInfo) {
+        return this.instanceCache.get(handle)!
     }
 
     private createStreamInfo() {
@@ -91,6 +102,10 @@ export default class LslStreamInfo implements StreamInfo {
     public get boundStreamInfo() {
         return this.boundInfo
     }
+
+    public set boundStreamInfo(boundInfo: BoundStreamInfo) {
+        this.boundInfo = boundInfo
+    }
 }
 
 export interface StreamInfo {
@@ -103,7 +118,7 @@ export interface StreamInfo {
     readonly channelCount: number
     readonly channelFormat: ChannelFormat
     readonly sampleRateHz: number
-    readonly boundStreamInfo: BoundStreamInfo
+    boundStreamInfo: BoundStreamInfo
 }
 
 type StreamInfoConstructor = new (options: StreamInfoOptions) => StreamInfo

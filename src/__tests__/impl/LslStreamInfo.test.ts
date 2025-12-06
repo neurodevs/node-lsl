@@ -244,10 +244,21 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async cachesInfoAttributesByBoundStreamInfo() {
+        const cached = LslStreamInfo.From(this.instance.getBoundInfo())
+
+        assert.isEqualDeep(
+            cached,
+            this.instance,
+            'Should have set bound stream info!'
+        )
+    }
+
     private static readonly defaultOptions = {
-        name: this.generateId(),
-        type: this.generateId(),
-        sourceId: this.generateId(),
+        name: this.name,
+        type: this.type,
+        sourceId: this.sourceId,
         channelNames: this.channelNames,
         channelFormat: 'float32',
         sampleRateHz: 100 * Math.random(),
