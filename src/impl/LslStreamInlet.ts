@@ -1,13 +1,9 @@
-import generateId from '@neurodevs/generate-id'
 import { createPointer, DataType, JsExternal, unwrapPointer } from 'ffi-rs'
 
 import handleError from '../handleError.js'
-import { BoundInlet, ChannelFormat } from './LiblslAdapter.js'
+import { BoundInlet } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
-import LslStreamInfo, {
-    StreamInfo,
-    StreamInfoOptions,
-} from './LslStreamInfo.js'
+import LslStreamInfo, { StreamInfo } from './LslStreamInfo.js'
 
 export default class LslStreamInlet implements StreamInlet {
     public static Class?: StreamInletConstructor
@@ -15,13 +11,10 @@ export default class LslStreamInlet implements StreamInlet {
     public isRunning = false
 
     protected info: StreamInfo
-    protected name: string
-    private channelNames: string[]
     private channelCount: number
     private chunkSize: number
     private maxBufferedMs: number
     private timeoutMs: number
-
     private onData: OnDataCallback
 
     protected inlet!: BoundInlet
@@ -40,7 +33,6 @@ export default class LslStreamInlet implements StreamInlet {
     private errorCodeBuffer!: Buffer<ArrayBuffer>
     private errorCodeBufferPtr!: JsExternal
 
-    private readonly defaultName = `lsl-inlet-${generateId()}`
     private readonly sixMinutesInMs = 360 * 1000
 
     private lsl = LiblslAdapter.getInstance()
@@ -50,18 +42,10 @@ export default class LslStreamInlet implements StreamInlet {
         options: StreamInletOptions,
         onData: OnDataCallback
     ) {
-        const {
-            name = this.defaultName,
-            channelNames,
-            chunkSize,
-            maxBufferedMs,
-            timeoutMs,
-        } = options ?? {}
+        const { chunkSize, maxBufferedMs, timeoutMs } = options ?? {}
 
         this.info = info
-        this.name = name
-        this.channelNames = channelNames
-        this.channelCount = this.channelNames.length
+        this.channelCount = this.info.channelCount
         this.chunkSize = chunkSize
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.timeoutMs = timeoutMs ?? 0
@@ -71,13 +55,12 @@ export default class LslStreamInlet implements StreamInlet {
         this.createBoundInlet()
     }
 
-    public static Create(options: StreamInletOptions, onData: OnDataCallback) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { maxBufferedMs, chunkSize, ...rest } = options
-        const infoOptions: StreamInfoOptions = rest
-
-        const info = this.LslStreamInfo(infoOptions)
-
+    public static async Create(
+        options: StreamInletOptions,
+        onData: OnDataCallback
+    ) {
+        const { sourceId } = options
+        const info = await this.LslStreamInfo(sourceId)
         return new (this.Class ?? this)(info, options, onData)
     }
 
@@ -267,8 +250,15 @@ export default class LslStreamInlet implements StreamInlet {
         this.lsl.destroyInlet({ inlet: this.inlet })
     }
 
-    private static LslStreamInfo(options: StreamInfoOptions) {
-        return LslStreamInfo.Create(options)
+    private static async LslStreamInfo(sourceId: string) {
+        const lsl = LiblslAdapter.getInstance()
+
+        const handles = await lsl.resolveByProp({
+            prop: 'source_id',
+            value: sourceId,
+        })
+
+        return LslStreamInfo.From(handles[0])
     }
 }
 
@@ -287,17 +277,10 @@ export type StreamInletConstructor = new (
 ) => StreamInlet
 
 export interface StreamInletOptions {
-    channelNames: string[]
-    channelFormat: ChannelFormat
-    sampleRateHz: number
+    sourceId: string
     chunkSize: number
     maxBufferedMs?: number
     timeoutMs?: number
-    name?: string
-    type?: string
-    sourceId?: string
-    manufacturer?: string
-    units?: string
 }
 
 export type OnDataCallback = (

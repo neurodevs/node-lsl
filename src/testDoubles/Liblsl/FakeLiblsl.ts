@@ -21,7 +21,7 @@ import {
 } from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {
-    public static fakeResolveHandles: bigint[] = []
+    public static fakeStreamInfoHandles: BoundStreamInfo[] = []
 
     public static fakeSamples: Float32Array[] = [
         new Float32Array([1, 2, 3]),
@@ -90,7 +90,7 @@ export default class FakeLiblsl implements Liblsl {
 
     public async resolveByProp(options: ResolveByPropOptions) {
         this.lastResolveByPropOptions = options
-        return FakeLiblsl.fakeResolveHandles
+        return FakeLiblsl.fakeStreamInfoHandles as bigint[]
     }
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {

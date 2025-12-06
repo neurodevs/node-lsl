@@ -23,7 +23,8 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         this.setFakeWebSocketServer()
         this.setSpyLslWebSocketBridge()
 
-        this.instance = this.LslWebSocketBridge() as SpyLslWebSocketBridge
+        this.instance =
+            (await this.LslWebSocketBridge()) as SpyLslWebSocketBridge
     }
 
     @test()
@@ -33,25 +34,13 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     @test()
     protected static async createsLslStreamInlet() {
-        const {
-            channelNames,
-            channelFormat,
-            sampleRateHz,
-            chunkSize,
-            name,
-            type,
-            sourceId,
-        } = FakeStreamInlet.callsToConstructor[0]?.options ?? {}
+        const { sourceId, chunkSize } =
+            FakeStreamInlet.callsToConstructor[0]?.options ?? {}
 
         assert.isEqualDeep(
             {
-                channelNames,
-                channelFormat,
-                sampleRateHz,
-                chunkSize,
-                name,
-                type,
                 sourceId,
+                chunkSize,
             },
             this.inletOptions
         )
@@ -254,8 +243,8 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     @test()
     protected static async throwsIfNeitherPortNorRemoteUrlsPassed() {
-        assert.doesThrow(() => {
-            this.LslWebSocketBridge({
+        await assert.doesThrowAsync(async () => {
+            await this.LslWebSocketBridge({
                 listenPort: undefined,
                 connectUrls: undefined,
             })
@@ -287,13 +276,8 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     private static readonly connectUrls = [this.generateId(), this.generateId()]
 
     private static readonly inletOptions = {
-        channelNames: this.channelNames,
-        channelFormat: 'float32' as const,
-        sampleRateHz: 100 * Math.random(),
-        chunkSize: randomInt(1, 100),
-        name: this.generateId(),
-        type: this.generateId(),
         sourceId: this.generateId(),
+        chunkSize: randomInt(1, 100),
     }
 
     private static readonly baseOptions = {

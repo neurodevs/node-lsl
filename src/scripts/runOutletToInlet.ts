@@ -26,9 +26,12 @@ const inletOptions = {
     chunkSize: 1,
 }
 
-const inlet = LslStreamInlet.Create(inletOptions, (samples, timestamps) => {
-    console.log('Received samples:', samples, 'at timestamps:', timestamps)
-})
+const inlet = await LslStreamInlet.Create(
+    inletOptions,
+    (samples, timestamps) => {
+        console.log('Received samples:', samples, 'at timestamps:', timestamps)
+    }
+)
 
 console.log('Start pulling...')
 inlet.startPulling()

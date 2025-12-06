@@ -1,11 +1,16 @@
 import { test, assert } from '@neurodevs/node-tdd'
+import { BoundStreamInfo } from '../../impl/LiblslAdapter.js'
+import LslStreamInfo, { StreamInfo } from '../../impl/LslStreamInfo.js'
 import { StreamInletOptions } from '../../impl/LslStreamInlet.js'
+import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
 import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamInletTest extends AbstractPackageTest {
     private static instance: SpyStreamInlet
+    private static outletInfo: StreamInfo
+    private static passedHandle?: BoundStreamInfo
 
     private static callsToOnData: {
         samples: Float32Array
@@ -21,7 +26,27 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         this.callsToOnData = []
 
-        this.instance = this.LslStreamInlet()
+        this.outletInfo = LslStreamInfo.Create({
+            sourceId: this.sourceId,
+            channelNames: [],
+            channelFormat: 'float32',
+            sampleRateHz: 0,
+        })
+
+        FakeStreamInfo.resetTestDouble()
+
+        FakeLiblsl.fakeStreamInfoHandles = [
+            this.outletInfo.boundStreamInfo as bigint,
+        ]
+
+        const From = LslStreamInfo.From.bind(LslStreamInfo)
+
+        LslStreamInfo.From = (handle: BoundStreamInfo) => {
+            this.passedHandle = handle
+            return From(handle) as FakeStreamInfo
+        }
+
+        this.instance = await this.LslStreamInlet()
     }
 
     @test()
@@ -32,27 +57,9 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     @test()
     protected static async createsStreamInfoWithExpectedOptions() {
         assert.isEqualDeep(
-            FakeStreamInfo.callsToConstructor[0],
-            {
-                channelNames: this.channelNames,
-                channelFormat: 'float32',
-                sampleRateHz: 0,
-                name: this.name_,
-                type: this.type,
-                sourceId: this.sourceId,
-            },
+            this.passedHandle,
+            this.outletInfo.boundStreamInfo,
             'Stream info should have expected options!'
-        )
-    }
-
-    @test()
-    protected static async uniqueNameHasSetPrefix() {
-        const instance = this.LslStreamInlet({ name: undefined })
-
-        assert.doesInclude(
-            instance.getName(),
-            'lsl-inlet-',
-            'Name should have set prefix!'
         )
     }
 
@@ -282,7 +289,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     private static async runInletWithOptions(
         options?: Partial<StreamInletOptions>
     ) {
-        const inlet = this.LslStreamInlet(options)
+        const inlet = await this.LslStreamInlet(options)
         await this.startThenStop(inlet)
         return inlet
     }
@@ -317,12 +324,14 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         this.callsToOnData.push({ samples, timestamps })
     }
 
-    protected static LslStreamInlet(options?: Partial<StreamInletOptions>) {
-        return AbstractPackageTest.LslStreamInlet(
+    protected static async LslStreamInlet(
+        options?: Partial<StreamInletOptions>
+    ) {
+        return (await AbstractPackageTest.LslStreamInlet(
             {
                 ...options,
             },
             this.onData
-        ) as SpyStreamInlet
+        )) as SpyStreamInlet
     }
 }

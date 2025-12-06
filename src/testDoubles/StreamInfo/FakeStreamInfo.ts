@@ -12,7 +12,7 @@ export default class FakeStreamInfo implements StreamInfo {
     public name = generateId()
     public type = generateId()
     public sourceId = generateId()
-    public channelNames: string[] = [generateId(), generateId()]
+    public channelNames: string[] = [generateId(), generateId(), generateId()]
     public channelFormat = 'float32' as const
     public sampleRateHz = 0
     public units = 'N/A'

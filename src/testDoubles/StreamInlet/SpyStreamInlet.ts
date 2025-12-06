@@ -13,10 +13,6 @@ export class SpyStreamInlet extends LslStreamInlet {
         super(info, options, onData)
     }
 
-    public getName() {
-        return this.name
-    }
-
     public getStreamInfo() {
         return this.info
     }

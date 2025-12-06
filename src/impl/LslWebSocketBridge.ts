@@ -1,5 +1,4 @@
 import WebSocket, { WebSocketServer } from 'ws'
-import { ChannelFormat } from './LiblslAdapter.js'
 import LslStreamInlet, {
     StreamInlet,
     StreamInletOptions,
@@ -26,14 +25,14 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         this.throwIfNoLocalServerOrRemoteSockets()
     }
 
-    public static Create(options: WebSocketBridgeOptions) {
+    public static async Create(options: WebSocketBridgeOptions) {
         const { listenPort, connectUrls, ...rest } = options
         const inletOptions: StreamInletOptions = rest
 
         const localServer = this.WebSocketServer(listenPort)
         const remoteSockets = this.createSocketsFrom(connectUrls)
 
-        const inlet = this.LslStreamInlet(
+        const inlet = await this.LslStreamInlet(
             inletOptions,
             localServer,
             remoteSockets
@@ -175,13 +174,8 @@ export type WebSocketBridgeConstructor = new (
 ) => WebSocketBridge
 
 export interface WebSocketBridgeOptions {
-    channelNames: string[]
-    channelFormat: ChannelFormat
-    sampleRateHz: number
+    sourceId: string
     chunkSize: number
-    name?: string
-    type?: string
-    sourceId?: string
     listenPort?: number
     connectUrls?: string | string[]
 }
