@@ -196,7 +196,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastAppendChannelsToStreamInfoOptions,
             {
-                info: this.instance.boundStreamInfo,
+                info: this.instance.boundInfo,
                 channels: this.channelNames.map((label: string) => ({
                     label,
                     units: this.units,
@@ -213,15 +213,15 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastDestroyStreamInfoOptions?.info,
-            this.instance.boundStreamInfo,
+            this.instance.boundInfo,
             'Should have called destroyStreamInfo!'
         )
     }
 
     @test()
-    protected static async doesNotCreateNewStreamInfoIfPassedBoundStreamInfo() {
+    protected static async doesNotCreateNewStreamInfoIfPassedBoundInfo() {
         this.LslStreamInfo({
-            boundStreamInfo: this.instance.boundStreamInfo,
+            boundInfo: this.instance.boundInfo,
         })
 
         assert.isEqual(
@@ -232,21 +232,21 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async setsBoundStreamInfoWhenPassed() {
+    protected static async setsBoundInfoWhenPassed() {
         const instance = this.LslStreamInfo({
-            boundStreamInfo: this.instance.boundStreamInfo,
+            boundInfo: this.instance.boundInfo,
         })
 
         assert.isEqualDeep(
-            instance.boundStreamInfo,
-            this.instance.boundStreamInfo,
+            instance.boundInfo,
+            this.instance.boundInfo,
             'Should have set bound stream info!'
         )
     }
 
     @test()
-    protected static async cachesInfoAttributesByBoundStreamInfo() {
-        const cached = LslStreamInfo.From(this.instance.boundStreamInfo)
+    protected static async cachesInfoAttributesByBoundInfo() {
+        const cached = LslStreamInfo.From(this.instance.boundInfo)
 
         assert.isEqualDeep(
             cached,

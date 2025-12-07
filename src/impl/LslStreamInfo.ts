@@ -17,7 +17,7 @@ export default class LslStreamInfo implements StreamInfo {
     public readonly channelFormat: ChannelFormat
     public readonly sampleRateHz: number
     public readonly units: string
-    public readonly boundStreamInfo: BoundStreamInfo
+    public readonly boundInfo: BoundStreamInfo
 
     private lsl = LiblslAdapter.getInstance()
 
@@ -30,7 +30,7 @@ export default class LslStreamInfo implements StreamInfo {
             channelFormat,
             sampleRateHz,
             units = 'N/A',
-            boundStreamInfo,
+            boundInfo,
         } = options
 
         this.name = name
@@ -42,18 +42,18 @@ export default class LslStreamInfo implements StreamInfo {
         this.sampleRateHz = sampleRateHz
         this.units = units
 
-        if (!boundStreamInfo) {
-            this.boundStreamInfo = this.createStreamInfo()
+        if (!boundInfo) {
+            this.boundInfo = this.createStreamInfo()
             this.appendChannelsToStreamInfo()
         } else {
-            this.boundStreamInfo = boundStreamInfo
+            this.boundInfo = boundInfo
         }
     }
 
     public static Create(options: StreamInfoOptions) {
         const instance = new (this.Class ?? this)(options)
 
-        const { boundStreamInfo: handle } = instance
+        const { boundInfo: handle } = instance
         this.instanceCache.set(handle, instance)
 
         return instance
@@ -80,7 +80,7 @@ export default class LslStreamInfo implements StreamInfo {
 
     private appendChannelsToStreamInfo() {
         this.lsl.appendChannelsToStreamInfo({
-            info: this.boundStreamInfo,
+            info: this.boundInfo,
             channels: this.channelNames.map((label: string) => ({
                 label,
                 units: this.units,
@@ -90,7 +90,7 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     public destroy() {
-        this.lsl.destroyStreamInfo({ info: this.boundStreamInfo })
+        this.lsl.destroyStreamInfo({ info: this.boundInfo })
     }
 }
 
@@ -104,7 +104,7 @@ export interface StreamInfo {
     readonly channelCount: number
     readonly channelFormat: ChannelFormat
     readonly sampleRateHz: number
-    readonly boundStreamInfo: BoundStreamInfo
+    readonly boundInfo: BoundStreamInfo
 }
 
 type StreamInfoConstructor = new (options: StreamInfoOptions) => StreamInfo
@@ -117,5 +117,5 @@ export interface StreamInfoOptions {
     type?: string
     sourceId?: string
     units?: string
-    boundStreamInfo?: BoundStreamInfo
+    boundInfo?: BoundStreamInfo
 }

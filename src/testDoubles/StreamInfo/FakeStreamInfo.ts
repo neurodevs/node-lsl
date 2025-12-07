@@ -7,7 +7,7 @@ export default class FakeStreamInfo implements StreamInfo {
     public static callsToConstructor: (StreamInfoOptions | undefined)[] = []
     public static numCallsToDestroy = 0
 
-    public static boundStreamInfo = {} as BoundStreamInfo
+    public static boundInfo = {} as BoundStreamInfo
 
     public name = generateId()
     public type = generateId()
@@ -29,8 +29,8 @@ export default class FakeStreamInfo implements StreamInfo {
         return this.channelNames.length
     }
 
-    public get boundStreamInfo() {
-        return FakeStreamInfo.boundStreamInfo
+    public get boundInfo() {
+        return FakeStreamInfo.boundInfo
     }
 
     public static resetTestDouble() {

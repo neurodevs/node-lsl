@@ -109,14 +109,10 @@ export default class LslStreamOutlet implements StreamOutlet {
 
     private createStreamOutlet() {
         this.boundOutlet = this.lsl.createOutlet({
-            info: this.boundStreamInfo,
+            info: this.info.boundInfo,
             chunkSize: this.chunkSize,
             maxBufferedMs: this.maxBufferedMs,
         })
-    }
-
-    private get boundStreamInfo() {
-        return this.info.boundStreamInfo
     }
 
     private setPushSampleMethod() {
@@ -146,12 +142,12 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public destroy() {
-        this.destroyBoundStreamInfo()
+        this.destroyBoundInfo()
         this.destroyBoundOutlet()
     }
 
-    private destroyBoundStreamInfo() {
-        this.lsl.destroyStreamInfo({ info: this.boundStreamInfo })
+    private destroyBoundInfo() {
+        this.lsl.destroyStreamInfo({ info: this.info.boundInfo })
     }
 
     private destroyBoundOutlet() {

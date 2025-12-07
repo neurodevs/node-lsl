@@ -73,13 +73,9 @@ export default class LslStreamInlet implements StreamInlet {
 
     private createBoundInlet() {
         this.inlet = this.lsl.createInlet({
-            info: this.boundStreamInfo,
+            info: this.info.boundInfo,
             maxBufferedMs: this.maxBufferedMs,
         })
-    }
-
-    private get boundStreamInfo() {
-        return this.info.boundStreamInfo
     }
 
     public startPulling() {

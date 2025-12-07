@@ -38,7 +38,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastCreateInletOptions,
             {
-                info: fakeInfo.boundStreamInfo,
+                info: fakeInfo.boundInfo,
                 maxBufferedMs: this.maxBufferedMs,
             },
             'Should have called createInlet!'
