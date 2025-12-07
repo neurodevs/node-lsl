@@ -21,6 +21,7 @@ import LslStreamInfo, {
 export default class LslStreamOutlet implements StreamOutlet {
     public static Class?: StreamOutletConstructor
 
+    public readonly info: StreamInfo
     public readonly name: string
     public readonly type: string
     public readonly sourceId: string
@@ -33,7 +34,6 @@ export default class LslStreamOutlet implements StreamOutlet {
     public readonly manufacturer: string = 'N/A'
     public readonly units: string = 'N/A'
 
-    private info: StreamInfo
     private boundOutlet!: BoundOutlet
     private pushSampleMethod!: (options: unknown) => LslErrorCode
 
@@ -190,6 +190,7 @@ export default class LslStreamOutlet implements StreamOutlet {
 export interface StreamOutlet {
     pushSample(sample: LslSample): void
     destroy(): void
+    readonly info: StreamInfo
     readonly name: string
     readonly type: string
     readonly sourceId: string

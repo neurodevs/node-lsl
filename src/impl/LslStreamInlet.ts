@@ -3,7 +3,7 @@ import { createPointer, DataType, JsExternal, unwrapPointer } from 'ffi-rs'
 import handleError from '../handleError.js'
 import { BoundInlet } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
-import LslStreamInfo, { StreamInfo } from './LslStreamInfo.js'
+import { StreamInfo } from './LslStreamInfo.js'
 
 export default class LslStreamInlet implements StreamInlet {
     public static Class?: StreamInletConstructor
@@ -39,7 +39,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     protected constructor(
         info: StreamInfo,
-        options: StreamInletOptions,
+        options: StreamInletConstructorOptions,
         onData: OnDataCallback
     ) {
         const { chunkSize, maxBufferedMs, timeoutMs } = options ?? {}
@@ -59,8 +59,7 @@ export default class LslStreamInlet implements StreamInlet {
         options: StreamInletOptions,
         onData: OnDataCallback
     ) {
-        const { sourceId } = options
-        const info = await this.LslStreamInfo(sourceId)
+        const { info } = options
         return new (this.Class ?? this)(info, options, onData)
     }
 
@@ -249,17 +248,6 @@ export default class LslStreamInlet implements StreamInlet {
     private destroyBoundInlet() {
         this.lsl.destroyInlet({ inlet: this.inlet })
     }
-
-    private static async LslStreamInfo(sourceId: string) {
-        const lsl = LiblslAdapter.getInstance()
-
-        const handles = await lsl.resolveByProp({
-            prop: 'source_id',
-            value: sourceId,
-        })
-
-        return LslStreamInfo.From(handles[0])
-    }
 }
 
 export interface StreamInlet {
@@ -272,16 +260,18 @@ export interface StreamInlet {
 
 export type StreamInletConstructor = new (
     info: StreamInfo,
-    options: StreamInletOptions,
+    options: StreamInletConstructorOptions,
     onData: OnDataCallback
 ) => StreamInlet
 
 export interface StreamInletOptions {
-    sourceId: string
+    info: StreamInfo
     chunkSize: number
     maxBufferedMs?: number
     timeoutMs?: number
 }
+
+export type StreamInletConstructorOptions = Omit<StreamInletOptions, 'info'>
 
 export type OnDataCallback = (
     samples: Float32Array,

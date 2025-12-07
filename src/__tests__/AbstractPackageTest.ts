@@ -78,6 +78,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeWebSocketServer.resetTestDouble()
     }
 
+    protected static readonly info = new FakeStreamInfo()
     protected static readonly name_ = this.generateId()
     protected static readonly type = this.generateId()
     protected static readonly sourceId = this.generateId()
@@ -102,14 +103,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         onData: OnDataCallback
     ) {
         const defaultOptions = {
-            sampleRateHz: 0,
-            channelNames: this.channelNames,
-            channelFormat: 'float32',
+            info: this.info,
             chunkSize: this.chunkSize,
             maxBufferedMs: this.maxBufferedMs,
-            name: this.name_,
-            type: this.type,
-            sourceId: this.sourceId,
             ...options,
         } as StreamInletOptions
 

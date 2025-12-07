@@ -4,7 +4,7 @@ import { BoundStreamInfo } from 'impl/LiblslAdapter.js'
 import { StreamInfo, StreamInfoOptions } from '../../impl/LslStreamInfo.js'
 
 export default class FakeStreamInfo implements StreamInfo {
-    public static callsToConstructor: StreamInfoOptions[] = []
+    public static callsToConstructor: (StreamInfoOptions | undefined)[] = []
     public static numCallsToDestroy = 0
 
     public static boundStreamInfo = {} as BoundStreamInfo
@@ -17,7 +17,7 @@ export default class FakeStreamInfo implements StreamInfo {
     public sampleRateHz = 0
     public units = 'N/A'
 
-    public constructor(options: StreamInfoOptions) {
+    public constructor(options?: StreamInfoOptions) {
         FakeStreamInfo.callsToConstructor.push(options)
     }
 

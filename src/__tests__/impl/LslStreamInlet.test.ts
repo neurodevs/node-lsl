@@ -1,16 +1,11 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import { BoundStreamInfo } from '../../impl/LiblslAdapter.js'
-import LslStreamInfo, { StreamInfo } from '../../impl/LslStreamInfo.js'
+
 import { StreamInletOptions } from '../../impl/LslStreamInlet.js'
-import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
-import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
 import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamInletTest extends AbstractPackageTest {
     private static instance: SpyStreamInlet
-    private static outletInfo: StreamInfo
-    private static passedHandle?: BoundStreamInfo
 
     private static callsToOnData: {
         samples: Float32Array
@@ -26,41 +21,12 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         this.callsToOnData = []
 
-        this.outletInfo = LslStreamInfo.Create({
-            sourceId: this.sourceId,
-            channelNames: [],
-            channelFormat: 'float32',
-            sampleRateHz: 0,
-        })
-
-        FakeStreamInfo.resetTestDouble()
-
-        FakeLiblsl.fakeStreamInfoHandles = [
-            this.outletInfo.boundStreamInfo as bigint,
-        ]
-
-        const From = LslStreamInfo.From.bind(LslStreamInfo)
-
-        LslStreamInfo.From = (handle: BoundStreamInfo) => {
-            this.passedHandle = handle
-            return From(handle) as FakeStreamInfo
-        }
-
         this.instance = await this.LslStreamInlet()
     }
 
     @test()
     protected static async createsInstance() {
         assert.isTruthy(this.instance, 'Failed to create instance!')
-    }
-
-    @test()
-    protected static async createsStreamInfoWithExpectedOptions() {
-        assert.isEqualDeep(
-            this.passedHandle,
-            this.outletInfo.boundStreamInfo,
-            'Stream info should have expected options!'
-        )
     }
 
     @test()

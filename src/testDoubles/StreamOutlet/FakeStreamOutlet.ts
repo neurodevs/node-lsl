@@ -7,6 +7,7 @@ import {
     StreamOutlet,
     StreamOutletOptions,
 } from '../../impl/LslStreamOutlet.js'
+import FakeStreamInfo from '../StreamInfo/FakeStreamInfo.js'
 
 export default class FakeStreamOutlet implements StreamOutlet {
     public static callsToConstructor: {
@@ -17,10 +18,13 @@ export default class FakeStreamOutlet implements StreamOutlet {
     public static callsToPushSample: LslSample[] = []
     public static numCallsToDestroy = 0
 
+    public info: StreamInfo
     public options?: StreamOutletOptions
 
     public constructor(info?: StreamInfo, options?: StreamOutletOptions) {
         FakeStreamOutlet.callsToConstructor.push({ info, options })
+
+        this.info = info ?? new FakeStreamInfo()
         this.options = options
     }
 
