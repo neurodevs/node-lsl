@@ -5,7 +5,7 @@ async function main() {
         name: 'Muse S (2nd gen)',
         type: 'EEG',
         channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
-        sampleRateHz: 256,
+        sampleRateHz: 10,
         channelFormat: 'float32',
         sourceId: 'muse-s-eeg',
         manufacturer: 'Interaxon Inc.',
@@ -13,7 +13,17 @@ async function main() {
         chunkSize: 12,
     })
 
-    instance.pushSample([1, 2, 3, 4, 5])
+    for (let i = 0; i < 100; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
+        instance.pushSample([
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+        ])
+    }
 }
 
 main().catch((error) => {
