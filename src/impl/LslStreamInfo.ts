@@ -17,25 +17,19 @@ export default class LslStreamInfo implements StreamInfo {
     public readonly channelFormat: ChannelFormat
     public readonly sampleRateHz: number
     public readonly units: string
-
-    protected boundInfo!: BoundStreamInfo
-
-    private readonly defaultName = `lsl-stream-info-${generateId()}`
-    private readonly defaultType = generateId()
-    private readonly defaultSourceId = generateId()
-    private readonly defaultUnits = 'N/A'
+    public readonly boundStreamInfo: BoundStreamInfo
 
     private lsl = LiblslAdapter.getInstance()
 
     protected constructor(options: StreamInfoOptions) {
         const {
-            name = this.defaultName,
-            type = this.defaultType,
-            sourceId = this.defaultSourceId,
+            name = `lsl-stream-info-${generateId()}`,
+            type = generateId(),
+            sourceId = generateId(),
             channelNames,
             channelFormat,
             sampleRateHz,
-            units = this.defaultUnits,
+            units = 'N/A',
             boundStreamInfo,
         } = options
 
@@ -49,10 +43,10 @@ export default class LslStreamInfo implements StreamInfo {
         this.units = units
 
         if (!boundStreamInfo) {
-            this.createStreamInfo()
+            this.boundStreamInfo = this.createStreamInfo()
             this.appendChannelsToStreamInfo()
         } else {
-            this.boundInfo = boundStreamInfo
+            this.boundStreamInfo = boundStreamInfo
         }
     }
 
@@ -70,7 +64,7 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     private createStreamInfo() {
-        this.boundInfo = this.lsl.createStreamInfo({
+        return this.lsl.createStreamInfo({
             name: this.name,
             type: this.type,
             sourceId: this.sourceId,
@@ -86,7 +80,7 @@ export default class LslStreamInfo implements StreamInfo {
 
     private appendChannelsToStreamInfo() {
         this.lsl.appendChannelsToStreamInfo({
-            info: this.boundInfo,
+            info: this.boundStreamInfo,
             channels: this.channelNames.map((label: string) => ({
                 label,
                 units: this.units,
@@ -96,15 +90,7 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     public destroy() {
-        this.lsl.destroyStreamInfo({ info: this.boundInfo })
-    }
-
-    public get boundStreamInfo() {
-        return this.boundInfo
-    }
-
-    public set boundStreamInfo(boundInfo: BoundStreamInfo) {
-        this.boundInfo = boundInfo
+        this.lsl.destroyStreamInfo({ info: this.boundStreamInfo })
     }
 }
 
@@ -118,7 +104,7 @@ export interface StreamInfo {
     readonly channelCount: number
     readonly channelFormat: ChannelFormat
     readonly sampleRateHz: number
-    boundStreamInfo: BoundStreamInfo
+    readonly boundStreamInfo: BoundStreamInfo
 }
 
 type StreamInfoConstructor = new (options: StreamInfoOptions) => StreamInfo

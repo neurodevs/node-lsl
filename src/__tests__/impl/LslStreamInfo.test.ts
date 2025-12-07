@@ -196,7 +196,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastAppendChannelsToStreamInfoOptions,
             {
-                info: this.instance.getBoundInfo(),
+                info: this.instance.boundStreamInfo,
                 channels: this.channelNames.map((label: string) => ({
                     label,
                     units: this.units,
@@ -213,7 +213,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastDestroyStreamInfoOptions?.info,
-            this.instance.getBoundInfo(),
+            this.instance.boundStreamInfo,
             'Should have called destroyStreamInfo!'
         )
     }
@@ -221,7 +221,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     @test()
     protected static async doesNotCreateNewStreamInfoIfPassedBoundStreamInfo() {
         this.LslStreamInfo({
-            boundStreamInfo: this.instance.getBoundInfo(),
+            boundStreamInfo: this.instance.boundStreamInfo,
         })
 
         assert.isEqual(
@@ -234,19 +234,19 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     @test()
     protected static async setsBoundStreamInfoWhenPassed() {
         const instance = this.LslStreamInfo({
-            boundStreamInfo: this.instance.getBoundInfo(),
+            boundStreamInfo: this.instance.boundStreamInfo,
         })
 
         assert.isEqualDeep(
-            instance.getBoundInfo(),
-            this.instance.getBoundInfo(),
+            instance.boundStreamInfo,
+            this.instance.boundStreamInfo,
             'Should have set bound stream info!'
         )
     }
 
     @test()
     protected static async cachesInfoAttributesByBoundStreamInfo() {
-        const cached = LslStreamInfo.From(this.instance.getBoundInfo())
+        const cached = LslStreamInfo.From(this.instance.boundStreamInfo)
 
         assert.isEqualDeep(
             cached,

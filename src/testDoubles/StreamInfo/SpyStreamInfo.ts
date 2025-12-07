@@ -8,10 +8,6 @@ export default class SpyStreamInfo extends LslStreamInfo {
         SpyStreamInfo.numCallsToConstructor++
     }
 
-    public getBoundInfo() {
-        return this.boundInfo
-    }
-
     public getName() {
         return this.name
     }
