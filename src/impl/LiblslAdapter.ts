@@ -494,14 +494,9 @@ export interface PullSampleOptions {
     errcodePtr: JsExternal
 }
 
-export interface PullChunkOptions {
-    inlet: BoundInlet
-    dataBufferPtr: JsExternal
+export interface PullChunkOptions extends PullSampleOptions {
     timestampBufferPtr: JsExternal
-    dataBufferElements: number
     timestampBufferElements: number
-    timeout: number
-    errcodePtr: JsExternal
 }
 
 export interface FlushInletOptions {
