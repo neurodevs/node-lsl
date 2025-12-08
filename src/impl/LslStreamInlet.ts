@@ -209,8 +209,8 @@ export default class LslStreamInlet implements StreamInlet {
         return this.lsl.pullChunk({
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
-            timestampBufferPtr: this.timestampBufferPtr,
             dataBufferElements: this.chunkSize * this.channelCount,
+            timestampBufferPtr: this.timestampBufferPtr,
             timestampBufferElements: this.chunkSize,
             timeout: this.timeoutMs / 1000,
             errcodePtr: this.errorCodeBufferPtr,
