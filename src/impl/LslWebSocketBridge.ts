@@ -154,7 +154,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         return listenPort ? new this.WSS({ port: listenPort }) : undefined
     }
 
-    private static LslStreamInlet(
+    private static async LslStreamInlet(
         options: StreamInletOptions,
         localServer?: WebSocketServer,
         remoteSockets?: WebSocket[]
