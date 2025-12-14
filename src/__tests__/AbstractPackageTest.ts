@@ -1,7 +1,6 @@
 import AbstractModuleTest from '@neurodevs/node-tdd'
-import WebSocket from 'ws'
+import WebSocket, { Server } from 'ws'
 
-import { Server } from 'ws'
 import LiblslAdapter from '../impl/LiblslAdapter.js'
 import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
@@ -11,6 +10,7 @@ import LslStreamInlet, {
 } from '../impl/LslStreamInlet.js'
 import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
+
 import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
 import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo.js'
