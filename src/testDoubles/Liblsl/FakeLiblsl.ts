@@ -56,8 +56,8 @@ export default class FakeLiblsl implements Liblsl {
     public lastCreateOutletOptions?: CreateOutletOptions
     public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
     public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
-    public lastCreateInletOptions?: CreateInletOptions
     public lastDestroyOutletOptions?: DestroyOutletOptions
+    public lastCreateInletOptions?: CreateInletOptions
     public lastPullSampleOptions?: PullSampleOptions
     public lastPullChunkOptions?: PullChunkOptions
     public lastFlushInletOptions?: FlushInletOptions
