@@ -238,6 +238,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     public destroy() {
+        this.stopPulling()
         this.destroyBoundInlet()
     }
 
