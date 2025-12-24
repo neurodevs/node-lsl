@@ -79,6 +79,19 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async destroyDoesNotCallStopIfNotRunning() {
+        let wasHit = false
+        
+        this.instance.stopPulling = () => {
+            wasHit = true
+        }
+
+        this.instance.destroy()
+
+        assert.isFalse(wasHit, 'Stop should not have been called!')
+    }
+
+    @test()
     protected static async exposesIsRunningFieldThatIsFalseAtFirst() {
         assert.isFalse(this.isRunning, 'isRunning should be false at first!')
     }
