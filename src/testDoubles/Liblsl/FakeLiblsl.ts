@@ -18,6 +18,7 @@ import {
     DestroyStreamInfoOptions,
     ResolveByPropOptions,
     DestroyOutletOptions,
+    OpenStreamOptions,
 } from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {
@@ -58,6 +59,7 @@ export default class FakeLiblsl implements Liblsl {
     public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
     public lastDestroyOutletOptions?: DestroyOutletOptions
     public lastCreateInletOptions?: CreateInletOptions
+    public lastOpenStreamOptions?: OpenStreamOptions
     public lastPullSampleOptions?: PullSampleOptions
     public lastPullChunkOptions?: PullChunkOptions
     public lastFlushInletOptions?: FlushInletOptions
@@ -121,6 +123,10 @@ export default class FakeLiblsl implements Liblsl {
         this.createInletHitCount++
         this.lastCreateInletOptions = options
         return {} as BoundInlet
+    }
+
+    public openStream(options: OpenStreamOptions) {
+        this.lastOpenStreamOptions = options
     }
 
     public pullSample(options: PullSampleOptions) {
