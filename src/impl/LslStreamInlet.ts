@@ -25,12 +25,15 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private dataBuffer!: Buffer<ArrayBuffer>
+    private wrappedDataBufferPtr!: JsExternal[]
     private dataBufferPtr!: JsExternal
 
     private timestampBuffer!: Buffer<ArrayBuffer>
+    private wrappedTimestampBufferPtr!: JsExternal[]
     private timestampBufferPtr!: JsExternal
 
     private errorCodeBuffer!: Buffer<ArrayBuffer>
+    private wrappedErrorCodeBufferPtr!: JsExternal[]
     private errorCodeBufferPtr!: JsExternal
 
     private readonly sixMinutesInMs = 360 * 1000
@@ -122,29 +125,35 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private createDataBufferPtr() {
+        this.wrappedDataBufferPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.dataBuffer],
+        })
+
         this.dataBufferPtr = unwrapPointer(
-            createPointer({
-                paramsType: [DataType.U8Array],
-                paramsValue: [this.dataBuffer],
-            })
+            this.wrappedDataBufferPtr
         )[0]
     }
 
     private createTimestampBufferPtr() {
+        this.wrappedTimestampBufferPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.timestampBuffer],
+        })
+
         this.timestampBufferPtr = unwrapPointer(
-            createPointer({
-                paramsType: [DataType.U8Array],
-                paramsValue: [this.timestampBuffer],
-            })
+            this.wrappedTimestampBufferPtr
         )[0]
     }
 
     private createErrorCodeBufferPtr() {
+        this.wrappedErrorCodeBufferPtr = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.errorCodeBuffer],
+        })
+
         this.errorCodeBufferPtr = unwrapPointer(
-            createPointer({
-                paramsType: [DataType.U8Array],
-                paramsValue: [this.errorCodeBuffer],
-            })
+            this.wrappedErrorCodeBufferPtr
         )[0]
     }
 
