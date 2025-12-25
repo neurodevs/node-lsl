@@ -18,6 +18,8 @@ export default class LslStreamInlet implements StreamInlet {
     private waitBetweenPullsMs: number
     private onData: OnDataCallback
 
+    private readonly sixMinutesInMs = 360 * 1000
+
     protected inlet!: BoundInlet
 
     private pullDataMethod!: () => {
@@ -36,8 +38,6 @@ export default class LslStreamInlet implements StreamInlet {
     private pullSampleErrorBufferPtrWrapped!: JsExternal[]
     private pullSampleErrorBufferPtr!: JsExternal
     private pullSampleErrorBuffer!: Buffer<ArrayBuffer>
-
-    private readonly sixMinutesInMs = 360 * 1000
 
     private lsl = LiblslAdapter.getInstance()
 
