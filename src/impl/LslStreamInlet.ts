@@ -175,7 +175,7 @@ export default class LslStreamInlet implements StreamInlet {
     private pullSample() {
         const timestamp = this.callPullSampleBinding()
 
-        if (timestamp) {
+        if (timestamp > 0) {
             return {
                 samples: this.createFloatArrayFromDataBuffer(),
                 timestamps: new Float64Array([timestamp]),
@@ -205,7 +205,7 @@ export default class LslStreamInlet implements StreamInlet {
     private pullChunk() {
         const firstTimestamp = this.callPullChunkBinding()
 
-        if (firstTimestamp) {
+        if (firstTimestamp > 0) {
             return {
                 samples: this.createFloatArrayFromDataBuffer(),
                 timestamps: this.createDoubleArrayFromTimestampBuffer(),
