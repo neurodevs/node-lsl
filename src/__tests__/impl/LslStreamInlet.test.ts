@@ -99,7 +99,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     @test()
     protected static async startPullingSetsIsRunningToTrue() {
         this.startPulling()
-        await this.wait(10)
 
         assert.isTrue(this.isRunning, 'isRunning should be true!')
 
