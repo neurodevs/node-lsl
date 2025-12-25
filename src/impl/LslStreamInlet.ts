@@ -25,17 +25,17 @@ export default class LslStreamInlet implements StreamInlet {
         timestamps: Float64Array | undefined
     }
 
-    private dataBuffer!: Buffer<ArrayBuffer>
-    private wrappedDataBufferPtr!: JsExternal[]
+    private dataBufferPtrWrapped!: JsExternal[]
     private dataBufferPtr!: JsExternal
+    private dataBuffer!: Buffer<ArrayBuffer>
 
-    private timestampBuffer!: Buffer<ArrayBuffer>
-    private wrappedTimestampBufferPtr!: JsExternal[]
+    private timestampBufferPtrWrapped!: JsExternal[]
     private timestampBufferPtr!: JsExternal
+    private timestampBuffer!: Buffer<ArrayBuffer>
 
-    private errorCodeBuffer!: Buffer<ArrayBuffer>
-    private wrappedErrorCodeBufferPtr!: JsExternal[]
-    private errorCodeBufferPtr!: JsExternal
+    private pullSampleErrorBufferPtrWrapped!: JsExternal[]
+    private pullSampleErrorBufferPtr!: JsExternal
+    private pullSampleErrorBuffer!: Buffer<ArrayBuffer>
 
     protected loop!: Promise<void>
 
@@ -118,7 +118,7 @@ export default class LslStreamInlet implements StreamInlet {
     private readonly bytesPerDouble = 8
 
     private createErrorCodeBuffer() {
-        this.errorCodeBuffer = Buffer.alloc(this.bytesPerInt)
+        this.pullSampleErrorBuffer = Buffer.alloc(this.bytesPerInt)
     }
 
     private readonly bytesPerInt = 4
@@ -130,33 +130,33 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private createDataBufferPtr() {
-        this.wrappedDataBufferPtr = createPointer({
+        this.dataBufferPtrWrapped = createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [this.dataBuffer],
         })
 
-        this.dataBufferPtr = unwrapPointer(this.wrappedDataBufferPtr)[0]
+        this.dataBufferPtr = unwrapPointer(this.dataBufferPtrWrapped)[0]
     }
 
     private createTimestampBufferPtr() {
-        this.wrappedTimestampBufferPtr = createPointer({
+        this.timestampBufferPtrWrapped = createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [this.timestampBuffer],
         })
 
         this.timestampBufferPtr = unwrapPointer(
-            this.wrappedTimestampBufferPtr
+            this.timestampBufferPtrWrapped
         )[0]
     }
 
     private createErrorCodeBufferPtr() {
-        this.wrappedErrorCodeBufferPtr = createPointer({
+        this.pullSampleErrorBufferPtrWrapped = createPointer({
             paramsType: [DataType.U8Array],
-            paramsValue: [this.errorCodeBuffer],
+            paramsValue: [this.pullSampleErrorBuffer],
         })
 
-        this.errorCodeBufferPtr = unwrapPointer(
-            this.wrappedErrorCodeBufferPtr
+        this.pullSampleErrorBufferPtr = unwrapPointer(
+            this.pullSampleErrorBufferPtrWrapped
         )[0]
     }
 
@@ -197,7 +197,7 @@ export default class LslStreamInlet implements StreamInlet {
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
             timeout: this.timeoutMs / 1000,
-            errcodePtr: this.errorCodeBufferPtr,
+            errcodePtr: this.pullSampleErrorBufferPtr,
         })
     }
 
@@ -229,7 +229,7 @@ export default class LslStreamInlet implements StreamInlet {
             timestampBufferPtr: this.timestampBufferPtr,
             timestampBufferElements: this.chunkSize,
             timeout: this.timeoutMs / 1000,
-            errcodePtr: this.errorCodeBufferPtr,
+            errcodePtr: this.pullSampleErrorBufferPtr,
         })
     }
 
@@ -242,7 +242,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private handleErrorCodeIfPresent() {
-        handleError(this.errorCodeBuffer.readInt32LE())
+        handleError(this.pullSampleErrorBuffer.readInt32LE())
     }
 
     public stopPulling() {
