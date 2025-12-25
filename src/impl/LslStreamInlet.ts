@@ -130,9 +130,7 @@ export default class LslStreamInlet implements StreamInlet {
             paramsValue: [this.dataBuffer],
         })
 
-        this.dataBufferPtr = unwrapPointer(
-            this.wrappedDataBufferPtr
-        )[0]
+        this.dataBufferPtr = unwrapPointer(this.wrappedDataBufferPtr)[0]
     }
 
     private createTimestampBufferPtr() {

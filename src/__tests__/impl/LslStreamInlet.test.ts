@@ -81,7 +81,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     @test()
     protected static async destroyDoesNotCallStopIfNotRunning() {
         let wasHit = false
-        
+
         this.instance.stopPulling = () => {
             wasHit = true
         }
