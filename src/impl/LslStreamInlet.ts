@@ -56,7 +56,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.chunkSize = chunkSize
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.timeoutMs = timeoutMs ?? 0
-        this.waitBetweenPullsMs = waitBetweenPullsMs ?? 0
+        this.waitBetweenPullsMs = waitBetweenPullsMs ?? 1
         this.onData = onData
 
         this.setPullDataMethod()

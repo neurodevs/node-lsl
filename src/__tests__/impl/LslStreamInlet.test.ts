@@ -205,6 +205,15 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async waitsOneMillisecondBetweenPullsIfNotPassed() {
+        assert.isEqual(
+            this.instance['waitBetweenPullsMs'],
+            1,
+            'Default waitBetweenPullsMs should be 1!'
+        )
+    }
+
+    @test()
     protected static async passesTimeoutMsOptionToPullSample() {
         const timeoutMs = 1000 * Math.random()
 
