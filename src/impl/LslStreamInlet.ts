@@ -15,6 +15,7 @@ export default class LslStreamInlet implements StreamInlet {
     private chunkSize: number
     private maxBufferedMs: number
     private timeoutMs: number
+    private waitBetweenPullsMs: number
     private onData: OnDataCallback
 
     protected inlet!: BoundInlet
@@ -36,6 +37,8 @@ export default class LslStreamInlet implements StreamInlet {
     private wrappedErrorCodeBufferPtr!: JsExternal[]
     private errorCodeBufferPtr!: JsExternal
 
+    protected loop!: Promise<void>
+
     private readonly sixMinutesInMs = 360 * 1000
 
     private lsl = LiblslAdapter.getInstance()
@@ -45,13 +48,15 @@ export default class LslStreamInlet implements StreamInlet {
         options: StreamInletConstructorOptions,
         onData: OnDataCallback
     ) {
-        const { chunkSize, maxBufferedMs, timeoutMs } = options ?? {}
+        const { chunkSize, maxBufferedMs, timeoutMs, waitBetweenPullsMs } =
+            options ?? {}
 
         this.info = info
         this.channelCount = this.info.channelCount
         this.chunkSize = chunkSize
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.timeoutMs = timeoutMs ?? 0
+        this.waitBetweenPullsMs = waitBetweenPullsMs ?? 0
         this.onData = onData
 
         this.setPullDataMethod()
@@ -87,7 +92,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.createWriteableBuffers()
         this.createPointersToBuffers()
 
-        void this.pullOnLoop()
+        this.loop = this.pullOnLoop()
     }
 
     private createWriteableBuffers() {
@@ -157,16 +162,20 @@ export default class LslStreamInlet implements StreamInlet {
 
     private async pullOnLoop() {
         if (this.isRunning) {
-            const { samples, timestamps } = this.pullDataMethod()
-            this.handleErrorCodeIfPresent()
+            this.pullOnce()
 
-            if (samples && timestamps) {
-                this.onData(samples, timestamps)
-            }
+            setTimeout(() => {
+                this.loop = this.pullOnLoop()
+            }, this.waitBetweenPullsMs)
+        }
+    }
 
-            setImmediate(() => {
-                void this.pullOnLoop()
-            })
+    private pullOnce() {
+        const { samples, timestamps } = this.pullDataMethod()
+        this.handleErrorCodeIfPresent()
+
+        if (samples && timestamps) {
+            this.onData(samples, timestamps)
         }
     }
 
@@ -275,6 +284,7 @@ export interface StreamInletOptions {
     chunkSize: number
     maxBufferedMs?: number
     timeoutMs?: number
+    waitBetweenPullsMs?: number
 }
 
 export type StreamInletConstructorOptions = Omit<StreamInletOptions, 'info'>

@@ -172,6 +172,39 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async waitsBetweenPullsIfPassedOption() {
+        const waitBetweenPullsMs = 10
+
+        const instance = await this.LslStreamInlet({
+            waitBetweenPullsMs,
+        })
+
+        let pulls = 0
+
+        //@ts-ignore
+        instance.pullOnce = async () => {
+            pulls++
+        }
+
+        const t0 = Date.now()
+        instance.startPulling()
+
+        while (pulls < 2) {
+            await this.wait(1)
+        }
+
+        const elapsed = Date.now() - t0
+
+        assert.isAbove(
+            elapsed,
+            waitBetweenPullsMs * 0.8,
+            'Did not wait between pulls'
+        )
+
+        instance.stopPulling()
+    }
+
+    @test()
     protected static async passesTimeoutMsOptionToPullSample() {
         const timeoutMs = 1000 * Math.random()
 
