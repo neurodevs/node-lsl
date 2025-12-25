@@ -41,8 +41,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static createOutletParams?: any[]
     private static destroyOutletParams?: any[]
     private static createInletParams?: any[]
-    private static openStreamParams?: any[]
-    private static closeStreamParams?: any[]
     private static flushInletParams?: any[]
     private static destroyInletParams?: any[]
     private static localClockParams?: any[]
@@ -209,16 +207,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     DataType.I32,
                     DataType.I32,
                 ],
-            },
-            lsl_open_stream: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [DataType.External, DataType.Double, DataType.I32],
-            },
-            lsl_close_stream: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [DataType.External],
             },
             lsl_flush_inlet: {
                 library: 'lsl',
@@ -540,15 +528,26 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             })
         )[0]
 
-        this.instance.openStream({
+        await this.instance.openStream({
             inlet,
             timeoutMs,
             errcodePtr,
         })
 
         assert.isEqualDeep(
-            this.openStreamParams,
-            [inlet, timeoutMs / 1000, errcodePtr],
+            this.ffiRsLoadOptions,
+            {
+                library: 'lsl',
+                funcName: 'lsl_open_stream',
+                retType: DataType.Void,
+                paramsType: [
+                    DataType.External,
+                    DataType.Double,
+                    DataType.External,
+                ],
+                paramsValue: [inlet, timeoutMs / 1000, errcodePtr],
+                runInNewThread: true,
+            },
             'Did not call openStream with expected options!'
         )
     }
@@ -557,13 +556,20 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     protected static async closeStreamCallsBinding() {
         const { inlet } = this.createRandomInlet()
 
-        this.instance.closeStream({
+        await this.instance.closeStream({
             inlet,
         })
 
         assert.isEqualDeep(
-            this.closeStreamParams,
-            [inlet],
+            this.ffiRsLoadOptions,
+            {
+                library: 'lsl',
+                funcName: 'lsl_close_stream',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
+                paramsValue: [inlet],
+                runInNewThread: true,
+            },
             'Did not call closeStream with expected options!'
         )
     }
@@ -836,12 +842,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             lsl_create_inlet: (params: any[]) => {
                 this.createInletParams = params
                 return this.fakeInlet
-            },
-            lsl_open_stream: (params: any[]) => {
-                this.openStreamParams = params
-            },
-            lsl_close_stream: (params: any[]) => {
-                this.closeStreamParams = params
             },
             lsl_flush_inlet: (params: any[]) => {
                 this.flushInletParams = params

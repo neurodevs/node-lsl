@@ -127,11 +127,11 @@ export default class FakeLiblsl implements Liblsl {
         return {} as BoundInlet
     }
 
-    public openStream(options: OpenStreamOptions) {
+    public async openStream(options: OpenStreamOptions) {
         this.lastOpenStreamOptions = options
     }
 
-    public closeStream(options: CloseStreamOptions) {
+    public async closeStream(options: CloseStreamOptions) {
         this.lastCloseStreamOptions = options
     }
 

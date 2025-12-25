@@ -211,14 +211,30 @@ export default class LiblslAdapter implements Liblsl {
     private readonly maxChunkSize = 0
     private readonly shouldRecover = 1
 
-    public openStream(options: OpenStreamOptions) {
+    public async openStream(options: OpenStreamOptions) {
         const { inlet, timeoutMs, errcodePtr } = options
-        this.bindings.lsl_open_stream([inlet, timeoutMs / 1000, errcodePtr])
+
+        await this.load({
+            library: 'lsl',
+            funcName: 'lsl_open_stream',
+            retType: DataType.Void,
+            paramsType: [DataType.External, DataType.Double, DataType.External],
+            paramsValue: [inlet, timeoutMs / 1000, errcodePtr],
+            runInNewThread: true,
+        })
     }
 
-    public closeStream(options: CloseStreamOptions) {
+    public async closeStream(options: CloseStreamOptions) {
         const { inlet } = options
-        this.bindings.lsl_close_stream([inlet])
+
+        await this.load({
+            library: 'lsl',
+            funcName: 'lsl_close_stream',
+            retType: DataType.Void,
+            paramsType: [DataType.External],
+            paramsValue: [inlet],
+            runInNewThread: true,
+        })
     }
 
     public pullSample(options: PullSampleOptions) {
@@ -374,16 +390,6 @@ export default class LiblslAdapter implements Liblsl {
                     DataType.I32,
                 ],
             },
-            lsl_open_stream: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [DataType.External, DataType.Double, DataType.I32],
-            },
-            lsl_close_stream: {
-                library: 'lsl',
-                retType: DataType.Void,
-                paramsType: [DataType.External],
-            },
             lsl_flush_inlet: {
                 library: 'lsl',
                 retType: DataType.I32,
@@ -444,8 +450,8 @@ export interface Liblsl {
     destroyOutlet(options: DestroyOutletOptions): void
 
     createInlet(options: CreateInletOptions): BoundInlet
-    openStream(options: OpenStreamOptions): void
-    closeStream(options: CloseStreamOptions): void
+    openStream(options: OpenStreamOptions): Promise<void>
+    closeStream(options: CloseStreamOptions): Promise<void>
     pullSample(options: PullSampleOptions): number
     pullChunk(options: PullChunkOptions): number
     flushInlet(options: FlushInletOptions): void
@@ -550,8 +556,6 @@ export interface LiblslBindings {
     lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): LslErrorCode
     lsl_destroy_outlet(args: [BoundOutlet]): void
     lsl_create_inlet(args: any): BoundInlet
-    lsl_open_stream(args: [BoundInlet, number, JsExternal]): void
-    lsl_close_stream(args: [BoundInlet]): void
     lsl_flush_inlet(args: [BoundInlet]): void
     lsl_destroy_inlet(args: any): void
     lsl_local_clock(args: []): number
