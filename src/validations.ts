@@ -7,11 +7,9 @@ export function isGreaterThanOrEqualToZero(value: number) {
 }
 
 export function isPositiveInteger(value: number) {
-    //@ts-ignore
     return Number.isInteger(value) && value > 0
 }
 
 export function isPositiveIntegerOrZero(value: number) {
-    //@ts-ignore
     return Number.isInteger(value) && value >= 0
 }
