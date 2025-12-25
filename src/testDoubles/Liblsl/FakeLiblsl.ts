@@ -19,6 +19,7 @@ import {
     ResolveByPropOptions,
     DestroyOutletOptions,
     OpenStreamOptions,
+    CloseStreamOptions,
 } from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {
@@ -60,6 +61,7 @@ export default class FakeLiblsl implements Liblsl {
     public lastDestroyOutletOptions?: DestroyOutletOptions
     public lastCreateInletOptions?: CreateInletOptions
     public lastOpenStreamOptions?: OpenStreamOptions
+    public lastCloseStreamOptions?: CloseStreamOptions
     public lastPullSampleOptions?: PullSampleOptions
     public lastPullChunkOptions?: PullChunkOptions
     public lastFlushInletOptions?: FlushInletOptions
@@ -127,6 +129,10 @@ export default class FakeLiblsl implements Liblsl {
 
     public openStream(options: OpenStreamOptions) {
         this.lastOpenStreamOptions = options
+    }
+
+    public closeStream(options: CloseStreamOptions) {
+        this.lastCloseStreamOptions = options
     }
 
     public pullSample(options: PullSampleOptions) {

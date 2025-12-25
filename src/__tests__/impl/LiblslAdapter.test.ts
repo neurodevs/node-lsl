@@ -42,6 +42,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static destroyOutletParams?: any[]
     private static createInletParams?: any[]
     private static openStreamParams?: any[]
+    private static closeStreamParams?: any[]
     private static flushInletParams?: any[]
     private static destroyInletParams?: any[]
     private static localClockParams?: any[]
@@ -213,6 +214,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 library: 'lsl',
                 retType: DataType.Void,
                 paramsType: [DataType.External, DataType.Double, DataType.I32],
+            },
+            lsl_close_stream: {
+                library: 'lsl',
+                retType: DataType.Void,
+                paramsType: [DataType.External],
             },
             lsl_flush_inlet: {
                 library: 'lsl',
@@ -522,7 +528,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async opensStreamCallsBinding() {
+    protected static async openStreamCallsBinding() {
         const { inlet } = this.createRandomInlet()
 
         const timeoutMs = randomInt(1000)
@@ -544,6 +550,21 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             this.openStreamParams,
             [inlet, timeoutMs / 1000, errcodePtr],
             'Did not call openStream with expected options!'
+        )
+    }
+
+    @test()
+    protected static async closeStreamCallsBinding() {
+        const { inlet } = this.createRandomInlet()
+
+        this.instance.closeStream({
+            inlet,
+        })
+
+        assert.isEqualDeep(
+            this.closeStreamParams,
+            [inlet],
+            'Did not call closeStream with expected options!'
         )
     }
 
@@ -818,6 +839,9 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             lsl_open_stream: (params: any[]) => {
                 this.openStreamParams = params
+            },
+            lsl_close_stream: (params: any[]) => {
+                this.closeStreamParams = params
             },
             lsl_flush_inlet: (params: any[]) => {
                 this.flushInletParams = params
