@@ -276,6 +276,7 @@ export default class LslStreamInlet implements StreamInlet {
     public stopPulling() {
         this.isRunning = false
         this.closeLslStream()
+        this.flushQueue()
     }
 
     private closeLslStream() {

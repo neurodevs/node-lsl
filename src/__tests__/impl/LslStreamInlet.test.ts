@@ -139,6 +139,20 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async stopPullingFlushesInletQueue() {
+        await this.startPulling()
+        this.stopPulling()
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastFlushInletOptions,
+            {
+                inlet: this.boundInlet,
+            },
+            'Did not flush inlet queue!'
+        )
+    }
+
+    @test()
     protected static async stopPullingSetsIsRunningToFalse() {
         await this.startThenStop()
 
