@@ -14,7 +14,8 @@ export default class LslStreamInlet implements StreamInlet {
     private channelCount: number
     private chunkSize: number
     private maxBufferedMs: number
-    private timeoutMs: number
+    private pullTimeoutMs: number
+    private openStreamTimeoutMs: number
     private waitBetweenPullsMs: number
     private flushQueueOnStop: boolean
     private onData: OnDataCallback
@@ -55,7 +56,8 @@ export default class LslStreamInlet implements StreamInlet {
         const {
             chunkSize,
             maxBufferedMs,
-            timeoutMs,
+            pullTimeoutMs,
+            openStreamTimeoutMs,
             waitBetweenPullsMs,
             flushQueueOnStop,
         } = options ?? {}
@@ -64,7 +66,8 @@ export default class LslStreamInlet implements StreamInlet {
         this.channelCount = this.info.channelCount
         this.chunkSize = chunkSize
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
-        this.timeoutMs = timeoutMs ?? 0
+        this.pullTimeoutMs = pullTimeoutMs ?? 0
+        this.openStreamTimeoutMs = openStreamTimeoutMs ?? this.aboutOneYearInMs
         this.waitBetweenPullsMs = waitBetweenPullsMs ?? 1
         this.flushQueueOnStop = flushQueueOnStop ?? true
         this.onData = onData
@@ -112,7 +115,7 @@ export default class LslStreamInlet implements StreamInlet {
 
         await this.lsl.openStream({
             inlet: this.inlet,
-            timeoutMs: this.aboutOneYearInMs,
+            timeoutMs: this.openStreamTimeoutMs,
             errcodePtr: this.openStreamErrorBufferPtr,
         })
     }
@@ -231,7 +234,7 @@ export default class LslStreamInlet implements StreamInlet {
             inlet: this.inlet,
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
-            timeout: this.timeoutMs / 1000,
+            timeout: this.pullTimeoutMs / 1000,
             errcodePtr: this.pullSampleErrorBufferPtr,
         })
     }
@@ -263,7 +266,7 @@ export default class LslStreamInlet implements StreamInlet {
             dataBufferElements: this.chunkSize * this.channelCount,
             timestampBufferPtr: this.timestampBufferPtr,
             timestampBufferElements: this.chunkSize,
-            timeout: this.timeoutMs / 1000,
+            timeout: this.pullTimeoutMs / 1000,
             errcodePtr: this.pullSampleErrorBufferPtr,
         })
     }
@@ -327,7 +330,8 @@ export interface StreamInletOptions {
     info: StreamInfo
     chunkSize: number
     maxBufferedMs?: number
-    timeoutMs?: number
+    pullTimeoutMs?: number
+    openStreamTimeoutMs?: number
     waitBetweenPullsMs?: number
     flushQueueOnStop?: boolean
 }

@@ -125,6 +125,29 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async opensInletStreamWithPassedTimeout() {
+        const openStreamTimeoutMs = 1000 * Math.random()
+
+        const instance = await this.LslStreamInlet({
+            openStreamTimeoutMs,
+        })
+
+        await instance.startPulling()
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastOpenStreamOptions,
+            {
+                inlet: instance.getBoundInlet(),
+                timeoutMs: openStreamTimeoutMs,
+                errcodePtr: instance['openStreamErrorBufferPtr'],
+            },
+            'Did not open inlet stream with passed timeout!'
+        )
+
+        instance.stopPulling()
+    }
+
+    @test()
     protected static async stopPullingClosesInletStream() {
         await this.startPulling()
         this.stopPulling()
@@ -276,32 +299,32 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async passesTimeoutMsOptionToPullSample() {
-        const timeoutMs = 1000 * Math.random()
+        const pullTimeoutMs = 1000 * Math.random()
 
         await this.runInletWithOptions({
             chunkSize: 1,
-            timeoutMs,
+            pullTimeoutMs,
         })
 
         assert.isEqual(
             this.fakeLiblsl.lastPullSampleOptions?.timeout,
-            timeoutMs / 1000,
-            'Did not pass timeoutMs to pullSample!'
+            pullTimeoutMs / 1000,
+            'Did not pass pullTimeoutMs to pullSample!'
         )
     }
 
     @test()
     protected static async passesTimeoutMsOptionToPullChunk() {
-        const timeoutMs = 1000 * Math.random()
+        const pullTimeoutMs = 1000 * Math.random()
 
         await this.runInletWithOptions({
             chunkSize: this.chunkSize,
-            timeoutMs,
+            pullTimeoutMs,
         })
 
         assert.isEqual(
             this.fakeLiblsl.lastPullChunkOptions?.timeout,
-            timeoutMs / 1000,
+            pullTimeoutMs / 1000,
             'Did not pass timeoutMs to pullChunk!'
         )
     }
