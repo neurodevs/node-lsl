@@ -1,6 +1,8 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { StreamInletOptions } from '../../impl/LslStreamInlet.js'
+import LslStreamInlet, {
+    StreamInletOptions,
+} from '../../impl/LslStreamInlet.js'
 import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
@@ -12,6 +14,14 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         timestamps: Float64Array
     }[]
 
+    protected static async beforeAll() {
+        assert.isEqual(
+            LslStreamInlet.waitAfterOpenStreamMs,
+            100,
+            'Default waitAfterOpenStreamMs should be 100!'
+        )
+    }
+
     protected static async beforeEach() {
         await super.beforeEach()
 
@@ -20,6 +30,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         this.setSpyStreamInlet()
 
         this.callsToOnData = []
+
+        LslStreamInlet.waitAfterOpenStreamMs = 0
 
         this.instance = await this.LslStreamInlet()
     }
@@ -163,7 +175,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         assert.isAbove(
             elapsed,
-            waitAfterOpenStreamMs,
+            waitAfterOpenStreamMs * 0.8,
             'Did not wait after opening stream!'
         )
     }

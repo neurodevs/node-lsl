@@ -7,6 +7,7 @@ import { StreamInfo } from './LslStreamInfo.js'
 
 export default class LslStreamInlet implements StreamInlet {
     public static Class?: StreamInletConstructor
+    public static waitAfterOpenStreamMs = 100
 
     public isRunning = false
 
@@ -59,7 +60,7 @@ export default class LslStreamInlet implements StreamInlet {
             maxBufferedMs,
             pullTimeoutMs,
             openStreamTimeoutMs,
-            waitAfterOpenStreamMs,
+            waitAfterOpenStreamMs: waitAfterOpenMs,
             waitBetweenPullsMs,
             flushQueueOnStop,
         } = options ?? {}
@@ -70,7 +71,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.pullTimeoutMs = pullTimeoutMs ?? 0
         this.openStreamTimeoutMs = openStreamTimeoutMs ?? this.aboutOneYearInMs
-        this.waitAfterOpenStreamMs = waitAfterOpenStreamMs ?? 0
+        this.waitAfterOpenStreamMs = waitAfterOpenMs ?? this.waitAfterOpenMs
         this.waitBetweenPullsMs = waitBetweenPullsMs ?? 1
         this.flushQueueOnStop = flushQueueOnStop ?? true
         this.onData = onData
@@ -316,6 +317,10 @@ export default class LslStreamInlet implements StreamInlet {
 
     private destroyBoundInlet() {
         this.lsl.destroyInlet({ inlet: this.inlet })
+    }
+
+    private get waitAfterOpenMs() {
+        return LslStreamInlet.waitAfterOpenStreamMs
     }
 }
 
