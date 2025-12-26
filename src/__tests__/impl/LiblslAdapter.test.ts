@@ -568,7 +568,6 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 retType: DataType.Void,
                 paramsType: [DataType.External],
                 paramsValue: [inlet],
-                runInNewThread: true,
             },
             'Did not call closeStream with expected options!'
         )

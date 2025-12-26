@@ -92,7 +92,7 @@ export default class LslStreamInlet implements StreamInlet {
     public async startPulling() {
         this.isRunning = true
 
-        await this.openStream()
+        await this.openLslStream()
 
         this.createWriteableBuffers()
         this.createPointersToBuffers()
@@ -100,7 +100,7 @@ export default class LslStreamInlet implements StreamInlet {
         void this.pullOnLoop()
     }
 
-    private async openStream() {
+    private async openLslStream() {
         this.createOpenStreamErrorBuffer()
 
         await this.lsl.openStream({
@@ -275,6 +275,11 @@ export default class LslStreamInlet implements StreamInlet {
 
     public stopPulling() {
         this.isRunning = false
+        this.closeLslStream()
+    }
+
+    private closeLslStream() {
+        this.lsl.closeStream({ inlet: this.inlet })
     }
 
     public flushQueue() {

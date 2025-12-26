@@ -224,16 +224,15 @@ export default class LiblslAdapter implements Liblsl {
         })
     }
 
-    public async closeStream(options: CloseStreamOptions) {
+    public closeStream(options: CloseStreamOptions) {
         const { inlet } = options
 
-        await this.load({
+        this.load({
             library: 'lsl',
             funcName: 'lsl_close_stream',
             retType: DataType.Void,
             paramsType: [DataType.External],
             paramsValue: [inlet],
-            runInNewThread: true,
         })
     }
 
@@ -451,7 +450,7 @@ export interface Liblsl {
 
     createInlet(options: CreateInletOptions): BoundInlet
     openStream(options: OpenStreamOptions): Promise<void>
-    closeStream(options: CloseStreamOptions): Promise<void>
+    closeStream(options: CloseStreamOptions): void
     pullSample(options: PullSampleOptions): number
     pullChunk(options: PullChunkOptions): number
     flushInlet(options: FlushInletOptions): void
