@@ -48,6 +48,8 @@ export default class LslStreamInlet implements StreamInlet {
     private openStreamErrorBufferPtr!: JsExternal
     private openStreamErrorBuffer!: Buffer<ArrayBuffer>
 
+    protected loop!: Promise<void>
+
     private lsl = LiblslAdapter.getInstance()
 
     protected constructor(
@@ -111,7 +113,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.createWriteableBuffers()
         this.createPointersToBuffers()
 
-        void this.pullOnLoop()
+        this.loop = this.pullOnLoop()
     }
 
     private async openLslStream() {
@@ -215,7 +217,7 @@ export default class LslStreamInlet implements StreamInlet {
             this.pullOnce()
 
             setTimeout(() => {
-                void this.pullOnLoop()
+                this.loop = this.pullOnLoop()
             }, this.waitBetweenPullsMs)
         }
     }
