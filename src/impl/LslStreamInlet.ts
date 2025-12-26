@@ -16,6 +16,7 @@ export default class LslStreamInlet implements StreamInlet {
     private maxBufferedMs: number
     private pullTimeoutMs: number
     private openStreamTimeoutMs: number
+    private waitAfterOpenStreamMs: number
     private waitBetweenPullsMs: number
     private flushQueueOnStop: boolean
     private onData: OnDataCallback
@@ -58,6 +59,7 @@ export default class LslStreamInlet implements StreamInlet {
             maxBufferedMs,
             pullTimeoutMs,
             openStreamTimeoutMs,
+            waitAfterOpenStreamMs,
             waitBetweenPullsMs,
             flushQueueOnStop,
         } = options ?? {}
@@ -68,6 +70,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.pullTimeoutMs = pullTimeoutMs ?? 0
         this.openStreamTimeoutMs = openStreamTimeoutMs ?? this.aboutOneYearInMs
+        this.waitAfterOpenStreamMs = waitAfterOpenStreamMs ?? 0
         this.waitBetweenPullsMs = waitBetweenPullsMs ?? 1
         this.flushQueueOnStop = flushQueueOnStop ?? true
         this.onData = onData
@@ -118,6 +121,10 @@ export default class LslStreamInlet implements StreamInlet {
             timeoutMs: this.openStreamTimeoutMs,
             errcodePtr: this.openStreamErrorBufferPtr,
         })
+
+        await new Promise((resolve) =>
+            setTimeout(resolve, this.waitAfterOpenStreamMs)
+        )
     }
 
     private createOpenStreamErrorBuffer() {
@@ -332,6 +339,7 @@ export interface StreamInletOptions {
     maxBufferedMs?: number
     pullTimeoutMs?: number
     openStreamTimeoutMs?: number
+    waitAfterOpenStreamMs?: number
     waitBetweenPullsMs?: number
     flushQueueOnStop?: boolean
 }

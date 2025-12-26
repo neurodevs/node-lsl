@@ -148,6 +148,27 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async waitsAfterOpeningStreamWithPassedOption() {
+        const waitAfterOpenStreamMs = 10
+
+        const instance = await this.LslStreamInlet({
+            waitAfterOpenStreamMs,
+        })
+
+        let t0 = Date.now()
+        await instance.startPulling()
+        let elapsed = Date.now() - t0
+
+        instance.stopPulling()
+
+        assert.isAbove(
+            elapsed,
+            waitAfterOpenStreamMs,
+            'Did not wait after opening stream!'
+        )
+    }
+
+    @test()
     protected static async stopPullingClosesInletStream() {
         await this.startPulling()
         this.stopPulling()
