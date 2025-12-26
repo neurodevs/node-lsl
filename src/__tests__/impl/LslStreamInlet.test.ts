@@ -69,8 +69,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async destroyCallsStopIfIsRunning() {
-        this.instance.startPulling()
-        this.instance.destroy()
+        await this.startPulling()
+        this.destroy()
 
         assert.isFalse(
             this.instance.isRunning,
@@ -98,9 +98,28 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async startPullingSetsIsRunningToTrue() {
-        this.startPulling()
+        await this.startPulling()
 
         assert.isTrue(this.isRunning, 'isRunning should be true!')
+
+        this.stopPulling()
+    }
+
+    @test()
+    protected static async startPullingOpensInletStream() {
+        await this.startPulling()
+
+        const aboutOneYearInMs = 32000000 * 1000
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastOpenStreamOptions,
+            {
+                inlet: this.boundInlet,
+                timeoutMs: aboutOneYearInMs,
+                errcodePtr: this.instance['openStreamErrorBufferPtr'],
+            },
+            'Did not open inlet stream!'
+        )
 
         this.stopPulling()
     }
@@ -186,7 +205,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         }
 
         const t0 = Date.now()
-        instance.startPulling()
+        await instance.startPulling()
 
         while (pulls < 2) {
             await this.wait(1)
@@ -327,17 +346,21 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     private static async startThenStop(inlet?: SpyStreamInlet) {
         const instance = inlet || this.instance
-        instance.startPulling()
+        await instance.startPulling()
         await this.wait(10)
         instance.stopPulling()
     }
 
-    private static startPulling() {
-        this.instance.startPulling()
+    private static async startPulling() {
+        await this.instance.startPulling()
     }
 
     private static stopPulling() {
         this.instance.stopPulling()
+    }
+
+    private static destroy() {
+        this.instance.destroy()
     }
 
     private static get isRunning() {

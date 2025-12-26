@@ -19,6 +19,7 @@ export default class LslStreamInlet implements StreamInlet {
     private onData: OnDataCallback
 
     private readonly sixMinutesInMs = 360 * 1000
+    private readonly aboutOneYearInMs = 32000000 * 1000
 
     protected inlet!: BoundInlet
 
@@ -38,6 +39,10 @@ export default class LslStreamInlet implements StreamInlet {
     private pullSampleErrorBufferPtrWrapped!: JsExternal[]
     private pullSampleErrorBufferPtr!: JsExternal
     private pullSampleErrorBuffer!: Buffer<ArrayBuffer>
+
+    private openStreamErrorBufferPtrWrapped!: JsExternal[]
+    private openStreamErrorBufferPtr!: JsExternal
+    private openStreamErrorBuffer!: Buffer<ArrayBuffer>
 
     private lsl = LiblslAdapter.getInstance()
 
@@ -84,13 +89,38 @@ export default class LslStreamInlet implements StreamInlet {
         })
     }
 
-    public startPulling() {
+    public async startPulling() {
         this.isRunning = true
+
+        await this.openStream()
 
         this.createWriteableBuffers()
         this.createPointersToBuffers()
 
         void this.pullOnLoop()
+    }
+
+    private async openStream() {
+        this.createOpenStreamErrorBuffer()
+
+        await this.lsl.openStream({
+            inlet: this.inlet,
+            timeoutMs: this.aboutOneYearInMs,
+            errcodePtr: this.openStreamErrorBufferPtr,
+        })
+    }
+
+    private createOpenStreamErrorBuffer() {
+        this.openStreamErrorBuffer = Buffer.alloc(this.bytesPerInt)
+
+        this.openStreamErrorBufferPtrWrapped = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.openStreamErrorBuffer],
+        })
+
+        this.openStreamErrorBufferPtr = unwrapPointer(
+            this.openStreamErrorBufferPtrWrapped
+        )[0]
     }
 
     private createWriteableBuffers() {
@@ -264,7 +294,7 @@ export default class LslStreamInlet implements StreamInlet {
 }
 
 export interface StreamInlet {
-    startPulling(): void
+    startPulling(): Promise<void>
     stopPulling(): void
     flushQueue(): void
     destroy(): void

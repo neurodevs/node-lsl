@@ -34,7 +34,7 @@ export default class FakeStreamInlet implements StreamInlet {
         })
     }
 
-    public startPulling() {
+    public async startPulling() {
         FakeStreamInlet.numCallsToStartPulling++
         this.isRunning = true
     }
