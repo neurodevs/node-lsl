@@ -16,6 +16,7 @@ export default class LslStreamInlet implements StreamInlet {
     private maxBufferedMs: number
     private timeoutMs: number
     private waitBetweenPullsMs: number
+    private flushQueueOnStop: boolean
     private onData: OnDataCallback
 
     private readonly sixMinutesInMs = 360 * 1000
@@ -51,8 +52,13 @@ export default class LslStreamInlet implements StreamInlet {
         options: StreamInletConstructorOptions,
         onData: OnDataCallback
     ) {
-        const { chunkSize, maxBufferedMs, timeoutMs, waitBetweenPullsMs } =
-            options ?? {}
+        const {
+            chunkSize,
+            maxBufferedMs,
+            timeoutMs,
+            waitBetweenPullsMs,
+            flushQueueOnStop,
+        } = options ?? {}
 
         this.info = info
         this.channelCount = this.info.channelCount
@@ -60,6 +66,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.timeoutMs = timeoutMs ?? 0
         this.waitBetweenPullsMs = waitBetweenPullsMs ?? 1
+        this.flushQueueOnStop = flushQueueOnStop ?? true
         this.onData = onData
 
         this.setPullDataMethod()
@@ -276,7 +283,10 @@ export default class LslStreamInlet implements StreamInlet {
     public stopPulling() {
         this.isRunning = false
         this.closeLslStream()
-        this.flushQueue()
+
+        if (this.flushQueueOnStop) {
+            this.flushQueue()
+        }
     }
 
     private closeLslStream() {
@@ -319,6 +329,7 @@ export interface StreamInletOptions {
     maxBufferedMs?: number
     timeoutMs?: number
     waitBetweenPullsMs?: number
+    flushQueueOnStop?: boolean
 }
 
 export type StreamInletConstructorOptions = Omit<StreamInletOptions, 'info'>
