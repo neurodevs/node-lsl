@@ -304,7 +304,7 @@ export default class LiblslAdapter implements Liblsl {
 
     public flushInlet(options: FlushInletOptions) {
         const { inlet } = options
-        this.bindings.lsl_flush_inlet([inlet])
+        this.bindings.lsl_inlet_flush([inlet])
     }
 
     public destroyInlet(options: DestroyInletOptions) {
@@ -389,7 +389,7 @@ export default class LiblslAdapter implements Liblsl {
                     DataType.I32,
                 ],
             },
-            lsl_flush_inlet: {
+            lsl_inlet_flush: {
                 library: 'lsl',
                 retType: DataType.I32,
                 paramsType: [DataType.External],
@@ -555,7 +555,7 @@ export interface LiblslBindings {
     lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): LslErrorCode
     lsl_destroy_outlet(args: [BoundOutlet]): void
     lsl_create_inlet(args: any): BoundInlet
-    lsl_flush_inlet(args: [BoundInlet]): void
+    lsl_inlet_flush(args: [BoundInlet]): void
     lsl_destroy_inlet(args: any): void
     lsl_local_clock(args: []): number
     lsl_get_desc(args: [BoundStreamInfo]): BoundDescription

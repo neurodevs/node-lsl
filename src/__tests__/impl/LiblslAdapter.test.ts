@@ -208,7 +208,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     DataType.I32,
                 ],
             },
-            lsl_flush_inlet: {
+            lsl_inlet_flush: {
                 library: 'lsl',
                 retType: DataType.I32,
                 paramsType: [DataType.External],
@@ -842,7 +842,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 this.createInletParams = params
                 return this.fakeInlet
             },
-            lsl_flush_inlet: (params: any[]) => {
+            lsl_inlet_flush: (params: any[]) => {
                 this.flushInletParams = params
                 return 0
             },
