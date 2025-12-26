@@ -123,6 +123,10 @@ export default class LslStreamInlet implements StreamInlet {
             errcodePtr: this.openStreamErrorBufferPtr,
         })
 
+        await this.waitToAllowSetup()
+    }
+
+    private async waitToAllowSetup() {
         await new Promise((resolve) =>
             setTimeout(resolve, this.waitAfterOpenStreamMs)
         )
