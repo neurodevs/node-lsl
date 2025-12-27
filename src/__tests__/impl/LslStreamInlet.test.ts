@@ -299,7 +299,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         let pulls = 0
 
         //@ts-ignore
-        instance.pullOnce = async () => {
+        instance.pullDataOnce = () => {
             pulls++
         }
 

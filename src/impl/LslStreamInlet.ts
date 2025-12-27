@@ -213,22 +213,25 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private async pullOnLoop() {
-        if (this.isRunning) {
-            this.pullOnce()
-
-            setTimeout(() => {
-                this.loop = this.pullOnLoop()
-            }, this.waitBetweenPullsMs)
+        while (this.isRunning) {
+            this.pullDataOnce()
+            await this.waitBetweenPulls()
         }
     }
 
-    private pullOnce() {
+    private pullDataOnce() {
         const { samples, timestamps } = this.pullDataMethod()
         this.handleErrorCodeIfPresent()
 
         if (samples && timestamps) {
             this.onData(samples, timestamps)
         }
+    }
+
+    private async waitBetweenPulls() {
+        await new Promise((resolve) =>
+            setTimeout(resolve, this.waitBetweenPullsMs)
+        )
     }
 
     private pullSample() {
