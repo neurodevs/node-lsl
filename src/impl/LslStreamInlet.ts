@@ -106,14 +106,18 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     public async startPulling() {
-        this.isRunning = true
+        if (!this.isRunning) {
+            this.isRunning = true
 
-        await this.openLslStream()
+            await this.openLslStream()
 
-        this.createWriteableBuffers()
-        this.createPointersToBuffers()
+            this.createWriteableBuffers()
+            this.createPointersToBuffers()
 
-        this.loop = this.pullOnLoop()
+            this.loop = this.pullOnLoop()
+        } else {
+            console.warn('Cannot start pulling: inlet is already running!')
+        }
     }
 
     private async openLslStream() {

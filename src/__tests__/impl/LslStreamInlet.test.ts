@@ -118,6 +118,25 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async startPullingReturnsEarlyIfAlreadyRunning() {
+        let numHits = 0
+
+        const original = this.instance['openLslStream'].bind(this.instance)
+
+        this.instance['openLslStream'] = async () => {
+            numHits++
+            await original()
+        }
+
+        await this.startPulling()
+        await this.startPulling()
+
+        assert.isEqual(numHits, 1, 'startPulling did not return early!')
+
+        this.stopPulling()
+    }
+
+    @test()
     protected static async startPullingOpensInletStream() {
         await this.startPulling()
 
