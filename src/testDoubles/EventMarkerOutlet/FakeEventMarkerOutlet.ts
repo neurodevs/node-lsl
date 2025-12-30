@@ -4,12 +4,15 @@ import {
 } from '../../impl/LslEventMarkerOutlet.js'
 
 export default class FakeEventMarkerOutlet implements EventMarkerOutlet {
+    public static numCallsToConstructor = 0
     public static callsToPushMarker: string[] = []
     public static callsToPushMarkers: DurationMarker[][] = []
     public static numCallsToStop = 0
     public static numCallsToDestroy = 0
 
-    public constructor() {}
+    public constructor() {
+        FakeEventMarkerOutlet.numCallsToConstructor++
+    }
 
     public pushMarker(markerName: string) {
         FakeEventMarkerOutlet.callsToPushMarker.push(markerName)
@@ -28,6 +31,7 @@ export default class FakeEventMarkerOutlet implements EventMarkerOutlet {
     }
 
     public static resetTestDouble() {
+        this.numCallsToConstructor = 0
         this.callsToPushMarker = []
         this.callsToPushMarkers = []
         this.numCallsToStop = 0
