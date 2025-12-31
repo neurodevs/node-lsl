@@ -20,9 +20,13 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         return new (this.Class ?? this)(outlet)
     }
 
-    public emit(marker: EventMarker) {
-        const { name } = marker
+    public async emit(marker: EventMarker) {
+        const { name, waitForMs } = marker
         this.pushMarkerToOutlet(name)
+
+        if (waitForMs) {
+            await this.wait(waitForMs)
+        }
     }
 
     public async emitMany(markers: TimedEventMarker[]) {
@@ -85,7 +89,7 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
 }
 
 export interface EventMarkerEmitter {
-    emit(marker: EventMarker): void
+    emit(marker: EventMarker): Promise<void>
     emitMany(markers: TimedEventMarker[]): Promise<void>
     interrupt(): void
     destroy(): void

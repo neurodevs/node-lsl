@@ -143,9 +143,27 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     @test()
     protected static async emitCallsPushSampleOnStreamOutlet() {
         const markerName = this.generateId()
-        this.instance.emit({ name: markerName })
+        await this.instance.emit({ name: markerName })
 
         assert.isEqual(FakeStreamOutlet.callsToPushSample[0][0], markerName)
+    }
+
+    @test()
+    protected static async emitWaitsForMsIfPassed() {
+        SpyEventMarkerEmitter.shouldCallWaitOnSuper = true
+
+        const waitForMs = 10
+        const eventMarker = this.generateEventMarker(waitForMs)
+
+        const startMs = Date.now()
+        await this.instance.emit(eventMarker)
+        const endMs = Date.now()
+
+        assert.isAbove(
+            endMs - startMs,
+            waitForMs,
+            'Did not wait for the specified time!'
+        )
     }
 
     @test()

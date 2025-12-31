@@ -15,7 +15,7 @@ export default class FakeEventMarkerEmitter implements EventMarkerEmitter {
         FakeEventMarkerEmitter.numCallsToConstructor++
     }
 
-    public emit(marker: EventMarker) {
+    public async emit(marker: EventMarker) {
         FakeEventMarkerEmitter.callsToEmit.push(marker)
     }
 
