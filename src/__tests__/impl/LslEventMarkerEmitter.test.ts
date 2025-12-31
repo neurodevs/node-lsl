@@ -54,7 +54,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async pushingSingleMarkerIncrementsHitCountAndWaitTime() {
+    protected static async emittingSingleMarkerIncrementsHitCountAndWaitTime() {
         const markers = [this.generateEventMarker()]
         await this.instance.emitMany(markers)
 
@@ -70,8 +70,8 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async pushingTwoMarkersIncrementsHitCountAndWaitTimeTwice() {
-        const markers = await this.pushTotalMarkers(2)
+    protected static async emittingTwoMarkersIncrementsHitCountAndWaitTimeTwice() {
+        const markers = await this.emitMany(2)
 
         assert.isEqual(FakeStreamOutlet.callsToPushSample.length, 2)
 
@@ -81,10 +81,10 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         )
     }
 
-    @test('can stop on the first marker', 1)
-    @test('can stop on the second marker', 2)
-    @test('can stop on the third marker', 3)
-    protected static async canStopEventMarkersMidPush(bailIdx: number) {
+    @test('can interrupt on the first marker', 1)
+    @test('can interrupt on the second marker', 2)
+    @test('can interrupt on the third marker', 3)
+    protected static async eventMarkerEmitterIsInterruptable(bailIdx: number) {
         let hitCount = 0
 
         const outlet = this.instance.getStreamOutlet()
@@ -96,13 +96,13 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
             }
         }
 
-        await this.pushTotalMarkers(10)
+        await this.emitMany(10)
 
         assert.isEqual(hitCount, bailIdx)
     }
 
     @test()
-    protected static async canStartAgainAfterStopping() {
+    protected static async canStartAgainAfterInterrupting() {
         this.instance.interrupt()
 
         let hitCount = 0
@@ -113,17 +113,17 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
             hitCount++
         }
 
-        await this.pushTotalMarkers(10)
+        await this.emitMany(10)
 
         assert.isEqual(hitCount, 10)
     }
 
     @test()
-    protected static async doesNotWaitIfStopped() {
+    protected static async doesNotWaitIfInterrupted() {
         await this.setupOutlet()
 
         const startMs = Date.now()
-        const promise = this.pushTotalMarkers(2, 1000)
+        const promise = this.emitMany(2, 1000)
         this.instance.interrupt()
         await promise
         const endMs = Date.now()
@@ -132,8 +132,8 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async clearsTheTimeoutOnStop() {
-        void this.pushTotalMarkers(2, 100)
+    protected static async clearsTimeoutOnInterrupt() {
+        void this.emitMany(2, 100)
         this.instance.interrupt()
 
         this.streamOutlet.pushSample = () =>
@@ -168,7 +168,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         this.instance = await this.LslEventMarkerEmitter()
     }
 
-    private static async pushTotalMarkers(total: number, waitForMs?: number) {
+    private static async emitMany(total: number, waitForMs?: number) {
         const markers = new Array(total)
             .fill(null)
             .map(() => this.generateEventMarker(waitForMs))
