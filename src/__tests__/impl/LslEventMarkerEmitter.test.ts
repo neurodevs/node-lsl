@@ -1,24 +1,24 @@
 import { randomInt } from 'crypto'
 import { assert, test } from '@neurodevs/node-tdd'
 
-import LslEventMarkerOutlet from '../../impl/LslEventMarkerOutlet.js'
+import LslEventMarkerEmitter from '../../impl/LslEventMarkerEmitter.js'
 import { StreamOutletOptions } from '../../impl/LslStreamOutlet.js'
-import SpyEventMarkerOutlet from '../../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
+import SpyEventMarkerEmitter from '../../testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
 import FakeStreamOutlet from '../../testDoubles/StreamOutlet/FakeStreamOutlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
-export default class EventMarkerOutletTest extends AbstractPackageTest {
-    private static instance: SpyEventMarkerOutlet
+export default class EventMarkerEmitterTest extends AbstractPackageTest {
+    private static instance: SpyEventMarkerEmitter
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeLiblsl()
         this.setFakeStreamOutlet()
-        this.setSpyEventMarkerOutlet()
+        this.setSpyEventMarkerEmitter()
 
-        this.instance = await this.LslEventMarkerOutlet()
+        this.instance = await this.LslEventMarkerEmitter()
     }
 
     @test()
@@ -45,7 +45,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
     @test()
     protected static async canOverrideDefaultOptions() {
         const options = generateRandomOutletOptions()
-        await this.LslEventMarkerOutlet(options)
+        await this.LslEventMarkerEmitter(options)
 
         assert.isEqualDeep(
             FakeStreamOutlet.callsToConstructor[1].options,
@@ -55,8 +55,8 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
 
     @test()
     protected static async pushingSingleMarkerIncrementsHitCountAndWaitTime() {
-        const markers = [this.generateDurationMarker()]
-        await this.instance.pushMarkers(markers)
+        const markers = [this.generateEventMarker()]
+        await this.instance.emitMany(markers)
 
         const marker = markers[0]
 
@@ -66,7 +66,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
             'Pushed the wrong marker!'
         )
 
-        assert.isEqual(this.instance.totalWaitTimeMs, marker.durationMs)
+        assert.isEqual(this.instance.totalWaitForMs, marker.waitForMs)
     }
 
     @test()
@@ -76,8 +76,8 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         assert.isEqual(FakeStreamOutlet.callsToPushSample.length, 2)
 
         assert.isEqual(
-            this.instance.totalWaitTimeMs,
-            markers[0].durationMs + markers[1].durationMs
+            this.instance.totalWaitForMs,
+            markers[0].waitForMs + markers[1].waitForMs
         )
     }
 
@@ -92,7 +92,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
         outlet.pushSample = () => {
             hitCount += 1
             if (hitCount === bailIdx) {
-                this.instance.stop()
+                this.instance.interrupt()
             }
         }
 
@@ -103,7 +103,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
 
     @test()
     protected static async canStartAgainAfterStopping() {
-        this.instance.stop()
+        this.instance.interrupt()
 
         let hitCount = 0
 
@@ -124,7 +124,7 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
 
         const startMs = Date.now()
         const promise = this.pushTotalMarkers(2, 1000)
-        this.instance.stop()
+        this.instance.interrupt()
         await promise
         const endMs = Date.now()
 
@@ -134,16 +134,16 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
     @test()
     protected static async clearsTheTimeoutOnStop() {
         void this.pushTotalMarkers(2, 100)
-        this.instance.stop()
+        this.instance.interrupt()
 
         this.streamOutlet.pushSample = () =>
             assert.fail('Should not have been called')
     }
 
     @test()
-    protected static async pushMarkerCallsPushSampleOnMarkerOutlet() {
+    protected static async emitCallsPushSampleOnStreamOutlet() {
         const markerName = this.generateId()
-        this.instance.pushMarker(markerName)
+        this.instance.emit({ name: markerName })
 
         assert.isEqual(FakeStreamOutlet.callsToPushSample[0][0], markerName)
     }
@@ -164,32 +164,32 @@ export default class EventMarkerOutletTest extends AbstractPackageTest {
     }
 
     private static async setupOutlet() {
-        LslEventMarkerOutlet.Class = LslEventMarkerOutlet as any
-        this.instance = await this.LslEventMarkerOutlet()
+        LslEventMarkerEmitter.Class = LslEventMarkerEmitter as any
+        this.instance = await this.LslEventMarkerEmitter()
     }
 
-    private static async pushTotalMarkers(total: number, durationMs?: number) {
+    private static async pushTotalMarkers(total: number, waitForMs?: number) {
         const markers = new Array(total)
             .fill(null)
-            .map(() => this.generateDurationMarker(durationMs))
+            .map(() => this.generateEventMarker(waitForMs))
 
-        await this.instance.pushMarkers(markers)
+        await this.instance.emitMany(markers)
 
         return markers
     }
 
-    private static generateDurationMarker(durationMs?: number) {
+    private static generateEventMarker(waitForMs?: number) {
         return {
             name: this.generateId(),
-            durationMs: durationMs ?? randomInt(100, 1000),
+            waitForMs: waitForMs ?? randomInt(100, 1000),
         }
     }
 
-    private static async LslEventMarkerOutlet(
+    private static async LslEventMarkerEmitter(
         options?: Partial<StreamOutletOptions>
     ) {
-        return (await LslEventMarkerOutlet.Create(
+        return (await LslEventMarkerEmitter.Create(
             options
-        )) as SpyEventMarkerOutlet
+        )) as SpyEventMarkerEmitter
     }
 }

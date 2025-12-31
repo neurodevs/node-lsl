@@ -6,7 +6,7 @@ Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series
 - [Installation](#installation)
 - [Usage](#usage)
   - [LslStreamOutlet](#lslstreamoutlet)
-  - [LslEventMarkerOutlet](#lsleventmarkeroutlet) 
+  - [LslEventMarkerEmitter](#LslEventMarkerEmitter) 
 - [Test Doubles](#test-doubles)
 
 ## Overview
@@ -57,47 +57,21 @@ const outlet = await LslStreamOutlet.Create({
 outlet.pushSample([1, 2, 3, 4, 5])
 ```
 
-### LslEventMarkerOutlet
+### LslEventMarkerEmitter
 
-LSL is also often used to push event markers that mark different phases of an experiment or session. The `pushMarkers` method pushes an event marker, waits for a specified duration, then pushes the next marker. I recommend that each event marker has a duration of at least 100 ms so that LSL receives the markers in the right order.
+LSL is also often used to push event markers that mark different phases of an experiment or session. The `emitMany` method pushes an event marker, waits for a specified duration, then pushes the next marker. From experience, each event marker should have a `waitForMs` of at least 100 ms or so to ensure LSL receives the event markers in the right order.
 
 ```typescript
-import { LslEventMarkerOutlet } from '@neurodevs/node-lsl'
+import { LslEventMarkerEmitter } from '@neurodevs/node-lsl'
 
-const outlet = await LslEventMarkerOutlet.Create()
+const emitter = await LslEventMarkerEmitter.Create()
 
 const markers = [
-    { name: 'phase-1-begin', durationMs: 1000 },
-    { name: 'phase-1-end', durationMs: 100 },
+    { name: 'phase-1-begin', waitForMs: 1000 },
+    { name: 'phase-1-end', waitForMs: 100 },
 ]
 
-// Hangs until complete
-await outlet.pushMarkers(markers)
+const promise = emitter.emitMany(markers)
 
-// Void promise, does not hang
-void outlet.pushMarkers(markers)
-
-// Interrupts the above pushMarkers process
-outlet.stop()
+emitter.interrupt()
 ```
-
-## Test Doubles
-
-This package was developed using test-driven development (TDD). If you also follow TDD, you'll likely want test doubles to fake or mock certain behaviors for these classes.
-
-For example, the `MockEventMarkerOutlet` class lets you test whether your application appropriately calls its methods without actually doing anything. Set this mock in your test code like this:
-
-```typescript
-import { LslEventMarkerOutlet, MockEventMarkerOutlet } from '@neurodevs/node-lsl'
-
-// In your tests / beforeEach
-LslEventMarkerOutlet.Class = MockEventMarkerOutlet
-const mock = await LslEventMarkerOutlet.Create()
-
-// Do something in your application that should start the outlet
-
-const expectedMarkers = ['phase-1-begin', ...]
-mock.assertDidPushSamples(expectedMarkers)
-```
-
-Now, you'll have a failing test. There will be a helpful error message to guide you towards the solution. Basically, you just need to call the `pushSample` method in your application with the expected markers. See examples above for how to do so.

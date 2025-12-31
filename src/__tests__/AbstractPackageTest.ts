@@ -2,7 +2,7 @@ import AbstractModuleTest from '@neurodevs/node-tdd'
 import WebSocket, { Server } from 'ws'
 
 import LiblslAdapter from '../impl/LiblslAdapter.js'
-import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
+import LslEventMarkerEmitter from '../impl/LslEventMarkerEmitter.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
 import LslStreamInlet, {
     OnDataCallback,
@@ -11,7 +11,7 @@ import LslStreamInlet, {
 import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
 
-import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
+import SpyEventMarkerEmitter from '../testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
 import FakeLiblsl from '../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo.js'
 import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo.js'
@@ -60,8 +60,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeStreamOutlet.resetTestDouble()
     }
 
-    protected static setSpyEventMarkerOutlet() {
-        LslEventMarkerOutlet.Class = SpyEventMarkerOutlet
+    protected static setSpyEventMarkerEmitter() {
+        LslEventMarkerEmitter.Class = SpyEventMarkerEmitter
     }
 
     protected static setSpyLslWebSocketBridge() {
