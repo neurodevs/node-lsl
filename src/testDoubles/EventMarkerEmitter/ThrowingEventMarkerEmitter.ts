@@ -1,6 +1,7 @@
 import {
     EventMarker,
     EventMarkerEmitter,
+    TimedEventMarker,
 } from '../../impl/LslEventMarkerEmitter.js'
 
 export default class ThrowingEventMarkerEmitter implements EventMarkerEmitter {
@@ -14,7 +15,7 @@ export default class ThrowingEventMarkerEmitter implements EventMarkerEmitter {
         throw new Error(this.errorMsg + 'emit')
     }
 
-    public async emitMany(_markers: Required<EventMarker>[]) {
+    public async emitMany(_markers: TimedEventMarker[]) {
         throw new Error(this.errorMsg + 'emitMany')
     }
 

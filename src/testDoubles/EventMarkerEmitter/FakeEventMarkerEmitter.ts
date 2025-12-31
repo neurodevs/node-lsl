@@ -1,12 +1,13 @@
 import {
     EventMarker,
     EventMarkerEmitter,
+    TimedEventMarker,
 } from '../../impl/LslEventMarkerEmitter.js'
 
 export default class FakeEventMarkerEmitter implements EventMarkerEmitter {
     public static numCallsToConstructor = 0
     public static callsToEmit: EventMarker[] = []
-    public static callsToEmitMany: Required<EventMarker>[][] = []
+    public static callsToEmitMany: TimedEventMarker[][] = []
     public static numCallsToInterrupt = 0
     public static numCallsToDestroy = 0
 
@@ -18,7 +19,7 @@ export default class FakeEventMarkerEmitter implements EventMarkerEmitter {
         FakeEventMarkerEmitter.callsToEmit.push(marker)
     }
 
-    public async emitMany(markers: Required<EventMarker>[]) {
+    public async emitMany(markers: TimedEventMarker[]) {
         FakeEventMarkerEmitter.callsToEmitMany.push(markers)
     }
 

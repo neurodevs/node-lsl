@@ -25,7 +25,7 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         this.pushMarkerToOutlet(name)
     }
 
-    public async emitMany(markers: Required<EventMarker>[]) {
+    public async emitMany(markers: TimedEventMarker[]) {
         this.isPlaying = true
 
         for (const marker of markers) {
@@ -86,7 +86,7 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
 
 export interface EventMarkerEmitter {
     emit(marker: EventMarker): void
-    emitMany(markers: Required<EventMarker>[]): Promise<void>
+    emitMany(markers: TimedEventMarker[]): Promise<void>
     interrupt(): void
     destroy(): void
 }
@@ -101,3 +101,5 @@ export interface EventMarker {
     name: string
     waitForMs?: number
 }
+
+export type TimedEventMarker = Required<EventMarker>
