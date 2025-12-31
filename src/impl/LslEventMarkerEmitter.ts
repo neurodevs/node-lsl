@@ -64,6 +64,9 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
     }
 
     public destroy() {
+        if (this.isPlaying) {
+            this.interrupt()
+        }
         this.outlet.destroy()
     }
 

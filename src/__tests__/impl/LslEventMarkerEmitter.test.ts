@@ -71,7 +71,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async emittingTwoMarkersIncrementsHitCountAndWaitTimeTwice() {
-        const markers = await this.emitMany(2)
+        const markers = await this.emitManyFor(2)
 
         assert.isEqual(FakeStreamOutlet.callsToPushSample.length, 2)
 
@@ -81,39 +81,35 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         )
     }
 
-    @test('can interrupt on the first marker', 1)
-    @test('can interrupt on the second marker', 2)
-    @test('can interrupt on the third marker', 3)
-    protected static async eventMarkerEmitterIsInterruptable(bailIdx: number) {
+    @test('interrupts on first marker', 1)
+    @test('interrupts on second marker', 2)
+    @test('interrupts on third marker', 3)
+    protected static async emitterIsInterruptable(bailIdx: number) {
         let hitCount = 0
 
-        const outlet = this.instance.getStreamOutlet()
-
-        outlet.pushSample = () => {
+        this.streamOutlet.pushSample = () => {
             hitCount += 1
             if (hitCount === bailIdx) {
-                this.instance.interrupt()
+                this.interrupt()
             }
         }
 
-        await this.emitMany(10)
+        await this.emitManyFor(10)
 
         assert.isEqual(hitCount, bailIdx)
     }
 
     @test()
     protected static async canStartAgainAfterInterrupting() {
-        this.instance.interrupt()
+        this.interrupt()
 
         let hitCount = 0
 
-        const outlet = this.instance.getStreamOutlet()
-
-        outlet.pushSample = () => {
+        this.streamOutlet.pushSample = () => {
             hitCount++
         }
 
-        await this.emitMany(10)
+        await this.emitManyFor(10)
 
         assert.isEqual(hitCount, 10)
     }
@@ -123,8 +119,8 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         await this.setupOutlet()
 
         const startMs = Date.now()
-        const promise = this.emitMany(2, 1000)
-        this.instance.interrupt()
+        const promise = this.emitManyFor(2, 1000)
+        this.interrupt()
         await promise
         const endMs = Date.now()
 
@@ -133,8 +129,8 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async clearsTimeoutOnInterrupt() {
-        void this.emitMany(2, 100)
-        this.instance.interrupt()
+        void this.emitManyFor(2, 100)
+        this.interrupt()
 
         this.streamOutlet.pushSample = () =>
             assert.fail('Should not have been called')
@@ -143,7 +139,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     @test()
     protected static async emitCallsPushSampleOnStreamOutlet() {
         const markerName = this.generateId()
-        await this.instance.emit({ name: markerName })
+        await this.emitFor(markerName)
 
         assert.isEqual(FakeStreamOutlet.callsToPushSample[0][0], markerName)
     }
@@ -168,7 +164,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async destroyCallsDestroyOnInternalStreamOutlet() {
-        this.instance.destroy()
+        this.destroy()
 
         assert.isEqual(
             FakeStreamOutlet.numCallsToDestroy,
@@ -177,16 +173,25 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         )
     }
 
-    private static get streamOutlet() {
-        return this.instance.getStreamOutlet()
+    @test()
+    protected static async destroyInterruptsIfRunning() {
+        let wasHit = false
+
+        this.instance.interrupt = () => {
+            wasHit = true
+        }
+
+        void this.emitManyFor(5, 1000)
+        this.destroy()
+
+        assert.isTrue(wasHit, 'Did not call interrupt on destroy!')
     }
 
-    private static async setupOutlet() {
-        LslEventMarkerEmitter.Class = LslEventMarkerEmitter as any
-        this.instance = await this.LslEventMarkerEmitter()
+    private static emitFor(markerName: string) {
+        return this.instance.emit({ name: markerName })
     }
 
-    private static async emitMany(total: number, waitForMs?: number) {
+    private static async emitManyFor(total: number, waitForMs?: number) {
         const markers = new Array(total)
             .fill(null)
             .map(() => this.generateEventMarker(waitForMs))
@@ -201,6 +206,23 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
             name: this.generateId(),
             waitForMs: waitForMs ?? randomInt(100, 1000),
         }
+    }
+
+    private static interrupt() {
+        this.instance.interrupt()
+    }
+
+    private static destroy() {
+        this.instance.destroy()
+    }
+
+    private static get streamOutlet() {
+        return this.instance.getStreamOutlet()
+    }
+
+    private static async setupOutlet() {
+        LslEventMarkerEmitter.Class = LslEventMarkerEmitter as any
+        this.instance = await this.LslEventMarkerEmitter()
     }
 
     private static async LslEventMarkerEmitter(
