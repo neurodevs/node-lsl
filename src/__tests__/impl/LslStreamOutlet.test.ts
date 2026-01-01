@@ -216,6 +216,19 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async pushSampleAcceptsOptionalPreciseTimestamp() {
+        const outlet = await this.FloatOutlet()
+        const fakeTimestamp = Math.random() * 1000
+
+        outlet.pushSample([1.0], fakeTimestamp)
+
+        assert.isEqual(
+            this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.timestamp,
+            fakeTimestamp
+        )
+    }
+
+    @test()
     protected static async waitsForTenMsAfterConstructionBeforeReturning() {
         const startMs = Date.now()
         await this.LslStreamOutlet({ waitAfterConstructionMs: 10 })

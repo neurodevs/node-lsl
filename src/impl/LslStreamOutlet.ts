@@ -130,8 +130,8 @@ export default class LslStreamOutlet implements StreamOutlet {
         string: 'pushSampleStringTimestamp',
     }
 
-    public pushSample(sample: LslSample) {
-        const timestamp = this.lsl.localClock()
+    public pushSample(sample: LslSample, preciseTimestamp?: number) {
+        const timestamp = preciseTimestamp ?? this.lsl.localClock()
 
         const err = this.pushSampleMethod({
             outlet: this.boundOutlet,
@@ -184,7 +184,7 @@ export default class LslStreamOutlet implements StreamOutlet {
 }
 
 export interface StreamOutlet {
-    pushSample(sample: LslSample): void
+    pushSample(sample: LslSample, preciseTimestamp?: number): void
     destroy(): void
     readonly info: StreamInfo
     readonly name: string
