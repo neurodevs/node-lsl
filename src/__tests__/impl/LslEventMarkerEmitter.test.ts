@@ -188,14 +188,19 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     protected static async destroyInterruptsIfRunning() {
         let wasHit = false
 
+        const original = this.instance.interrupt.bind(this.instance)
+
         this.instance.interrupt = () => {
             wasHit = true
+            original()
         }
 
-        void this.emitManyFor(5, 1000)
+        const promise = this.emitManyFor(5, 10)
         this.destroy()
 
         assert.isTrue(wasHit, 'Did not call interrupt on destroy!')
+
+        await promise
     }
 
     @test()
