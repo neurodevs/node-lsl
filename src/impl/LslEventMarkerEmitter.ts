@@ -73,17 +73,17 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
     }
 
     private static generateDefaultOutletOptions() {
-        const sourceId = `event-markers-${generateShortId()}`
+        const uniqueId = generateShortId()
+        const sourceId = `event-markers-${uniqueId}`
 
         return {
-            name: 'Event markers',
+            name: `Event markers (${uniqueId})`,
             type: 'Markers',
             sourceId,
             channelNames: ['Markers'],
             channelFormat: 'string',
             sampleRateHz: 0,
-            chunkSize: 0,
-            maxBufferedMs: 0,
+            chunkSize: 1,
         } as StreamOutletOptions
     }
 

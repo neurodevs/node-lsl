@@ -31,17 +31,17 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         assert.isEqualDeep(
             {
                 ...FakeStreamOutlet.callsToConstructor[0].options,
+                name: undefined,
                 sourceId: undefined,
             },
             {
-                name: 'Event markers',
+                name: undefined,
                 type: 'Markers',
                 sourceId: undefined,
                 channelNames: ['Markers'],
                 channelFormat: 'string',
                 sampleRateHz: 0,
-                chunkSize: 0,
-                maxBufferedMs: 0,
+                chunkSize: 1,
             }
         )
 
@@ -50,6 +50,13 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
                 'event-markers-'
             ),
             'Source ID was not generated uniquely!'
+        )
+
+        assert.isTrue(
+            FakeStreamOutlet.callsToConstructor[0].options?.name.startsWith(
+                'Event markers ('
+            ),
+            'Name was not generated uniquely!'
         )
     }
 
