@@ -222,6 +222,15 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async emitThrowsIfCalledWhileAlreadyRunning() {
+        void this.emitFor(this.generateId())
+
+        await assert.doesThrowAsync(async () => {
+            await this.emitFor(this.generateId())
+        }, 'Cannot call emit while already running!')
+    }
+
+    @test()
     protected static async emitManyThrowsIfCalledWhileAlreadyRunning() {
         void this.emitManyFor(5, 1)
 

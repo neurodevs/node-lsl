@@ -23,6 +23,9 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
     }
 
     public async emit(marker: EventMarker) {
+        this.throwIfAlreadyRunning('emit')
+        this.isRunning = true
+
         const { name, waitForMs } = marker
         this.pushMarkerToOutlet(name)
 
@@ -31,9 +34,14 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         }
     }
 
-    public async emitMany(markers: TimedEventMarker[]) {
-        this.throwIfAlreadyRunning()
+    private throwIfAlreadyRunning(methodName: string) {
+        if (this.isRunning) {
+            throw new Error(`Cannot call ${methodName} while already running!`)
+        }
+    }
 
+    public async emitMany(markers: TimedEventMarker[]) {
+        this.throwIfAlreadyRunning('emitMany')
         this.isRunning = true
 
         for (const marker of markers) {
@@ -45,12 +53,6 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
             if (!this.isRunning) {
                 return
             }
-        }
-    }
-
-    private throwIfAlreadyRunning() {
-        if (this.isRunning) {
-            throw new Error('Cannot call emitMany while already running!')
         }
     }
 
