@@ -32,6 +32,8 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
     }
 
     public async emitMany(markers: TimedEventMarker[]) {
+        this.throwIfAlreadyRunning()
+
         this.isPlaying = true
 
         for (const marker of markers) {
@@ -43,6 +45,12 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
             if (!this.isPlaying) {
                 return
             }
+        }
+    }
+
+    private throwIfAlreadyRunning() {
+        if (this.isPlaying) {
+            throw new Error('Cannot call emitMany while already running!')
         }
     }
 
