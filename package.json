@@ -44,7 +44,7 @@
     "test.rs": "node build/test.js"
   },
   "dependencies": {
-    "@neurodevs/generate-id": "1.1.1",
+    "@neurodevs/generate-id": "1.1.2",
     "ffi-rs": "^1.3.1",
     "node-gyp": "^12.1.0",
     "ref-array-napi": "^1.2.2",
