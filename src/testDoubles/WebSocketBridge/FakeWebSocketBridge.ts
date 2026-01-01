@@ -20,7 +20,7 @@ export default class FakeWebSocketBridge implements WebSocketBridge {
         FakeWebSocketBridge.callsToConstructor.push(options)
     }
 
-    public activate() {
+    public async activate() {
         FakeWebSocketBridge.numCallsToActivate++
     }
 

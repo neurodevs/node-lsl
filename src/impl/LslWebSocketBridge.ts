@@ -1,4 +1,5 @@
 import WebSocket, { WebSocketServer } from 'ws'
+
 import { StreamInfo } from './LslStreamInfo.js'
 import LslStreamInlet, {
     StreamInlet,
@@ -55,9 +56,9 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     private readonly insufficientOptionsError = `At least one of listenPort or connectUrls must be provided!`
 
-    public activate() {
+    public async activate() {
         this.throwIfBridgeIsDestroyed(this.cannotActivateMessage)
-        this.startPullingData()
+        await this.startPullingData()
     }
 
     private throwIfBridgeIsDestroyed(err: string) {
@@ -68,8 +69,8 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 
     private readonly cannotActivateMessage = `\n\n Cannot activate bridge after destroying it! \n\n Please create and activate a new instance. \n`
 
-    private startPullingData() {
-        this.inlet.startPulling()
+    private async startPullingData() {
+        await this.inlet.startPulling()
     }
 
     public deactivate() {
@@ -165,7 +166,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
 }
 
 export interface WebSocketBridge {
-    activate(): void
+    activate(): Promise<void>
     deactivate(): void
     destroy(): void
 }

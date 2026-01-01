@@ -1,4 +1,5 @@
 import { generateShortId } from '@neurodevs/generate-id'
+
 import LslStreamOutlet, {
     StreamOutletOptions,
     StreamOutlet,

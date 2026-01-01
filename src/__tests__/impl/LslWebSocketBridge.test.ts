@@ -50,7 +50,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     @test()
     protected static async activateCallsStartPullingOnInlet() {
-        this.activate()
+        await this.activate()
 
         assert.isEqual(
             FakeStreamInlet.numCallsToStartPulling,
@@ -61,7 +61,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     @test()
     protected static async deactivateCallsStopPullingOnInlet() {
-        this.activate()
+        await this.activate()
         this.deactivate()
 
         assert.isEqual(
@@ -93,7 +93,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     @test()
     protected static async activateSendsDataToWebSocketClients() {
-        this.activate()
+        await this.activate()
 
         const { samples, timestamps } = this.simulateOnDataCallback()
 
@@ -119,7 +119,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
             client.readyState = WebSocket.CONNECTING
         }
 
-        this.activate()
+        await this.activate()
         this.simulateOnDataCallback()
 
         const calls = FakeWebSocket.callsToSend.filter((call) =>
@@ -150,8 +150,8 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async throwsIfActivateIsCalledAfterDestroy() {
         this.destroy()
 
-        assert.doesThrow(() => {
-            this.activate()
+        await assert.doesThrowAsync(async () => {
+            await this.activate()
         }, `\n\n Cannot activate bridge after destroying it! \n\n Please create and activate a new instance. \n`)
     }
 
@@ -184,7 +184,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     @test()
     protected static async activateSendsDataToRemoteSockets() {
-        this.activate()
+        await this.activate()
 
         const { samples, timestamps } = this.simulateOnDataCallback()
 
@@ -218,7 +218,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
             socket.readyState = WebSocket.CONNECTING
         }
 
-        this.activate()
+        await this.activate()
         this.simulateOnDataCallback()
 
         const calls = FakeWebSocket.callsToSend.filter((call) =>
@@ -253,8 +253,8 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         }, `At least one of listenPort or connectUrls must be provided!`)
     }
 
-    private static activate() {
-        this.instance.activate()
+    private static async activate() {
+        await this.instance.activate()
     }
 
     private static deactivate() {
