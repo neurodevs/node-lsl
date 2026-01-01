@@ -223,7 +223,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async emitThrowsIfCalledWhileAlreadyRunning() {
-        void this.emitFor(this.generateId())
+        void this.instance.emit({ name: this.generateId(), waitForMs: 10 })
 
         await assert.doesThrowAsync(async () => {
             await this.emitFor(this.generateId())
@@ -237,6 +237,16 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         await assert.doesThrowAsync(async () => {
             await this.emitManyFor(5, 1)
         }, 'Cannot call emitMany while already running!')
+    }
+
+    @test()
+    protected static async emitSetsIsRunningFalseOnceDone() {
+        await this.emitOnce()
+        assert.isFalse(this.instance['isRunning'])
+    }
+
+    private static async emitOnce() {
+        await this.emitFor(this.generateId())
     }
 
     private static emitFor(markerName: string) {

@@ -32,6 +32,7 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         if (waitForMs) {
             await this.wait(waitForMs)
         }
+        this.isRunning = false
     }
 
     private throwIfAlreadyRunning(methodName: string) {
