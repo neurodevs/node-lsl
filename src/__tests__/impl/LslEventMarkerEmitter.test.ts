@@ -28,18 +28,31 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async loadsWithEventMarkerSpecificOptions() {
-        assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[0].options, {
-            name: 'Event markers',
-            type: 'Markers',
-            sourceId: 'event-markers',
-            channelNames: ['Markers'],
-            channelFormat: 'string',
-            sampleRateHz: 0,
-            chunkSize: 0,
-            maxBufferedMs: 0,
-            manufacturer: 'N/A',
-            units: 'N/A',
-        })
+        assert.isEqualDeep(
+            {
+                ...FakeStreamOutlet.callsToConstructor[0].options,
+                sourceId: undefined,
+            },
+            {
+                name: 'Event markers',
+                type: 'Markers',
+                sourceId: undefined,
+                channelNames: ['Markers'],
+                channelFormat: 'string',
+                sampleRateHz: 0,
+                chunkSize: 0,
+                maxBufferedMs: 0,
+                manufacturer: 'N/A',
+                units: 'N/A',
+            }
+        )
+
+        assert.isTrue(
+            FakeStreamOutlet.callsToConstructor[0].options?.sourceId.startsWith(
+                'event-markers-'
+            ),
+            'Source ID was not generated uniquely!'
+        )
     }
 
     @test()
@@ -185,6 +198,17 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         this.destroy()
 
         assert.isTrue(wasHit, 'Did not call interrupt on destroy!')
+    }
+
+    @test()
+    protected static async sourceIdIsUniqueAcrossInstances() {
+        const instance = await this.LslEventMarkerEmitter()
+
+        assert.isNotEqual(
+            instance['outlet'].sourceId,
+            this.instance['outlet'].sourceId,
+            'Source IDs are not unique!'
+        )
     }
 
     private static emitFor(markerName: string) {

@@ -1,3 +1,4 @@
+import { generateShortId } from '@neurodevs/generate-id'
 import LslStreamOutlet, {
     StreamOutletOptions,
     StreamOutlet,
@@ -70,22 +71,26 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         this.outlet.destroy()
     }
 
-    private static readonly defaultOutletOptions = {
-        name: 'Event markers',
-        type: 'Markers',
-        channelNames: ['Markers'],
-        sampleRateHz: 0,
-        channelFormat: 'string',
-        sourceId: 'event-markers',
-        manufacturer: 'N/A',
-        units: 'N/A',
-        chunkSize: 0,
-        maxBufferedMs: 0,
-    } as StreamOutletOptions
+    private static generateDefaultOutletOptions() {
+        const sourceId = `event-markers-${generateShortId()}`
+
+        return {
+            name: 'Event markers',
+            type: 'Markers',
+            channelNames: ['Markers'],
+            sampleRateHz: 0,
+            channelFormat: 'string',
+            sourceId,
+            manufacturer: 'N/A',
+            units: 'N/A',
+            chunkSize: 0,
+            maxBufferedMs: 0,
+        } as StreamOutletOptions
+    }
 
     private static LslStreamOutlet(options?: Partial<StreamOutletOptions>) {
         return LslStreamOutlet.Create({
-            ...this.defaultOutletOptions,
+            ...this.generateDefaultOutletOptions(),
             ...options,
         })
     }
