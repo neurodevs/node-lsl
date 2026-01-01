@@ -42,8 +42,6 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
                 sampleRateHz: 0,
                 chunkSize: 0,
                 maxBufferedMs: 0,
-                manufacturer: 'N/A',
-                units: 'N/A',
             }
         )
 

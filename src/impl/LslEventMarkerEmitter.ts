@@ -81,8 +81,6 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
             sampleRateHz: 0,
             channelFormat: 'string',
             sourceId,
-            manufacturer: 'N/A',
-            units: 'N/A',
             chunkSize: 0,
             maxBufferedMs: 0,
         } as StreamOutletOptions
