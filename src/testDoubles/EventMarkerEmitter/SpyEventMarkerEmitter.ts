@@ -4,19 +4,19 @@ import { StreamOutlet } from '../../impl/LslStreamOutlet.js'
 export default class SpyEventMarkerEmitter extends LslEventMarkerEmitter {
     public static shouldCallWaitOnSuper = false
 
-    public totalWaitForMs: number
+    public totalwaitAfterMs: number
 
     public constructor(outlet: StreamOutlet) {
         super(outlet)
 
-        this.totalWaitForMs = 0
+        this.totalwaitAfterMs = 0
     }
 
-    public async wait(waitForMs: number) {
-        this.totalWaitForMs += waitForMs
+    public async wait(waitAfterMs: number) {
+        this.totalwaitAfterMs += waitAfterMs
 
         if (SpyEventMarkerEmitter.shouldCallWaitOnSuper) {
-            return super.wait(waitForMs)
+            return super.wait(waitAfterMs)
         }
         return Promise.resolve()
     }
@@ -26,6 +26,6 @@ export default class SpyEventMarkerEmitter extends LslEventMarkerEmitter {
     }
 
     public resetTestDouble() {
-        this.totalWaitForMs = 0
+        this.totalwaitAfterMs = 0
     }
 }

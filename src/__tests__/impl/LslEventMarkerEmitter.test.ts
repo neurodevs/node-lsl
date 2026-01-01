@@ -84,7 +84,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
             'Pushed the wrong marker!'
         )
 
-        assert.isEqual(this.instance.totalWaitForMs, marker.waitForMs)
+        assert.isEqual(this.instance.totalwaitAfterMs, marker.waitAfterMs)
     }
 
     @test()
@@ -94,8 +94,8 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         assert.isEqual(FakeStreamOutlet.callsToPushSample.length, 2)
 
         assert.isEqual(
-            this.instance.totalWaitForMs,
-            markers[0].waitForMs + markers[1].waitForMs
+            this.instance.totalwaitAfterMs,
+            markers[0].waitAfterMs + markers[1].waitAfterMs
         )
     }
 
@@ -166,8 +166,8 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     protected static async emitWaitsForMsIfPassed() {
         SpyEventMarkerEmitter.shouldCallWaitOnSuper = true
 
-        const waitForMs = 10
-        const eventMarker = this.generateEventMarker(waitForMs)
+        const waitAfterMs = 10
+        const eventMarker = this.generateEventMarker(waitAfterMs)
 
         const startMs = Date.now()
         await this.instance.emit(eventMarker)
@@ -175,7 +175,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
         assert.isAbove(
             endMs - startMs,
-            waitForMs,
+            waitAfterMs,
             'Did not wait for the specified time!'
         )
     }
@@ -223,7 +223,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async emitThrowsIfCalledWhileAlreadyRunning() {
-        void this.instance.emit({ name: this.generateId(), waitForMs: 10 })
+        void this.instance.emit({ name: this.generateId(), waitAfterMs: 10 })
 
         await assert.doesThrowAsync(async () => {
             await this.emitFor(this.generateId())
@@ -271,20 +271,20 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         return this.emitManyFor(5, 1)
     }
 
-    private static async emitManyFor(total: number, waitForMs?: number) {
+    private static async emitManyFor(total: number, waitAfterMs?: number) {
         const markers = new Array(total)
             .fill(null)
-            .map(() => this.generateEventMarker(waitForMs))
+            .map(() => this.generateEventMarker(waitAfterMs))
 
         await this.instance.emitMany(markers)
 
         return markers
     }
 
-    private static generateEventMarker(waitForMs?: number) {
+    private static generateEventMarker(waitAfterMs?: number) {
         return {
             name: this.generateId(),
-            waitForMs: waitForMs ?? randomInt(100, 1000),
+            waitAfterMs: waitAfterMs ?? randomInt(100, 1000),
         }
     }
 

@@ -26,11 +26,11 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         this.throwIfAlreadyRunning('emit')
         this.isRunning = true
 
-        const { name, waitForMs } = marker
+        const { name, waitAfterMs } = marker
         this.pushMarkerToOutlet(name)
 
-        if (waitForMs) {
-            await this.wait(waitForMs)
+        if (waitAfterMs) {
+            await this.wait(waitAfterMs)
         }
         this.isRunning = false
     }
@@ -46,10 +46,10 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         this.isRunning = true
 
         for (const marker of markers) {
-            const { name, waitForMs } = marker
+            const { name, waitAfterMs } = marker
             this.pushMarkerToOutlet(name)
 
-            await this.wait(waitForMs)
+            await this.wait(waitAfterMs)
 
             if (!this.isRunning) {
                 return
@@ -66,9 +66,9 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         return new Promise((resolve) => this.setTimeout(resolve, forMs))
     }
 
-    private setTimeout(resolve: (value: unknown) => void, waitForMs: number) {
+    private setTimeout(resolve: (value: unknown) => void, waitAfterMs: number) {
         this.waitResolve = resolve as any
-        this.timeout = setTimeout(resolve, waitForMs)
+        this.timeout = setTimeout(resolve, waitAfterMs)
     }
 
     public interrupt() {
@@ -124,7 +124,7 @@ export type EventMarkerEmitterConstructor = new (
 
 export interface EventMarker {
     name: string
-    waitForMs?: number
+    waitAfterMs?: number
 }
 
 export type TimedEventMarker = Required<EventMarker>
