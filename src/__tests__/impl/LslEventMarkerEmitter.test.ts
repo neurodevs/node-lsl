@@ -232,7 +232,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async emitManyThrowsIfCalledWhileAlreadyRunning() {
-        void this.emitManyFor(5, 1)
+        void EventMarkerEmitterTest.emitManyOnce()
 
         await assert.doesThrowAsync(async () => {
             await this.emitManyFor(5, 1)
@@ -242,15 +242,33 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     @test()
     protected static async emitSetsIsRunningFalseOnceDone() {
         await this.emitOnce()
-        assert.isFalse(this.instance['isRunning'])
+
+        assert.isFalse(
+            this.instance['isRunning'],
+            'emit did not set isRunning to false once done!'
+        )
+    }
+
+    @test()
+    protected static async emitManySetsIsRunningFalseOnceDone() {
+        await this.emitManyOnce()
+
+        assert.isFalse(
+            this.instance['isRunning'],
+            'emitMany did not set isRunning to false once done! '
+        )
     }
 
     private static async emitOnce() {
         await this.emitFor(this.generateId())
     }
 
-    private static emitFor(markerName: string) {
+    private static async emitFor(markerName: string) {
         return this.instance.emit({ name: markerName })
+    }
+
+    private static async emitManyOnce() {
+        return this.emitManyFor(5, 1)
     }
 
     private static async emitManyFor(total: number, waitForMs?: number) {

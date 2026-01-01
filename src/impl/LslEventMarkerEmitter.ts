@@ -55,6 +55,7 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
                 return
             }
         }
+        this.isRunning = false
     }
 
     private pushMarkerToOutlet(markerName: string) {
