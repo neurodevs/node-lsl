@@ -9,7 +9,7 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
     public static Class?: EventMarkerEmitterConstructor
 
     protected outlet: StreamOutlet
-    private isPlaying = false
+    private isRunning = false
     private waitResolve?: () => void
     private timeout?: any
 
@@ -34,7 +34,7 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
     public async emitMany(markers: TimedEventMarker[]) {
         this.throwIfAlreadyRunning()
 
-        this.isPlaying = true
+        this.isRunning = true
 
         for (const marker of markers) {
             const { name, waitForMs } = marker
@@ -42,14 +42,14 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
 
             await this.wait(waitForMs)
 
-            if (!this.isPlaying) {
+            if (!this.isRunning) {
                 return
             }
         }
     }
 
     private throwIfAlreadyRunning() {
-        if (this.isPlaying) {
+        if (this.isRunning) {
             throw new Error('Cannot call emitMany while already running!')
         }
     }
@@ -70,11 +70,11 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
     public interrupt() {
         this.waitResolve?.()
         clearTimeout(this.timeout)
-        this.isPlaying = false
+        this.isRunning = false
     }
 
     public destroy() {
-        if (this.isPlaying) {
+        if (this.isRunning) {
             this.interrupt()
         }
         this.outlet.destroy()
