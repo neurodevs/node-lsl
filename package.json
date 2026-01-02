@@ -52,7 +52,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
-    "@neurodevs/node-tdd": "^0.2.3",
+    "@neurodevs/node-tdd": "0.2.5",
     "@types/ffi-napi": "^4.0.10",
     "@types/node": "^25.0.2",
     "@types/ws": "^8.18.1",
