@@ -18,10 +18,6 @@ import LslStreamInfo, {
     StreamInfoOptions,
 } from './LslStreamInfo.js'
 
-export async function createLslStreamOutlet(options: StreamOutletOptions) {
-    return LslStreamOutlet.Create(options)
-}
-
 export default class LslStreamOutlet implements StreamOutlet {
     public static Class?: StreamOutletConstructor
 
