@@ -18,6 +18,10 @@ import LslStreamInfo, {
     StreamInfoOptions,
 } from './LslStreamInfo.js'
 
+export async function createLslStreamOutlet(options: StreamOutletOptions) {
+    return LslStreamOutlet.Create(options)
+}
+
 export default class LslStreamOutlet implements StreamOutlet {
     public static Class?: StreamOutletConstructor
 
@@ -133,12 +137,12 @@ export default class LslStreamOutlet implements StreamOutlet {
     public pushSample(sample: LslSample, preciseTimestamp?: number) {
         const timestamp = preciseTimestamp ?? this.lsl.localClock()
 
-        const err = this.pushSampleMethod({
+        const errorCode = this.pushSampleMethod({
             outlet: this.boundOutlet,
             sample,
             timestamp,
         })
-        handleError(err)
+        handleError(errorCode)
     }
 
     public destroy() {
