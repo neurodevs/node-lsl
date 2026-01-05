@@ -1,3 +1,11 @@
+// BackpressureMonitor
+
+export { default as LslBackpressureMonitor } from './impl/LslBackpressureMonitor.js'
+export * from './impl/LslBackpressureMonitor.js'
+
+export { default as FakeBackpressureMonitor } from './testDoubles/BackpressureMonitor/FakeBackpressureMonitor.js'
+export * from './testDoubles/BackpressureMonitor/FakeBackpressureMonitor.js'
+
 // EventMarkerEmitter
 
 export { default as LslEventMarkerEmitter } from './impl/LslEventMarkerEmitter.js'
