@@ -29,7 +29,7 @@ const inlet = await LslStreamInlet.Create(
 )
 
 console.log('Start pulling...')
-inlet.startPulling()
+await inlet.startPulling()
 
 console.log('Waiting for 100 ms...')
 await new Promise((resolve) => setTimeout(resolve, 100))
