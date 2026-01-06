@@ -49,3 +49,5 @@ for (let i = 0; i < 30; i++) {
     outlet.pushSample(sample)
     await new Promise((resolve) => setTimeout(resolve, 100))
 }
+
+process.exit(0)
