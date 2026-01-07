@@ -232,6 +232,11 @@ export default class LslStreamInlet implements StreamInlet {
         }
     }
 
+    private handleErrorCodeIfPresent() {
+        const errorCode = this.pullDataErrorBuffer.readInt32LE()
+        handleError(errorCode)
+    }
+
     private async waitBetweenPulls() {
         await new Promise((resolve) =>
             setTimeout(resolve, this.waitBetweenPullsMs)
@@ -298,10 +303,6 @@ export default class LslStreamInlet implements StreamInlet {
             this.timestampBuffer.byteOffset,
             this.chunkSize
         )
-    }
-
-    private handleErrorCodeIfPresent() {
-        handleError(this.pullDataErrorBuffer.readInt32LE())
     }
 
     public stopPulling() {
