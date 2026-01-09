@@ -36,7 +36,7 @@
     "rebuild": "yarn run clean.all && yarn install && yarn run build.dev",
     "update.dependencies": "yarn run clean.dependencies && yarn",
     "resolve-paths.lint": "yarn run build.resolve-paths ; yarn run lint",
-    "test": "jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "watch.build.dev": "tsc-watch --sourceMap --onCompilationComplete 'yarn run post.watch.build'",
     "watch.lint": "concurrently 'yarn lint' \"chokidar 'src/**/*' -c 'yarn lint.tsc'\"",
     "watch.rebuild": "yarn run clean.all && yarn install && yarn run watch.build.dev",
@@ -72,6 +72,8 @@
     "maxWorkers": 4,
     "testTimeout": 120000,
     "testEnvironment": "node",
+    "extensionsToTreatAsEsm": [".ts"],
+    "transform": {},
     "testPathIgnorePatterns": [
       "<rootDir>/tmp/",
       "<rootDir>/src/",
