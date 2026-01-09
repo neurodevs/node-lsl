@@ -33,6 +33,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         LslStreamInlet.waitAfterOpenStreamMs = 0
 
+        console.warn = () => {}
+
         this.instance = await this.LslStreamInlet()
     }
 
