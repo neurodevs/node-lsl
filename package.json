@@ -6,7 +6,12 @@
   "keywords": [
     "nodejs",
     "typescript",
-    "tdd"
+    "tdd",
+    "lsl",
+    "lab streaming layer",
+    "neurotech",
+    "bci",
+    "brain-computer interface"
   ],
   "license": "MIT",
   "author": "Eric Yates <hello@ericthecurious.com>",
