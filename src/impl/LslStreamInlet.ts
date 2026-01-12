@@ -132,12 +132,6 @@ export default class LslStreamInlet implements StreamInlet {
         await this.waitToAllowSetup()
     }
 
-    private async waitToAllowSetup() {
-        await new Promise((resolve) =>
-            setTimeout(resolve, this.waitAfterOpenStreamMs)
-        )
-    }
-
     private createOpenStreamErrorBuffer() {
         this.openStreamErrorBuffer = Buffer.alloc(this.bytesPerInt)
 
@@ -149,6 +143,12 @@ export default class LslStreamInlet implements StreamInlet {
         this.openStreamErrorBufferPtr = unwrapPointer(
             this.openStreamErrorBufferPtrWrapped
         )[0]
+    }
+
+    private async waitToAllowSetup() {
+        await new Promise((resolve) =>
+            setTimeout(resolve, this.waitAfterOpenStreamMs)
+        )
     }
 
     private createWriteableBuffers() {
