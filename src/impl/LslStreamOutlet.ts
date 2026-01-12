@@ -8,7 +8,7 @@ import {
 import handleError, { LslErrorCode } from '../handleError.js'
 import {
     ChannelFormat,
-    BoundOutlet,
+    OutletHandle,
     Liblsl,
     LslSample,
 } from './LiblslAdapter.js'
@@ -34,7 +34,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     public readonly manufacturer: string = 'N/A'
     public readonly units: string = 'N/A'
 
-    private boundOutlet!: BoundOutlet
+    private outletHandle!: OutletHandle
     private pushSampleMethod!: (options: unknown) => LslErrorCode
 
     private lsl = LiblslAdapter.getInstance()
@@ -108,8 +108,8 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     private createStreamOutlet() {
-        this.boundOutlet = this.lsl.createOutlet({
-            info: this.info.boundInfo,
+        this.outletHandle = this.lsl.createOutlet({
+            infoHandle: this.info.infoHandle,
             chunkSize: this.chunkSize,
             maxBufferedMs: this.maxBufferedMs,
         })
@@ -134,7 +134,7 @@ export default class LslStreamOutlet implements StreamOutlet {
         const timestamp = preciseTimestamp ?? this.lsl.localClock()
 
         const errorCode = this.pushSampleMethod({
-            outlet: this.boundOutlet,
+            outletHandle: this.outletHandle,
             sample,
             timestamp,
         })
@@ -142,16 +142,16 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public destroy() {
-        this.destroyBoundInfo()
-        this.destroyBoundOutlet()
+        this.destroyInfoHandle()
+        this.destroyOutletHandle()
     }
 
-    private destroyBoundInfo() {
-        this.lsl.destroyStreamInfo({ info: this.info.boundInfo })
+    private destroyInfoHandle() {
+        this.lsl.destroyStreamInfo({ infoHandle: this.info.infoHandle })
     }
 
-    private destroyBoundOutlet() {
-        this.lsl.destroyOutlet({ outlet: this.boundOutlet })
+    private destroyOutletHandle() {
+        this.lsl.destroyOutlet({ outletHandle: this.outletHandle })
     }
 
     private static async waitToAllowSetup(waitAfterConstructionMs: number) {

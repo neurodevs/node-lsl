@@ -106,15 +106,15 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         outlet.pushSample(sample)
 
         assert.isEqual(
-            this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.outlet,
-            this.fakeLiblsl.outlet
+            this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.outletHandle,
+            this.fakeLiblsl.outletHandle
         )
         assert.isEqualDeep(
             this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.sample,
             sample
         )
         assert.isEqualDeep(this.fakeLiblsl.lastCreateOutletOptions, {
-            info: this.fakeLiblsl.streamInfo,
+            infoHandle: this.fakeLiblsl.infoHandle,
             chunkSize: this.randomOutletOptions.chunkSize,
             maxBufferedMs: this.randomOutletOptions.maxBufferedMs,
         })
@@ -131,8 +131,8 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         outlet.pushSample(sample)
 
         assert.isEqual(
-            this.fakeLiblsl.lastPushSampleStringTimestampOptions?.outlet,
-            this.fakeLiblsl.outlet
+            this.fakeLiblsl.lastPushSampleStringTimestampOptions?.outletHandle,
+            this.fakeLiblsl.outletHandle
         )
         assert.isEqualDeep(
             this.fakeLiblsl.lastPushSampleStringTimestampOptions?.sample,
@@ -200,7 +200,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastDestroyStreamInfoOptions,
-            { info: this.fakeLiblsl.streamInfo },
+            { infoHandle: this.fakeLiblsl.infoHandle },
             'Did not call destroyStreamInfo on destroy!'
         )
     }

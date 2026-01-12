@@ -53,7 +53,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastCreateInletOptions,
             {
-                info: fakeInfo.boundInfo,
+                infoHandle: fakeInfo.infoHandle,
                 maxBufferedMs: this.maxBufferedMs,
             },
             'Should have called createInlet!'
@@ -66,7 +66,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastFlushInletOptions,
-            { inlet: this.boundInlet },
+            { inletHandle: this.inletHandle },
             'Should have called flushInlet!'
         )
     }
@@ -79,7 +79,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastDestroyInletOptions,
-            { inlet: this.boundInlet },
+            { inletHandle: this.inletHandle },
             'Did not destroy inlet!'
         )
     }
@@ -184,7 +184,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastOpenStreamOptions,
             {
-                inlet: this.boundInlet,
+                inletHandle: this.inletHandle,
                 timeoutMs: aboutOneYearInMs,
                 errcodePtr: this.instance['openStreamErrorBufferPtr'],
             },
@@ -207,7 +207,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastOpenStreamOptions,
             {
-                inlet: instance.getBoundInlet(),
+                inletHandle: instance.getInletHandle(),
                 timeoutMs: openStreamTimeoutMs,
                 errcodePtr: instance['openStreamErrorBufferPtr'],
             },
@@ -246,7 +246,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastCloseStreamOptions,
             {
-                inlet: this.boundInlet,
+                inletHandle: this.inletHandle,
             },
             'Did not close inlet stream!'
         )
@@ -260,7 +260,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastFlushInletOptions,
             {
-                inlet: this.boundInlet,
+                inletHandle: this.inletHandle,
             },
             'Did not flush inlet queue!'
         )
@@ -317,7 +317,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastPullSampleOptions,
             {
-                inlet: this.boundInlet,
+                inletHandle: this.inletHandle,
                 dataBufferPtr: inlet['dataBufferPtr'],
                 dataBufferElements: this.channelCount,
                 timeout: 0,
@@ -334,7 +334,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastPullChunkOptions,
             {
-                inlet: this.boundInlet,
+                inletHandle: this.inletHandle,
                 dataBufferPtr: this.instance['dataBufferPtr'],
                 timestampBufferPtr: this.instance['timestampBufferPtr'],
                 dataBufferElements: this.chunkSize * this.channelCount,
@@ -529,8 +529,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         return this.instance.isRunning
     }
 
-    private static get boundInlet() {
-        return this.instance.getBoundInlet()
+    private static get inletHandle() {
+        return this.instance.getInletHandle()
     }
 
     private static onData = (

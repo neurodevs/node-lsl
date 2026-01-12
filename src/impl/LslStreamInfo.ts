@@ -1,13 +1,13 @@
 import generateId from '@neurodevs/generate-id'
 
 import { CHANNEL_FORMATS_MAP } from '../consts.js'
-import { BoundStreamInfo, ChannelFormat } from './LiblslAdapter.js'
+import { InfoHandle, ChannelFormat } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 
 export default class LslStreamInfo implements StreamInfo {
     public static Class?: StreamInfoConstructor
 
-    private static instanceCache = new Map<BoundStreamInfo, StreamInfo>()
+    private static instanceCache = new Map<InfoHandle, StreamInfo>()
 
     public readonly name: string
     public readonly type: string
@@ -17,7 +17,7 @@ export default class LslStreamInfo implements StreamInfo {
     public readonly channelFormat: ChannelFormat
     public readonly sampleRateHz: number
     public readonly units: string
-    public readonly boundInfo: BoundStreamInfo
+    public readonly infoHandle: InfoHandle
 
     private lsl = LiblslAdapter.getInstance()
 
@@ -30,7 +30,7 @@ export default class LslStreamInfo implements StreamInfo {
             channelFormat,
             sampleRateHz,
             units = 'N/A',
-            boundInfo,
+            infoHandle,
         } = options
 
         this.name = name
@@ -42,25 +42,25 @@ export default class LslStreamInfo implements StreamInfo {
         this.sampleRateHz = sampleRateHz
         this.units = units
 
-        if (!boundInfo) {
-            this.boundInfo = this.createStreamInfo()
+        if (!infoHandle) {
+            this.infoHandle = this.createStreamInfo()
             this.appendChannelsToStreamInfo()
         } else {
-            this.boundInfo = boundInfo
+            this.infoHandle = infoHandle
         }
     }
 
     public static Create(options: StreamInfoOptions) {
         const instance = new (this.Class ?? this)(options)
 
-        const { boundInfo: handle } = instance
-        this.instanceCache.set(handle, instance)
+        const { infoHandle } = instance
+        this.instanceCache.set(infoHandle, instance)
 
         return instance
     }
 
-    public static From(handle: BoundStreamInfo) {
-        return this.instanceCache.get(handle)!
+    public static From(infoHandle: InfoHandle) {
+        return this.instanceCache.get(infoHandle)!
     }
 
     private createStreamInfo() {
@@ -80,7 +80,7 @@ export default class LslStreamInfo implements StreamInfo {
 
     private appendChannelsToStreamInfo() {
         this.lsl.appendChannelsToStreamInfo({
-            info: this.boundInfo,
+            infoHandle: this.infoHandle,
             channels: this.channelNames.map((label: string) => ({
                 label,
                 units: this.units,
@@ -90,7 +90,7 @@ export default class LslStreamInfo implements StreamInfo {
     }
 
     public destroy() {
-        this.lsl.destroyStreamInfo({ info: this.boundInfo })
+        this.lsl.destroyStreamInfo({ infoHandle: this.infoHandle })
     }
 }
 
@@ -104,7 +104,7 @@ export interface StreamInfo {
     readonly channelCount: number
     readonly channelFormat: ChannelFormat
     readonly sampleRateHz: number
-    readonly boundInfo: BoundStreamInfo
+    readonly infoHandle: InfoHandle
 }
 
 type StreamInfoConstructor = new (options: StreamInfoOptions) => StreamInfo
@@ -117,5 +117,5 @@ export interface StreamInfoOptions {
     type?: string
     sourceId?: string
     units?: string
-    boundInfo?: BoundStreamInfo
+    infoHandle?: InfoHandle
 }

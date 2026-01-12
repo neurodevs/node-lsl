@@ -1,8 +1,8 @@
 import generateId from '@neurodevs/generate-id'
 
 import {
-    BoundOutlet,
-    BoundStreamInfo,
+    OutletHandle,
+    InfoHandle,
     CreateStreamInfoOptions,
     AppendChannelsToStreamInfoOptions,
     CreateOutletOptions,
@@ -11,7 +11,7 @@ import {
     Liblsl,
     CreateInletOptions,
     DestroyInletOptions,
-    BoundInlet,
+    InletHandle,
     FlushInletOptions,
     PullChunkOptions,
     PullSampleOptions,
@@ -23,7 +23,7 @@ import {
 } from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {
-    public static fakeStreamInfoHandles: BoundStreamInfo[] = []
+    public static fakeStreamInfoHandles: InfoHandle[] = []
 
     public static fakeSamples: Float32Array[] = [
         new Float32Array([1, 2, 3]),
@@ -48,8 +48,8 @@ export default class FakeLiblsl implements Liblsl {
     public fakeChunks = FakeLiblsl.fakeChunks.slice()
     public fakeTimestamps = FakeLiblsl.fakeTimestamps.slice()
 
-    public outlet: BoundOutlet = {} as BoundOutlet
-    public streamInfo: BoundStreamInfo = {} as BoundStreamInfo
+    public outletHandle: OutletHandle = {} as OutletHandle
+    public infoHandle: InfoHandle = {} as InfoHandle
 
     public lastCreateStreamInfoOptions?: CreateStreamInfoOptions
     public lastAppendChannelsToStreamInfoOptions?: AppendChannelsToStreamInfoOptions
@@ -79,7 +79,7 @@ export default class FakeLiblsl implements Liblsl {
     public createStreamInfo(options: CreateStreamInfoOptions) {
         this.createStreamInfoHitCount++
         this.lastCreateStreamInfoOptions = options
-        return this.streamInfo
+        return this.infoHandle
     }
 
     public appendChannelsToStreamInfo(
@@ -113,7 +113,7 @@ export default class FakeLiblsl implements Liblsl {
     public createOutlet(options: CreateOutletOptions) {
         this.createOutletHitCount++
         this.lastCreateOutletOptions = options
-        return this.outlet
+        return this.outletHandle
     }
 
     public destroyOutlet(options: DestroyOutletOptions) {
@@ -124,7 +124,7 @@ export default class FakeLiblsl implements Liblsl {
     public createInlet(options: CreateInletOptions) {
         this.createInletHitCount++
         this.lastCreateInletOptions = options
-        return {} as BoundInlet
+        return {} as InletHandle
     }
 
     public async openStream(options: OpenStreamOptions) {

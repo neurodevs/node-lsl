@@ -85,13 +85,13 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     }
 
     public destroy() {
-        this.destroyBoundInlet()
+        this.destroyInletHandle()
         this.closeLocalServerIfExists()
         this.closeRemoteSocketsIfExists()
         this.isDestroyed = true
     }
 
-    private destroyBoundInlet() {
+    private destroyInletHandle() {
         this.inlet.destroy()
     }
 

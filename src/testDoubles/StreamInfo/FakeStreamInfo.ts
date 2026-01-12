@@ -1,13 +1,13 @@
 import generateId from '@neurodevs/generate-id'
 
-import { BoundStreamInfo } from 'impl/LiblslAdapter.js'
+import { InfoHandle } from 'impl/LiblslAdapter.js'
 import { StreamInfo, StreamInfoOptions } from '../../impl/LslStreamInfo.js'
 
 export default class FakeStreamInfo implements StreamInfo {
     public static callsToConstructor: (StreamInfoOptions | undefined)[] = []
     public static numCallsToDestroy = 0
 
-    public static boundInfo = {} as BoundStreamInfo
+    public static infoHandle = {} as InfoHandle
 
     public name = generateId()
     public type = generateId()
@@ -29,8 +29,8 @@ export default class FakeStreamInfo implements StreamInfo {
         return this.channelNames.length
     }
 
-    public get boundInfo() {
-        return FakeStreamInfo.boundInfo
+    public get infoHandle() {
+        return FakeStreamInfo.infoHandle
     }
 
     public static resetTestDouble() {

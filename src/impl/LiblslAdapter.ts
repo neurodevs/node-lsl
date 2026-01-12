@@ -97,7 +97,7 @@ export default class LiblslAdapter implements Liblsl {
     public appendChannelsToStreamInfo(
         options: AppendChannelsToStreamInfoOptions
     ) {
-        const { info, channels } = options
+        const { infoHandle: info, channels } = options
 
         const description = this.bindings.lsl_get_desc([info])
         const parent = this.bindings.lsl_append_child([description, 'channels'])
@@ -115,7 +115,7 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public destroyStreamInfo(options: DestroyStreamInfoOptions) {
-        const { info } = options
+        const { infoHandle: info } = options
         this.bindings.lsl_destroy_streaminfo([info])
     }
 
@@ -171,7 +171,7 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public createOutlet(options: CreateOutletOptions) {
-        const { info, chunkSize, maxBufferedMs } = options
+        const { infoHandle: info, chunkSize, maxBufferedMs } = options
 
         return this.bindings.lsl_create_outlet([
             info,
@@ -181,24 +181,24 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
-        const { outlet, sample, timestamp } = options
+        const { outletHandle: outlet, sample, timestamp } = options
         return this.bindings.lsl_push_sample_ft([outlet, sample, timestamp])
     }
 
     public pushSampleStringTimestamp(
         options: PushSampleStringTimestampOptions
     ) {
-        const { outlet, sample, timestamp } = options
+        const { outletHandle: outlet, sample, timestamp } = options
         return this.bindings.lsl_push_sample_strt([outlet, sample, timestamp])
     }
 
     public destroyOutlet(options: DestroyOutletOptions) {
-        const { outlet } = options
+        const { outletHandle: outlet } = options
         this.bindings.lsl_destroy_outlet([outlet])
     }
 
     public createInlet(options: CreateInletOptions) {
-        const { info, maxBufferedMs } = options
+        const { infoHandle: info, maxBufferedMs } = options
 
         return this.bindings.lsl_create_inlet([
             info,
@@ -212,7 +212,7 @@ export default class LiblslAdapter implements Liblsl {
     private readonly shouldRecover = 1
 
     public async openStream(options: OpenStreamOptions) {
-        const { inlet, timeoutMs, errcodePtr } = options
+        const { inletHandle: inlet, timeoutMs, errcodePtr } = options
 
         await this.load({
             library: 'lsl',
@@ -225,7 +225,7 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public closeStream(options: CloseStreamOptions) {
-        const { inlet } = options
+        const { inletHandle: inlet } = options
 
         this.load({
             library: 'lsl',
@@ -238,7 +238,7 @@ export default class LiblslAdapter implements Liblsl {
 
     public pullSample(options: PullSampleOptions) {
         const {
-            inlet,
+            inletHandle: inlet,
             dataBufferPtr,
             dataBufferElements,
             timeout,
@@ -268,7 +268,7 @@ export default class LiblslAdapter implements Liblsl {
 
     public pullChunk(options: PullChunkOptions) {
         const {
-            inlet,
+            inletHandle: inlet,
             dataBufferPtr,
             timestampBufferPtr,
             dataBufferElements,
@@ -303,12 +303,12 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public flushInlet(options: FlushInletOptions) {
-        const { inlet } = options
+        const { inletHandle: inlet } = options
         this.bindings.lsl_inlet_flush([inlet])
     }
 
     public destroyInlet(options: DestroyInletOptions) {
-        const { inlet } = options
+        const { inletHandle: inlet } = options
         this.bindings.lsl_destroy_inlet([inlet])
     }
 
@@ -430,13 +430,13 @@ export default class LiblslAdapter implements Liblsl {
 export interface Liblsl {
     liblslPath: string
 
-    createStreamInfo(options: CreateStreamInfoOptions): BoundStreamInfo
+    createStreamInfo(options: CreateStreamInfoOptions): InfoHandle
     destroyStreamInfo(options: DestroyStreamInfoOptions): void
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
 
     resolveByProp(options: ResolveByPropOptions): Promise<bigint[]>
 
-    createOutlet(options: CreateOutletOptions): BoundOutlet
+    createOutlet(options: CreateOutletOptions): OutletHandle
 
     pushSampleFloatTimestamp(
         options: PushSampleFloatTimestampOptions
@@ -448,7 +448,7 @@ export interface Liblsl {
 
     destroyOutlet(options: DestroyOutletOptions): void
 
-    createInlet(options: CreateInletOptions): BoundInlet
+    createInlet(options: CreateInletOptions): InletHandle
     openStream(options: OpenStreamOptions): Promise<void>
     closeStream(options: CloseStreamOptions): void
     pullSample(options: PullSampleOptions): number
@@ -471,12 +471,12 @@ export interface CreateStreamInfoOptions {
 }
 
 export interface AppendChannelsToStreamInfoOptions {
-    info: BoundStreamInfo
+    infoHandle: InfoHandle
     channels: LslChannel[]
 }
 
 export interface DestroyStreamInfoOptions {
-    info: BoundStreamInfo
+    infoHandle: InfoHandle
 }
 
 export interface ResolveByPropOptions {
@@ -487,44 +487,44 @@ export interface ResolveByPropOptions {
 }
 
 export interface CreateOutletOptions {
-    info: BoundStreamInfo
+    infoHandle: InfoHandle
     chunkSize: number
     maxBufferedMs: number
 }
 
 export interface PushSampleFloatTimestampOptions {
-    outlet: BoundOutlet
+    outletHandle: OutletHandle
     sample: number[]
     timestamp: number
 }
 
 export interface PushSampleStringTimestampOptions {
-    outlet: BoundOutlet
+    outletHandle: OutletHandle
     sample: string[]
     timestamp: number
 }
 
 export interface DestroyOutletOptions {
-    outlet: BoundOutlet
+    outletHandle: OutletHandle
 }
 
 export interface CreateInletOptions {
-    info: BoundStreamInfo
+    infoHandle: InfoHandle
     maxBufferedMs: number
 }
 
 export interface OpenStreamOptions {
-    inlet: BoundInlet
+    inletHandle: InletHandle
     timeoutMs: number
     errcodePtr: JsExternal
 }
 
 export interface CloseStreamOptions {
-    inlet: BoundInlet
+    inletHandle: InletHandle
 }
 
 export interface PullSampleOptions {
-    inlet: BoundInlet
+    inletHandle: InletHandle
     dataBufferPtr: JsExternal
     dataBufferElements: number
     timeout: number
@@ -537,30 +537,30 @@ export interface PullChunkOptions extends PullSampleOptions {
 }
 
 export interface FlushInletOptions {
-    inlet: BoundInlet
+    inletHandle: InletHandle
 }
 
 export interface DestroyInletOptions {
-    inlet: BoundInlet
+    inletHandle: InletHandle
 }
 
 export interface LiblslBindings {
     lsl_create_streaminfo(
         args: [string, string, number, number, number, string]
-    ): BoundStreamInfo
+    ): InfoHandle
 
-    lsl_destroy_streaminfo(args: [BoundStreamInfo]): void
-    lsl_create_outlet(args: [BoundStreamInfo, number, number]): BoundOutlet
-    lsl_push_sample_ft(args: [BoundOutlet, LslSample, number]): LslErrorCode
-    lsl_push_sample_strt(args: [BoundOutlet, LslSample, number]): LslErrorCode
-    lsl_destroy_outlet(args: [BoundOutlet]): void
-    lsl_create_inlet(args: any): BoundInlet
-    lsl_inlet_flush(args: [BoundInlet]): void
+    lsl_destroy_streaminfo(args: [InfoHandle]): void
+    lsl_create_outlet(args: [InfoHandle, number, number]): OutletHandle
+    lsl_push_sample_ft(args: [OutletHandle, LslSample, number]): LslErrorCode
+    lsl_push_sample_strt(args: [OutletHandle, LslSample, number]): LslErrorCode
+    lsl_destroy_outlet(args: [OutletHandle]): void
+    lsl_create_inlet(args: any): InletHandle
+    lsl_inlet_flush(args: [InletHandle]): void
     lsl_destroy_inlet(args: any): void
     lsl_local_clock(args: []): number
-    lsl_get_desc(args: [BoundStreamInfo]): BoundDescription
-    lsl_append_child(args: [BoundDescription, string]): BoundChild
-    lsl_append_child_value(args: [BoundChild, string, string]): void
+    lsl_get_desc(args: [InfoHandle]): DescriptionHandle
+    lsl_append_child(args: [DescriptionHandle, string]): ChildHandle
+    lsl_append_child_value(args: [ChildHandle, string, string]): void
 }
 
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]
@@ -573,8 +573,8 @@ export interface LslChannel {
 
 export type LslSample = (number | string | undefined)[]
 
-export interface BoundStreamInfo {}
-export interface BoundOutlet {}
-export interface BoundInlet {}
-export interface BoundDescription {}
-export interface BoundChild {}
+export interface InfoHandle {}
+export interface OutletHandle {}
+export interface InletHandle {}
+export interface DescriptionHandle {}
+export interface ChildHandle {}

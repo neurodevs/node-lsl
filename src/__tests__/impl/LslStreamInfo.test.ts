@@ -196,7 +196,7 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastAppendChannelsToStreamInfoOptions,
             {
-                info: this.instance.boundInfo,
+                infoHandle: this.instance.infoHandle,
                 channels: this.channelNames.map((label: string) => ({
                     label,
                     units: this.units,
@@ -212,16 +212,16 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         this.instance.destroy()
 
         assert.isEqualDeep(
-            this.fakeLiblsl.lastDestroyStreamInfoOptions?.info,
-            this.instance.boundInfo,
+            this.fakeLiblsl.lastDestroyStreamInfoOptions?.infoHandle,
+            this.instance.infoHandle,
             'Should have called destroyStreamInfo!'
         )
     }
 
     @test()
-    protected static async doesNotCreateNewStreamInfoIfPassedBoundInfo() {
+    protected static async doesNotCreateNewStreamInfoIfPassedInfoHandle() {
         this.LslStreamInfo({
-            boundInfo: this.instance.boundInfo,
+            infoHandle: this.instance.infoHandle,
         })
 
         assert.isEqual(
@@ -232,26 +232,26 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async setsBoundInfoWhenPassed() {
+    protected static async setsInfoHandleWhenPassed() {
         const instance = this.LslStreamInfo({
-            boundInfo: this.instance.boundInfo,
+            infoHandle: this.instance.infoHandle,
         })
 
         assert.isEqualDeep(
-            instance.boundInfo,
-            this.instance.boundInfo,
-            'Should have set bound stream info!'
+            instance.infoHandle,
+            this.instance.infoHandle,
+            'Should have set info handle!'
         )
     }
 
     @test()
-    protected static async cachesInfoAttributesByBoundInfo() {
-        const cached = LslStreamInfo.From(this.instance.boundInfo)
+    protected static async cachesInfoAttributesByInfoHandle() {
+        const cached = LslStreamInfo.From(this.instance.infoHandle)
 
         assert.isEqualDeep(
             cached,
             this.instance,
-            'Should have set bound stream info!'
+            'Should have set info handle!'
         )
     }
 

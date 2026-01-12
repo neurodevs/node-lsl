@@ -10,11 +10,11 @@ import {
 } from 'ffi-rs'
 
 import {
-    BoundChild,
-    BoundDescription,
-    BoundInlet,
-    BoundOutlet,
-    BoundStreamInfo,
+    ChildHandle,
+    DescriptionHandle,
+    InletHandle,
+    OutletHandle,
+    InfoHandle,
     Liblsl,
     LiblslBindings,
     LslChannel,
@@ -28,29 +28,35 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static instance: Liblsl
     private static libraryPath?: string
     private static libraryOptions?: Record<string, any>
+
     private static fakeBindings: LiblslBindings
-    private static fakeStreamInfo: BoundStreamInfo
-    private static fakeOutlet: BoundOutlet
-    private static fakeInlet: BoundInlet = {}
-    private static fakeDesc: BoundDescription
-    private static fakeChildNamedChannels: BoundChild
+    private static shouldThrowWhenCreatingBindings: boolean
+
+    private static fakeInfoHandle: InfoHandle
+    private static fakeOutletHandle: OutletHandle
+    private static fakeInletHandle: InletHandle = {}
+    private static fakeDescHandle: DescriptionHandle
+    private static fakeChildHandle: ChildHandle
+    private static fakeChildNamedChannel: ChildHandle
 
     private static createStreamInfoParams?: any[]
     private static destroyStreamInfoParams?: any[]
     private static appendChildParams: any[] = []
+    private static appendChildValueParams: any[]
+    private static appendChildHitCount: number
+    private static getDescriptionParams?: [InfoHandle]
+
     private static createOutletParams?: any[]
+    private static pushSampleFloatTimestampParams?: any[]
+    private static pushSampleStringTimestampParams?: any[]
     private static destroyOutletParams?: any[]
+
     private static createInletParams?: any[]
     private static flushInletParams?: any[]
     private static destroyInletParams?: any[]
+
     private static localClockParams?: any[]
-    private static pushSampleFloatTimestampParams?: any[]
-    private static pushSampleStringTimestampParams?: any[]
-    private static appendChildValueParams: any[]
-    private static shouldThrowWhenCreatingBindings: boolean
-    private static getDescriptionParams?: [BoundStreamInfo]
-    private static fakeChildNamedChannel: BoundChild
-    private static appendChildHitCount: number
+
     private static ffiRsOpenOptions?: OpenParams
     private static ffiRsDefineOptions: FfiRsDefineOptions
     private static ffiRsLoadOptions?: Record<string, any>
@@ -72,10 +78,10 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
         process.env.LIBLSL_PATH = this.generateId()
 
-        this.fakeStreamInfo = {}
-        this.fakeDesc = {}
-        this.fakeOutlet = {}
-        this.fakeChildNamedChannels = {}
+        this.fakeInfoHandle = {}
+        this.fakeDescHandle = {}
+        this.fakeOutletHandle = {}
+        this.fakeChildHandle = {}
         this.fakeChildNamedChannel = {}
         this.fakeBindings = this.FakeBindings()
 
@@ -250,18 +256,18 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const options = this.generateRandomCreateStreamInfoOptions()
         const actual = this.instance.createStreamInfo(options)
 
-        assert.isEqual(actual, this.fakeStreamInfo)
+        assert.isEqual(actual, this.fakeInfoHandle)
         assert.isEqualDeep(this.createStreamInfoParams, Object.values(options))
     }
 
     @test()
-    protected static async destroysStreamInfoWithBoundInfo() {
-        const info = this.createRandomStreamInfo()
-        this.instance.destroyStreamInfo({ info })
+    protected static async destroyStreamInfoPasses() {
+        const infoHandle = this.createRandomInfoHandle()
+        this.instance.destroyStreamInfo({ infoHandle })
 
         assert.isEqualDeep(
             this.destroyStreamInfoParams,
-            [info],
+            [infoHandle],
             'Did not call destroyStreamInfo with expected params!'
         )
     }
@@ -351,7 +357,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async createsOutletWithRequiredParams() {
-        const { options, outlet } = this.createRandomOutlet()
+        const { options, outletHandle } = this.createRandomOutlet()
 
         const expected = {
             ...options,
@@ -359,22 +365,24 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         }
 
         assert.isEqualDeep(this.createOutletParams, Object.values(expected))
-        assert.isEqual(outlet, this.fakeOutlet)
+        assert.isEqual(outletHandle, this.fakeOutletHandle)
     }
 
     @test()
     protected static async pushesFloatSample() {
         const expected = [1.0, 2.0, 3.0]
         const timestamp = randomInt(100)
+
         const options = {
-            outlet: this.fakeOutlet,
+            outletHandle: this.fakeOutletHandle,
             sample: expected,
             timestamp,
         }
+
         this.instance.pushSampleFloatTimestamp(options)
 
         assert.isEqualDeep(this.pushSampleFloatTimestampParams, [
-            this.fakeOutlet,
+            this.fakeOutletHandle,
             expected,
             timestamp,
         ])
@@ -384,15 +392,17 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     protected static async pushesStringSample() {
         const expected = [this.generateId()]
         const timestamp = randomInt(100)
+
         const options = {
-            outlet: this.fakeOutlet,
+            outletHandle: this.fakeOutletHandle,
             sample: expected,
             timestamp,
         }
+
         this.instance.pushSampleStringTimestamp(options)
         assert.isEqual(
             this.pushSampleStringTimestampParams?.[0],
-            this.fakeOutlet
+            this.fakeOutletHandle
         )
         assert.isEqualDeep(this.pushSampleStringTimestampParams?.[1], expected)
         assert.isEqual(this.pushSampleStringTimestampParams?.[2], timestamp)
@@ -400,22 +410,19 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async addingSingleChannelGetsDescription() {
-        const info = this.createRandomStreamInfo()
+        const info = this.createRandomInfoHandle()
         const channel: LslChannel = this.generateRandomChannelValues()
 
         this.instance.appendChannelsToStreamInfo({
-            info,
+            infoHandle: info,
             channels: [channel],
         })
         assert.isEqualDeep(this.getDescriptionParams?.[0], [info])
 
-        assert.isEqual(this.appendChildParams?.[0][0], this.fakeDesc)
+        assert.isEqual(this.appendChildParams?.[0][0], this.fakeDescHandle)
         assert.isEqual(this.appendChildParams?.[0][1], 'channels')
 
-        assert.isEqual(
-            this.appendChildParams?.[1][0],
-            this.fakeChildNamedChannels
-        )
+        assert.isEqual(this.appendChildParams?.[1][0], this.fakeChildHandle)
         assert.isEqual(this.appendChildParams?.[1][1], 'channel')
 
         assert.isLength(this.appendChildValueParams, 3)
@@ -436,19 +443,16 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async addingMultpleChannelsAddsChildrenToChannelsChild() {
-        const info = this.createRandomStreamInfo()
+        const info = this.createRandomInfoHandle()
         const channel1 = this.generateRandomChannelValues()
         const channel2 = this.generateRandomChannelValues()
 
         this.instance.appendChannelsToStreamInfo({
-            info,
+            infoHandle: info,
             channels: [channel1, channel2],
         })
 
-        assert.isEqual(
-            this.appendChildParams?.[2][0],
-            this.fakeChildNamedChannels
-        )
+        assert.isEqual(this.appendChildParams?.[2][0], this.fakeChildHandle)
         assert.isEqual(this.appendChildParams?.[2][1], 'channel')
 
         assert.isEqual(this.appendChildValueParams[3][2], channel2.label)
@@ -458,8 +462,8 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async canDestroyOutlet() {
-        const outlet = this.createRandomOutlet()
-        const options = { outlet }
+        const { outletHandle } = this.createRandomOutlet()
+        const options = { outletHandle }
         this.instance.destroyOutlet(options)
 
         assert.isEqualDeep(this.destroyOutletParams, Object.values(options))
@@ -512,7 +516,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             'Did not call createInlet with expected params!'
         )
 
-        assert.isEqual(inlet, this.fakeInlet, 'Did not receive expected inlet!')
+        assert.isEqual(
+            inlet,
+            this.fakeInletHandle,
+            'Did not receive expected inlet!'
+        )
     }
 
     @test()
@@ -529,7 +537,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )[0]
 
         await this.instance.openStream({
-            inlet,
+            inletHandle: inlet,
             timeoutMs,
             errcodePtr,
         })
@@ -557,7 +565,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         const { inlet } = this.createRandomInlet()
 
         await this.instance.closeStream({
-            inlet,
+            inletHandle: inlet,
         })
 
         assert.isEqualDeep(
@@ -596,7 +604,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )[0]
 
         this.instance.pullSample({
-            inlet,
+            inletHandle: inlet,
             dataBufferPtr,
             dataBufferElements,
             timeout,
@@ -660,7 +668,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )[0]
 
         this.instance.pullChunk({
-            inlet,
+            inletHandle: inlet,
             dataBufferPtr,
             timestampBufferPtr,
             dataBufferElements,
@@ -701,7 +709,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     @test()
     protected static async flushInletCallsBinding() {
         const { inlet } = this.createRandomInlet()
-        this.instance.flushInlet({ inlet })
+        this.instance.flushInlet({ inletHandle: inlet })
 
         assert.isEqualDeep(
             this.flushInletParams,
@@ -713,7 +721,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     @test()
     protected static async destroyInletCallsBinding() {
         const { inlet } = this.createRandomInlet()
-        this.instance.destroyInlet({ inlet })
+        this.instance.destroyInlet({ inletHandle: inlet })
 
         assert.isEqualDeep(
             this.destroyInletParams,
@@ -722,7 +730,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )
     }
 
-    private static createRandomStreamInfo() {
+    private static createRandomInfoHandle() {
         return this.instance.createStreamInfo(
             this.generateRandomCreateStreamInfoOptions()
         )
@@ -742,18 +750,18 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     private static createRandomOutlet() {
         const options = this.createRandomOutletOptions()
-        const outlet = this.instance.createOutlet(options)
-        return { options, outlet }
+        const outletHandle = this.instance.createOutlet(options)
+        return { options, outletHandle }
     }
 
     private static createRandomOutletOptions() {
-        const info = this.createRandomStreamInfo()
-        const options = {
-            info,
+        const infoHandle = this.createRandomInfoHandle()
+
+        return {
+            infoHandle,
             chunkSize: randomInt(10),
             maxBufferedMs: randomInt(10),
         }
-        return options
     }
 
     private static createRandomInlet() {
@@ -763,12 +771,12 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     }
 
     private static createRandomInletOptions() {
-        const info = this.createRandomStreamInfo()
-        const options = {
-            info,
+        const infoHandle = this.createRandomInfoHandle()
+
+        return {
+            infoHandle,
             maxBufferedMs: randomInt(10),
         }
-        return options
     }
 
     private static generateRandomChannelValues() {
@@ -818,14 +826,14 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         return {
             lsl_create_streaminfo: (params: any[]) => {
                 this.createStreamInfoParams = params
-                return this.fakeStreamInfo
+                return this.fakeInfoHandle
             },
             lsl_destroy_streaminfo: (params: any[]) => {
                 this.destroyStreamInfoParams = params
             },
             lsl_create_outlet: (params: any[]) => {
                 this.createOutletParams = params
-                return this.fakeOutlet
+                return this.fakeOutletHandle
             },
             lsl_push_sample_ft: (params: any[]) => {
                 this.pushSampleFloatTimestampParams = params
@@ -840,7 +848,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             },
             lsl_create_inlet: (params: any[]) => {
                 this.createInletParams = params
-                return this.fakeInlet
+                return this.fakeInletHandle
             },
             lsl_inlet_flush: (params: any[]) => {
                 this.flushInletParams = params
@@ -853,15 +861,15 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 this.localClockParams = params
                 return new Date().getTime()
             },
-            lsl_get_desc: (info: BoundStreamInfo) => {
+            lsl_get_desc: (info: InfoHandle) => {
                 this.getDescriptionParams = [info]
-                return this.fakeDesc
+                return this.fakeDescHandle
             },
             lsl_append_child: (params: any) => {
                 this.appendChildParams.push(params)
                 if (this.appendChildHitCount === 0) {
                     this.appendChildHitCount++
-                    return this.fakeChildNamedChannels
+                    return this.fakeChildHandle
                 }
                 return this.fakeChildNamedChannel
             },

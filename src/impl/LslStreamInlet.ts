@@ -8,7 +8,7 @@ import {
 } from 'ffi-rs'
 
 import handleError from '../handleError.js'
-import { BoundInlet } from './LiblslAdapter.js'
+import { InletHandle } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import { StreamInfo } from './LslStreamInfo.js'
 
@@ -33,7 +33,7 @@ export default class LslStreamInlet implements StreamInlet {
     private readonly sixMinutesInMs = 360 * 1000
     private readonly aboutOneYearInMs = 32000000 * 1000
 
-    protected inlet!: BoundInlet
+    protected inletHandle!: InletHandle
 
     private pullDataMethod!: () => {
         samples: Float32Array | undefined
@@ -87,7 +87,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.onData = onData
 
         this.setPullDataMethod()
-        this.createBoundInlet()
+        this.createInletHandle()
     }
 
     public static async Create(
@@ -106,9 +106,9 @@ export default class LslStreamInlet implements StreamInlet {
         }
     }
 
-    private createBoundInlet() {
-        this.inlet = this.lsl.createInlet({
-            info: this.info.boundInfo,
+    private createInletHandle() {
+        this.inletHandle = this.lsl.createInlet({
+            infoHandle: this.info.infoHandle,
             maxBufferedMs: this.maxBufferedMs,
         })
     }
@@ -132,7 +132,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.createOpenStreamErrorBuffer()
 
         await this.lsl.openStream({
-            inlet: this.inlet,
+            inletHandle: this.inletHandle,
             timeoutMs: this.openStreamTimeoutMs,
             errcodePtr: this.openStreamErrorBufferPtr,
         })
@@ -265,7 +265,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     private callPullSampleBinding() {
         return this.lsl.pullSample({
-            inlet: this.inlet,
+            inletHandle: this.inletHandle,
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
             timeout: this.pullTimeoutMs / 1000,
@@ -295,7 +295,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     private callPullChunkBinding() {
         return this.lsl.pullChunk({
-            inlet: this.inlet,
+            inletHandle: this.inletHandle,
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.chunkSize * this.channelCount,
             timestampBufferPtr: this.timestampBufferPtr,
@@ -323,23 +323,23 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     private closeLslStream() {
-        this.lsl.closeStream({ inlet: this.inlet })
+        this.lsl.closeStream({ inletHandle: this.inletHandle })
     }
 
     public flushQueue() {
-        this.lsl.flushInlet({ inlet: this.inlet })
+        this.lsl.flushInlet({ inletHandle: this.inletHandle })
     }
 
     public destroy() {
         if (this.isRunning) {
             this.stopPulling()
         }
-        this.destroyBoundInlet()
+        this.destroyInletHandle()
         this.freeAllPointers()
     }
 
-    private destroyBoundInlet() {
-        this.lsl.destroyInlet({ inlet: this.inlet })
+    private destroyInletHandle() {
+        this.lsl.destroyInlet({ inletHandle: this.inletHandle })
     }
 
     private freeAllPointers() {

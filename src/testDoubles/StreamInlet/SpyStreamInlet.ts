@@ -17,7 +17,7 @@ export class SpyStreamInlet extends LslStreamInlet {
         return this.info
     }
 
-    public getBoundInlet() {
-        return this.inlet
+    public getInletHandle() {
+        return this.inletHandle
     }
 }

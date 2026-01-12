@@ -78,7 +78,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeWebSocketServer.resetTestDouble()
     }
 
-    protected static readonly info = new FakeStreamInfo()
+    protected static readonly fakeStreamInfo = new FakeStreamInfo()
+
     protected static readonly name_ = this.generateId()
     protected static readonly type = this.generateId()
     protected static readonly sourceId = this.generateId()
@@ -103,7 +104,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         onData: OnDataCallback
     ) {
         const defaultOptions = {
-            info: this.info,
+            info: this.fakeStreamInfo,
             chunkSize: this.chunkSize,
             maxBufferedMs: this.maxBufferedMs,
             ...options,
