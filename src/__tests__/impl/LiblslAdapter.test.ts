@@ -410,14 +410,14 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async addingSingleChannelGetsDescription() {
-        const info = this.createRandomInfoHandle()
+        const infoHandle = this.createRandomInfoHandle()
         const channel: LslChannel = this.generateRandomChannelValues()
 
         this.instance.appendChannelsToStreamInfo({
-            infoHandle: info,
+            infoHandle,
             channels: [channel],
         })
-        assert.isEqualDeep(this.getDescriptionParams?.[0], [info])
+        assert.isEqualDeep(this.getDescriptionParams?.[0], [infoHandle])
 
         assert.isEqual(this.appendChildParams?.[0][0], this.fakeDescHandle)
         assert.isEqual(this.appendChildParams?.[0][1], 'channels')
@@ -443,12 +443,12 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async addingMultpleChannelsAddsChildrenToChannelsChild() {
-        const info = this.createRandomInfoHandle()
+        const infoHandle = this.createRandomInfoHandle()
         const channel1 = this.generateRandomChannelValues()
         const channel2 = this.generateRandomChannelValues()
 
         this.instance.appendChannelsToStreamInfo({
-            infoHandle: info,
+            infoHandle,
             channels: [channel1, channel2],
         })
 
@@ -499,7 +499,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async createInletWithRequiredParams() {
-        const { options, inlet } = this.createRandomInlet()
+        const { options, inletHandle } = this.createRandomInlet()
         const { maxBufferedMs } = options
 
         const expected = {
@@ -517,7 +517,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )
 
         assert.isEqual(
-            inlet,
+            inletHandle,
             this.fakeInletHandle,
             'Did not receive expected inlet!'
         )
@@ -525,11 +525,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async openStreamCallsBinding() {
-        const { inlet } = this.createRandomInlet()
+        const { inletHandle } = this.createRandomInlet()
 
         const timeoutMs = randomInt(1000)
 
-        const errcodePtr = unwrapPointer(
+        const errorCodePointer = unwrapPointer(
             createPointer({
                 paramsType: [DataType.U8Array],
                 paramsValue: [new Int32Array(1)],
@@ -537,9 +537,9 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )[0]
 
         await this.instance.openStream({
-            inletHandle: inlet,
+            inletHandle,
             timeoutMs,
-            errcodePtr,
+            errorCodePointer,
         })
 
         assert.isEqualDeep(
@@ -553,7 +553,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     DataType.Double,
                     DataType.External,
                 ],
-                paramsValue: [inlet, timeoutMs / 1000, errcodePtr],
+                paramsValue: [inletHandle, timeoutMs / 1000, errorCodePointer],
                 runInNewThread: true,
             },
             'Did not call openStream with expected options!'
@@ -562,10 +562,10 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async closeStreamCallsBinding() {
-        const { inlet } = this.createRandomInlet()
+        const { inletHandle } = this.createRandomInlet()
 
-        await this.instance.closeStream({
-            inletHandle: inlet,
+        this.instance.closeStream({
+            inletHandle,
         })
 
         assert.isEqualDeep(
@@ -575,7 +575,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 funcName: 'lsl_close_stream',
                 retType: DataType.Void,
                 paramsType: [DataType.External],
-                paramsValue: [inlet],
+                paramsValue: [inletHandle],
             },
             'Did not call closeStream with expected options!'
         )
@@ -583,11 +583,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async pullSampleCallsBinding() {
-        const { inlet } = this.createRandomInlet()
+        const { inletHandle } = this.createRandomInlet()
 
         const dataBuffer = Buffer.alloc(4 * this.channelCount)
         const dataBufferElements = this.channelCount
-        const timeout = 0.0
+        const timeoutMs = 0.0
 
         const dataBufferPtr = unwrapPointer(
             createPointer({
@@ -596,7 +596,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             })
         )[0]
 
-        const errcodePtr = unwrapPointer(
+        const errorCodePointer = unwrapPointer(
             createPointer({
                 paramsType: [DataType.U8Array],
                 paramsValue: [new Int32Array(1)],
@@ -604,11 +604,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )[0]
 
         this.instance.pullSample({
-            inletHandle: inlet,
+            inletHandle,
             dataBufferPtr,
             dataBufferElements,
-            timeout,
-            errcodePtr,
+            timeoutMs,
+            errorCodePointer,
         })
 
         assert.isEqualDeep(
@@ -625,11 +625,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     DataType.External,
                 ],
                 paramsValue: [
-                    inlet,
+                    inletHandle,
                     dataBufferPtr,
                     dataBufferElements,
-                    timeout,
-                    errcodePtr,
+                    timeoutMs,
+                    errorCodePointer,
                 ],
             },
             'Did not call pullSample with expected options!'
@@ -638,13 +638,13 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async pullChunkCallsBinding() {
-        const { inlet } = this.createRandomInlet()
+        const { inletHandle } = this.createRandomInlet()
 
         const dataBuffer = Buffer.alloc(4 * this.chunkSize * this.channelCount)
         const timestampBuffer = Buffer.alloc(8 * this.chunkSize)
         const dataBufferElements = this.chunkSize * this.channelCount
         const timestampBufferElements = this.chunkSize
-        const timeout = 0.0
+        const timeoutMs = 0.0
 
         const dataBufferPtr = unwrapPointer(
             createPointer({
@@ -660,7 +660,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             })
         )[0]
 
-        const errcodePtr = unwrapPointer(
+        const errorCodePointer = unwrapPointer(
             createPointer({
                 paramsType: [DataType.U8Array],
                 paramsValue: [new Int32Array(1)],
@@ -668,13 +668,13 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         )[0]
 
         this.instance.pullChunk({
-            inletHandle: inlet,
+            inletHandle,
             dataBufferPtr,
             timestampBufferPtr,
             dataBufferElements,
             timestampBufferElements,
-            timeout,
-            errcodePtr,
+            timeoutMs,
+            errorCodePointer,
         })
 
         assert.isEqualDeep(
@@ -693,13 +693,13 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     DataType.External,
                 ],
                 paramsValue: [
-                    inlet,
+                    inletHandle,
                     dataBufferPtr,
                     timestampBufferPtr,
                     dataBufferElements,
                     timestampBufferElements,
-                    timeout,
-                    errcodePtr,
+                    timeoutMs,
+                    errorCodePointer,
                 ],
             },
             'Did not call pullChunk with expected options!'
@@ -708,24 +708,24 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     @test()
     protected static async flushInletCallsBinding() {
-        const { inlet } = this.createRandomInlet()
-        this.instance.flushInlet({ inletHandle: inlet })
+        const { inletHandle } = this.createRandomInlet()
+        this.instance.flushInlet({ inletHandle })
 
         assert.isEqualDeep(
             this.flushInletParams,
-            [inlet],
+            [inletHandle],
             'Should have called flushInlet with expected params!'
         )
     }
 
     @test()
     protected static async destroyInletCallsBinding() {
-        const { inlet } = this.createRandomInlet()
-        this.instance.destroyInlet({ inletHandle: inlet })
+        const { inletHandle } = this.createRandomInlet()
+        this.instance.destroyInlet({ inletHandle })
 
         assert.isEqualDeep(
             this.destroyInletParams,
-            [inlet],
+            [inletHandle],
             'Should have called destroyInlet with expected params!'
         )
     }
@@ -766,8 +766,8 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
     private static createRandomInlet() {
         const options = this.createRandomInletOptions()
-        const inlet = this.instance.createInlet(options)
-        return { options, inlet }
+        const inletHandle = this.instance.createInlet(options)
+        return { options, inletHandle }
     }
 
     private static createRandomInletOptions() {
@@ -811,11 +811,13 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         this.maxResults * this.bytesPerPointer
     )
 
+    private static readonly resultsBufferRef = createPointer({
+        paramsType: [DataType.U8Array],
+        paramsValue: [this.resultsBuffer],
+    })
+
     private static readonly resultsBufferPtr = unwrapPointer(
-        createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [this.resultsBuffer],
-        })
+        this.resultsBufferRef
     )[0]
 
     private static generateFailedMessage() {

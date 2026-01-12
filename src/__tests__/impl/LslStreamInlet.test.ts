@@ -186,7 +186,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 inletHandle: this.inletHandle,
                 timeoutMs: aboutOneYearInMs,
-                errcodePtr: this.instance['openStreamErrorBufferPtr'],
+                errorCodePointer: this.instance['openStreamErrorBufferPtr'],
             },
             'Did not open inlet stream!'
         )
@@ -209,7 +209,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 inletHandle: instance.getInletHandle(),
                 timeoutMs: openStreamTimeoutMs,
-                errcodePtr: instance['openStreamErrorBufferPtr'],
+                errorCodePointer: instance['openStreamErrorBufferPtr'],
             },
             'Did not open inlet stream with passed timeout!'
         )
@@ -320,8 +320,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
                 inletHandle: this.inletHandle,
                 dataBufferPtr: inlet['dataBufferPtr'],
                 dataBufferElements: this.channelCount,
-                timeout: 0,
-                errcodePtr: inlet['pullDataErrorBufferPtr'],
+                timeoutMs: 0,
+                errorCodePointer: inlet['pullErrorBufferPtr'],
             },
             'Should have called pullSample!'
         )
@@ -339,8 +339,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
                 timestampBufferPtr: this.instance['timestampBufferPtr'],
                 dataBufferElements: this.chunkSize * this.channelCount,
                 timestampBufferElements: this.chunkSize,
-                timeout: 0,
-                errcodePtr: this.instance['pullDataErrorBufferPtr'],
+                timeoutMs: 0,
+                errorCodePointer: this.instance['pullErrorBufferPtr'],
             },
             'Should have called pullChunk!'
         )
@@ -398,8 +398,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         })
 
         assert.isEqual(
-            this.fakeLiblsl.lastPullSampleOptions?.timeout,
-            pullTimeoutMs / 1000,
+            this.fakeLiblsl.lastPullSampleOptions?.timeoutMs,
+            pullTimeoutMs,
             'Did not pass pullTimeoutMs to pullSample!'
         )
     }
@@ -414,8 +414,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         })
 
         assert.isEqual(
-            this.fakeLiblsl.lastPullChunkOptions?.timeout,
-            pullTimeoutMs / 1000,
+            this.fakeLiblsl.lastPullChunkOptions?.timeoutMs,
+            pullTimeoutMs,
             'Did not pass timeoutMs to pullChunk!'
         )
     }
@@ -485,7 +485,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     ) {
         await this.startThenStop()
 
-        this.instance['pullDataErrorBuffer'].writeInt32LE(errorCode)
+        this.instance['pullErrorBuffer'].writeInt32LE(errorCode)
 
         assert.doesThrow(() => {
             this.instance['handleErrorCodeIfPresent']()

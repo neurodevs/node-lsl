@@ -97,9 +97,9 @@ export default class LiblslAdapter implements Liblsl {
     public appendChannelsToStreamInfo(
         options: AppendChannelsToStreamInfoOptions
     ) {
-        const { infoHandle: info, channels } = options
+        const { infoHandle, channels } = options
 
-        const description = this.bindings.lsl_get_desc([info])
+        const description = this.bindings.lsl_get_desc([infoHandle])
         const parent = this.bindings.lsl_append_child([description, 'channels'])
 
         for (const channel of channels) {
@@ -115,8 +115,8 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public destroyStreamInfo(options: DestroyStreamInfoOptions) {
-        const { infoHandle: info } = options
-        this.bindings.lsl_destroy_streaminfo([info])
+        const { infoHandle } = options
+        this.bindings.lsl_destroy_streaminfo([infoHandle])
     }
 
     public async resolveByProp(options: ResolveByPropOptions) {
@@ -171,37 +171,47 @@ export default class LiblslAdapter implements Liblsl {
     }
 
     public createOutlet(options: CreateOutletOptions) {
-        const { infoHandle: info, chunkSize, maxBufferedMs } = options
+        const { infoHandle, chunkSize, maxBufferedMs } = options
 
         return this.bindings.lsl_create_outlet([
-            info,
+            infoHandle,
             chunkSize,
             maxBufferedMs / 1000,
         ])
     }
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {
-        const { outletHandle: outlet, sample, timestamp } = options
-        return this.bindings.lsl_push_sample_ft([outlet, sample, timestamp])
+        const { outletHandle, sample, timestamp } = options
+
+        return this.bindings.lsl_push_sample_ft([
+            outletHandle,
+            sample,
+            timestamp,
+        ])
     }
 
     public pushSampleStringTimestamp(
         options: PushSampleStringTimestampOptions
     ) {
-        const { outletHandle: outlet, sample, timestamp } = options
-        return this.bindings.lsl_push_sample_strt([outlet, sample, timestamp])
+        const { outletHandle, sample, timestamp } = options
+
+        return this.bindings.lsl_push_sample_strt([
+            outletHandle,
+            sample,
+            timestamp,
+        ])
     }
 
     public destroyOutlet(options: DestroyOutletOptions) {
-        const { outletHandle: outlet } = options
-        this.bindings.lsl_destroy_outlet([outlet])
+        const { outletHandle } = options
+        this.bindings.lsl_destroy_outlet([outletHandle])
     }
 
     public createInlet(options: CreateInletOptions) {
-        const { infoHandle: info, maxBufferedMs } = options
+        const { infoHandle, maxBufferedMs } = options
 
         return this.bindings.lsl_create_inlet([
-            info,
+            infoHandle,
             maxBufferedMs / 1000,
             this.maxChunkSize,
             this.shouldRecover,
@@ -212,37 +222,37 @@ export default class LiblslAdapter implements Liblsl {
     private readonly shouldRecover = 1
 
     public async openStream(options: OpenStreamOptions) {
-        const { inletHandle: inlet, timeoutMs, errcodePtr } = options
+        const { inletHandle, timeoutMs, errorCodePointer } = options
 
         await this.load({
             library: 'lsl',
             funcName: 'lsl_open_stream',
             retType: DataType.Void,
             paramsType: [DataType.External, DataType.Double, DataType.External],
-            paramsValue: [inlet, timeoutMs / 1000, errcodePtr],
+            paramsValue: [inletHandle, timeoutMs / 1000, errorCodePointer],
             runInNewThread: true,
         })
     }
 
     public closeStream(options: CloseStreamOptions) {
-        const { inletHandle: inlet } = options
+        const { inletHandle } = options
 
         this.load({
             library: 'lsl',
             funcName: 'lsl_close_stream',
             retType: DataType.Void,
             paramsType: [DataType.External],
-            paramsValue: [inlet],
+            paramsValue: [inletHandle],
         })
     }
 
     public pullSample(options: PullSampleOptions) {
         const {
-            inletHandle: inlet,
+            inletHandle,
             dataBufferPtr,
             dataBufferElements,
-            timeout,
-            errcodePtr,
+            timeoutMs,
+            errorCodePointer,
         } = options
 
         return this.load({
@@ -257,24 +267,24 @@ export default class LiblslAdapter implements Liblsl {
                 DataType.External,
             ],
             paramsValue: [
-                inlet,
+                inletHandle,
                 dataBufferPtr,
                 dataBufferElements,
-                timeout,
-                errcodePtr,
+                timeoutMs / 1000,
+                errorCodePointer,
             ],
         })
     }
 
     public pullChunk(options: PullChunkOptions) {
         const {
-            inletHandle: inlet,
+            inletHandle,
             dataBufferPtr,
             timestampBufferPtr,
             dataBufferElements,
             timestampBufferElements,
-            timeout,
-            errcodePtr,
+            timeoutMs,
+            errorCodePointer,
         } = options
 
         return this.load({
@@ -291,25 +301,25 @@ export default class LiblslAdapter implements Liblsl {
                 DataType.External,
             ],
             paramsValue: [
-                inlet,
+                inletHandle,
                 dataBufferPtr,
                 timestampBufferPtr,
                 dataBufferElements,
                 timestampBufferElements,
-                timeout,
-                errcodePtr,
+                timeoutMs / 1000,
+                errorCodePointer,
             ],
         })
     }
 
     public flushInlet(options: FlushInletOptions) {
-        const { inletHandle: inlet } = options
-        this.bindings.lsl_inlet_flush([inlet])
+        const { inletHandle } = options
+        this.bindings.lsl_inlet_flush([inletHandle])
     }
 
     public destroyInlet(options: DestroyInletOptions) {
-        const { inletHandle: inlet } = options
-        this.bindings.lsl_destroy_inlet([inlet])
+        const { inletHandle } = options
+        this.bindings.lsl_destroy_inlet([inletHandle])
     }
 
     public localClock() {
@@ -516,7 +526,7 @@ export interface CreateInletOptions {
 export interface OpenStreamOptions {
     inletHandle: InletHandle
     timeoutMs: number
-    errcodePtr: JsExternal
+    errorCodePointer: JsExternal
 }
 
 export interface CloseStreamOptions {
@@ -527,8 +537,8 @@ export interface PullSampleOptions {
     inletHandle: InletHandle
     dataBufferPtr: JsExternal
     dataBufferElements: number
-    timeout: number
-    errcodePtr: JsExternal
+    timeoutMs: number
+    errorCodePointer: JsExternal
 }
 
 export interface PullChunkOptions extends PullSampleOptions {
