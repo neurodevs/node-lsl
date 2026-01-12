@@ -1,4 +1,11 @@
-import { createPointer, DataType, JsExternal, unwrapPointer } from 'ffi-rs'
+import {
+    createPointer,
+    DataType,
+    freePointer,
+    JsExternal,
+    PointerType,
+    unwrapPointer,
+} from 'ffi-rs'
 
 import handleError from '../handleError.js'
 import { BoundInlet } from './LiblslAdapter.js'
@@ -7,6 +14,7 @@ import { StreamInfo } from './LslStreamInfo.js'
 
 export default class LslStreamInlet implements StreamInlet {
     public static Class?: StreamInletConstructor
+    public static freePointer = freePointer
     public static waitAfterOpenStreamMs = 100
 
     public isRunning = false
@@ -327,14 +335,37 @@ export default class LslStreamInlet implements StreamInlet {
             this.stopPulling()
         }
         this.destroyBoundInlet()
+        this.freeAllPointers()
     }
 
     private destroyBoundInlet() {
         this.lsl.destroyInlet({ inlet: this.inlet })
     }
 
+    private freeAllPointers() {
+        this.freePointer({
+            paramsType: [
+                DataType.U8Array,
+                DataType.U8Array,
+                DataType.U8Array,
+                DataType.U8Array,
+            ],
+            paramsValue: [
+                this.openStreamErrorBufferPtr,
+                this.dataBufferPtr,
+                this.timestampBufferPtr,
+                this.pullDataErrorBufferPtr,
+            ],
+            pointerType: PointerType.CPointer,
+        })
+    }
+
     private get waitAfterOpenMs() {
         return LslStreamInlet.waitAfterOpenStreamMs
+    }
+
+    private get freePointer() {
+        return LslStreamInlet.freePointer
     }
 }
 

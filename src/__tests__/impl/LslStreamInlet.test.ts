@@ -1,5 +1,6 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
+import { DataType, FieldType, JsExternal, PointerType } from 'ffi-rs'
 import LslStreamInlet, {
     StreamInletOptions,
 } from '../../impl/LslStreamInlet.js'
@@ -72,12 +73,48 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async destroyCallsLslBinding() {
-        this.instance.destroy()
+        LslStreamInlet.freePointer = () => {}
+
+        await this.startPullingThenDestroy()
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastDestroyInletOptions,
             { inlet: this.boundInlet },
             'Did not destroy inlet!'
+        )
+    }
+
+    @test()
+    protected static async destroyFreesAllPointers() {
+        interface FreePointerParams {
+            paramsType: FieldType[]
+            paramsValue: JsExternal[]
+            pointerType: PointerType
+        }
+
+        let calls: FreePointerParams[] = []
+
+        LslStreamInlet.freePointer = (params: FreePointerParams) => {
+            calls.push(params)
+        }
+
+        await this.startPullingThenDestroy()
+
+        const { paramsType, pointerType } = calls[0]
+
+        assert.isEqualDeep(
+            { paramsType, pointerType },
+            {
+                paramsType: [
+                    DataType.U8Array,
+                    DataType.U8Array,
+                    DataType.U8Array,
+                    DataType.U8Array,
+                ],
+                pointerType: PointerType.CPointer,
+            },
+
+            'Destroy did not free all pointers!'
         )
     }
 
@@ -435,6 +472,11 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             -4,
             'An internal liblsl error has occurred!'
         )
+    }
+
+    private static async startPullingThenDestroy() {
+        await this.startPulling()
+        this.destroy()
     }
 
     private static async assertThrowsWithErrorCode(
