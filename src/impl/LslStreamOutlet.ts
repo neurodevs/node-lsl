@@ -142,16 +142,16 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public destroy() {
-        this.destroyOutletHandle()
-        this.destroyInfoHandle()
+        this.firstDestroyOutletHandle()
+        this.thenDestroyInfoHandle()
     }
 
-    private destroyInfoHandle() {
-        this.info.destroy()
-    }
-
-    private destroyOutletHandle() {
+    private firstDestroyOutletHandle() {
         this.lsl.destroyOutlet({ outletHandle: this.outletHandle })
+    }
+
+    private thenDestroyInfoHandle() {
+        this.info.destroy()
     }
 
     private static async waitToAllowSetup(waitAfterConstructionMs: number) {
