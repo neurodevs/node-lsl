@@ -206,6 +206,29 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async destroysOutletHandleBeforeInletHandle() {
+        const outlet = await this.LslStreamOutlet()
+
+        const calls: string[] = []
+
+        this.fakeLiblsl.destroyOutlet = (_options) => {
+            calls.push('destroyOutlet')
+        }
+
+        outlet.info.destroy = () => {
+            calls.push('destroyStreamInfo')
+        }
+
+        outlet.destroy()
+
+        assert.isEqualDeep(
+            calls,
+            ['destroyOutlet', 'destroyStreamInfo'],
+            'Did not destroy in correct order!'
+        )
+    }
+
+    @test()
     protected static async pushSampleShouldNotCreateMultipleOutlets() {
         const outlet = await this.FloatOutlet()
         outlet.pushSample([1.0])

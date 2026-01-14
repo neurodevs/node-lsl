@@ -142,8 +142,8 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public destroy() {
-        this.destroyInfoHandle()
         this.destroyOutletHandle()
+        this.destroyInfoHandle()
     }
 
     private destroyInfoHandle() {
