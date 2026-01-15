@@ -107,7 +107,9 @@ export interface StreamInfo {
     readonly infoHandle: InfoHandle
 }
 
-type StreamInfoConstructor = new (options: StreamInfoOptions) => StreamInfo
+export type StreamInfoConstructor = new (
+    options: StreamInfoOptions
+) => StreamInfo
 
 export interface StreamInfoOptions {
     channelNames: string[]
