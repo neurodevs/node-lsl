@@ -120,7 +120,6 @@ export default class LslStreamInlet implements StreamInlet {
             await this.openLslStream()
 
             this.createWritableBuffers()
-            this.createPointersToBuffers()
 
             this.pullLoop = this.pullOnLoop()
         } else {
@@ -169,31 +168,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.dataBuffer = Buffer.alloc(
             this.bytesPerFloat * this.chunkSize * this.channelCount
         )
-    }
 
-    private readonly bytesPerFloat = 4
-
-    private createTimestampBuffer() {
-        this.timestampBuffer = Buffer.alloc(
-            this.bytesPerDouble * this.chunkSize
-        )
-    }
-
-    private readonly bytesPerDouble = 8
-
-    private createErrorCodeBuffer() {
-        this.pullErrorBuffer = Buffer.alloc(this.bytesPerInt)
-    }
-
-    private readonly bytesPerInt = 4
-
-    private createPointersToBuffers() {
-        this.createDataBufferPtr()
-        this.createTimestampBufferPtr()
-        this.createErrorCodeBufferPtr()
-    }
-
-    private createDataBufferPtr() {
         this.dataBufferRef = createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [this.dataBuffer],
@@ -202,7 +177,13 @@ export default class LslStreamInlet implements StreamInlet {
         this.dataBufferPtr = unwrapPointer(this.dataBufferRef)[0]
     }
 
-    private createTimestampBufferPtr() {
+    private readonly bytesPerFloat = 4
+
+    private createTimestampBuffer() {
+        this.timestampBuffer = Buffer.alloc(
+            this.bytesPerDouble * this.chunkSize
+        )
+
         this.timestampBufferRef = createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [this.timestampBuffer],
@@ -211,7 +192,11 @@ export default class LslStreamInlet implements StreamInlet {
         this.timestampBufferPtr = unwrapPointer(this.timestampBufferRef)[0]
     }
 
-    private createErrorCodeBufferPtr() {
+    private readonly bytesPerDouble = 8
+
+    private createErrorCodeBuffer() {
+        this.pullErrorBuffer = Buffer.alloc(this.bytesPerInt)
+
         this.pullErrorBufferRef = createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [this.pullErrorBuffer],
@@ -219,6 +204,8 @@ export default class LslStreamInlet implements StreamInlet {
 
         this.pullErrorBufferPtr = unwrapPointer(this.pullErrorBufferRef)[0]
     }
+
+    private readonly bytesPerInt = 4
 
     private async pullOnLoop() {
         while (this.isRunning) {
