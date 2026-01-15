@@ -118,7 +118,6 @@ export default class LslStreamInlet implements StreamInlet {
             this.isRunning = true
 
             await this.openLslStream()
-
             this.createWritableBuffers()
 
             this.pullLoop = this.pullOnLoop()
