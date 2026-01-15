@@ -132,12 +132,12 @@ export default class LslStreamOutlet implements StreamOutlet {
         string: 'pushSampleStringTimestamp',
     }
 
-    public pushSample(sample: LslSample, preciseTimestamp?: number) {
+    public pushSample(sample: LslSample, timestamp?: number) {
         this.worker.postMessage({
             type: 'pushSample',
             payload: {
                 sample,
-                timestamp: preciseTimestamp,
+                timestamp,
             },
         })
     }
@@ -160,7 +160,7 @@ export default class LslStreamOutlet implements StreamOutlet {
 }
 
 export interface StreamOutlet {
-    pushSample(sample: LslSample, preciseTimestamp?: number): void
+    pushSample(sample: LslSample, timestamp?: number): void
     destroy(): void
     readonly name: string
     readonly type: string
