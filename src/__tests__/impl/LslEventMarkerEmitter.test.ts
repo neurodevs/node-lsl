@@ -30,7 +30,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     protected static async loadsWithEventMarkerSpecificOptions() {
         assert.isEqualDeep(
             {
-                ...FakeStreamOutlet.callsToConstructor[0].options,
+                ...FakeStreamOutlet.callsToConstructor[0],
                 name: undefined,
                 sourceId: undefined,
             },
@@ -46,14 +46,14 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         )
 
         assert.isTrue(
-            FakeStreamOutlet.callsToConstructor[0].options?.sourceId.startsWith(
+            FakeStreamOutlet.callsToConstructor[0]?.sourceId.startsWith(
                 'event-markers-'
             ),
             'Source ID was not generated uniquely!'
         )
 
         assert.isTrue(
-            FakeStreamOutlet.callsToConstructor[0].options?.name.startsWith(
+            FakeStreamOutlet.callsToConstructor[0]?.name.startsWith(
                 'Event markers ('
             ),
             'Name was not generated uniquely!'
@@ -65,10 +65,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         const options = generateRandomOutletOptions()
         await this.LslEventMarkerEmitter(options)
 
-        assert.isEqualDeep(
-            FakeStreamOutlet.callsToConstructor[1].options,
-            options
-        )
+        assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[1], options)
     }
 
     @test()

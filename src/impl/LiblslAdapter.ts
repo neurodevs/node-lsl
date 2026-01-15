@@ -9,7 +9,7 @@ import {
 } from 'ffi-rs'
 
 import { CHANNEL_FORMATS } from '../consts.js'
-import { LslErrorCode } from '../handleError.js'
+import { LslErrorCode } from '../lib/handleError.js'
 
 export default class LiblslAdapter implements Liblsl {
     public static open = open

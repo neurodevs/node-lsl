@@ -2,29 +2,21 @@ import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
 
 import { LslSample } from 'impl/LiblslAdapter.js'
-import { StreamInfo } from '../../impl/LslStreamInfo.js'
 import {
     StreamOutlet,
     StreamOutletOptions,
 } from '../../impl/LslStreamOutlet.js'
-import FakeStreamInfo from '../StreamInfo/FakeStreamInfo.js'
 
 export default class FakeStreamOutlet implements StreamOutlet {
-    public static callsToConstructor: {
-        info?: StreamInfo
-        options?: StreamOutletOptions
-    }[] = []
+    public static callsToConstructor: (StreamOutletOptions | undefined)[] = []
 
     public static callsToPushSample: LslSample[] = []
     public static numCallsToDestroy = 0
 
-    public info: StreamInfo
     public options?: StreamOutletOptions
 
-    public constructor(info?: StreamInfo, options?: StreamOutletOptions) {
-        FakeStreamOutlet.callsToConstructor.push({ info, options })
-
-        this.info = info ?? new FakeStreamInfo()
+    public constructor(options?: StreamOutletOptions) {
+        FakeStreamOutlet.callsToConstructor.push(options)
         this.options = options
     }
 

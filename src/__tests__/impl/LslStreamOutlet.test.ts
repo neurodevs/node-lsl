@@ -1,11 +1,15 @@
+import { Worker } from 'node:worker_threads'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import { ChannelFormat, LslSample } from 'impl/LiblslAdapter.js'
 import { CHANNEL_FORMATS } from '../../consts.js'
-import { StreamInfo } from '../../impl/LslStreamInfo.js'
 import LslStreamOutlet, {
     StreamOutletOptions,
 } from '../../impl/LslStreamOutlet.js'
+import {
+    setHandleError,
+    setLiblslAdapter,
+} from '../../impl/workers/LslStreamOutlet.worker.js'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
@@ -14,6 +18,7 @@ import {
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
 import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
+import FakeWorker from '../../testDoubles/WorkerThreads/FakeWorker.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamOutletTest extends AbstractPackageTest {
@@ -28,6 +33,11 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 
         this.setFakeLiblsl()
         this.setFakeStreamInfo()
+
+        LslStreamOutlet.Worker = FakeWorker as unknown as typeof Worker
+        FakeWorker.resetTestDoubles()
+
+        setLiblslAdapter(this.fakeLiblsl)
     }
 
     @test()
@@ -198,33 +208,10 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         const outlet = await this.LslStreamOutlet()
         outlet.destroy()
 
-        assert.isEqual(
-            FakeStreamInfo.numCallsToDestroy,
-            1,
-            'Did not call destroy on stream info!'
-        )
-    }
-
-    @test()
-    protected static async destroysOutletHandleBeforeInletHandle() {
-        const outlet = await this.LslStreamOutlet()
-
-        const calls: string[] = []
-
-        this.fakeLiblsl.destroyOutlet = (_options) => {
-            calls.push('destroyOutlet')
-        }
-
-        outlet.info.destroy = () => {
-            calls.push('destroyStreamInfo')
-        }
-
-        outlet.destroy()
-
         assert.isEqualDeep(
-            calls,
-            ['destroyOutlet', 'destroyStreamInfo'],
-            'Did not destroy in correct order!'
+            this.fakeLiblsl.lastDestroyOutletOptions,
+            { outletHandle: this.fakeLiblsl.outletHandle },
+            'Did not call destroy on outlet!'
         )
     }
 
@@ -248,6 +235,32 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         assert.isEqual(
             this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.timestamp,
             fakeTimestamp
+        )
+    }
+
+    @test()
+    protected static async pushSampleHandlesErrorCode() {
+        let passedErrorCode: number | undefined
+
+        setHandleError((errorCode: number) => {
+            passedErrorCode = errorCode
+        })
+
+        FakeLiblsl.fakeErrorCode = [-4, -3, -2, -1, 0][
+            Math.floor(Math.random() * 5)
+        ]
+
+        const outlet =
+            Math.random() > 0.5
+                ? await this.FloatOutlet()
+                : await this.StringOutlet()
+
+        outlet.pushSample([1.0])
+
+        assert.isEqualDeep(
+            passedErrorCode,
+            FakeLiblsl.fakeErrorCode,
+            'Did not pass the expected error code to handleError!'
         )
     }
 
@@ -286,62 +299,6 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     protected static async defaultsUnitsToNA() {
         const outlet = await this.LslStreamOutlet({ units: undefined })
         assert.isEqualDeep(outlet['units'], 'N/A', 'Did not set units as N/A!')
-    }
-
-    @test()
-    protected static async throwsWithUnknownErrorCode() {
-        await this.assertThrowsWithErrorCode(
-            -999,
-            `An unknown liblsl error has occurred!`
-        )
-    }
-
-    @test()
-    protected static async throwsWithErrorCodeNegativeOne() {
-        await this.assertThrowsWithErrorCode(
-            -1,
-            `The liblsl operation failed due to a timeout!`
-        )
-    }
-
-    @test()
-    protected static async throwsWithErrorCodeNegativeTwo() {
-        await this.assertThrowsWithErrorCode(
-            -2,
-            `The liblsl stream has been lost!`
-        )
-    }
-
-    @test()
-    protected static async throwsWithErrorCodeNegativeThree() {
-        await this.assertThrowsWithErrorCode(
-            -3,
-            'A liblsl argument was incorrectly specified!'
-        )
-    }
-
-    @test()
-    protected static async throwsWithErrorCodeNegativeFour() {
-        await this.assertThrowsWithErrorCode(
-            -4,
-            'An internal liblsl error has occurred!'
-        )
-    }
-
-    private static async assertThrowsWithErrorCode(
-        errorCode: number,
-        message: string
-    ) {
-        FakeLiblsl.fakeErrorCode = errorCode
-
-        const outlet =
-            Math.random() > 0.5
-                ? await this.FloatOutlet()
-                : await this.StringOutlet()
-
-        assert.doesThrow(() => {
-            outlet.pushSample([1.0])
-        }, message)
     }
 
     private static async assertThrowsWithEmptyChannelNames() {
@@ -422,7 +379,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 }
 
 class CheckingOutlet extends LslStreamOutlet {
-    public constructor(info: StreamInfo, options: StreamOutletOptions) {
-        super(info, options)
+    public constructor(options: StreamOutletOptions) {
+        super(options)
     }
 }

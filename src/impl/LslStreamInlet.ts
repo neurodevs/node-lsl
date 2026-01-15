@@ -7,7 +7,7 @@ import {
     unwrapPointer,
 } from 'ffi-rs'
 
-import handleError from '../handleError.js'
+import handleError from '../lib/handleError.js'
 import { InletHandle } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
 import { StreamInfo } from './LslStreamInfo.js'

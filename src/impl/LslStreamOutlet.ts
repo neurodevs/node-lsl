@@ -1,3 +1,5 @@
+import { Worker } from 'node:worker_threads'
+
 import {
     assertValidChannelCount,
     assertValidChannelFormat,
@@ -5,23 +7,12 @@ import {
     assertValidMaxBufferedMs,
     assertValidSampleRateHz,
 } from '../assertions.js'
-import handleError, { LslErrorCode } from '../handleError.js'
-import {
-    ChannelFormat,
-    OutletHandle,
-    Liblsl,
-    LslSample,
-} from './LiblslAdapter.js'
-import LiblslAdapter from './LiblslAdapter.js'
-import LslStreamInfo, {
-    StreamInfo,
-    StreamInfoOptions,
-} from './LslStreamInfo.js'
+import { ChannelFormat, Liblsl, LslSample } from './LiblslAdapter.js'
 
 export default class LslStreamOutlet implements StreamOutlet {
     public static Class?: StreamOutletConstructor
+    public static Worker = Worker
 
-    public readonly info: StreamInfo
     public readonly name: string
     public readonly type: string
     public readonly sourceId: string
@@ -34,12 +25,9 @@ export default class LslStreamOutlet implements StreamOutlet {
     public readonly manufacturer: string = 'N/A'
     public readonly units: string = 'N/A'
 
-    private outletHandle!: OutletHandle
-    private pushSampleMethod!: (options: unknown) => LslErrorCode
+    private worker!: Worker
 
-    private lsl = LiblslAdapter.getInstance()
-
-    protected constructor(info: StreamInfo, options: StreamOutletOptions) {
+    protected constructor(options: StreamOutletOptions) {
         const {
             name,
             type,
@@ -53,7 +41,6 @@ export default class LslStreamOutlet implements StreamOutlet {
             units,
         } = options
 
-        this.info = info
         this.name = name
         this.type = type
         this.sourceId = sourceId
@@ -68,16 +55,13 @@ export default class LslStreamOutlet implements StreamOutlet {
 
         this.validateOptions()
         this.createStreamOutlet()
-        this.setPushSampleMethod()
     }
 
     public static async Create(options: StreamOutletOptions) {
         const { waitAfterConstructionMs = 10 } = options ?? {}
 
-        const info = this.LslStreamInfo(options)
-        const instance = new (this.Class ?? this)(info, options)
-
-        await this.waitToAllowSetup(waitAfterConstructionMs)
+        const instance = new (this.Class ?? this)(options)
+        await this.waitForSetup(waitAfterConstructionMs)
 
         return instance
     }
@@ -108,17 +92,35 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     private createStreamOutlet() {
-        this.outletHandle = this.lsl.createOutlet({
-            infoHandle: this.info.infoHandle,
-            chunkSize: this.chunkSize,
-            maxBufferedMs: this.maxBufferedMs,
-        })
-    }
+        const t0 = Date.now()
 
-    private setPushSampleMethod() {
-        this.pushSampleMethod = (
-            this.lsl[this.pushMethod] as (options: unknown) => LslErrorCode
-        ).bind(this.lsl)
+        this.worker = new this.Worker(
+            new URL('./workers/LslStreamOutlet.worker.js', import.meta.url)
+        )
+
+        const t1 = Date.now()
+        console.info(`Worker creation took ${t1 - t0} ms...`)
+
+        this.worker.postMessage({
+            type: 'createOutlet',
+            payload: {
+                infoOptions: {
+                    name: this.name,
+                    type: this.type,
+                    sourceId: this.sourceId,
+                    channelNames: this.channelNames,
+                    channelFormat: this.channelFormat,
+                    sampleRateHz: this.sampleRateHz,
+                    units: this.units,
+                },
+                chunkSize: this.chunkSize,
+                maxBufferedMs: this.maxBufferedMs,
+                pushMethod: this.pushMethod,
+            },
+        })
+
+        const t2 = Date.now()
+        console.info(`Outlet creation took ${t2 - t1} ms...`)
     }
 
     private get pushMethod() {
@@ -131,62 +133,35 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public pushSample(sample: LslSample, preciseTimestamp?: number) {
-        const timestamp = preciseTimestamp ?? this.lsl.localClock()
-
-        const errorCode = this.pushSampleMethod({
-            outletHandle: this.outletHandle,
-            sample,
-            timestamp,
+        this.worker.postMessage({
+            type: 'pushSample',
+            payload: {
+                sample,
+                timestamp: preciseTimestamp,
+            },
         })
-        handleError(errorCode)
     }
 
     public destroy() {
-        this.firstDestroyOutletHandle()
-        this.thenDestroyInfoHandle()
+        this.worker.postMessage({
+            type: 'destroyOutlet',
+        })
     }
 
-    private firstDestroyOutletHandle() {
-        this.lsl.destroyOutlet({ outletHandle: this.outletHandle })
+    private get Worker() {
+        return LslStreamOutlet.Worker
     }
 
-    private thenDestroyInfoHandle() {
-        this.info.destroy()
-    }
-
-    private static async waitToAllowSetup(waitAfterConstructionMs: number) {
+    private static async waitForSetup(waitAfterConstructionMs: number) {
         await new Promise((resolve) =>
             setTimeout(resolve, waitAfterConstructionMs)
         )
-    }
-
-    private static LslStreamInfo(options: StreamInfoOptions) {
-        const {
-            channelNames,
-            channelFormat,
-            sampleRateHz,
-            name,
-            type,
-            sourceId,
-            units,
-        } = options
-
-        return LslStreamInfo.Create({
-            name,
-            type,
-            sourceId,
-            channelNames,
-            channelFormat,
-            sampleRateHz,
-            units,
-        })
     }
 }
 
 export interface StreamOutlet {
     pushSample(sample: LslSample, preciseTimestamp?: number): void
     destroy(): void
-    readonly info: StreamInfo
     readonly name: string
     readonly type: string
     readonly sourceId: string
@@ -201,11 +176,14 @@ export interface StreamOutlet {
 }
 
 export type StreamOutletConstructor = new (
-    info: StreamInfo,
     options: StreamOutletOptions
 ) => StreamOutlet
 
-export interface StreamOutletOptions {
+export interface StreamOutletOptions extends StreamOutletConstructorOptions {
+    waitAfterConstructionMs?: number
+}
+
+export interface StreamOutletConstructorOptions {
     name: string
     type: string
     sourceId: string
@@ -216,5 +194,4 @@ export interface StreamOutletOptions {
     maxBufferedMs?: number
     manufacturer?: string
     units?: string
-    waitAfterConstructionMs?: number
 }

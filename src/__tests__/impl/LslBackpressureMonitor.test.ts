@@ -1,10 +1,11 @@
-import AbstractModuleTest, { test, assert } from '@neurodevs/node-tdd'
+import { test, assert } from '@neurodevs/node-tdd'
 
 import LslBackpressureMonitor, {
     BackpressureMonitor,
 } from '../../impl/LslBackpressureMonitor.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
-export default class LslBackpressureMonitorTest extends AbstractModuleTest {
+export default class LslBackpressureMonitorTest extends AbstractPackageTest {
     private static instance: BackpressureMonitor
 
     protected static async beforeEach() {
