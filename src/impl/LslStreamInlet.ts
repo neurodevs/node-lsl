@@ -133,7 +133,7 @@ export default class LslStreamInlet implements StreamInlet {
         await this.lsl.openStream({
             inletHandle: this.inletHandle,
             timeoutMs: this.openStreamTimeoutMs,
-            errorCodePointer: this.openStreamErrorBufferPtr,
+            errorCodePtr: this.openStreamErrorBufferPtr,
         })
 
         await this.waitForSetup()
@@ -252,7 +252,7 @@ export default class LslStreamInlet implements StreamInlet {
             dataBufferPtr: this.dataBufferPtr,
             dataBufferElements: this.channelCount,
             timeoutMs: this.pullTimeoutMs,
-            errorCodePointer: this.pullErrorBufferPtr,
+            errorCodePtr: this.pullErrorBufferPtr,
         })
     }
 
@@ -284,7 +284,7 @@ export default class LslStreamInlet implements StreamInlet {
             timestampBufferPtr: this.timestampBufferPtr,
             timestampBufferElements: this.chunkSize,
             timeoutMs: this.pullTimeoutMs,
-            errorCodePointer: this.pullErrorBufferPtr,
+            errorCodePtr: this.pullErrorBufferPtr,
         })
     }
 

@@ -222,14 +222,14 @@ export default class LiblslAdapter implements Liblsl {
     private readonly shouldRecover = 1
 
     public async openStream(options: OpenStreamOptions) {
-        const { inletHandle, timeoutMs, errorCodePointer } = options
+        const { inletHandle, timeoutMs, errorCodePtr } = options
 
         await this.load({
             library: 'lsl',
             funcName: 'lsl_open_stream',
             retType: DataType.Void,
             paramsType: [DataType.External, DataType.Double, DataType.External],
-            paramsValue: [inletHandle, timeoutMs / 1000, errorCodePointer],
+            paramsValue: [inletHandle, timeoutMs / 1000, errorCodePtr],
             runInNewThread: true,
         })
     }
@@ -252,7 +252,7 @@ export default class LiblslAdapter implements Liblsl {
             dataBufferPtr,
             dataBufferElements,
             timeoutMs,
-            errorCodePointer,
+            errorCodePtr: errorCodePtr,
         } = options
 
         return this.load({
@@ -271,7 +271,7 @@ export default class LiblslAdapter implements Liblsl {
                 dataBufferPtr,
                 dataBufferElements,
                 timeoutMs / 1000,
-                errorCodePointer,
+                errorCodePtr,
             ],
         })
     }
@@ -284,7 +284,7 @@ export default class LiblslAdapter implements Liblsl {
             dataBufferElements,
             timestampBufferElements,
             timeoutMs,
-            errorCodePointer,
+            errorCodePtr: errorCodePtr,
         } = options
 
         return this.load({
@@ -307,7 +307,7 @@ export default class LiblslAdapter implements Liblsl {
                 dataBufferElements,
                 timestampBufferElements,
                 timeoutMs / 1000,
-                errorCodePointer,
+                errorCodePtr,
             ],
         })
     }
@@ -526,7 +526,7 @@ export interface CreateInletOptions {
 export interface OpenStreamOptions {
     inletHandle: InletHandle
     timeoutMs: number
-    errorCodePointer: JsExternal
+    errorCodePtr: JsExternal
 }
 
 export interface CloseStreamOptions {
@@ -538,7 +538,7 @@ export interface PullSampleOptions {
     dataBufferPtr: JsExternal
     dataBufferElements: number
     timeoutMs: number
-    errorCodePointer: JsExternal
+    errorCodePtr: JsExternal
 }
 
 export interface PullChunkOptions extends PullSampleOptions {

@@ -529,7 +529,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
         const timeoutMs = randomInt(1000)
 
-        const errorCodePointer = unwrapPointer(
+        const errorCodePtr = unwrapPointer(
             createPointer({
                 paramsType: [DataType.U8Array],
                 paramsValue: [new Int32Array(1)],
@@ -539,7 +539,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         await this.instance.openStream({
             inletHandle,
             timeoutMs,
-            errorCodePointer,
+            errorCodePtr,
         })
 
         assert.isEqualDeep(
@@ -553,7 +553,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     DataType.Double,
                     DataType.External,
                 ],
-                paramsValue: [inletHandle, timeoutMs / 1000, errorCodePointer],
+                paramsValue: [inletHandle, timeoutMs / 1000, errorCodePtr],
                 runInNewThread: true,
             },
             'Did not call openStream with expected options!'
@@ -596,7 +596,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             })
         )[0]
 
-        const errorCodePointer = unwrapPointer(
+        const errorCodePtr = unwrapPointer(
             createPointer({
                 paramsType: [DataType.U8Array],
                 paramsValue: [new Int32Array(1)],
@@ -608,7 +608,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             dataBufferPtr,
             dataBufferElements,
             timeoutMs,
-            errorCodePointer,
+            errorCodePtr,
         })
 
         assert.isEqualDeep(
@@ -629,7 +629,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     dataBufferPtr,
                     dataBufferElements,
                     timeoutMs,
-                    errorCodePointer,
+                    errorCodePtr,
                 ],
             },
             'Did not call pullSample with expected options!'
@@ -660,7 +660,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             })
         )[0]
 
-        const errorCodePointer = unwrapPointer(
+        const errorCodePtr = unwrapPointer(
             createPointer({
                 paramsType: [DataType.U8Array],
                 paramsValue: [new Int32Array(1)],
@@ -674,7 +674,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             dataBufferElements,
             timestampBufferElements,
             timeoutMs,
-            errorCodePointer,
+            errorCodePtr,
         })
 
         assert.isEqualDeep(
@@ -699,7 +699,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                     dataBufferElements,
                     timestampBufferElements,
                     timeoutMs,
-                    errorCodePointer,
+                    errorCodePtr,
                 ],
             },
             'Did not call pullChunk with expected options!'

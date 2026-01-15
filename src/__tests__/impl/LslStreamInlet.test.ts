@@ -186,7 +186,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 inletHandle: this.inletHandle,
                 timeoutMs: aboutOneYearInMs,
-                errorCodePointer: this.instance['openStreamErrorBufferPtr'],
+                errorCodePtr: this.instance['openStreamErrorBufferPtr'],
             },
             'Did not open inlet stream!'
         )
@@ -209,7 +209,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 inletHandle: instance.getInletHandle(),
                 timeoutMs: openStreamTimeoutMs,
-                errorCodePointer: instance['openStreamErrorBufferPtr'],
+                errorCodePtr: instance['openStreamErrorBufferPtr'],
             },
             'Did not open inlet stream with passed timeout!'
         )
@@ -321,7 +321,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
                 dataBufferPtr: inlet['dataBufferPtr'],
                 dataBufferElements: this.channelCount,
                 timeoutMs: 0,
-                errorCodePointer: inlet['pullErrorBufferPtr'],
+                errorCodePtr: inlet['pullErrorBufferPtr'],
             },
             'Should have called pullSample!'
         )
@@ -340,7 +340,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
                 dataBufferElements: this.chunkSize * this.channelCount,
                 timestampBufferElements: this.chunkSize,
                 timeoutMs: 0,
-                errorCodePointer: this.instance['pullErrorBufferPtr'],
+                errorCodePtr: this.instance['pullErrorBufferPtr'],
             },
             'Should have called pullChunk!'
         )
