@@ -17,7 +17,8 @@
 			"runtimeArgs": [
 				"--inspect-brk",
 				"--trace-warnings",
-				"${workspaceFolder}/node_modules/.bin/jest",
+				"--experimental-vm-modules",
+				"${workspaceFolder}/node_modules/jest/bin/jest.js",
 				"${fileBasenameNoExtension}",
 				"--detectOpenHandles"
 			],
@@ -33,7 +34,7 @@
 			"runtimeArgs": [
 				"--inspect-brk",
 				"--trace-warnings",
-				"${workspaceFolder}/node_modules/.bin/jest"
+				"${workspaceFolder}/node_modules/jest/bin/jest.js"
 			],
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal",
