@@ -157,7 +157,7 @@ export default class LiblslAdapter implements Liblsl {
             runInNewThread: true,
         })
 
-        const handles: bigint[] = []
+        const handles: InfoHandle[] = []
 
         for (let i = 0; i < numResults; i++) {
             const handle = resultsBuffer.readBigUInt64LE(i * bytesPerPointer)
@@ -220,6 +220,11 @@ export default class LiblslAdapter implements Liblsl {
 
     private readonly maxChunkSize = 0
     private readonly shouldRecover = 1
+
+    public getChannelCount(options: GetChannelCountOptions) {
+        const { infoHandle } = options
+        return this.bindings.lsl_get_channel_count([infoHandle])
+    }
 
     public async openStream(options: OpenStreamOptions) {
         const { inletHandle, timeoutMs, errorCodePtr } = options
@@ -414,6 +419,11 @@ export default class LiblslAdapter implements Liblsl {
                 retType: DataType.External,
                 paramsType: [DataType.External],
             },
+            lsl_get_channel_count: {
+                library: 'lsl',
+                retType: DataType.I32,
+                paramsType: [DataType.External],
+            },
             lsl_append_child: {
                 library: 'lsl',
                 retType: DataType.External,
@@ -443,8 +453,9 @@ export interface Liblsl {
     createStreamInfo(options: CreateStreamInfoOptions): InfoHandle
     destroyStreamInfo(options: DestroyStreamInfoOptions): void
     appendChannelsToStreamInfo(options: AppendChannelsToStreamInfoOptions): void
+    getChannelCount(options: GetChannelCountOptions): number
 
-    resolveByProp(options: ResolveByPropOptions): Promise<bigint[]>
+    resolveByProp(options: ResolveByPropOptions): Promise<InfoHandle[]>
 
     createOutlet(options: CreateOutletOptions): OutletHandle
 
@@ -483,6 +494,10 @@ export interface CreateStreamInfoOptions {
 export interface AppendChannelsToStreamInfoOptions {
     infoHandle: InfoHandle
     channels: LslChannel[]
+}
+
+export interface GetChannelCountOptions {
+    infoHandle: InfoHandle
 }
 
 export interface DestroyStreamInfoOptions {
@@ -559,18 +574,22 @@ export interface LiblslBindings {
         args: [string, string, number, number, number, string]
     ): InfoHandle
 
+    lsl_get_desc(args: [InfoHandle]): DescriptionHandle
+    lsl_get_channel_count(args: [InfoHandle]): number
+    lsl_append_child(args: [DescriptionHandle, string]): ChildHandle
+    lsl_append_child_value(args: [ChildHandle, string, string]): void
     lsl_destroy_streaminfo(args: [InfoHandle]): void
+
     lsl_create_outlet(args: [InfoHandle, number, number]): OutletHandle
     lsl_push_sample_ft(args: [OutletHandle, LslSample, number]): LslErrorCode
     lsl_push_sample_strt(args: [OutletHandle, LslSample, number]): LslErrorCode
     lsl_destroy_outlet(args: [OutletHandle]): void
+
     lsl_create_inlet(args: any): InletHandle
     lsl_inlet_flush(args: [InletHandle]): void
     lsl_destroy_inlet(args: any): void
+
     lsl_local_clock(args: []): number
-    lsl_get_desc(args: [InfoHandle]): DescriptionHandle
-    lsl_append_child(args: [DescriptionHandle, string]): ChildHandle
-    lsl_append_child_value(args: [ChildHandle, string, string]): void
 }
 
 export type ChannelFormat = (typeof CHANNEL_FORMATS)[number]

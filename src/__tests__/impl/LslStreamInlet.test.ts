@@ -34,8 +34,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         LslStreamInlet.waitAfterOpenStreamMs = 0
 
-        console.warn = () => {}
-
         this.instance = await this.LslStreamInlet()
     }
 
@@ -46,14 +44,16 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async callsBindingsToCreateStreamInlet() {
-        const fakeInfo = this.instance.getStreamInfo()
+        await this.startPulling()
 
-        assert.isTruthy(fakeInfo, 'Should have created stream info!')
+        const fakeInfoHandle = this.instance.getInfoHandle()
+
+        assert.isTruthy(fakeInfoHandle, 'Should have created stream info!')
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastCreateInletOptions,
             {
-                infoHandle: fakeInfo.infoHandle,
+                infoHandle: fakeInfoHandle,
                 maxBufferedMs: this.maxBufferedMs,
             },
             'Should have called createInlet!'
@@ -317,7 +317,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.fakeLiblsl.lastPullSampleOptions,
             {
-                inletHandle: this.inletHandle,
+                inletHandle: inlet['inletHandle'],
                 dataBufferPtr: inlet['dataBufferPtr'],
                 dataBufferElements: this.channelCount,
                 timeoutMs: 0,

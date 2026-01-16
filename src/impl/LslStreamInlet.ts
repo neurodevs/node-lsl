@@ -8,9 +8,8 @@ import {
 } from 'ffi-rs'
 
 import handleError from '../lib/handleError.js'
-import { InletHandle } from './LiblslAdapter.js'
+import { InfoHandle, InletHandle } from './LiblslAdapter.js'
 import LiblslAdapter from './LiblslAdapter.js'
-import { StreamInfo } from './LslStreamInfo.js'
 
 export default class LslStreamInlet implements StreamInlet {
     public static Class?: StreamInletConstructor
@@ -19,8 +18,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     public isRunning = false
 
-    protected info: StreamInfo
-    private channelCount: number
+    private sourceId: string
     private chunkSize: number
     private maxBufferedMs: number
     private pullTimeoutMs: number
@@ -33,7 +31,10 @@ export default class LslStreamInlet implements StreamInlet {
     private readonly sixMinutesInMs = 360 * 1000
     private readonly aboutOneYearInMs = 32000000 * 1000
 
+    protected infoHandle!: InfoHandle
     protected inletHandle!: InletHandle
+
+    private channelCount!: number
 
     private pullDataMethod!: () => {
         samples: Float32Array | undefined
@@ -60,12 +61,9 @@ export default class LslStreamInlet implements StreamInlet {
 
     private lsl = LiblslAdapter.getInstance()
 
-    protected constructor(
-        info: StreamInfo,
-        options: StreamInletConstructorOptions,
-        onData: OnDataCallback
-    ) {
+    protected constructor(options: StreamInletOptions, onData: OnDataCallback) {
         const {
+            sourceId,
             chunkSize,
             maxBufferedMs,
             pullTimeoutMs,
@@ -75,8 +73,7 @@ export default class LslStreamInlet implements StreamInlet {
             flushQueueOnStop,
         } = options ?? {}
 
-        this.info = info
-        this.channelCount = this.info.channelCount
+        this.sourceId = sourceId
         this.chunkSize = chunkSize
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.pullTimeoutMs = pullTimeoutMs ?? 0
@@ -87,15 +84,13 @@ export default class LslStreamInlet implements StreamInlet {
         this.onData = onData
 
         this.setPullDataMethod()
-        this.createInletHandle()
     }
 
     public static async Create(
         options: StreamInletOptions,
         onData: OnDataCallback
     ) {
-        const { info } = options
-        return new (this.Class ?? this)(info, options, onData)
+        return new (this.Class ?? this)(options, onData)
     }
 
     private setPullDataMethod() {
@@ -106,24 +101,49 @@ export default class LslStreamInlet implements StreamInlet {
         }
     }
 
-    private createInletHandle() {
-        this.inletHandle = this.lsl.createInlet({
-            infoHandle: this.info.infoHandle,
-            maxBufferedMs: this.maxBufferedMs,
-        })
-    }
-
     public async startPulling() {
         if (!this.isRunning) {
             this.isRunning = true
 
+            this.infoHandle = await this.resolveInfoHandle()
+            this.channelCount = this.getChannelCountFromInfoHandle()
+            this.inletHandle = this.createInletHandle()
+
             await this.openLslStream()
+
             this.createWritableBuffers()
 
             this.pullLoop = this.pullOnLoop()
         } else {
             console.warn('Cannot start pulling: inlet is already running!')
         }
+    }
+
+    private async resolveInfoHandle() {
+        const handles = await this.lsl.resolveByProp({
+            prop: 'source_id',
+            value: this.sourceId,
+        })
+
+        if (handles.length > 1) {
+            console.warn(
+                `Expected to find exactly one stream info with sourceId "${this.sourceId}", but found ${handles.length}. Returning the first one.`
+            )
+        }
+        return handles[0]
+    }
+
+    private getChannelCountFromInfoHandle() {
+        return this.lsl.getChannelCount({
+            infoHandle: this.infoHandle,
+        })
+    }
+
+    private createInletHandle() {
+        return this.lsl.createInlet({
+            infoHandle: this.infoHandle,
+            maxBufferedMs: this.maxBufferedMs,
+        })
     }
 
     private async openLslStream() {
@@ -360,13 +380,12 @@ export interface StreamInlet {
 }
 
 export type StreamInletConstructor = new (
-    info: StreamInfo,
-    options: StreamInletConstructorOptions,
+    options: StreamInletOptions,
     onData: OnDataCallback
 ) => StreamInlet
 
 export interface StreamInletOptions {
-    info: StreamInfo
+    sourceId: string
     chunkSize: number
     maxBufferedMs?: number
     openStreamTimeoutMs?: number
@@ -375,8 +394,6 @@ export interface StreamInletOptions {
     waitBetweenPullsMs?: number
     flushQueueOnStop?: boolean
 }
-
-export type StreamInletConstructorOptions = Omit<StreamInletOptions, 'info'>
 
 export type OnDataCallback = (
     samples: Float32Array,

@@ -1,13 +1,8 @@
-import { StreamInfo } from '../../impl/LslStreamInfo.js'
-import {
-    StreamInlet,
-    StreamInletConstructorOptions,
-} from '../../impl/LslStreamInlet.js'
+import { StreamInlet, StreamInletOptions } from '../../impl/LslStreamInlet.js'
 
 export default class FakeStreamInlet implements StreamInlet {
     public static callsToConstructor: {
-        info?: StreamInfo
-        options?: StreamInletConstructorOptions
+        options?: StreamInletOptions
         onData?: (samples: Float32Array, timestamps: Float64Array) => void
     }[] = []
 
@@ -21,14 +16,12 @@ export default class FakeStreamInlet implements StreamInlet {
     protected onData!: (samples: Float32Array, timestamps: Float64Array) => void
 
     public constructor(
-        info?: StreamInfo,
-        options?: StreamInletConstructorOptions,
+        options?: StreamInletOptions,
         onData?: (samples: Float32Array, timestamps: Float64Array) => void
     ) {
         this.onData = onData ?? (() => {})
 
         FakeStreamInlet.callsToConstructor.push({
-            info,
             options,
             onData: this.onData,
         })

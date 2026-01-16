@@ -1,6 +1,5 @@
 import WebSocket, { WebSocketServer } from 'ws'
 
-import { StreamInfo } from './LslStreamInfo.js'
 import LslStreamInlet, {
     StreamInlet,
     StreamInletOptions,
@@ -176,7 +175,7 @@ export type WebSocketBridgeConstructor = new (
 ) => WebSocketBridge
 
 export interface WebSocketBridgeOptions {
-    info: StreamInfo
+    sourceId: string
     chunkSize: number
     listenPort?: number
     connectUrls?: string | string[]

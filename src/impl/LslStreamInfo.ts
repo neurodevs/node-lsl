@@ -7,8 +7,6 @@ import LiblslAdapter from './LiblslAdapter.js'
 export default class LslStreamInfo implements StreamInfo {
     public static Class?: StreamInfoConstructor
 
-    private static instanceCache = new Map<InfoHandle, StreamInfo>()
-
     public readonly name: string
     public readonly type: string
     public readonly sourceId: string
@@ -17,6 +15,7 @@ export default class LslStreamInfo implements StreamInfo {
     public readonly channelFormat: ChannelFormat
     public readonly sampleRateHz: number
     public readonly units: string
+
     public readonly infoHandle: InfoHandle
 
     private lsl = LiblslAdapter.getInstance()
@@ -30,7 +29,6 @@ export default class LslStreamInfo implements StreamInfo {
             channelFormat,
             sampleRateHz,
             units = 'N/A',
-            infoHandle,
         } = options
 
         this.name = name
@@ -42,25 +40,12 @@ export default class LslStreamInfo implements StreamInfo {
         this.sampleRateHz = sampleRateHz
         this.units = units
 
-        if (!infoHandle) {
-            this.infoHandle = this.createStreamInfo()
-            this.appendChannelsToStreamInfo()
-        } else {
-            this.infoHandle = infoHandle
-        }
+        this.infoHandle = this.createStreamInfo()
+        this.appendChannelsToStreamInfo()
     }
 
     public static Create(options: StreamInfoOptions) {
-        const instance = new (this.Class ?? this)(options)
-
-        const { infoHandle } = instance
-        this.instanceCache.set(infoHandle, instance)
-
-        return instance
-    }
-
-    public static From(infoHandle: InfoHandle) {
-        return this.instanceCache.get(infoHandle)!
+        return new (this.Class ?? this)(options)
     }
 
     private createStreamInfo() {
@@ -119,5 +104,4 @@ export interface StreamInfoOptions {
     type?: string
     sourceId?: string
     units?: string
-    infoHandle?: InfoHandle
 }

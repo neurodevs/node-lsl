@@ -1,11 +1,13 @@
 import LslStreamInlet from '../impl/LslStreamInlet.js'
 import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 
+const sourceId = 'TestOutletID'
+
 console.log('Creating outlet...')
 const outlet = await LslStreamOutlet.Create({
     name: 'TestOutlet',
     type: 'TEST',
-    sourceId: 'TestOutletID',
+    sourceId,
     sampleRateHz: 100,
     channelNames: ['Ch1', 'Ch2', 'Ch3'],
     channelFormat: 'float32',
@@ -16,13 +18,11 @@ const outlet = await LslStreamOutlet.Create({
 
 console.log('Creating inlet...')
 
-const inletOptions = {
-    info: {} as any, // TODO
-    chunkSize: 1,
-}
-
 const inlet = await LslStreamInlet.Create(
-    inletOptions,
+    {
+        sourceId,
+        chunkSize: 1,
+    },
     (samples, timestamps) => {
         console.log('Received samples:', samples, 'at timestamps:', timestamps)
     }

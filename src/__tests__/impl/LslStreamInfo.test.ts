@@ -218,43 +218,6 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         )
     }
 
-    @test()
-    protected static async doesNotCreateNewStreamInfoIfPassedInfoHandle() {
-        this.LslStreamInfo({
-            infoHandle: this.instance.infoHandle,
-        })
-
-        assert.isEqual(
-            this.fakeLiblsl.createStreamInfoHitCount,
-            1,
-            'Should not have created new stream info!'
-        )
-    }
-
-    @test()
-    protected static async setsInfoHandleWhenPassed() {
-        const instance = this.LslStreamInfo({
-            infoHandle: this.instance.infoHandle,
-        })
-
-        assert.isEqualDeep(
-            instance.infoHandle,
-            this.instance.infoHandle,
-            'Should have set info handle!'
-        )
-    }
-
-    @test()
-    protected static async cachesInfoAttributesByInfoHandle() {
-        const cached = LslStreamInfo.From(this.instance.infoHandle)
-
-        assert.isEqualDeep(
-            cached,
-            this.instance,
-            'Should have set info handle!'
-        )
-    }
-
     private static readonly defaultOptions = {
         name: this.name,
         type: this.type,

@@ -1,7 +1,7 @@
 import AbstractModuleTest from '@neurodevs/node-tdd'
 import WebSocket, { Server } from 'ws'
 
-import LiblslAdapter from '../impl/LiblslAdapter.js'
+import LiblslAdapter, { InfoHandle } from '../impl/LiblslAdapter.js'
 import LslEventMarkerEmitter from '../impl/LslEventMarkerEmitter.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
 import LslStreamInlet, {
@@ -34,6 +34,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LiblslAdapter.setInstance(this.fakeLiblsl)
 
         FakeLiblsl.fakeErrorCode = 0
+        FakeLiblsl.fakeInfoHandles = [{} as InfoHandle]
     }
 
     protected static setSpyStreamInfo() {

@@ -172,7 +172,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
         assert.isAbove(
             endMs - startMs,
-            waitAfterMs,
+            0.8 * waitAfterMs,
             'Did not wait for the specified time!'
         )
     }

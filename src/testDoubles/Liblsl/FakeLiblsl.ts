@@ -20,10 +20,11 @@ import {
     DestroyOutletOptions,
     OpenStreamOptions,
     CloseStreamOptions,
+    GetChannelCountOptions,
 } from 'impl/LiblslAdapter.js'
 
 export default class FakeLiblsl implements Liblsl {
-    public static fakeStreamInfoHandles: InfoHandle[] = []
+    public static fakeInfoHandles: InfoHandle[] = []
 
     public static fakeSamples: Float32Array[] = [
         new Float32Array([1, 2, 3]),
@@ -40,6 +41,7 @@ export default class FakeLiblsl implements Liblsl {
         new Float64Array([7, 8]),
     ]
 
+    public static fakeChannelCount = 3
     public static fakeErrorCode = 0
 
     public liblslPath: string = generateId()
@@ -55,10 +57,13 @@ export default class FakeLiblsl implements Liblsl {
     public lastAppendChannelsToStreamInfoOptions?: AppendChannelsToStreamInfoOptions
     public lastDestroyStreamInfoOptions?: DestroyStreamInfoOptions
     public lastResolveByPropOptions?: ResolveByPropOptions
+    public lastGetChannelCountOptions?: GetChannelCountOptions
+
     public lastCreateOutletOptions?: CreateOutletOptions
     public lastPushSampleFloatTimestampOptions?: PushSampleFloatTimestampOptions
     public lastPushSampleStringTimestampOptions?: PushSampleStringTimestampOptions
     public lastDestroyOutletOptions?: DestroyOutletOptions
+
     public lastCreateInletOptions?: CreateInletOptions
     public lastOpenStreamOptions?: OpenStreamOptions
     public lastCloseStreamOptions?: CloseStreamOptions
@@ -88,13 +93,18 @@ export default class FakeLiblsl implements Liblsl {
         this.lastAppendChannelsToStreamInfoOptions = options
     }
 
+    public getChannelCount(options: GetChannelCountOptions) {
+        this.lastGetChannelCountOptions = options
+        return FakeLiblsl.fakeChannelCount
+    }
+
     public destroyStreamInfo(options: DestroyStreamInfoOptions) {
         this.lastDestroyStreamInfoOptions = options
     }
 
     public async resolveByProp(options: ResolveByPropOptions) {
         this.lastResolveByPropOptions = options
-        return FakeLiblsl.fakeStreamInfoHandles as bigint[]
+        return FakeLiblsl.fakeInfoHandles
     }
 
     public pushSampleFloatTimestamp(options: PushSampleFloatTimestampOptions) {

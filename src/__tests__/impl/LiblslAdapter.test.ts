@@ -45,6 +45,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     private static appendChildValueParams: any[]
     private static appendChildHitCount: number
     private static getDescriptionParams?: [InfoHandle]
+    private static getChannelCountParams?: [InfoHandle]
 
     private static createOutletParams?: any[]
     private static pushSampleFloatTimestampParams?: any[]
@@ -73,6 +74,8 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
         delete this.destroyInletParams
         delete this.pushSampleFloatTimestampParams
         delete this.getDescriptionParams
+        delete this.getChannelCountParams
+
         this.appendChildParams = []
         this.appendChildValueParams = []
 
@@ -227,6 +230,11 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             lsl_get_desc: {
                 library: 'lsl',
                 retType: DataType.External,
+                paramsType: [DataType.External],
+            },
+            lsl_get_channel_count: {
+                library: 'lsl',
+                retType: DataType.I32,
                 paramsType: [DataType.External],
             },
             lsl_append_child: {
@@ -521,6 +529,14 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             this.fakeInletHandle,
             'Did not receive expected inlet!'
         )
+    }
+
+    @test()
+    protected static async getsChannelCountFromInfoHandle() {
+        const infoHandle = this.createRandomInfoHandle()
+
+        const channelCount = this.instance.getChannelCount({ infoHandle })
+        assert.isEqual(channelCount, this.channelCount)
     }
 
     @test()
@@ -862,6 +878,10 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
             lsl_local_clock: (params: []) => {
                 this.localClockParams = params
                 return new Date().getTime()
+            },
+            lsl_get_channel_count: (info: InfoHandle) => {
+                this.getChannelCountParams = [info]
+                return this.channelCount
             },
             lsl_get_desc: (info: InfoHandle) => {
                 this.getDescriptionParams = [info]

@@ -1,10 +1,10 @@
 import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
 
+import { StreamInletOptions } from '../../impl/LslStreamInlet.js'
 import LslWebSocketBridge, {
     WebSocketBridgeOptions,
 } from '../../impl/LslWebSocketBridge.js'
-import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
 import FakeStreamInlet from '../../testDoubles/StreamInlet/FakeStreamInlet.js'
 import SpyLslWebSocketBridge from '../../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
 import FakeWebSocket from '../../testDoubles/WebSockets/FakeWebSocket.js'
@@ -36,12 +36,12 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
     protected static async createsLslStreamInlet() {
         const call = FakeStreamInlet.callsToConstructor[0]
 
-        const info = call?.info
-        const chunkSize = call?.options?.chunkSize
+        const sourceId = call.options!.sourceId
+        const chunkSize = call.options!.chunkSize
 
         assert.isEqualDeep(
             {
-                info,
+                sourceId,
                 chunkSize,
             },
             this.inletOptions
@@ -277,8 +277,8 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static readonly connectUrls = [this.generateId(), this.generateId()]
 
-    private static readonly inletOptions = {
-        info: new FakeStreamInfo(),
+    private static readonly inletOptions: StreamInletOptions = {
+        sourceId: this.sourceId,
         chunkSize: randomInt(1, 100),
     }
 
