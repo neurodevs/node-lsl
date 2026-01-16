@@ -94,7 +94,10 @@ export default class LslStreamOutlet implements StreamOutlet {
 
     private createWorkerThread() {
         this.worker = new this.Worker(
-            new URL('./workers/LslStreamOutlet.worker.js', import.meta.url)
+            new URL(
+                './workers/outlet/LslStreamOutlet.worker.js',
+                import.meta.url
+            )
         )
     }
 

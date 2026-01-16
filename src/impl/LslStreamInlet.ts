@@ -57,7 +57,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     private createWorkerThread() {
         this.worker = new this.Worker(
-            new URL('./workers/LslStreamInlet.worker.js', import.meta.url)
+            new URL('./workers/inlet/LslStreamInlet.worker.js', import.meta.url)
         )
 
         this.worker.on('message', (msg) => {
@@ -72,6 +72,7 @@ export default class LslStreamInlet implements StreamInlet {
                     const { payload } = msg
                     const { samples, timestamps } = payload
 
+                    console.info(samples, timestamps)
                     this.onData(samples, timestamps)
                     break
                 }
