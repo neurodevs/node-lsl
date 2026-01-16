@@ -12,7 +12,7 @@ export default class LslStreamInlet implements StreamInlet {
     private openStreamTimeoutMs: number
     private waitAfterOpenStreamMs: number
     private waitBetweenPullsMs: number
-    private flushQueueOnStop: boolean
+    private flushInletOnStop: boolean
     private onData: OnDataCallback
 
     private worker!: Worker
@@ -32,7 +32,7 @@ export default class LslStreamInlet implements StreamInlet {
             openStreamTimeoutMs,
             waitAfterOpenStreamMs,
             waitBetweenPullsMs,
-            flushQueueOnStop,
+            flushInletOnStop,
         } = options ?? {}
 
         this.sourceId = sourceId
@@ -42,7 +42,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.openStreamTimeoutMs = openStreamTimeoutMs ?? this.aboutOneYearInMs
         this.waitAfterOpenStreamMs = waitAfterOpenStreamMs ?? this.defaultWaitMs
         this.waitBetweenPullsMs = waitBetweenPullsMs ?? 1
-        this.flushQueueOnStop = flushQueueOnStop ?? true
+        this.flushInletOnStop = flushInletOnStop ?? true
         this.onData = onData
 
         this.createWorkerThread()
@@ -112,7 +112,7 @@ export default class LslStreamInlet implements StreamInlet {
                 waitAfterOpenStreamMs: this.waitAfterOpenStreamMs,
                 pullTimeoutMs: this.pullTimeoutMs,
                 waitBetweenPullsMs: this.waitBetweenPullsMs,
-                flushQueueOnStop: this.flushQueueOnStop,
+                flushInletOnStop: this.flushInletOnStop,
             },
         })
     }
@@ -121,8 +121,8 @@ export default class LslStreamInlet implements StreamInlet {
         this.worker.postMessage({ type: 'startPulling' })
     }
 
-    public flushQueue() {
-        this.worker.postMessage({ type: 'flushQueue' })
+    public flushInlet() {
+        this.worker.postMessage({ type: 'flushInlet' })
     }
 
     public stopPulling() {
@@ -149,7 +149,7 @@ export default class LslStreamInlet implements StreamInlet {
 export interface StreamInlet {
     startPulling(): Promise<void>
     stopPulling(): void
-    flushQueue(): void
+    flushInlet(): void
     destroy(): void
     readonly isRunning: boolean
 }
@@ -167,7 +167,7 @@ export interface StreamInletOptions {
     waitAfterOpenStreamMs?: number
     pullTimeoutMs?: number
     waitBetweenPullsMs?: number
-    flushQueueOnStop?: boolean
+    flushInletOnStop?: boolean
 }
 
 export type OnDataCallback = (

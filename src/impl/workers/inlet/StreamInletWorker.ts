@@ -24,7 +24,7 @@ export default class StreamInletWorker {
     private waitAfterOpenStreamMs!: number
     private waitBetweenPullsMs!: number
     private pullTimeoutMs!: number
-    private flushQueueOnStop!: boolean
+    private flushInletOnStop!: boolean
 
     private pullMethod!: () => {
         samples: Float32Array | undefined
@@ -284,7 +284,7 @@ export default class StreamInletWorker {
         await new Promise((r) => setTimeout(r, this.waitBetweenPullsMs))
     }
 
-    public flushQueue() {
+    public flushInlet() {
         this.lsl.flushInlet({ inletHandle: this.inletHandle })
     }
 
@@ -292,8 +292,8 @@ export default class StreamInletWorker {
         this.isRunning = false
         this.closeStream()
 
-        if (this.flushQueueOnStop) {
-            this.flushQueue()
+        if (this.flushInletOnStop) {
+            this.flushInlet()
         }
     }
 

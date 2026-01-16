@@ -59,8 +59,8 @@ export default class FakeWorker {
                 this.inletWorker.startPulling(this.fakeOnData)
                 break
             }
-            case 'flushQueue': {
-                this.inletWorker.flushQueue()
+            case 'flushInlet': {
+                this.inletWorker.flushInlet()
                 break
             }
             case 'stopPulling': {

@@ -24,12 +24,11 @@ parentPort?.on('message', async (msg: InletMessage) => {
                 })
                 break
 
-            case 'flushQueue':
-                worker.flushQueue()
-                break
-
             case 'stopPulling':
                 worker.stopPulling()
+                break
+            case 'flushInlet':
+                worker.flushInlet()
                 break
 
             case 'destroyInlet':
@@ -54,7 +53,7 @@ export type InletMessage =
           type: 'startPulling'
       }
     | {
-          type: 'flushQueue'
+          type: 'flushInlet'
       }
     | {
           type: 'stopPulling'
@@ -71,5 +70,5 @@ export interface CreateInletPayload {
     waitAfterOpenStreamMs: number
     pullTimeoutMs: number
     waitBetweenPullsMs: number
-    flushQueueOnStop: boolean
+    flushInletOnStop: boolean
 }
