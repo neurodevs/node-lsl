@@ -92,14 +92,9 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     private createStreamOutlet() {
-        const t0 = Date.now()
-
         this.worker = new this.Worker(
             new URL('./workers/LslStreamOutlet.worker.js', import.meta.url)
         )
-
-        const t1 = Date.now()
-        console.info(`Worker creation took ${t1 - t0} ms...`)
 
         this.worker.postMessage({
             type: 'createOutlet',
@@ -118,9 +113,6 @@ export default class LslStreamOutlet implements StreamOutlet {
                 pushMethod: this.pushMethod,
             },
         })
-
-        const t2 = Date.now()
-        console.info(`Outlet creation took ${t2 - t1} ms...`)
     }
 
     private get pushMethod() {
@@ -133,6 +125,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public pushSample(sample: LslSample, timestamp?: number) {
+        console.info('Pushing sample:', sample, 'at', timestamp)
         this.worker.postMessage({
             type: 'pushSample',
             payload: {
