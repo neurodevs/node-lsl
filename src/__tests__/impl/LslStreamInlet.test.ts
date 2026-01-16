@@ -1,10 +1,21 @@
+import { Worker } from 'node:worker_threads'
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { DataType, FieldType, JsExternal, PointerType } from 'ffi-rs'
+import {
+    createPointer,
+    DataType,
+    FieldType,
+    JsExternal,
+    PointerType,
+    unwrapPointer,
+} from 'ffi-rs'
 import LslStreamInlet, {
     StreamInletOptions,
 } from '../../impl/LslStreamInlet.js'
+import StreamInletWorker from '../../impl/workers/inlet/StreamInletWorker.js'
+import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
+import FakeWorker from '../../testDoubles/WorkerThreads/FakeWorker.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamInletTest extends AbstractPackageTest {
@@ -14,6 +25,27 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         samples: Float32Array
         timestamps: Float64Array
     }[]
+
+    private static readonly dataBufferPtr = unwrapPointer(
+        createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [new Float32Array(this.channelCount * this.chunkSize)],
+        })
+    )[0]
+
+    private static readonly timestampBufferPtr = unwrapPointer(
+        createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [new Float64Array(this.chunkSize)],
+        })
+    )[0]
+
+    private static readonly errorCodePtr = unwrapPointer(
+        createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [new Int32Array(1)],
+        })
+    )[0]
 
     protected static async beforeAll() {
         assert.isEqual(
@@ -34,6 +66,14 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         LslStreamInlet.waitAfterOpenStreamMs = 0
 
+        LslStreamInlet.Worker = FakeWorker as unknown as typeof Worker
+        FakeWorker.resetTestDoubles()
+
+        StreamInletWorker.lsl = this.fakeLiblsl
+        StreamInletWorker.freePointer = () => {}
+
+        FakeWorker.fakeOnData = this.onData
+
         this.instance = await this.LslStreamInlet()
     }
 
@@ -46,14 +86,12 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     protected static async callsBindingsToCreateStreamInlet() {
         await this.startPulling()
 
-        const fakeInfoHandle = this.instance.getInfoHandle()
-
-        assert.isTruthy(fakeInfoHandle, 'Should have created stream info!')
+        assert.isTruthy(this.inletHandle, 'Should have created stream info!')
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastCreateInletOptions,
             {
-                infoHandle: fakeInfoHandle,
+                infoHandle: this.inletHandle,
                 maxBufferedMs: this.maxBufferedMs,
             },
             'Should have called createInlet!'
@@ -75,8 +113,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async destroyCallsLslBinding() {
-        LslStreamInlet.freePointer = () => {}
-
         await this.startPullingThenDestroy()
 
         assert.isEqualDeep(
@@ -96,7 +132,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         let calls: FreePointerParams[] = []
 
-        LslStreamInlet.freePointer = (params: FreePointerParams) => {
+        StreamInletWorker.freePointer = (params: FreePointerParams) => {
             calls.push(params)
         }
 
@@ -159,20 +195,17 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async startPullingReturnsEarlyIfAlreadyRunning() {
-        let numHits = 0
-
-        const original = this.instance['openLslStream'].bind(this.instance)
-
-        this.instance['openLslStream'] = async () => {
-            numHits++
-            await original()
-        }
-
+    protected static async doesNotStartPullingTwiceIfAlreadyRunning() {
         await this.startPulling()
         await this.startPulling()
 
-        assert.isEqual(numHits, 1, 'startPulling did not return early!')
+        assert.isEqual(
+            FakeWorker.callsToPostMessage.filter(
+                (msg) => msg.type === 'startPulling'
+            ).length,
+            1,
+            'startPulling did not return early!'
+        )
 
         this.stopPulling()
     }
@@ -188,7 +221,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 inletHandle: this.inletHandle,
                 timeoutMs: aboutOneYearInMs,
-                errorCodePtr: this.instance['openStreamErrorBufferPtr'],
+                errorCodePtr: this.errorCodePtr,
             },
             'Did not open inlet stream!'
         )
@@ -204,14 +237,14 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             openStreamTimeoutMs,
         })
 
-        await instance.startPulling()
+        await this.startPulling(instance)
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastOpenStreamOptions,
             {
-                inletHandle: instance.getInletHandle(),
+                inletHandle: this.inletHandle,
                 timeoutMs: openStreamTimeoutMs,
-                errorCodePtr: instance['openStreamErrorBufferPtr'],
+                errorCodePtr: this.errorCodePtr,
             },
             'Did not open inlet stream with passed timeout!'
         )
@@ -228,7 +261,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         })
 
         let t0 = Date.now()
-        await instance.startPulling()
+        await this.startPulling(instance)
         let elapsed = Date.now() - t0
 
         instance.stopPulling()
@@ -274,7 +307,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             flushQueueOnStop: false,
         })
 
-        await instance.startPulling()
+        await this.startPulling(instance)
         instance.stopPulling()
 
         assert.isUndefined(
@@ -314,16 +347,16 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async callsPullSampleIfChunkSizeIsOne() {
-        const inlet = await this.runChunkSizeOne()
+        await this.runChunkSizeOne()
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastPullSampleOptions,
             {
-                inletHandle: inlet['inletHandle'],
-                dataBufferPtr: inlet['dataBufferPtr'],
+                inletHandle: this.inletHandle,
+                dataBufferPtr: this.dataBufferPtr,
                 dataBufferElements: this.channelCount,
                 timeoutMs: 0,
-                errorCodePtr: inlet['pullErrorBufferPtr'],
+                errorCodePtr: this.errorCodePtr,
             },
             'Should have called pullSample!'
         )
@@ -337,14 +370,36 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             this.fakeLiblsl.lastPullChunkOptions,
             {
                 inletHandle: this.inletHandle,
-                dataBufferPtr: this.instance['dataBufferPtr'],
-                timestampBufferPtr: this.instance['timestampBufferPtr'],
+                dataBufferPtr: this.dataBufferPtr,
+                timestampBufferPtr: this.timestampBufferPtr,
                 dataBufferElements: this.chunkSize * this.channelCount,
                 timestampBufferElements: this.chunkSize,
                 timeoutMs: 0,
-                errorCodePtr: this.instance['pullErrorBufferPtr'],
+                errorCodePtr: this.errorCodePtr,
             },
             'Should have called pullChunk!'
+        )
+    }
+
+    @test()
+    protected static async pushSampleHandlesErrorCode() {
+        let passedErrorCode: number | undefined
+
+        StreamInletWorker.handleError = (errorCode: number) => {
+            passedErrorCode = errorCode
+        }
+
+        const fakeErrorCode = [-4, -3, -2, -1, 0][Math.floor(Math.random() * 5)]
+        const worker = this.getFakeWorker()
+
+        worker['inletWorker']['pullErrorBuffer'].writeInt32LE(fakeErrorCode)
+
+        await this.startThenStop()
+
+        assert.isEqualDeep(
+            passedErrorCode,
+            FakeLiblsl.fakeErrorCode,
+            'Did not pass the expected error code to handleError!'
         )
     }
 
@@ -358,13 +413,16 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         let pulls = 0
 
-        //@ts-ignore
-        instance.pullDataOnce = () => {
+        const inletWorker = this.getFakeWorker(instance)['inletWorker']
+        const original = inletWorker['pullDataOnce'].bind(inletWorker)
+
+        inletWorker['pullDataOnce'] = async () => {
             pulls++
+            await original()
         }
 
         const t0 = Date.now()
-        await instance.startPulling()
+        const promise = this.startPulling(instance)
 
         while (pulls < 2) {
             await this.wait(1)
@@ -379,6 +437,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
 
         instance.stopPulling()
+        await promise
     }
 
     @test()
@@ -436,62 +495,9 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         )
     }
 
-    @test()
-    protected static async throwsWithUnknownErrorCode() {
-        await this.assertThrowsWithErrorCode(
-            -999,
-            `An unknown liblsl error has occurred!`
-        )
-    }
-
-    @test()
-    protected static async throwsWithErrorCodeNegativeOne() {
-        await this.assertThrowsWithErrorCode(
-            -1,
-            `The liblsl operation failed due to a timeout!`
-        )
-    }
-
-    @test()
-    protected static async throwsWithErrorCodeNegativeTwo() {
-        await this.assertThrowsWithErrorCode(
-            -2,
-            `The liblsl stream has been lost!`
-        )
-    }
-
-    @test()
-    protected static async throwsWithErrorCodeNegativeThree() {
-        await this.assertThrowsWithErrorCode(
-            -3,
-            'A liblsl argument was incorrectly specified!'
-        )
-    }
-
-    @test()
-    protected static async throwsWithErrorCodeNegativeFour() {
-        await this.assertThrowsWithErrorCode(
-            -4,
-            'An internal liblsl error has occurred!'
-        )
-    }
-
     private static async startPullingThenDestroy() {
         await this.startPulling()
         this.destroy()
-    }
-
-    private static async assertThrowsWithErrorCode(
-        errorCode: number,
-        message: string
-    ) {
-        await this.startThenStop()
-
-        this.instance['pullErrorBuffer'].writeInt32LE(errorCode)
-
-        assert.doesThrow(() => {
-            this.instance['handleErrorCodeIfPresent']()
-        }, message)
     }
 
     private static async runChunkSizeOne() {
@@ -510,13 +516,23 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     private static async startThenStop(inlet?: SpyStreamInlet) {
         const instance = inlet || this.instance
-        await instance.startPulling()
+        await this.startPulling(instance)
         await this.wait(10)
         instance.stopPulling()
     }
 
-    private static async startPulling() {
-        await this.instance.startPulling()
+    private static async startPulling(instance?: SpyStreamInlet) {
+        const inst = instance || this.instance
+        const startPullingPromise = inst.startPulling()
+
+        while (!this.getFakeWorker(inst).createInletPromise) {
+            await this.wait(1)
+        }
+
+        await this.getFakeWorker(inst).createInletPromise
+        inst['workerReady'] = true
+
+        await startPullingPromise
     }
 
     private static stopPulling() {
@@ -532,7 +548,12 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     private static get inletHandle() {
-        return this.instance.getInletHandle()
+        return this.getFakeWorker()['inletWorker']['inletHandle']
+    }
+
+    private static getFakeWorker(instance?: SpyStreamInlet) {
+        const inst = instance || this.instance
+        return inst['worker'] as unknown as FakeWorker
     }
 
     private static onData = (

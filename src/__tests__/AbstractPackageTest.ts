@@ -92,9 +92,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.generateId(),
     ]
 
-    protected static get channelCount() {
-        return this.channelNames.length
-    }
+    protected static readonly channelCount = this.channelNames.length
 
     protected static readonly chunkSize = 2
     protected static readonly sampleRateHz = Math.floor(Math.random() * 100)
@@ -104,12 +102,12 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         options: Partial<StreamInletOptions>,
         onData: OnDataCallback
     ) {
-        const defaultOptions = {
-            info: this.fakeStreamInfo,
+        const defaultOptions: StreamInletOptions = {
+            sourceId: this.sourceId,
             chunkSize: this.chunkSize,
             maxBufferedMs: this.maxBufferedMs,
             ...options,
-        } as StreamInletOptions
+        }
 
         return LslStreamInlet.Create(defaultOptions, onData)
     }

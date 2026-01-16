@@ -7,9 +7,9 @@ import LslStreamOutlet, {
     StreamOutletOptions,
 } from '../../impl/LslStreamOutlet.js'
 import {
-    setHandleError,
-    setLiblslAdapter,
-} from '../../impl/workers/LslStreamOutlet.worker.js'
+    setOutletHandleError,
+    setOutletLiblslAdapter,
+} from '../../impl/workers/outlet/LslStreamOutlet.worker.js'
 import {
     TEST_SUPPORTED_CHANNEL_FORMATS,
     TEST_UNSUPPORTED_CHANNEL_FORMATS,
@@ -37,7 +37,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         LslStreamOutlet.Worker = FakeWorker as unknown as typeof Worker
         FakeWorker.resetTestDoubles()
 
-        setLiblslAdapter(this.fakeLiblsl)
+        setOutletLiblslAdapter(this.fakeLiblsl)
     }
 
     @test()
@@ -242,7 +242,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     protected static async pushSampleHandlesErrorCode() {
         let passedErrorCode: number | undefined
 
-        setHandleError((errorCode: number) => {
+        setOutletHandleError((errorCode: number) => {
             passedErrorCode = errorCode
         })
 

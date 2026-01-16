@@ -1,28 +1,28 @@
 import { parentPort } from 'node:worker_threads'
 
-import handleError, { LslErrorCode } from '../../lib/handleError.js'
-import LiblslAdapter, { Liblsl, OutletHandle } from '../LiblslAdapter.js'
+import handleError, { LslErrorCode } from '../../../lib/handleError.js'
+import LiblslAdapter, { Liblsl, OutletHandle } from '../../LiblslAdapter.js'
 import LslStreamInfo, {
     StreamInfo,
     StreamInfoOptions,
-} from '../LslStreamInfo.js'
+} from '../../LslStreamInfo.js'
 
 let lsl = LiblslAdapter.getInstance()
 
-export function setLiblslAdapter(adapter: Liblsl) {
+export function setOutletLiblslAdapter(adapter: Liblsl) {
     LiblslAdapter.setInstance(adapter)
     lsl = LiblslAdapter.getInstance()
 }
 
 let handleErrorFn = handleError
 
-export function setHandleError(fn: typeof handleError) {
+export function setOutletHandleError(fn: typeof handleError) {
     handleErrorFn = fn
 }
 
-let info: StreamInfo | undefined
-let handle: OutletHandle | undefined
-let pushMethod: ((opts: unknown) => LslErrorCode) | undefined
+let info: StreamInfo
+let handle: OutletHandle
+let pushMethod: (opts: unknown) => LslErrorCode
 
 parentPort?.on('message', (msg: OutletMessage) => {
     const { type } = msg
@@ -103,15 +103,12 @@ export function pushSample(msg: {
 export function destroyOutlet() {
     if (handle) {
         lsl.destroyOutlet({ outletHandle: handle })
-        handle = undefined
     }
 
     if (info) {
         lsl.destroyStreamInfo({ infoHandle: info.infoHandle })
-        info = undefined
     }
 
-    pushMethod = undefined
     parentPort?.close()
 }
 

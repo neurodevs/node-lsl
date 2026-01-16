@@ -54,6 +54,7 @@ export default class LslStreamOutlet implements StreamOutlet {
         this.units = units ?? this.units
 
         this.validateOptions()
+        this.createWorkerThread()
         this.createStreamOutlet()
     }
 
@@ -91,11 +92,13 @@ export default class LslStreamOutlet implements StreamOutlet {
         )
     }
 
-    private createStreamOutlet() {
+    private createWorkerThread() {
         this.worker = new this.Worker(
             new URL('./workers/LslStreamOutlet.worker.js', import.meta.url)
         )
+    }
 
+    private createStreamOutlet() {
         this.worker.postMessage({
             type: 'createOutlet',
             payload: {
