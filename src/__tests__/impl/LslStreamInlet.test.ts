@@ -58,6 +58,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             },
             'Should have called createInlet!'
         )
+
+        this.stopPulling()
     }
 
     @test()
