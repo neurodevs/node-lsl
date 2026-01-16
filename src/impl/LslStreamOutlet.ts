@@ -125,7 +125,6 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 
     public pushSample(sample: LslSample, timestamp?: number) {
-        console.info('Pushing sample:', sample, 'at', timestamp)
         this.worker.postMessage({
             type: 'pushSample',
             payload: {
