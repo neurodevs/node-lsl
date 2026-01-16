@@ -353,7 +353,7 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
         const actualHandles = await this.resolveByProp()
 
-        const actual = actualHandles.map((h) => h.toString())
+        const actual = actualHandles.map((_h, i) => (i + 1).toString())
         const expected = expectedHandles.map((h) => h.toString())
 
         assert.isEqualDeep(

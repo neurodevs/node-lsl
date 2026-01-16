@@ -238,6 +238,7 @@ export default class LslStreamInlet implements StreamInlet {
         this.handleErrorCodeIfPresent()
 
         if (samples && timestamps) {
+            console.info(samples, timestamps)
             this.onData(samples, timestamps)
         }
     }

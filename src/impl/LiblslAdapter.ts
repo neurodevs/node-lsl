@@ -163,7 +163,14 @@ export default class LiblslAdapter implements Liblsl {
             const handle = resultsBuffer.readBigUInt64LE(i * bytesPerPointer)
 
             if (handle !== 0n) {
-                handles.push(handle)
+                const handleRef = createPointer({
+                    paramsType: [DataType.BigInt],
+                    paramsValue: [handle],
+                })
+
+                const handlePtr = unwrapPointer(handleRef)[0]
+
+                handles.push(handlePtr)
             }
         }
 
