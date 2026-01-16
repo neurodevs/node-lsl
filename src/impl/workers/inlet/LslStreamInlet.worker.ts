@@ -16,8 +16,10 @@ parentPort?.on('message', async (msg: InletMessage) => {
                 worker.startPulling((samples, timestamps) => {
                     parentPort?.postMessage({
                         type: 'data',
-                        samples,
-                        timestamps,
+                        payload: {
+                            samples,
+                            timestamps,
+                        },
                     })
                 })
                 break
