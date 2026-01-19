@@ -179,7 +179,7 @@ export default class StreamInletWorker {
 
         if (timestamp > 0) {
             return {
-                samples: this.createSamplesFromDataBuffer(),
+                samples: this.readSamplesFromBuffer(),
                 timestamps: [...new Float64Array([timestamp])],
             }
         }
@@ -196,7 +196,7 @@ export default class StreamInletWorker {
         })
     }
 
-    private createSamplesFromDataBuffer() {
+    private readSamplesFromBuffer() {
         const floats = new Float32Array(
             this.sampleBuffer.buffer,
             this.sampleBuffer.byteOffset,
@@ -210,8 +210,8 @@ export default class StreamInletWorker {
 
         if (firstTimestamp > 0) {
             return {
-                samples: this.createSamplesFromDataBuffer(),
-                timestamps: this.createTimestampsFromTimestampBuffer(),
+                samples: this.readSamplesFromBuffer(),
+                timestamps: this.readTimestampsFromBuffer(),
             }
         }
         return { samples: undefined, timestamps: undefined }
@@ -229,7 +229,7 @@ export default class StreamInletWorker {
         })
     }
 
-    private createTimestampsFromTimestampBuffer() {
+    private readTimestampsFromBuffer() {
         const doubles = new Float64Array(
             this.timestampBuffer.buffer,
             this.timestampBuffer.byteOffset,
