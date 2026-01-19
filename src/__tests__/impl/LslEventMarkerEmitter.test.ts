@@ -1,7 +1,9 @@
 import { randomInt } from 'crypto'
 import { assert, test } from '@neurodevs/node-tdd'
 
-import LslEventMarkerEmitter from '../../impl/LslEventMarkerEmitter.js'
+import LslEventMarkerEmitter, {
+    EventMarkerOptions,
+} from '../../impl/LslEventMarkerEmitter.js'
 import { StreamOutletOptions } from '../../impl/LslStreamOutlet.js'
 import SpyEventMarkerEmitter from '../../testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
@@ -20,6 +22,8 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
         this.instance = await this.LslEventMarkerEmitter()
     }
+
+    private static readonly markerName = this.generateId()
 
     @test()
     protected static async createsInstance() {
@@ -154,7 +158,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     @test()
     protected static async emitCallsPushSampleOnStreamOutlet() {
         const markerName = this.generateId()
-        await this.emitFor(markerName)
+        await this.emit(markerName)
 
         assert.isEqual(FakeStreamOutlet.callsToPushSample[0][0], markerName)
     }
@@ -164,10 +168,9 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         SpyEventMarkerEmitter.shouldCallWaitOnSuper = true
 
         const waitAfterMs = 10
-        const eventMarker = this.generateEventMarker(waitAfterMs)
 
         const startMs = Date.now()
-        await this.instance.emit(eventMarker)
+        await this.instance.emit(this.markerName, { waitAfterMs })
         const endMs = Date.now()
 
         assert.isAbove(
@@ -220,10 +223,10 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async emitThrowsIfCalledWhileAlreadyRunning() {
-        void this.instance.emit({ name: this.generateId(), waitAfterMs: 10 })
+        void this.instance.emit(this.markerName, { waitAfterMs: 10 })
 
         await assert.doesThrowAsync(async () => {
-            await this.emitFor(this.generateId())
+            await this.emit(this.generateId())
         }, 'Cannot call emit while already running!')
     }
 
@@ -257,11 +260,14 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     }
 
     private static async emitOnce() {
-        await this.emitFor(this.generateId())
+        await this.emit(this.markerName)
     }
 
-    private static async emitFor(markerName: string) {
-        return this.instance.emit({ name: markerName })
+    private static async emit(
+        markerName: string,
+        options?: EventMarkerOptions
+    ) {
+        return this.instance.emit(markerName, options)
     }
 
     private static async emitManyOnce() {

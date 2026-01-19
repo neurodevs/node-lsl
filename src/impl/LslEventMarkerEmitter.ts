@@ -22,12 +22,13 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
         return new (this.Class ?? this)(outlet)
     }
 
-    public async emit(marker: EventMarker) {
+    public async emit(markerName: string, options?: EventMarkerOptions) {
         this.throwIfAlreadyRunning('emit')
         this.isRunning = true
 
-        const { name, waitAfterMs } = marker
-        this.pushMarkerToOutlet(name)
+        const { waitAfterMs } = options || {}
+
+        this.pushMarkerToOutlet(markerName)
 
         if (waitAfterMs) {
             await this.wait(waitAfterMs)
@@ -110,7 +111,7 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
 }
 
 export interface EventMarkerEmitter {
-    emit(marker: EventMarker): Promise<void>
+    emit(markerName: string, options?: EventMarkerOptions): Promise<void>
     emitMany(markers: TimedEventMarker[]): Promise<void>
     interrupt(): void
     destroy(): void
@@ -122,9 +123,11 @@ export type EventMarkerEmitterConstructor = new (
     outlet: StreamOutlet
 ) => EventMarkerEmitter
 
-export interface EventMarker {
-    name: string
+export interface EventMarkerOptions {
     waitAfterMs?: number
 }
 
-export type TimedEventMarker = Required<EventMarker>
+export interface TimedEventMarker {
+    name: string
+    waitAfterMs: number
+}

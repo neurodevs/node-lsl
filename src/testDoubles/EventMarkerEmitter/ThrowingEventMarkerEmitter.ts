@@ -1,6 +1,6 @@
 import {
-    EventMarker,
     EventMarkerEmitter,
+    EventMarkerOptions,
     TimedEventMarker,
 } from '../../impl/LslEventMarkerEmitter.js'
 
@@ -11,7 +11,7 @@ export default class ThrowingEventMarkerEmitter implements EventMarkerEmitter {
         throw new Error(this.errorMsg + 'constructor')
     }
 
-    public async emit(_marker: EventMarker) {
+    public async emit(_markerName: string, _options?: EventMarkerOptions) {
         throw new Error(this.errorMsg + 'emit')
     }
 
