@@ -106,7 +106,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         localServer?: WebSocketServer,
         remoteSockets?: WebSocket[]
     ) {
-        return (samples: Float32Array, timestamps: Float64Array) => {
+        return (samples: number[], timestamps: number[]) => {
             const payload = JSON.stringify({ samples, timestamps })
 
             if (localServer && localServer.clients.size > 0) {

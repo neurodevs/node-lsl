@@ -170,7 +170,4 @@ export interface StreamInletOptions {
     flushInletOnStop?: boolean
 }
 
-export type OnDataCallback = (
-    samples: Float32Array,
-    timestamps: Float64Array
-) => void
+export type OnDataCallback = (samples: number[], timestamps: number[]) => void

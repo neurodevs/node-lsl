@@ -27,17 +27,17 @@ export default class StreamInletWorker {
     private flushInletOnStop!: boolean
 
     private pullMethod!: () => {
-        samples: Float32Array | undefined
-        timestamps: Float64Array | undefined
+        samples: number[] | undefined
+        timestamps: number[] | undefined
     }
 
     protected infoHandle!: InfoHandle
     protected inletHandle!: InletHandle
     private channelCount!: number
 
-    private dataBuffer!: Buffer<ArrayBuffer>
-    private dataBufferRef!: JsExternal[]
-    private dataBufferPtr!: JsExternal
+    private sampleBuffer!: Buffer<ArrayBuffer>
+    private sampleBufferRef!: JsExternal[]
+    private sampleBufferPtr!: JsExternal
 
     private timestampBuffer!: Buffer<ArrayBuffer>
     private timestampBufferRef!: JsExternal[]
@@ -120,16 +120,16 @@ export default class StreamInletWorker {
     }
 
     private allocateDataBuffer() {
-        this.dataBuffer = Buffer.alloc(
+        this.sampleBuffer = Buffer.alloc(
             this.channelCount * this.chunkSize * this.bytesPerFloat
         )
 
-        this.dataBufferRef = createPointer({
+        this.sampleBufferRef = createPointer({
             paramsType: [DataType.U8Array],
-            paramsValue: [this.dataBuffer],
+            paramsValue: [this.sampleBuffer],
         })
 
-        this.dataBufferPtr = unwrapPointer(this.dataBufferRef)[0]
+        this.sampleBufferPtr = unwrapPointer(this.sampleBufferRef)[0]
     }
 
     private allocateTimestampBuffer() {
@@ -179,8 +179,8 @@ export default class StreamInletWorker {
 
         if (timestamp > 0) {
             return {
-                samples: this.createFloatArrayFromDataBuffer(),
-                timestamps: new Float64Array([timestamp]),
+                samples: this.createSamplesFromDataBuffer(),
+                timestamps: [...new Float64Array([timestamp])],
             }
         }
         return { samples: undefined, timestamps: undefined }
@@ -189,19 +189,20 @@ export default class StreamInletWorker {
     private doPullsample() {
         return this.lsl.pullSample({
             inletHandle: this.inletHandle,
-            dataBufferPtr: this.dataBufferPtr,
-            dataBufferElements: this.channelCount,
+            sampleBufferPtr: this.sampleBufferPtr,
+            sampleBufferElements: this.channelCount,
             timeoutMs: this.pullTimeoutMs,
             errorCodePtr: this.pullErrorBufferPtr,
         })
     }
 
-    private createFloatArrayFromDataBuffer() {
-        return new Float32Array(
-            this.dataBuffer.buffer,
-            this.dataBuffer.byteOffset,
+    private createSamplesFromDataBuffer() {
+        const floats = new Float32Array(
+            this.sampleBuffer.buffer,
+            this.sampleBuffer.byteOffset,
             this.chunkSize * this.channelCount
         )
+        return Array.from(floats)
     }
 
     private pullChunk = () => {
@@ -209,8 +210,8 @@ export default class StreamInletWorker {
 
         if (firstTimestamp > 0) {
             return {
-                samples: this.createFloatArrayFromDataBuffer(),
-                timestamps: this.createDoubleArrayFromTimestampBuffer(),
+                samples: this.createSamplesFromDataBuffer(),
+                timestamps: this.createTimestampsFromTimestampBuffer(),
             }
         }
         return { samples: undefined, timestamps: undefined }
@@ -219,8 +220,8 @@ export default class StreamInletWorker {
     private doPullChunk() {
         return this.lsl.pullChunk({
             inletHandle: this.inletHandle,
-            dataBufferPtr: this.dataBufferPtr,
-            dataBufferElements: this.chunkSize * this.channelCount,
+            sampleBufferPtr: this.sampleBufferPtr,
+            sampleBufferElements: this.chunkSize * this.channelCount,
             timestampBufferPtr: this.timestampBufferPtr,
             timestampBufferElements: this.chunkSize,
             timeoutMs: this.pullTimeoutMs,
@@ -228,12 +229,13 @@ export default class StreamInletWorker {
         })
     }
 
-    private createDoubleArrayFromTimestampBuffer() {
-        return new Float64Array(
+    private createTimestampsFromTimestampBuffer() {
+        const doubles = new Float64Array(
             this.timestampBuffer.buffer,
             this.timestampBuffer.byteOffset,
             this.chunkSize
         )
+        return Array.from(doubles)
     }
 
     private async openStream() {
@@ -321,7 +323,7 @@ export default class StreamInletWorker {
             ],
             paramsValue: [
                 this.openStreamErrorBufferPtr,
-                this.dataBufferPtr,
+                this.sampleBufferPtr,
                 this.timestampBufferPtr,
                 this.pullErrorBufferPtr,
             ],

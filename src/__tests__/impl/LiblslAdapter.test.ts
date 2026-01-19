@@ -601,14 +601,14 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     protected static async pullSampleCallsBinding() {
         const { inletHandle } = this.createRandomInlet()
 
-        const dataBuffer = Buffer.alloc(4 * this.channelCount)
-        const dataBufferElements = this.channelCount
+        const sampleBuffer = Buffer.alloc(4 * this.channelCount)
+        const sampleBufferElements = this.channelCount
         const timeoutMs = 0.0
 
-        const dataBufferPtr = unwrapPointer(
+        const sampleBufferPtr = unwrapPointer(
             createPointer({
                 paramsType: [DataType.U8Array],
-                paramsValue: [dataBuffer],
+                paramsValue: [sampleBuffer],
             })
         )[0]
 
@@ -621,8 +621,8 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
         this.instance.pullSample({
             inletHandle,
-            dataBufferPtr,
-            dataBufferElements,
+            sampleBufferPtr,
+            sampleBufferElements,
             timeoutMs,
             errorCodePtr,
         })
@@ -642,8 +642,8 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 ],
                 paramsValue: [
                     inletHandle,
-                    dataBufferPtr,
-                    dataBufferElements,
+                    sampleBufferPtr,
+                    sampleBufferElements,
                     timeoutMs,
                     errorCodePtr,
                 ],
@@ -656,16 +656,18 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
     protected static async pullChunkCallsBinding() {
         const { inletHandle } = this.createRandomInlet()
 
-        const dataBuffer = Buffer.alloc(4 * this.chunkSize * this.channelCount)
+        const sampleBuffer = Buffer.alloc(
+            4 * this.chunkSize * this.channelCount
+        )
         const timestampBuffer = Buffer.alloc(8 * this.chunkSize)
-        const dataBufferElements = this.chunkSize * this.channelCount
+        const sampleBufferElements = this.chunkSize * this.channelCount
         const timestampBufferElements = this.chunkSize
         const timeoutMs = 0.0
 
-        const dataBufferPtr = unwrapPointer(
+        const sampleBufferPtr = unwrapPointer(
             createPointer({
                 paramsType: [DataType.U8Array],
-                paramsValue: [dataBuffer],
+                paramsValue: [sampleBuffer],
             })
         )[0]
 
@@ -685,9 +687,9 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
 
         this.instance.pullChunk({
             inletHandle,
-            dataBufferPtr,
+            sampleBufferPtr,
             timestampBufferPtr,
-            dataBufferElements,
+            sampleBufferElements,
             timestampBufferElements,
             timeoutMs,
             errorCodePtr,
@@ -710,9 +712,9 @@ export default class LiblslAdapterTest extends AbstractPackageTest {
                 ],
                 paramsValue: [
                     inletHandle,
-                    dataBufferPtr,
+                    sampleBufferPtr,
                     timestampBufferPtr,
-                    dataBufferElements,
+                    sampleBufferElements,
                     timestampBufferElements,
                     timeoutMs,
                     errorCodePtr,

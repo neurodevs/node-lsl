@@ -22,11 +22,11 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     private static instance: SpyStreamInlet
 
     private static callsToOnData: {
-        samples: Float32Array
-        timestamps: Float64Array
+        samples: number[]
+        timestamps: number[]
     }[]
 
-    private static readonly dataBufferPtr = unwrapPointer(
+    private static readonly sampleBufferPtr = unwrapPointer(
         createPointer({
             paramsType: [DataType.U8Array],
             paramsValue: [new Float32Array(this.channelCount * this.chunkSize)],
@@ -353,8 +353,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             this.fakeLiblsl.lastPullSampleOptions,
             {
                 inletHandle: this.inletHandle,
-                dataBufferPtr: this.dataBufferPtr,
-                dataBufferElements: this.channelCount,
+                sampleBufferPtr: this.sampleBufferPtr,
+                sampleBufferElements: this.channelCount,
                 timeoutMs: 0,
                 errorCodePtr: this.errorCodePtr,
             },
@@ -370,9 +370,9 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             this.fakeLiblsl.lastPullChunkOptions,
             {
                 inletHandle: this.inletHandle,
-                dataBufferPtr: this.dataBufferPtr,
+                sampleBufferPtr: this.sampleBufferPtr,
                 timestampBufferPtr: this.timestampBufferPtr,
-                dataBufferElements: this.chunkSize * this.channelCount,
+                sampleBufferElements: this.chunkSize * this.channelCount,
                 timestampBufferElements: this.chunkSize,
                 timeoutMs: 0,
                 errorCodePtr: this.errorCodePtr,
@@ -556,10 +556,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         return inst['worker'] as unknown as FakeWorker
     }
 
-    private static onData = (
-        samples: Float32Array,
-        timestamps: Float64Array
-    ) => {
+    private static onData = (samples: number[], timestamps: number[]) => {
         this.callsToOnData.push({ samples, timestamps })
     }
 

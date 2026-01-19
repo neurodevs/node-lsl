@@ -261,8 +261,8 @@ export default class LiblslAdapter implements Liblsl {
     public pullSample(options: PullSampleOptions) {
         const {
             inletHandle,
-            dataBufferPtr,
-            dataBufferElements,
+            sampleBufferPtr,
+            sampleBufferElements,
             timeoutMs,
             errorCodePtr: errorCodePtr,
         } = options
@@ -280,8 +280,8 @@ export default class LiblslAdapter implements Liblsl {
             ],
             paramsValue: [
                 inletHandle,
-                dataBufferPtr,
-                dataBufferElements,
+                sampleBufferPtr,
+                sampleBufferElements,
                 timeoutMs / 1000,
                 errorCodePtr,
             ],
@@ -291,9 +291,9 @@ export default class LiblslAdapter implements Liblsl {
     public pullChunk(options: PullChunkOptions) {
         const {
             inletHandle,
-            dataBufferPtr,
+            sampleBufferPtr,
             timestampBufferPtr,
-            dataBufferElements,
+            sampleBufferElements,
             timestampBufferElements,
             timeoutMs,
             errorCodePtr: errorCodePtr,
@@ -314,9 +314,9 @@ export default class LiblslAdapter implements Liblsl {
             ],
             paramsValue: [
                 inletHandle,
-                dataBufferPtr,
+                sampleBufferPtr,
                 timestampBufferPtr,
-                dataBufferElements,
+                sampleBufferElements,
                 timestampBufferElements,
                 timeoutMs / 1000,
                 errorCodePtr,
@@ -557,8 +557,8 @@ export interface CloseStreamOptions {
 
 export interface PullSampleOptions {
     inletHandle: InletHandle
-    dataBufferPtr: JsExternal
-    dataBufferElements: number
+    sampleBufferPtr: JsExternal
+    sampleBufferElements: number
     timeoutMs: number
     errorCodePtr: JsExternal
 }

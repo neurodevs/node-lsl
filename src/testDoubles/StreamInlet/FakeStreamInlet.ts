@@ -1,9 +1,13 @@
-import { StreamInlet, StreamInletOptions } from '../../impl/LslStreamInlet.js'
+import {
+    OnDataCallback,
+    StreamInlet,
+    StreamInletOptions,
+} from '../../impl/LslStreamInlet.js'
 
 export default class FakeStreamInlet implements StreamInlet {
     public static callsToConstructor: {
         options?: StreamInletOptions
-        onData?: (samples: Float32Array, timestamps: Float64Array) => void
+        onData?: OnDataCallback
     }[] = []
 
     public static numCallsToStartPulling = 0
@@ -13,12 +17,9 @@ export default class FakeStreamInlet implements StreamInlet {
 
     public isRunning = false
 
-    protected onData!: (samples: Float32Array, timestamps: Float64Array) => void
+    protected onData!: OnDataCallback
 
-    public constructor(
-        options?: StreamInletOptions,
-        onData?: (samples: Float32Array, timestamps: Float64Array) => void
-    ) {
+    public constructor(options?: StreamInletOptions, onData?: OnDataCallback) {
         this.onData = onData ?? (() => {})
 
         FakeStreamInlet.callsToConstructor.push({
