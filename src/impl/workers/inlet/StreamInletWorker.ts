@@ -180,7 +180,7 @@ export default class StreamInletWorker {
         if (timestamp > 0) {
             return {
                 samples: this.readSamplesFromBuffer(),
-                timestamps: [...new Float64Array([timestamp])],
+                timestamps: [timestamp],
             }
         }
         return { samples: undefined, timestamps: undefined }
