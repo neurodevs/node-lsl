@@ -80,7 +80,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         const marker = markers[0]
 
         assert.isEqual(
-            FakeStreamOutlet.callsToPushSample[0][0],
+            FakeStreamOutlet.callsToPushSample[0]?.sample[0],
             marker.name,
             'Pushed the wrong marker!'
         )
@@ -160,7 +160,11 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         const markerName = this.generateId()
         await this.emit(markerName)
 
-        assert.isEqual(FakeStreamOutlet.callsToPushSample[0][0], markerName)
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample[0]?.sample,
+            [markerName],
+            'Pushed the wrong sample!'
+        )
     }
 
     @test()
