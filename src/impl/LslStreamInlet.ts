@@ -72,7 +72,6 @@ export default class LslStreamInlet implements StreamInlet {
                     const { payload } = msg
                     const { samples, timestamps } = payload
 
-                    console.info(samples, timestamps)
                     this.onData(samples, timestamps)
                     break
                 }
