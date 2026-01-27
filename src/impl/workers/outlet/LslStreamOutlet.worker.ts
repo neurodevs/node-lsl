@@ -1,8 +1,13 @@
 import { parentPort } from 'node:worker_threads'
 
-import { LiblslAdapter, Liblsl, OutletHandle } from '@neurodevs/ndx-native'
+import {
+    LiblslAdapter,
+    Liblsl,
+    OutletHandle,
+    handleError,
+    LslErrorCode,
+} from '@neurodevs/ndx-native'
 
-import handleError, { LslErrorCode } from '../../../lib/handleError.js'
 import LslStreamInfo, {
     StreamInfo,
     StreamInfoOptions,
