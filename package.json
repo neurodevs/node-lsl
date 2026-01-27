@@ -58,6 +58,8 @@
   },
   "devDependencies": {
     "@neurodevs/node-tdd": "0.2.5",
+    "@regressionproof/cli": "^0.7.3",
+    "@regressionproof/jest-reporter": "^0.7.3",
     "@types/ffi-napi": "^4.0.10",
     "@types/node": "^25.0.2",
     "@types/ws": "^8.18.1",
