@@ -1,6 +1,6 @@
+import { FakeLiblsl } from '@neurodevs/ndx-native'
 import { assert, test } from '@neurodevs/node-tdd'
 import handleError from '../../lib/handleError.js'
-import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class HandleErrorTest extends AbstractPackageTest {

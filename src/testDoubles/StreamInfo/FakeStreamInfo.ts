@@ -1,6 +1,6 @@
 import generateId from '@neurodevs/generate-id'
+import { InfoHandle } from '@neurodevs/ndx-native'
 
-import { InfoHandle } from 'impl/LiblslAdapter.js'
 import { StreamInfo, StreamInfoOptions } from '../../impl/LslStreamInfo.js'
 
 export default class FakeStreamInfo implements StreamInfo {

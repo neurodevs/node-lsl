@@ -9,7 +9,7 @@
     "test"
   ],
   "regressionproof": {
-    "enabled": true,
+    "enabled": false,
     "projectName": "node-lsl"
   }
 }

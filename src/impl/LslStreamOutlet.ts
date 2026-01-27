@@ -1,5 +1,7 @@
 import { Worker } from 'node:worker_threads'
 
+import { ChannelFormat, Liblsl, LslSample } from '@neurodevs/ndx-native'
+
 import {
     assertValidChannelCount,
     assertValidChannelFormat,
@@ -7,7 +9,6 @@ import {
     assertValidMaxBufferedMs,
     assertValidSampleRateHz,
 } from '../assertions.js'
-import { ChannelFormat, Liblsl, LslSample } from './LiblslAdapter.js'
 
 export default class LslStreamOutlet implements StreamOutlet {
     public static Class?: StreamOutletConstructor

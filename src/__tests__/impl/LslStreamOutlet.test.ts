@@ -1,7 +1,7 @@
 import { Worker } from 'node:worker_threads'
+import { ChannelFormat, LslSample, FakeLiblsl } from '@neurodevs/ndx-native'
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { ChannelFormat, LslSample } from 'impl/LiblslAdapter.js'
 import { CHANNEL_FORMATS } from '../../consts.js'
 import LslStreamOutlet, {
     StreamOutletOptions,
@@ -16,7 +16,6 @@ import {
     TestChannelFormat,
 } from '../../testDoubles/consts.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
-import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
 import FakeWorker from '../../testDoubles/WorkerThreads/FakeWorker.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'

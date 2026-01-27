@@ -1,3 +1,4 @@
+import { InfoHandle, InletHandle, LiblslAdapter } from '@neurodevs/ndx-native'
 import {
     JsExternal,
     unwrapPointer,
@@ -8,7 +9,6 @@ import {
 } from 'ffi-rs'
 
 import handleError from '../../../lib/handleError.js'
-import LiblslAdapter, { InfoHandle, InletHandle } from '../../LiblslAdapter.js'
 import { OnDataCallback } from '../../LslStreamInlet.js'
 import { CreateInletPayload } from './LslStreamInlet.worker.js'
 

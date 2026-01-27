@@ -1,7 +1,8 @@
-import { randomInt } from 'crypto'
-import generateId from '@neurodevs/generate-id'
+import { randomInt } from 'node:crypto'
 
-import { LslSample } from 'impl/LiblslAdapter.js'
+import generateId from '@neurodevs/generate-id'
+import { LslSample } from '@neurodevs/ndx-native'
+
 import {
     StreamOutlet,
     StreamOutletOptions,

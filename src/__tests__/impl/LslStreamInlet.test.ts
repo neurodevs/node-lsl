@@ -1,6 +1,7 @@
 import { Worker } from 'node:worker_threads'
-import { test, assert } from '@neurodevs/node-tdd'
 
+import { FakeLiblsl } from '@neurodevs/ndx-native'
+import { test, assert } from '@neurodevs/node-tdd'
 import {
     createPointer,
     DataType,
@@ -9,11 +10,11 @@ import {
     PointerType,
     unwrapPointer,
 } from 'ffi-rs'
+
 import LslStreamInlet, {
     StreamInletOptions,
 } from '../../impl/LslStreamInlet.js'
 import StreamInletWorker from '../../impl/workers/inlet/StreamInletWorker.js'
-import FakeLiblsl from '../../testDoubles/Liblsl/FakeLiblsl.js'
 import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
 import FakeWorker from '../../testDoubles/WorkerThreads/FakeWorker.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'

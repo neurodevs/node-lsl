@@ -20,14 +20,6 @@ export * from './testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
 export { default as ThrowingEventMarkerEmitter } from './testDoubles/EventMarkerEmitter/ThrowingEventMarkerEmitter.js'
 export * from './testDoubles/EventMarkerEmitter/ThrowingEventMarkerEmitter.js'
 
-// Liblsl
-
-export { default as LiblslAdapter } from './impl/LiblslAdapter.js'
-export * from './impl/LiblslAdapter.js'
-
-export { default as FakeLiblsl } from './testDoubles/Liblsl/FakeLiblsl.js'
-export * from './testDoubles/Liblsl/FakeLiblsl.js'
-
 // StreamInfo
 
 export { default as LslStreamInfo } from './impl/LslStreamInfo.js'

@@ -1,4 +1,5 @@
-import { ChannelFormat } from 'impl/LiblslAdapter.js'
+import { ChannelFormat } from '@neurodevs/ndx-native'
+
 import { CHANNEL_FORMATS } from './consts.js'
 import {
     isGreaterThanOrEqualToZero,
