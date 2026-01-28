@@ -120,13 +120,13 @@ export default class LslStreamInlet implements StreamInlet {
         this.worker.postMessage({ type: 'startPulling' })
     }
 
-    public flushInlet() {
-        this.worker.postMessage({ type: 'flushInlet' })
-    }
-
     public stopPulling() {
         this.isRunning = false
         this.worker.postMessage({ type: 'stopPulling' })
+    }
+
+    public flushInlet() {
+        this.worker.postMessage({ type: 'flushInlet' })
     }
 
     public destroy() {
