@@ -7,9 +7,5 @@
   ],
   "installed": [
     "test"
-  ],
-  "regressionproof": {
-    "enabled": false,
-    "projectName": "node-lsl"
-  }
+  ]
 }
