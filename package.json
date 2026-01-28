@@ -59,6 +59,8 @@
   },
   "devDependencies": {
     "@neurodevs/node-tdd": "0.2.5",
+    "@regressionproof/cli": "^0.8.0",
+    "@regressionproof/jest-reporter": "^0.8.0",
     "@types/ffi-napi": "^4.0.10",
     "@types/node": "^25.0.2",
     "@types/ws": "^8.18.1",
@@ -93,7 +95,11 @@
     ],
     "moduleNameMapper": {
       "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
-    }
+    },
+    "reporters": [
+      "default",
+      "@regressionproof/jest-reporter"
+    ]
   },
   "skill": {
     "namespace": "node-lsl",
