@@ -66,19 +66,19 @@ export default class StreamInletWorker {
     public async createInlet(payload: CreateInletPayload) {
         Object.assign(this, payload)
 
-        this.infoHandle = await this.resolveInfoHandle()
+        this.infoHandle = this.resolveInfoHandle()
         this.inletHandle = this.doCreateInlet()
         this.channelCount = this.getChannelCount()
 
         this.allocateWritableBuffers()
         this.setPullMethod()
 
-        await this.openStream()
+        this.openStream()
         await this.waitForSetup()
     }
 
-    private async resolveInfoHandle() {
-        const handles = await this.resolveByProp()
+    private resolveInfoHandle() {
+        const handles = this.resolveByProp()
 
         if (handles.length === 0) {
             this.throwNoStreamFound()
@@ -88,8 +88,8 @@ export default class StreamInletWorker {
         return handles[0]
     }
 
-    private async resolveByProp() {
-        return await this.lsl.resolveByProp({
+    private resolveByProp() {
+        return this.lsl.resolveByProp({
             prop: 'source_id',
             value: this.sourceId,
         })
@@ -242,15 +242,15 @@ export default class StreamInletWorker {
         return Array.from(doubles)
     }
 
-    private async openStream() {
-        await this.lsl.openStream({
+    private openStream() {
+        this.lsl.openStream({
             inletHandle: this.inletHandle,
             timeoutMs: this.openStreamTimeoutMs,
             errorCodePtr: this.openStreamErrorBufferPtr,
         })
     }
 
-    private waitForSetup() {
+    private async waitForSetup() {
         return new Promise((r) => setTimeout(r, this.waitAfterOpenStreamMs))
     }
 
@@ -308,7 +308,6 @@ export default class StreamInletWorker {
     }
 
     public destroyInlet() {
-        this.stopPulling()
         this.doDestroyInlet()
         this.freeNativePointers()
     }
