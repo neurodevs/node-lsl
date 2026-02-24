@@ -1,28 +1,25 @@
 {
-	"compilerOptions": {
-		"module": "nodenext",
-		"moduleResolution": "nodenext",
-		"target": "ES2022",
-		"lib": ["ES2022"],
-		"types": ["node"],
-		"baseUrl": "src",
-		"outDir": "build",
-		"sourceMap": false,
-		"strict": true,
-		"noImplicitAny": true,
-		"noImplicitReturns": true,
-		"noUnusedLocals": true,
-		"forceConsistentCasingInFileNames": true,
-		"declaration": true,
-		"skipLibCheck": true,
-		"esModuleInterop": true,
-		"moduleDetection": "force",
-		"allowJs": true,
-		"resolveJsonModule": true,
-		"experimentalDecorators": true
-	},
-	"include": [
-		"./src/*.ts",
-		"./src/**/*.ts"
-	]
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "baseUrl": "src",
+    "outDir": "build",
+    "sourceMap": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true
+  },
+  "include": ["./src/*.ts", "./src/**/*.ts"]
 }

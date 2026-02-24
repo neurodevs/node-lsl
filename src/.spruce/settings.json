@@ -2,12 +2,8 @@
   "scriptUpdater": {
     "skipped": []
   },
-  "skipped": [
-    "skill"
-  ],
-  "installed": [
-    "test"
-  ],
+  "skipped": ["skill"],
+  "installed": ["test"],
   "regressionproof": {
     "enabled": true,
     "projectName": "node-lsl"
