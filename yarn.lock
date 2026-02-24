@@ -735,10 +735,10 @@
     "@emnapi/runtime" "^1.4.3"
     "@tybys/wasm-util" "^0.10.0"
 
-"@neurodevs/eslint-config-ndx@^0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@neurodevs/eslint-config-ndx/-/eslint-config-ndx-0.0.12.tgz#5dd167fbab00f9331244a628e9e6fef8a0bb93fa"
-  integrity sha512-fILp2M3WoH5fQ9sZuKjSdxNHsIZFBCgW6G9f81sw64aLaENiOzRZ91DJO/Mhhjebn1XDQ4r0S9IRT1BacQHyuw==
+"@neurodevs/eslint-config-ndx@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/eslint-config-ndx/-/eslint-config-ndx-1.0.0.tgz#5bd0adb49c006768100c22955435e85b4076a0d8"
+  integrity sha512-ywdOoscxg1ytxsczfCBmBShI5Y/I4cfgRznarQD9Jukeo1KGMCSqQ5u3yB5dz6CToHXG1uaxFzkVrsTx2a1+Hw==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^8.56.0"
     "@typescript-eslint/parser" "^8.56.0"
