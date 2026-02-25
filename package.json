@@ -62,7 +62,7 @@
   "jest": {
     "testRunner": "jest-circus/runner",
     "maxWorkers": 4,
-    "testTimeout": 120000,
+    "testTimeout": 5000,
     "testEnvironment": "node",
     "testMatch": [
       "<rootDir>/build/__tests__/**/*.test.js?(x)"
