@@ -71,11 +71,5 @@
       "default",
       "@regressionproof/jest-reporter"
     ]
-  },
-  "skill": {
-    "namespace": "node-lsl",
-    "upgradeIgnoreList": [
-      "@sprucelabs/spruce-test-fixtures"
-    ]
   }
 }
