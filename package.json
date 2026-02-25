@@ -64,22 +64,9 @@
     "maxWorkers": 4,
     "testTimeout": 120000,
     "testEnvironment": "node",
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "transform": {},
-    "testPathIgnorePatterns": [
-      "<rootDir>/tmp/",
-      "<rootDir>/src/",
-      "<rootDir>/node_modules/",
-      "<rootDir>/build/__tests__/testDirsAndFiles/"
-    ],
     "testMatch": [
-      "**/__tests__/**/*.test.js?(x)"
+      "<rootDir>/build/__tests__/**/*.test.js?(x)"
     ],
-    "moduleNameMapper": {
-      "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
-    },
     "reporters": [
       "default",
       "@regressionproof/jest-reporter"
