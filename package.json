@@ -48,7 +48,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
-    "@neurodevs/eslint-config-ndx": "^1.0.0",
+    "@neurodevs/eslint-config-ndx": "^1.0.1",
     "@neurodevs/node-tdd": "0.2.5",
     "@neurodevs/prettier-config-ndx": "^1.0.1",
     "@regressionproof/cli": "^0.8.0",
