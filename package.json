@@ -35,11 +35,10 @@
     "clean.dependencies": "rm -rf node_modules/ package-lock.json yarn.lock",
     "fix.lint": "eslint --fix --cache '**/*.ts'",
     "lint": "eslint --cache '**/*.ts'",
-    "post.watch.build": "yarn run build.copy-files",
     "rebuild": "yarn run clean.all && yarn install && yarn run build.dev",
     "update.dependencies": "yarn run clean.dependencies && yarn",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "watch.build.dev": "tsc-watch --sourceMap --onCompilationComplete 'yarn run post.watch.build'"
+    "watch.build.dev": "tsc-watch --sourceMap --onCompilationComplete 'yarn run build.copy-files'"
   },
   "dependencies": {
     "@neurodevs/generate-id": "^1.1.2",
