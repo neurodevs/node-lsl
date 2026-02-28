@@ -1,12 +1,14 @@
 # node-lsl
+
 Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series data over a network.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [LslStreamOutlet](#lslstreamoutlet)
-  - [LslEventMarkerEmitter](#LslEventMarkerEmitter) 
+    - [LslStreamOutlet](#lslstreamoutlet)
+    - [LslEventMarkerEmitter](#LslEventMarkerEmitter)
 - [Test Doubles](#test-doubles)
 
 ## Overview
@@ -23,9 +25,9 @@ First, you need to install the C++ [liblsl](https://github.com/sccn/liblsl) libr
 
 Then, install the package with your preferred package manager (make sure to be in the right directory for your Node project):
 
-`npm install @neurodevs/node-lsl` 
+`npm install @neurodevs/node-lsl`
 
-or 
+or
 
 `yarn add @neurodevs/node-lsl`
 
