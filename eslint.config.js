@@ -1,3 +1,3 @@
-import eslintConfigNdx from '@neurodevs/eslint-config-ndx'
+import esConfigNdx from '@neurodevs/eslint-config-ndx'
 
-export default eslintConfigNdx
+export default esConfigNdx
