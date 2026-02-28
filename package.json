@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@neurodevs/eslint-config-ndx": "^1.0.1",
-    "@neurodevs/node-tdd": "0.2.5",
+    "@neurodevs/node-tdd": "^0.2.5",
     "@neurodevs/prettier-config-ndx": "^1.0.1",
     "@regressionproof/cli": "^0.8.0",
     "@regressionproof/jest-reporter": "^0.8.0",

@@ -731,7 +731,7 @@
   resolved "https://registry.yarnpkg.com/@neurodevs/node-mangled-names/-/node-mangled-names-1.0.1.tgz#165a4ee32879b7ab2019fd7f48c7ca1459332966"
   integrity sha512-tVx8EeO1NWCgo+R5fCuw+CO8r2+HrqFOWuRwJETtianrWFclDNUre4vb5sIryp0o+lyNi96tZ68EigfbftYbYw==
 
-"@neurodevs/node-tdd@0.2.5":
+"@neurodevs/node-tdd@^0.2.5":
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/@neurodevs/node-tdd/-/node-tdd-0.2.5.tgz#cb9187194cc1b4c7fd2935b450eb591ba76dfc59"
   integrity sha512-Tfzh/sbY9T1MnA00fU3saDX/Y1ejGDGiQcQ0LnjTt9QfBIorosfz94qSjqC9I2yq5q6jwIyD7pjaxXXJG85RIw==
