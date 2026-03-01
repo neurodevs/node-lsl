@@ -26,7 +26,7 @@
   "main": "build/index.js",
   "scripts": {
     "build.ci": "yarn run build.tsc && yarn run lint",
-    "build.dev": "yarn run build.tsc --sourceMap ; yarn run lint ; prettier --write .",
+    "build.dev": "yarn run build.tsc --sourceMap ; yarn run fix.lint ; prettier --write .",
     "build.copy-files": "mkdir -p build && rsync -avzq --exclude='*.ts' ./src/ ./build/",
     "build.tsc": "yarn run build.copy-files && tsc",
     "clean": "yarn run clean.build",
