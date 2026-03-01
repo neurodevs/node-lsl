@@ -7,8 +7,8 @@ Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series
 - [Overview](#overview)
 - [Installation](#installation)
 - [Usage](#usage)
-    - [LslStreamOutlet](#lslstreamoutlet)
-    - [LslEventMarkerEmitter](#LslEventMarkerEmitter)
+  - [LslStreamOutlet](#lslstreamoutlet)
+  - [LslEventMarkerEmitter](#LslEventMarkerEmitter)
 - [Test Doubles](#test-doubles)
 
 ## Overview
@@ -47,13 +47,13 @@ LSL is often used to stream EEG data over a network. For example, to instantiate
 import { LslStreamOutlet } from '@neurodevs/node-lsl'
 
 const outlet = await LslStreamOutlet.Create({
-    name: 'Muse S (2nd gen)',
-    type: 'EEG',
-    sourceId: 'muse-s-eeg',
-    channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
-    channelFormat: 'float32',
-    sampleRateHz: 256,
-    chunkSize: 12,
+  name: 'Muse S (2nd gen)',
+  type: 'EEG',
+  sourceId: 'muse-s-eeg',
+  channelNames: ['TP9', 'AF7', 'AF8', 'TP10', 'AUX'],
+  channelFormat: 'float32',
+  sampleRateHz: 256,
+  chunkSize: 12,
 })
 
 outlet.pushSample([1, 2, 3, 4, 5])
@@ -69,8 +69,8 @@ import { LslEventMarkerEmitter } from '@neurodevs/node-lsl'
 const emitter = await LslEventMarkerEmitter.Create()
 
 const markers = [
-    { name: 'phase-1-begin', waitAfterMs: 5000 },
-    { name: 'phase-1-end', waitAfterMs: 100 },
+  { name: 'phase-1-begin', waitAfterMs: 5000 },
+  { name: 'phase-1-end', waitAfterMs: 100 },
 ]
 
 const promise = emitter.emitMany(markers)
