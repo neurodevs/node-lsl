@@ -66,7 +66,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         }
     }
 
-    private readonly cannotActivateMessage = `\n\n Cannot activate bridge after destroying it! \n\n Please create and activate a new instance. \n`
+    private readonly cannotActivateMessage = `\n\nCannot activate bridge after destroying it! \n\nPlease create and activate a new instance. \n`
 
     private async startPullingData() {
         await this.inlet.startPulling()
@@ -77,7 +77,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         this.stopPullingData()
     }
 
-    private readonly cannotDeactivateMessage = `\n\n Cannot deactivate bridge after destroying it! \n\n Please create and activate a new instance. \n`
+    private readonly cannotDeactivateMessage = `\n\nCannot deactivate bridge after destroying it! \n\nPlease create and activate a new instance. \n`
 
     private stopPullingData() {
         this.inlet.stopPulling()

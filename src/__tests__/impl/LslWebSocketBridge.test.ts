@@ -152,7 +152,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(async () => {
             await this.activate()
-        }, `\n\n Cannot activate bridge after destroying it! \n\n Please create and activate a new instance. \n`)
+        }, `\n\nCannot activate bridge after destroying it! \n\nPlease create and activate a new instance. \n`)
     }
 
     @test()
@@ -161,7 +161,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
         assert.doesThrow(() => {
             this.deactivate()
-        }, `\n\n Cannot deactivate bridge after destroying it! \n\n Please create and activate a new instance. \n`)
+        }, `\n\nCannot deactivate bridge after destroying it! \n\nPlease create and activate a new instance. \n`)
     }
 
     @test()
