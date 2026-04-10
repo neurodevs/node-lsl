@@ -2,12 +2,8 @@
   "compilerOptions": {
     "module": "nodenext",
     "target": "esnext",
-    "lib": [
-      "esnext"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["esnext"],
+    "types": ["node"],
     "rootDir": "src",
     "outDir": "build",
     "sourceMap": false,
@@ -24,8 +20,5 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true
   },
-  "include": [
-    "./src/*.ts",
-    "./src/**/*.ts"
-  ]
+  "include": ["./src/*.ts", "./src/**/*.ts"]
 }
