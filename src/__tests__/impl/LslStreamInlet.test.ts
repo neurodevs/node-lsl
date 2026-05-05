@@ -386,7 +386,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     protected static async pushSampleHandlesErrorCode() {
         let passedErrorCode: number | undefined
 
-        StreamInletWorker.handleError = (errorCode: number) => {
+        StreamInletWorker.handleLslError = (errorCode: number) => {
             passedErrorCode = errorCode
         }
 
@@ -400,7 +400,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         assert.isEqualDeep(
             passedErrorCode,
             FakeLiblsl.fakeErrorCode,
-            'Did not pass the expected error code to handleError!'
+            'Did not pass the expected error code to handleLslError!'
         )
     }
 

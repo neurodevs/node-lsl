@@ -1,4 +1,10 @@
-import { FakeLiblsl, InfoHandle, LiblslAdapter } from '@neurodevs/ndx-native'
+import {
+    FakeLiblsl,
+    FakeLibndx,
+    InfoHandle,
+    LiblslAdapter,
+    LibndxAdapter,
+} from '@neurodevs/ndx-native'
 import AbstractModuleTest from '@neurodevs/node-tdd'
 import WebSocket, { Server } from 'ws'
 
@@ -19,9 +25,11 @@ import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
 import SpyLslWebSocketBridge from '../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
 import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
+import BleDeviceController from '../impl/BleDeviceController.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
+    protected static fakeLibndx: FakeLibndx
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -33,6 +41,13 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         FakeLiblsl.fakeErrorCode = 0
         FakeLiblsl.fakeInfoHandles = [{} as InfoHandle]
+    }
+
+    protected static setFakeLibndx() {
+        this.fakeLibndx = new FakeLibndx()
+        LibndxAdapter.setInstance(this.fakeLibndx)
+
+        BleDeviceController.ndx = this.fakeLibndx
     }
 
     protected static setSpyStreamInfo() {

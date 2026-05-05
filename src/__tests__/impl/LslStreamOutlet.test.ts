@@ -7,7 +7,7 @@ import LslStreamOutlet, {
     StreamOutletOptions,
 } from '../../impl/LslStreamOutlet.js'
 import {
-    setOutletHandleError,
+    setOutletHandleLslError,
     setOutletLiblslAdapter,
 } from '../../impl/workers/outlet/LslStreamOutlet.worker.js'
 import {
@@ -241,7 +241,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     protected static async pushSampleHandlesErrorCode() {
         let passedErrorCode: number | undefined
 
-        setOutletHandleError((errorCode: number) => {
+        setOutletHandleLslError((errorCode: number) => {
             passedErrorCode = errorCode
         })
 

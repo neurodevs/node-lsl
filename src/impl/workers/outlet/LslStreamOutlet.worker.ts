@@ -4,7 +4,7 @@ import {
     LiblslAdapter,
     Liblsl,
     OutletHandle,
-    handleError,
+    handleLslError,
     LslErrorCode,
 } from '@neurodevs/ndx-native'
 
@@ -20,10 +20,10 @@ export function setOutletLiblslAdapter(adapter: Liblsl) {
     lsl = LiblslAdapter.getInstance()
 }
 
-let handleErrorFn = handleError
+let handleLslErrorFn = handleLslError
 
-export function setOutletHandleError(fn: typeof handleError) {
-    handleErrorFn = fn
+export function setOutletHandleLslError(fn: typeof handleLslError) {
+    handleLslErrorFn = fn
 }
 
 let info: StreamInfo
@@ -97,7 +97,7 @@ export function pushSample(msg: {
     })
 
     try {
-        handleErrorFn(errorCode)
+        handleLslErrorFn(errorCode)
     } catch {
         parentPort?.postMessage({
             type: 'error',

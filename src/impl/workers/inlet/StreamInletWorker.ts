@@ -1,5 +1,5 @@
 import {
-    handleError,
+    handleLslError,
     InfoHandle,
     InletHandle,
     LiblslAdapter,
@@ -18,7 +18,7 @@ import { CreateInletPayload } from './LslStreamInlet.worker.js'
 
 export default class StreamInletWorker {
     public static lsl = LiblslAdapter.getInstance()
-    public static handleError = handleError
+    public static handleLslError = handleLslError
     public static freePointer = freePointer
 
     private sourceId!: string
@@ -274,16 +274,16 @@ export default class StreamInletWorker {
 
     private async pullDataOnce() {
         const { samples, timestamps } = this.pullMethod()
-        this.handleErrorIfPresent()
+        this.handleLslErrorIfPresent()
 
         if (samples && timestamps) {
             this.onData(samples, timestamps)
         }
     }
 
-    private handleErrorIfPresent() {
+    private handleLslErrorIfPresent() {
         const errorCode = this.pullErrorBuffer.readInt32LE()
-        this.handleError(errorCode)
+        this.handleLslError(errorCode)
     }
 
     private async waitBetweenPulls() {
@@ -338,8 +338,8 @@ export default class StreamInletWorker {
         return StreamInletWorker.lsl
     }
 
-    private get handleError() {
-        return StreamInletWorker.handleError
+    private get handleLslError() {
+        return StreamInletWorker.handleLslError
     }
 
     private get freePointer() {
