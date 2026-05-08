@@ -1,6 +1,6 @@
 import BleDeviceController, {
     BleControllerConstructorOptions,
-} from '../../impl/BleDeviceController.js'
+} from '../../impl/controllers/BleDeviceController.js'
 
 export default class SpyBleController extends BleDeviceController {
     public infoLogs: string[] = []

@@ -25,7 +25,7 @@ import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
 import SpyLslWebSocketBridge from '../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
 import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
-import BleDeviceController from '../impl/BleDeviceController.js'
+import BleDeviceController from '../impl/controllers/BleDeviceController.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl

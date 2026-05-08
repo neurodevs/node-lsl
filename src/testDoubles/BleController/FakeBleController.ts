@@ -2,7 +2,7 @@ import generateId from '@neurodevs/generate-id'
 import {
     BleController,
     BleControllerConstructorOptions,
-} from '../../impl/BleDeviceController.js'
+} from '../../impl/controllers/BleDeviceController.js'
 
 export default class FakeBleController implements BleController {
     public static callsToConstructor: (

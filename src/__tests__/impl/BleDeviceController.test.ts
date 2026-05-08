@@ -5,7 +5,7 @@ import SpyBleController from '../../testDoubles/BleController/SpyBleController.j
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import BleDeviceController, {
     BleControllerOptions,
-} from '../../impl/BleDeviceController.js'
+} from '../../impl/controllers/BleDeviceController.js'
 
 export default class BleDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyBleController
