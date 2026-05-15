@@ -3,9 +3,5 @@
     "skipped": []
   },
   "skipped": ["skill"],
-  "installed": ["test"],
-  "regressionproof": {
-    "enabled": true,
-    "projectName": "node-lsl"
-  }
+  "installed": ["test"]
 }
