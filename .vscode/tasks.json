@@ -22,16 +22,8 @@
     },
     {
       "label": "test.file",
-      "command": "spruce",
-      "args": [
-        "test",
-        "--inspect",
-        "5200",
-        "--pattern",
-        "${fileBasenameNoExtension}",
-        "--watchMode",
-        "standard"
-      ],
+      "type": "shell",
+      "command": "node node_modules/@neurodevs/node-tdd/build/workspace/testRunner.cli.js --pattern \"${fileBasenameNoExtension}\" --watchMode standard --inspect 5200",
       "promptOnClose": false,
       "group": {
         "kind": "test",
@@ -45,8 +37,8 @@
     },
     {
       "label": "test.reporter",
-      "command": "spruce",
-      "args": ["test", "--shouldHoldAtStart", "true", "--watchMode", "smart"],
+      "type": "shell",
+      "command": "node node_modules/@neurodevs/node-tdd/build/workspace/testRunner.cli.js --watchMode standard",
       "promptOnClose": false,
       "group": "test",
       "runOptions": {
@@ -56,19 +48,8 @@
         "panel": "shared",
         "focus": true,
         "reveal": "always"
-      }
-    },
-    {
-      "label": "spruce",
-      "type": "shell",
-      "command": "spruce ${input:spruceCommand}",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "new",
-        "clear": false
-      }
+      },
+      "problemMatcher": []
     },
     {
       "label": "shell",
@@ -96,12 +77,6 @@
     }
   ],
   "inputs": [
-    {
-      "id": "spruceCommand",
-      "description": "spruce command",
-      "default": "create.test",
-      "type": "promptString"
-    },
     {
       "id": "command",
       "description": "command",
