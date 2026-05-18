@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@neurodevs/eslint-config-ndx": "^1.0.1",
-    "@neurodevs/node-tdd": "^1.0.9",
+    "@neurodevs/node-tdd": "^1.1.1",
     "@neurodevs/prettier-config-ndx": "^1.0.2",
     "@types/ws": "^8.18.1",
     "jest": "^30.2.0",
@@ -56,6 +56,9 @@
     "prettier": "^3.8.1",
     "tsc-watch": "^7.2.0",
     "typescript": "^5.9.3"
+  },
+  "resolutions": {
+    "glob": "^13.0.0"
   },
   "jest": {
     "testRunner": "jest-circus/runner",
