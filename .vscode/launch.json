@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "1.0.0",
   "configurations": [
     {
       "type": "node",
@@ -18,7 +18,7 @@
         "--inspect-brk",
         "--trace-warnings",
         "--experimental-vm-modules",
-        "${workspaceFolder}/node_modules/jest/bin/jest.js",
+        "${workspaceFolder}/node_modules/.bin/jest",
         "${fileBasenameNoExtension}",
         "--detectOpenHandles"
       ],
@@ -34,7 +34,8 @@
       "runtimeArgs": [
         "--inspect-brk",
         "--trace-warnings",
-        "${workspaceFolder}/node_modules/jest/bin/jest.js"
+        "--experimental-vm-modules",
+        "${workspaceFolder}/node_modules/.bin/jest"
       ],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
