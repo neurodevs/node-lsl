@@ -6,3 +6,5 @@ const muse = await BleDeviceController.Create({
 })
 
 await muse.connect()
+
+await new Promise((resolve) => setTimeout(resolve, 60 * 1000))
