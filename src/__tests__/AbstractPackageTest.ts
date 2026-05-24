@@ -8,14 +8,6 @@ import {
 import AbstractModuleTest from '@neurodevs/node-tdd'
 import WebSocket, { Server } from 'ws'
 
-import LslEventMarkerEmitter from '../impl/LslEventMarkerEmitter.js'
-import LslStreamInfo from '../impl/LslStreamInfo.js'
-import LslStreamInlet, {
-    OnDataCallback,
-    StreamInletOptions,
-} from '../impl/LslStreamInlet.js'
-import LslStreamOutlet from '../impl/LslStreamOutlet.js'
-import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
 import SpyEventMarkerEmitter from '../testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
 import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo.js'
 import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo.js'
@@ -25,7 +17,16 @@ import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
 import SpyLslWebSocketBridge from '../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
 import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
+
+import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
 import BleDeviceController from '../impl/controllers/BleDeviceController.js'
+import LslEventMarkerEmitter from '../impl/LslEventMarkerEmitter.js'
+import LslStreamInfo from '../impl/LslStreamInfo.js'
+import LslStreamInlet, {
+    OnDataCallback,
+    StreamInletOptions,
+} from '../impl/LslStreamInlet.js'
+import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl

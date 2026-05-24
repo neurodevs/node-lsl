@@ -1,9 +1,20 @@
-import { LibndxAdapter } from '@neurodevs/ndx-native'
+import { LibndxAdapter, Libndx } from '@neurodevs/ndx-native'
 
 export default class BleDeviceController implements BleController {
     public static Class?: BleControllerConstructor
     public static setInterval = setInterval
-    public static ndx = LibndxAdapter.getInstance()
+    private static _ndx?: Libndx
+
+    public static get ndx() {
+        if (!this._ndx) {
+            this._ndx = LibndxAdapter.getInstance()
+        }
+        return this._ndx
+    }
+
+    public static set ndx(value: Libndx) {
+        this._ndx = value
+    }
 
     protected characteristicCallbacks: CharacteristicCallbacks
     protected rssiIntervalMs?: number
@@ -24,19 +35,35 @@ export default class BleDeviceController implements BleController {
     }
 
     public async connect() {
-        this.ndx.createBleBackend({ deviceUuid: this.uuid })
-        this.ndx.startBleBackend({ deviceUuid: this.uuid })
+        console.info(
+            'createBleBackend',
+            this.ndx.createBleBackend({ deviceUuid: this.uuid })
+        )
+
+        console.info(
+            'startBleBackend',
+            this.ndx.startBleBackend({
+                deviceUuid: this.uuid,
+                onData: (data: Buffer, length: number, timestamp: number) => {
+                    console.info(data, length, timestamp)
+                },
+            })
+        )
     }
 
     public async writeCharacteristic(
         characteristicUuid: CharacteristicUuid,
         value: string
     ) {
-        this.ndx.writeBleCharacteristic({
-            deviceUuid: this.uuid,
-            characteristicUuid,
+        console.info(
+            'writeBleCharacteristic',
             value,
-        })
+            this.ndx.writeBleCharacteristic({
+                deviceUuid: this.uuid,
+                characteristicUuid,
+                value,
+            })
+        )
     }
 
     public async disconnect() {

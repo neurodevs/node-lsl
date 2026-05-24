@@ -43,12 +43,15 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     protected static async connectCallsLibndxStartBleBackend() {
         await this.connect()
 
-        assert.isEqualDeep(
-            FakeLibndx.callsToStartBleBackend[0],
-            {
-                deviceUuid: this.uuid,
-            },
-            'Did not call startBleBackend!'
+        assert.isEqual(
+            FakeLibndx.callsToStartBleBackend[0].deviceUuid,
+            this.uuid,
+            'Did not call startBleBackend with correct deviceUuid!'
+        )
+
+        assert.isFunction(
+            FakeLibndx.callsToStartBleBackend[0].onData,
+            'Did not call startBleBackend with onData callback!'
         )
     }
 
