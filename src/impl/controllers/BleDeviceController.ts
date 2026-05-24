@@ -1,4 +1,5 @@
 import { LibndxAdapter, Libndx } from '@neurodevs/ndx-native'
+import koffi from 'koffi'
 
 export default class BleDeviceController implements BleController {
     public static Class?: BleControllerConstructor
@@ -35,17 +36,23 @@ export default class BleDeviceController implements BleController {
     }
 
     public async connect() {
-        console.info(
+        this.log.info(
             'createBleBackend',
             this.ndx.createBleBackend({ deviceUuid: this.uuid })
         )
 
-        console.info(
+        this.log.info(
             'startBleBackend',
             this.ndx.startBleBackend({
                 deviceUuid: this.uuid,
                 onData: (data: Buffer, length: number, timestamp: number) => {
-                    console.info(data, length, timestamp)
+                    const bytes = koffi.decode(
+                        data,
+                        'uint8',
+                        length
+                    ) as number[]
+
+                    this.log.info(`[${timestamp}] length=${length}`, bytes)
                 },
             })
         )
@@ -55,7 +62,7 @@ export default class BleDeviceController implements BleController {
         characteristicUuid: CharacteristicUuid,
         value: string
     ) {
-        console.info(
+        this.log.info(
             'writeBleCharacteristic',
             value,
             this.ndx.writeBleCharacteristic({
