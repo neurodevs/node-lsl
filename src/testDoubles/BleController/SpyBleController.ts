@@ -12,7 +12,7 @@ export default class SpyBleController extends BleDeviceController {
     }
 
     public getCharacteristicCallbacks() {
-        return this.characteristicCallbacks
+        return this.charCallbacks
     }
 
     public getRssiIntervalMs() {

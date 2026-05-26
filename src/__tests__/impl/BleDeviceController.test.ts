@@ -12,6 +12,19 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     private static readonly uuid = this.generateId()
 
+    private static readonly charCallbacks = [
+        {
+            charUuid: this.generateId(),
+            charName: this.generateId(),
+            onData: async () => {},
+        },
+        {
+            charUuid: this.generateId(),
+            charName: this.generateId(),
+            onData: async () => {},
+        },
+    ]
+
     protected static async beforeEach() {
         await super.beforeEach()
 
@@ -43,16 +56,40 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     protected static async connectCallsLibndxStartBleBackend() {
         await this.connect()
 
+        const call = FakeLibndx.callsToStartBleBackend[0]
+
         assert.isEqual(
-            FakeLibndx.callsToStartBleBackend[0].deviceUuid,
+            call.deviceUuid,
             this.uuid,
             'Did not call startBleBackend with correct deviceUuid!'
         )
 
-        assert.isFunction(
-            FakeLibndx.callsToStartBleBackend[0].onData,
-            'Did not call startBleBackend with onData callback!'
+        assert.isEqual(
+            call.charCallbacks.length,
+            2,
+            'Did not call startBleBackend with charCallbacks!'
         )
+
+        let i = 0
+        for (const charCallback of call.charCallbacks) {
+            assert.isEqual(
+                charCallback.charUuid,
+                this.charCallbacks[i].charUuid,
+                'Incorrect charUuid!'
+            )
+
+            assert.isEqual(
+                charCallback.charName,
+                this.charCallbacks[i].charName,
+                'Incorrect charName!'
+            )
+
+            assert.isFunction(
+                charCallback.onData,
+                'Callback is not a function!'
+            )
+            i++
+        }
     }
 
     @test()
@@ -99,7 +136,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     ) {
         return (await BleDeviceController.Create({
             deviceUuid: this.uuid,
-            characteristicCallbacks: {},
+            charCallbacks: this.charCallbacks,
             ...options,
         })) as SpyBleController
     }

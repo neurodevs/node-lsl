@@ -1,5 +1,4 @@
 import { LibndxAdapter, Libndx } from '@neurodevs/ndx-native'
-import koffi from 'koffi'
 
 export default class BleDeviceController implements BleController {
     public static Class?: BleControllerConstructor
@@ -17,17 +16,17 @@ export default class BleDeviceController implements BleController {
         this._ndx = value
     }
 
-    protected characteristicCallbacks: CharacteristicCallbacks
+    protected charCallbacks: CharacteristicCallbacks
     protected rssiIntervalMs?: number
     protected log = console
 
     private deviceUuid: string
 
     protected constructor(options: BleControllerConstructorOptions) {
-        const { deviceUuid, characteristicCallbacks, rssiIntervalMs } = options
+        const { deviceUuid, charCallbacks, rssiIntervalMs } = options
 
         this.deviceUuid = deviceUuid
-        this.characteristicCallbacks = characteristicCallbacks
+        this.charCallbacks = charCallbacks
         this.rssiIntervalMs = rssiIntervalMs
     }
 
@@ -45,15 +44,7 @@ export default class BleDeviceController implements BleController {
             'startBleBackend',
             this.ndx.startBleBackend({
                 deviceUuid: this.uuid,
-                onData: (data: Buffer, length: number, timestamp: number) => {
-                    const bytes = koffi.decode(
-                        data,
-                        'uint8',
-                        length
-                    ) as number[]
-
-                    this.log.info(`[${timestamp}] length=${length}`, bytes)
-                },
+                charCallbacks: this.charCallbacks,
             })
         )
     }
@@ -106,7 +97,7 @@ export interface BleController {
 
 export interface BleControllerOptions {
     deviceUuid: string
-    characteristicCallbacks: CharacteristicCallbacks
+    charCallbacks: CharacteristicCallbacks
     rssiIntervalMs?: number
 }
 
@@ -116,13 +107,14 @@ export type BleControllerConstructor = new (
 
 export interface BleControllerConstructorOptions {
     deviceUuid: string
-    characteristicCallbacks: CharacteristicCallbacks
+    charCallbacks: CharacteristicCallbacks
     rssiIntervalMs?: number
 }
 
-export type CharacteristicCallbacks = Record<
-    CharacteristicUuid,
-    (data: Buffer, characteristic: unknown) => void
->
+export type CharacteristicCallbacks = {
+    charUuid: string
+    charName?: string
+    onData: (data: Buffer, length: number, timestamp: number) => void
+}[]
 
 export type CharacteristicUuid = string
