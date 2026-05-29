@@ -55,7 +55,7 @@ export default class BleDeviceController implements BleController {
         })
         const { status, error } = JSON.parse(result)
 
-        if (status === 400) {
+        if (status !== 200) {
             throw new Error(error)
         }
     }
