@@ -68,6 +68,20 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async createBleBackendThrowsOn500() {
+        FakeLibndx.fakeResult = JSON.stringify({
+            status: 500,
+            error: this.fakeError,
+        })
+
+        assert.doesThrowAsync(
+            async () => await this.connect(),
+            this.fakeError,
+            'Did not throw error!'
+        )
+    }
+
+    @test()
     protected static async connectCallsLibndxStartBleBackend() {
         await this.connect()
 
