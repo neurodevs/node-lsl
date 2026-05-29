@@ -122,6 +122,23 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async startBleBackendThrowsOn400() {
+        //@ts-ignore
+        this.instance.createBleBackend = () => {}
+
+        FakeLibndx.fakeResult = JSON.stringify({
+            status: 400,
+            error: this.fakeError,
+        })
+
+        assert.doesThrowAsync(
+            async () => await this.connect(),
+            this.fakeError,
+            'Did not throw error!'
+        )
+    }
+
+    @test()
     protected static async writeCharacteristicCallsLibndxBinding() {
         const characteristicUuid = this.generateId()
         const value = this.generateId()
