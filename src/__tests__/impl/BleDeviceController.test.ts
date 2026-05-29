@@ -172,6 +172,17 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async writeCharacteristicThrowsOn500() {
+        this.setFake500Error()
+
+        assert.doesThrowAsync(
+            async () => await this.writeCharacteristic(),
+            this.fakeError,
+            'Did not throw error!'
+        )
+    }
+
+    @test()
     protected static async disconnectCallsLibndxDestroyBleBackend() {
         await this.disconnect()
 
