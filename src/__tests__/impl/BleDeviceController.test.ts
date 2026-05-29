@@ -153,10 +153,10 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
             FakeLibndx.callsToWriteBle[0],
             {
                 deviceUuid: this.uuid,
-                characteristicUuid: this.charUuid,
+                charUuid: this.charUuid,
                 value: this.charValueToWrite,
             },
-            'Did not call writeBleCharacteristic!'
+            'Did not call writeBleCharacteristic as expected!'
         )
     }
 

@@ -66,7 +66,7 @@ export default class BleDeviceController implements BleController {
     ) {
         const result = this.ndx.writeBleCharacteristic({
             deviceUuid: this.uuid,
-            characteristicUuid: charUuid,
+            charUuid,
             value,
         })
         const { status, error } = JSON.parse(result)
