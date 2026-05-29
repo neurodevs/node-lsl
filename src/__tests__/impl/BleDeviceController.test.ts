@@ -11,8 +11,8 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyBleController
 
     private static readonly uuid = this.generateId()
-    private static readonly characteristicUuid = this.generateId()
-    private static readonly characteristicValueToWrite = this.generateId()
+    private static readonly charUuid = this.generateId()
+    private static readonly charValueToWrite = this.generateId()
     private static readonly fakeError = this.generateId()
 
     private static readonly charCallbacks = [
@@ -153,8 +153,8 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
             FakeLibndx.callsToWriteBle[0],
             {
                 deviceUuid: this.uuid,
-                characteristicUuid: this.characteristicUuid,
-                value: this.characteristicValueToWrite,
+                characteristicUuid: this.charUuid,
+                value: this.charValueToWrite,
             },
             'Did not call writeBleCharacteristic!'
         )
@@ -223,8 +223,8 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     private static async writeCharacteristic() {
         await this.instance.writeCharacteristic(
-            this.characteristicUuid,
-            this.characteristicValueToWrite
+            this.charUuid,
+            this.charValueToWrite
         )
     }
 

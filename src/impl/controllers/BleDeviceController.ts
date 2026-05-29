@@ -61,12 +61,12 @@ export default class BleDeviceController implements BleController {
     }
 
     public async writeCharacteristic(
-        characteristicUuid: CharacteristicUuid,
+        charUuid: CharacteristicUuid,
         value: string
     ) {
         const result = this.ndx.writeBleCharacteristic({
             deviceUuid: this.uuid,
-            characteristicUuid,
+            characteristicUuid: charUuid,
             value,
         })
         const { status, error } = JSON.parse(result)
@@ -105,7 +105,7 @@ export interface BleController {
     connect(): Promise<void>
 
     writeCharacteristic(
-        characteristicUuid: CharacteristicUuid,
+        charUuid: CharacteristicUuid,
         value: string
     ): Promise<void>
 
