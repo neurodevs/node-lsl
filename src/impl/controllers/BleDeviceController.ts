@@ -80,7 +80,7 @@ export default class BleDeviceController implements BleController {
         const result = this.ndx.destroyBleBackend({ deviceUuid: this.uuid })
         const { status, error } = JSON.parse(result)
 
-        if (status === 400) {
+        if (status !== 200) {
             throw new Error(error)
         }
     }
