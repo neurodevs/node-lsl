@@ -35,10 +35,7 @@ export default class BleDeviceController implements BleController {
     }
 
     public async connect() {
-        this.log.info(
-            'createBleBackend',
-            this.ndx.createBleBackend({ deviceUuid: this.uuid })
-        )
+        this.createBleBackend()
 
         this.log.info(
             'startBleBackend',
@@ -47,6 +44,15 @@ export default class BleDeviceController implements BleController {
                 charCallbacks: this.charCallbacks,
             })
         )
+    }
+
+    private createBleBackend() {
+        const result = this.ndx.createBleBackend({ deviceUuid: this.uuid })
+        const { status, error } = JSON.parse(result)
+
+        if (status === 400) {
+            throw new Error(error)
+        }
     }
 
     public async writeCharacteristic(

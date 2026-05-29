@@ -48,6 +48,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.fakeLibndx = new FakeLibndx()
         LibndxAdapter.setInstance(this.fakeLibndx)
 
+        FakeLibndx.fakeResult = JSON.stringify({ status: 200 })
+
         BleDeviceController.ndx = this.fakeLibndx
     }
 

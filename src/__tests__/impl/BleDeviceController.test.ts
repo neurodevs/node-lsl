@@ -11,6 +11,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyBleController
 
     private static readonly uuid = this.generateId()
+    private static readonly fakeError = this.generateId()
 
     private static readonly charCallbacks = [
         {
@@ -49,6 +50,20 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
                 deviceUuid: this.uuid,
             },
             'Did not call createBleBackend!'
+        )
+    }
+
+    @test()
+    protected static async createBleBackendThrowsOn400() {
+        FakeLibndx.fakeResult = JSON.stringify({
+            status: 400,
+            error: this.fakeError,
+        })
+
+        assert.doesThrowAsync(
+            async () => await this.connect(),
+            this.fakeError,
+            'Did not throw error!'
         )
     }
 
