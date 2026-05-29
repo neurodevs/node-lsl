@@ -24,7 +24,10 @@ const charCallbacks = Object.entries(MUSE_CHARACTERISTIC_UUIDS).map(
         return {
             charUuid: uuid,
             charName: name,
-            onData: generateCallback(),
+            onData: (data: Buffer, length: number, timestamp: number) => {
+                const bytes = koffi.decode(data, 'uint8', length) as number[]
+                console.info(`[${timestamp}] length=${length}`, bytes)
+            },
         }
     }
 )
@@ -45,9 +48,4 @@ for (const cmd of ['h', 'p50', 's', 'd']) {
 
 await new Promise((resolve) => setTimeout(resolve, 60 * 1000))
 
-function generateCallback() {
-    return (data: Buffer, length: number, timestamp: number) => {
-        const bytes = koffi.decode(data, 'uint8', length) as number[]
-        console.info(`[${timestamp}] length=${length}`, bytes)
-    }
-}
+await muse.disconnect()
