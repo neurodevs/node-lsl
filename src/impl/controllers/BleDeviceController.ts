@@ -77,7 +77,12 @@ export default class BleDeviceController implements BleController {
     }
 
     public async disconnect() {
-        this.ndx.destroyBleBackend({ deviceUuid: this.uuid })
+        const result = this.ndx.destroyBleBackend({ deviceUuid: this.uuid })
+        const { status, error } = JSON.parse(result)
+
+        if (status === 400) {
+            throw new Error(error)
+        }
     }
 
     public get uuid() {

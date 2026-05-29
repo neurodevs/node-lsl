@@ -195,6 +195,17 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async disconnectThrowsOn400() {
+        this.setFake400Error()
+
+        assert.doesThrowAsync(
+            async () => await this.disconnect(),
+            this.fakeError,
+            'Did not throw error!'
+        )
+    }
+
     private static async connect() {
         await this.instance.connect()
     }
