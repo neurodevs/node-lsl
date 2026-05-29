@@ -11,6 +11,8 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyBleController
 
     private static readonly uuid = this.generateId()
+    private static readonly characteristicUuid = this.generateId()
+    private static readonly characteristicValueToWrite = this.generateId()
     private static readonly fakeError = this.generateId()
 
     private static readonly charCallbacks = [
@@ -55,10 +57,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async createBleBackendThrowsOn400() {
-        FakeLibndx.fakeResult = JSON.stringify({
-            status: 400,
-            error: this.fakeError,
-        })
+        this.setFake400Error()
 
         assert.doesThrowAsync(
             async () => await this.connect(),
@@ -69,10 +68,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async createBleBackendThrowsOn500() {
-        FakeLibndx.fakeResult = JSON.stringify({
-            status: 500,
-            error: this.fakeError,
-        })
+        this.setFake500Error()
 
         assert.doesThrowAsync(
             async () => await this.connect(),
@@ -126,10 +122,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         //@ts-ignore
         this.instance.createBleBackend = () => {}
 
-        FakeLibndx.fakeResult = JSON.stringify({
-            status: 400,
-            error: this.fakeError,
-        })
+        this.setFake400Error()
 
         assert.doesThrowAsync(
             async () => await this.connect(),
@@ -143,10 +136,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         //@ts-ignore
         this.instance.createBleBackend = () => {}
 
-        FakeLibndx.fakeResult = JSON.stringify({
-            status: 500,
-            error: this.fakeError,
-        })
+        this.setFake500Error()
 
         assert.doesThrowAsync(
             async () => await this.connect(),
@@ -157,19 +147,27 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async writeCharacteristicCallsLibndxBinding() {
-        const characteristicUuid = this.generateId()
-        const value = this.generateId()
-
-        await this.instance.writeCharacteristic(characteristicUuid, value)
+        await this.writeCharacteristic()
 
         assert.isEqualDeep(
             FakeLibndx.callsToWriteBle[0],
             {
                 deviceUuid: this.uuid,
-                characteristicUuid,
-                value,
+                characteristicUuid: this.characteristicUuid,
+                value: this.characteristicValueToWrite,
             },
             'Did not call writeBleCharacteristic!'
+        )
+    }
+
+    @test()
+    protected static async writeCharacteristicThrowsOn400() {
+        this.setFake400Error()
+
+        assert.doesThrowAsync(
+            async () => await this.writeCharacteristic(),
+            this.fakeError,
+            'Did not throw error!'
         )
     }
 
@@ -190,8 +188,29 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.instance.connect()
     }
 
+    private static async writeCharacteristic() {
+        await this.instance.writeCharacteristic(
+            this.characteristicUuid,
+            this.characteristicValueToWrite
+        )
+    }
+
     private static async disconnect() {
         await this.instance.disconnect()
+    }
+
+    private static setFake400Error() {
+        FakeLibndx.fakeResult = JSON.stringify({
+            status: 400,
+            error: this.fakeError,
+        })
+    }
+
+    private static setFake500Error() {
+        FakeLibndx.fakeResult = JSON.stringify({
+            status: 500,
+            error: this.fakeError,
+        })
     }
 
     private static async BleController(

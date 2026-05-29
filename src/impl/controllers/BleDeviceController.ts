@@ -64,15 +64,16 @@ export default class BleDeviceController implements BleController {
         characteristicUuid: CharacteristicUuid,
         value: string
     ) {
-        this.log.info(
-            'writeBleCharacteristic',
+        const result = this.ndx.writeBleCharacteristic({
+            deviceUuid: this.uuid,
+            characteristicUuid,
             value,
-            this.ndx.writeBleCharacteristic({
-                deviceUuid: this.uuid,
-                characteristicUuid,
-                value,
-            })
-        )
+        })
+        const { status, error } = JSON.parse(result)
+
+        if (status === 400) {
+            throw new Error(error)
+        }
     }
 
     public async disconnect() {
