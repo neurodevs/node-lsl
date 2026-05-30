@@ -3,6 +3,8 @@ import { LibndxAdapter, Libndx, NativePeripheral } from '@neurodevs/ndx-native'
 export default class BleDeviceController implements BleController {
     public static Class?: BleControllerConstructor
     public static setTimeout = setTimeout
+    public static waitAfterMs = 1000
+
     private static _ndx?: Libndx
 
     public static get ndx() {
@@ -43,6 +45,7 @@ export default class BleDeviceController implements BleController {
         this.startBleBackend()
 
         await this.waitForOnConnected()
+        await this.waitToDiscoverServices()
     }
 
     private createBleBackend() {
@@ -82,6 +85,15 @@ export default class BleDeviceController implements BleController {
             }
             checkConnected()
         })
+    }
+
+    private async waitToDiscoverServices() {
+        await new Promise<void>((resolve) =>
+            BleDeviceController.setTimeout(
+                resolve,
+                BleDeviceController.waitAfterMs
+            )
+        )
     }
 
     public async writeCharacteristic(

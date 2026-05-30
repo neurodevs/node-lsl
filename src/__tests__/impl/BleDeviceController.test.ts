@@ -39,8 +39,18 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         name: this.generateId(),
     }
 
+    protected static async beforeAll() {
+        assert.isEqual(
+            BleDeviceController.waitAfterMs,
+            1000,
+            'Set incorrect waitAfterMs!'
+        )
+    }
+
     protected static async beforeEach() {
         await super.beforeEach()
+
+        BleDeviceController.waitAfterMs = 0
 
         this.setFakeLibndx()
         BleDeviceController.Class = SpyBleController
@@ -165,6 +175,22 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         assert.isTruthy(
             this.wasConnected,
             'Did not wait for onConnected event!'
+        )
+    }
+
+    @test()
+    protected static async waitsAfterOnConnectedToDiscoverServices() {
+        const waitAfterMs = 20
+        BleDeviceController.waitAfterMs = waitAfterMs
+
+        const t0 = Date.now()
+        await this.connect()
+        const t1 = Date.now()
+
+        assert.isAbove(
+            t1 - t0,
+            100 + waitAfterMs * 0.8,
+            'Did not wait after on connected!'
         )
     }
 

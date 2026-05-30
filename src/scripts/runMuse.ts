@@ -39,8 +39,6 @@ const muse = await BleDeviceController.Create({
 
 await muse.connect()
 
-await new Promise((resolve) => setTimeout(resolve, 5000))
-
 for (const cmd of ['h', 'p50', 's', 'd']) {
     await muse.writeCharacteristic(CONTROL_UUID, cmd)
     await new Promise((resolve) => setTimeout(resolve, 100))
