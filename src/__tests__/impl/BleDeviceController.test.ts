@@ -233,17 +233,17 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     }
 
     private static setFake400Error() {
-        FakeLibndx.fakeResult = JSON.stringify({
+        FakeLibndx.fakeResult = {
             status: 400,
             error: this.fakeError,
-        })
+        }
     }
 
     private static setFake500Error() {
-        FakeLibndx.fakeResult = JSON.stringify({
+        FakeLibndx.fakeResult = {
             status: 500,
             error: this.fakeError,
-        })
+        }
     }
 
     private static async BleController(

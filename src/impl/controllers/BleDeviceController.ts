@@ -40,8 +40,9 @@ export default class BleDeviceController implements BleController {
     }
 
     private createBleBackend() {
-        const result = this.ndx.createBleBackend({ deviceUuid: this.uuid })
-        const { status, error } = JSON.parse(result)
+        const { status, error } = this.ndx.createBleBackend({
+            deviceUuid: this.uuid,
+        })
 
         if (status !== 200) {
             throw new Error(error)
@@ -49,11 +50,10 @@ export default class BleDeviceController implements BleController {
     }
 
     private startBleBackend() {
-        const result = this.ndx.startBleBackend({
+        const { status, error } = this.ndx.startBleBackend({
             deviceUuid: this.uuid,
             charCallbacks: this.charCallbacks,
         })
-        const { status, error } = JSON.parse(result)
 
         if (status !== 200) {
             throw new Error(error)
@@ -64,12 +64,11 @@ export default class BleDeviceController implements BleController {
         charUuid: CharacteristicUuid,
         value: string
     ) {
-        const result = this.ndx.writeBleCharacteristic({
+        const { status, error } = this.ndx.writeBleCharacteristic({
             deviceUuid: this.uuid,
             charUuid,
             value,
         })
-        const { status, error } = JSON.parse(result)
 
         if (status !== 200) {
             throw new Error(error)
@@ -77,8 +76,7 @@ export default class BleDeviceController implements BleController {
     }
 
     public async disconnect() {
-        const result = this.ndx.destroyBleBackend({ deviceUuid: this.uuid })
-        const { status, error } = JSON.parse(result)
+        const { status, error } = this.ndx.destroyBleBackend({ deviceUuid: this.uuid })
 
         if (status !== 200) {
             throw new Error(error)
