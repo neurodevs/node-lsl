@@ -48,6 +48,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.fakeLibndx = new FakeLibndx()
         LibndxAdapter.setInstance(this.fakeLibndx)
 
+        FakeLibndx.resetTestDouble()
         FakeLibndx.fakeResult = { status: 200 }
 
         BleDeviceController.ndx = this.fakeLibndx

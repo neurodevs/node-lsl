@@ -1,14 +1,11 @@
 import generateId from '@neurodevs/generate-id'
 import {
     BleController,
-    BleControllerConstructorOptions,
+    BleControllerOptions,
 } from '../../impl/controllers/BleDeviceController.js'
 
 export default class FakeBleController implements BleController {
-    public static callsToConstructor: (
-        | BleControllerConstructorOptions
-        | undefined
-    )[] = []
+    public static callsToConstructor: (BleControllerOptions | undefined)[] = []
 
     public static numCallsToConnect = 0
 
@@ -25,7 +22,7 @@ export default class FakeBleController implements BleController {
     private _uuid: string
     private _name: string
 
-    public constructor(options?: BleControllerConstructorOptions) {
+    public constructor(options?: BleControllerOptions) {
         const { deviceUuid } = options ?? {}
 
         this._uuid = deviceUuid ?? generateId()
@@ -69,5 +66,5 @@ export default class FakeBleController implements BleController {
 }
 
 export interface CallToBleControllerConstructor {
-    options: BleControllerConstructorOptions
+    options: BleControllerOptions
 }

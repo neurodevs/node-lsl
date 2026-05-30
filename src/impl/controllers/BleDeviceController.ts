@@ -1,8 +1,8 @@
-import { LibndxAdapter, Libndx } from '@neurodevs/ndx-native'
+import { LibndxAdapter, Libndx, NativePeripheral } from '@neurodevs/ndx-native'
 
 export default class BleDeviceController implements BleController {
     public static Class?: BleControllerConstructor
-    public static setInterval = setInterval
+    public static setTimeout = setTimeout
     private static _ndx?: Libndx
 
     public static get ndx() {
@@ -21,12 +21,16 @@ export default class BleDeviceController implements BleController {
     protected log = console
 
     private deviceUuid: string
+    private onConnected?: (peripheral: NativePeripheral) => void
+    private connected = false
 
-    protected constructor(options: BleControllerConstructorOptions) {
-        const { deviceUuid, charCallbacks, rssiIntervalMs } = options
+    protected constructor(options: BleControllerOptions) {
+        const { deviceUuid, charCallbacks, onConnected, rssiIntervalMs } =
+            options
 
         this.deviceUuid = deviceUuid
         this.charCallbacks = charCallbacks
+        this.onConnected = onConnected
         this.rssiIntervalMs = rssiIntervalMs
     }
 
@@ -37,6 +41,8 @@ export default class BleDeviceController implements BleController {
     public async connect() {
         this.createBleBackend()
         this.startBleBackend()
+
+        await this.waitForOnConnected()
     }
 
     private createBleBackend() {
@@ -52,8 +58,10 @@ export default class BleDeviceController implements BleController {
     private startBleBackend() {
         const { status, error } = this.ndx.startBleBackend({
             deviceUuid: this.uuid,
-            onConnected: () => {
+            onConnected: (peripheral: NativePeripheral) => {
+                this.connected = true
                 this.log.info(`Connected to device ${this.uuid}!`)
+                this.onConnected?.(peripheral)
             },
             charCallbacks: this.charCallbacks,
         })
@@ -61,6 +69,19 @@ export default class BleDeviceController implements BleController {
         if (status !== 200) {
             throw new Error(error)
         }
+    }
+
+    private async waitForOnConnected() {
+        await new Promise<void>((resolve) => {
+            const checkConnected = () => {
+                if (this.connected) {
+                    resolve()
+                } else {
+                    BleDeviceController.setTimeout(checkConnected, 100)
+                }
+            }
+            checkConnected()
+        })
     }
 
     public async writeCharacteristic(
@@ -118,18 +139,13 @@ export interface BleController {
 export interface BleControllerOptions {
     deviceUuid: string
     charCallbacks: CharacteristicCallbacks
+    onConnected?: (peripheral: NativePeripheral) => void
     rssiIntervalMs?: number
 }
 
 export type BleControllerConstructor = new (
-    options: BleControllerConstructorOptions
+    options: BleControllerOptions
 ) => BleController
-
-export interface BleControllerConstructorOptions {
-    deviceUuid: string
-    charCallbacks: CharacteristicCallbacks
-    rssiIntervalMs?: number
-}
 
 export type CharacteristicCallbacks = {
     charUuid: string

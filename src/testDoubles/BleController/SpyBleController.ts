@@ -1,5 +1,5 @@
 import BleDeviceController, {
-    BleControllerConstructorOptions,
+    BleControllerOptions,
 } from '../../impl/controllers/BleDeviceController.js'
 
 export default class SpyBleController extends BleDeviceController {
@@ -7,7 +7,7 @@ export default class SpyBleController extends BleDeviceController {
     public warnLogs: string[] = []
     public errorLogs: string[] = []
 
-    public constructor(options: BleControllerConstructorOptions) {
+    public constructor(options: BleControllerOptions) {
         super(options)
     }
 
