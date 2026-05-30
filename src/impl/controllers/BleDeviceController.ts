@@ -52,6 +52,9 @@ export default class BleDeviceController implements BleController {
     private startBleBackend() {
         const { status, error } = this.ndx.startBleBackend({
             deviceUuid: this.uuid,
+            onConnected: () => {
+                this.log.info(`Connected to device ${this.uuid}!`)
+            },
             charCallbacks: this.charCallbacks,
         })
 
@@ -76,7 +79,9 @@ export default class BleDeviceController implements BleController {
     }
 
     public async disconnect() {
-        const { status, error } = this.ndx.destroyBleBackend({ deviceUuid: this.uuid })
+        const { status, error } = this.ndx.stopBleBackend({
+            deviceUuid: this.uuid,
+        })
 
         if (status !== 200) {
             throw new Error(error)

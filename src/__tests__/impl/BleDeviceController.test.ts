@@ -150,7 +150,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.writeCharacteristic()
 
         assert.isEqualDeep(
-            FakeLibndx.callsToWriteBle[0],
+            FakeLibndx.callsToWriteBleChar[0],
             {
                 deviceUuid: this.uuid,
                 charUuid: this.charUuid,
@@ -183,15 +183,15 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async disconnectCallsLibndxDestroyBleBackend() {
+    protected static async disconnectCallsLibndxStopBleBackend() {
         await this.disconnect()
 
         assert.isEqualDeep(
-            FakeLibndx.callsToDestroyBleBackend[0],
+            FakeLibndx.callsToStopBleBackend[0],
             {
                 deviceUuid: this.uuid,
             },
-            'Did not call destroyBleBackend!'
+            'Did not call stopBleBackend!'
         )
     }
 
