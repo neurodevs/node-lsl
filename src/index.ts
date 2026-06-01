@@ -1,3 +1,8 @@
+// DeviceController
+
+export { default as BleDeviceController } from './impl/controllers/BleDeviceController.js'
+export * from './impl/controllers/BleDeviceController.js'
+
 // EventMarkerEmitter
 
 export { default as LslEventMarkerEmitter } from './impl/LslEventMarkerEmitter.js'
