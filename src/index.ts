@@ -3,6 +3,12 @@
 export { default as BleDeviceController } from './impl/controllers/BleDeviceController.js'
 export * from './impl/controllers/BleDeviceController.js'
 
+export { default as FakeBleController } from './testDoubles/BleController/FakeBleController.js'
+export * from './testDoubles/BleController/FakeBleController.js'
+
+export { default as SpyBleController } from './testDoubles/BleController/SpyBleController.js'
+export * from './testDoubles/BleController/SpyBleController.js'
+
 // EventMarkerEmitter
 
 export { default as LslEventMarkerEmitter } from './impl/LslEventMarkerEmitter.js'
