@@ -15,7 +15,6 @@ export default class FakeBleController implements BleController {
     }[] = []
 
     public static numCallsToDisconnect = 0
-    public static callsToGetCharacteristic: string[] = []
 
     public static fakeCharacteristics: Record<string, unknown> = {}
 
@@ -61,7 +60,6 @@ export default class FakeBleController implements BleController {
         this.callsToConstructor = []
         this.numCallsToConnect = 0
         this.numCallsToDisconnect = 0
-        this.callsToGetCharacteristic = []
     }
 }
 
