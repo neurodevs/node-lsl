@@ -23,6 +23,7 @@ export default class BleDeviceController implements BleController {
     protected log = console
 
     private deviceUuid: string
+    private deviceName?: string
     private onConnected?: (peripheral: NativePeripheral) => void
     private connected = false
 
@@ -62,6 +63,8 @@ export default class BleDeviceController implements BleController {
         const { status, error } = this.ndx.startBleBackend({
             deviceUuid: this.uuid,
             onConnected: (peripheral: NativePeripheral) => {
+                const { name } = peripheral
+                this.deviceName = name
                 this.connected = true
                 this.log.info(`Connected to device ${this.uuid}!`)
                 this.onConnected?.(peripheral)
@@ -126,7 +129,7 @@ export default class BleDeviceController implements BleController {
     }
 
     public get name() {
-        return ''
+        return this.deviceName ?? 'N/A'
     }
 
     private get ndx() {

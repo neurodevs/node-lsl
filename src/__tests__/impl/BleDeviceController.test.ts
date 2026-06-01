@@ -266,6 +266,26 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async exposesPeriperalName() {
+        await this.connect()
+
+        assert.isEqual(
+            this.instance.name,
+            this.nativePeripheral.name,
+            'Did not set peripheral name!'
+        )
+    }
+
+    @test()
+    protected static async returnsNAIfNameNotAvailable() {
+        assert.isEqual(
+            this.instance.name,
+            'N/A',
+            'Did not set default name to N/A!'
+        )
+    }
+
     private static async connect() {
         const promise = this.instance.connect()
 
