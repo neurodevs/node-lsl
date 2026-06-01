@@ -2,8 +2,6 @@ import koffi from 'koffi'
 
 import BleDeviceController from '../impl/controllers/BleDeviceController.js'
 
-const CONTROL_UUID = '273E0001-4C4D-454D-96BE-F03BAC821358'
-
 const MUSE_CHARACTERISTIC_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
     TELEMETRY: '273E000B-4C4D-454D-96BE-F03BAC821358',
@@ -18,6 +16,8 @@ const MUSE_CHARACTERISTIC_UUIDS: Record<string, string> = {
     EEG_TP10: '273E0006-4C4D-454D-96BE-F03BAC821358',
     EEG_AUX: '273E0007-4C4D-454D-96BE-F03BAC821358',
 }
+
+const CONTROL_UUID = MUSE_CHARACTERISTIC_UUIDS['CONTROL']
 
 const charCallbacks = Object.entries(MUSE_CHARACTERISTIC_UUIDS).map(
     ([name, uuid]) => {
@@ -47,7 +47,3 @@ for (const cmd of ['h', 'p50', 's', 'd']) {
 await new Promise((resolve) => setTimeout(resolve, 5 * 1000))
 
 await muse.disconnect()
-
-console.info('Done!')
-
-await new Promise((resolve) => setTimeout(resolve, 2000))
