@@ -59,6 +59,7 @@ export default class FakeBleController implements BleController {
     public static resetTestDouble() {
         this.callsToConstructor = []
         this.numCallsToConnect = 0
+        this.callsToWriteCharacteristic = []
         this.numCallsToDisconnect = 0
     }
 }
