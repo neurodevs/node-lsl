@@ -56,8 +56,12 @@ export default class BleDeviceController implements BleController {
             deviceUuid: this.uuid,
         })
 
+        this.throwIfError(status, error)
+    }
+
+    private throwIfError(status: number, error: string | undefined) {
         if (status !== 200) {
-            throw new Error(error)
+            throw new Error(`${status} error: ${error ?? 'Unknown error'}`)
         }
     }
 
@@ -86,9 +90,7 @@ export default class BleDeviceController implements BleController {
             charCallbacks: this.charCallbacks,
         })
 
-        if (status !== 200) {
-            throw new Error(error)
-        }
+        this.throwIfError(status, error)
     }
 
     private async waitForOnConnected() {
@@ -123,9 +125,7 @@ export default class BleDeviceController implements BleController {
             value,
         })
 
-        if (status !== 200) {
-            throw new Error(error)
-        }
+        this.throwIfError(status, error)
     }
 
     public async disconnect() {
@@ -133,10 +133,7 @@ export default class BleDeviceController implements BleController {
             deviceUuid: this.uuid,
         })
 
-        if (status !== 200) {
-            throw new Error(error)
-        }
-
+        this.throwIfError(status, error)
         this.connected = false
     }
 

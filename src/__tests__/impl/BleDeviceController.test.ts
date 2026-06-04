@@ -17,6 +17,8 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     private static readonly charValueToWrite = this.generateId()
     private static readonly rssiIntervalMs = randomInt(1, 5)
     private static readonly fakeError = this.generateId()
+    private static readonly fake400Error = `400 error: ${this.fakeError}`
+    private static readonly fake500Error = `500 error: ${this.fakeError}`
 
     private static readonly charCallbacks = [
         {
@@ -87,7 +89,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.instance.connect(),
-            this.fakeError,
+            this.fake400Error,
             'Did not throw error!'
         )
     }
@@ -98,7 +100,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.instance.connect(),
-            this.fakeError,
+            this.fake500Error,
             'Did not throw error!'
         )
     }
@@ -152,7 +154,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.instance.connect(),
-            this.fakeError,
+            this.fake400Error,
             'Did not throw error!'
         )
     }
@@ -166,7 +168,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.instance.connect(),
-            this.fakeError,
+            this.fake500Error,
             'Did not throw error!'
         )
     }
@@ -218,7 +220,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.writeCharacteristic(),
-            this.fakeError,
+            this.fake400Error,
             'Did not throw error!'
         )
     }
@@ -229,7 +231,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.writeCharacteristic(),
-            this.fakeError,
+            this.fake500Error,
             'Did not throw error!'
         )
     }
@@ -270,7 +272,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.disconnect(),
-            this.fakeError,
+            this.fake400Error,
             'Did not throw error!'
         )
     }
@@ -281,7 +283,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.disconnect(),
-            this.fakeError,
+            this.fake500Error,
             'Did not throw error!'
         )
     }
@@ -317,6 +319,17 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async throwsWithUnknownErrorIfNoError() {
+        this.setFake500ErrorWithoutError()
+
+        await assert.doesThrowAsync(
+            async () => await this.connect(),
+            'Unknown error',
+            'Did not throw error!'
+        )
+    }
+
     private static async connect() {
         const promise = this.instance.connect()
 
@@ -348,6 +361,12 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         FakeLibndx.fakeResult = {
             status: 500,
             error: this.fakeError,
+        }
+    }
+
+    private static setFake500ErrorWithoutError() {
+        FakeLibndx.fakeResult = {
+            status: 500,
         }
     }
 
