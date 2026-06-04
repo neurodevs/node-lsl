@@ -47,6 +47,8 @@ export default class BleDeviceController implements BleController {
 
         await this.waitForOnConnected()
         await this.waitToDiscoverServices()
+
+        this.setBleRssiInterval()
     }
 
     private createBleBackend() {
@@ -56,6 +58,18 @@ export default class BleDeviceController implements BleController {
 
         if (status !== 200) {
             throw new Error(error)
+        }
+    }
+
+    private setBleRssiInterval() {
+        if (this.rssiIntervalMs) {
+            this.ndx.setBleRssiInterval({
+                deviceUuid: this.uuid,
+                intervalMs: this.rssiIntervalMs,
+                onRssi: (rssi: number) => {
+                    this.log.info(`[RSSI=${rssi}]`)
+                },
+            })
         }
     }
 

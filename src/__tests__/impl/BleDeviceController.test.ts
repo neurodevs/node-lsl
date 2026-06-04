@@ -1,3 +1,5 @@
+import { randomInt } from 'crypto'
+
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeLibndx, NativePeripheral } from '@neurodevs/ndx-native'
 
@@ -13,6 +15,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     private static readonly uuid = this.generateId()
     private static readonly charUuid = this.generateId()
     private static readonly charValueToWrite = this.generateId()
+    private static readonly rssiIntervalMs = randomInt(1, 5)
     private static readonly fakeError = this.generateId()
 
     private static readonly charCallbacks = [
@@ -199,7 +202,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.writeCharacteristic()
 
         assert.isEqualDeep(
-            FakeLibndx.callsToWriteBleChar[0],
+            FakeLibndx.callsToWriteBleCharacteristic[0],
             {
                 deviceUuid: this.uuid,
                 charUuid: this.charUuid,
@@ -228,6 +231,23 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
             async () => await this.writeCharacteristic(),
             this.fakeError,
             'Did not throw error!'
+        )
+    }
+
+    @test()
+    protected static async callsSetBleRssiInterval() {
+        await this.connect()
+
+        const { deviceUuid, intervalMs } =
+            FakeLibndx.callsToSetBleRssiInterval[0]
+
+        assert.isEqualDeep(
+            { deviceUuid, intervalMs },
+            {
+                deviceUuid: this.uuid,
+                intervalMs: this.rssiIntervalMs,
+            },
+            'Did not call setBleRssiInterval as expected!'
         )
     }
 
@@ -327,6 +347,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
             deviceUuid: this.uuid,
             charCallbacks: this.charCallbacks,
             onConnected: this.onConnected,
+            rssiIntervalMs: this.rssiIntervalMs,
             ...options,
         })) as SpyBleController
     }

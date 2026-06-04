@@ -35,6 +35,7 @@ const charCallbacks = Object.entries(MUSE_CHARACTERISTIC_UUIDS).map(
 const muse = await BleDeviceController.Create({
     deviceUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
     charCallbacks,
+    rssiIntervalMs: 1000,
 })
 
 await muse.connect()
