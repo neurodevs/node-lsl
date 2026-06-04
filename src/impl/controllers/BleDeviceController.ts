@@ -20,12 +20,12 @@ export default class BleDeviceController implements BleController {
 
     protected charCallbacks: CharacteristicCallbacks
     protected rssiIntervalMs?: number
+    protected connected = false
     protected log = console
 
     private deviceUuid: string
     private deviceName?: string
     private onConnected?: (peripheral: NativePeripheral) => void
-    private connected = false
 
     protected constructor(options: BleControllerOptions) {
         const { deviceUuid, charCallbacks, onConnected, rssiIntervalMs } =
@@ -136,6 +136,8 @@ export default class BleDeviceController implements BleController {
         if (status !== 200) {
             throw new Error(error)
         }
+
+        this.connected = false
     }
 
     public get uuid() {

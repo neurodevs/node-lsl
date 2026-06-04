@@ -19,6 +19,10 @@ export default class SpyBleController extends BleDeviceController {
         return this.rssiIntervalMs
     }
 
+    public getConnected() {
+        return this.connected
+    }
+
     public setLogInfoSpy() {
         this.infoLogs = []
 

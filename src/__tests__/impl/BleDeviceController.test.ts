@@ -287,6 +287,17 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async disconnectResetsConnectedFlag() {
+        await this.connect()
+        await this.disconnect()
+
+        assert.isFalse(
+            this.instance.getConnected(),
+            'Did not reset connected flag on disconnect!'
+        )
+    }
+
+    @test()
     protected static async exposesPeriperalName() {
         await this.connect()
 
