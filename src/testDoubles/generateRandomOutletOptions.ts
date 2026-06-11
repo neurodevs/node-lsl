@@ -1,4 +1,5 @@
-import { randomInt } from 'crypto'
+import { randomInt } from 'node:crypto'
+
 import generateId from '@neurodevs/generate-id'
 
 import { StreamOutletOptions } from '../impl/LslStreamOutlet.js'

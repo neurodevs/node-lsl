@@ -1,4 +1,5 @@
-import { randomInt } from 'crypto'
+import { randomInt } from 'node:crypto'
+
 import { assert, test } from '@neurodevs/node-tdd'
 
 import LslEventMarkerEmitter, {

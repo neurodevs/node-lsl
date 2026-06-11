@@ -1,4 +1,4 @@
-import { randomInt } from 'crypto'
+import { randomInt } from 'node:crypto'
 
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeLibndx, NativePeripheral } from '@neurodevs/ndx-native'

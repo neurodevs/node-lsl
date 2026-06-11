@@ -47,7 +47,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
-    "@neurodevs/eslint-config-ndx": "^1.0.1",
+    "@neurodevs/eslint-config-ndx": "^1.0.2",
     "@neurodevs/node-tdd": "^3.0.1",
     "@neurodevs/prettier-config-ndx": "^1.0.2",
     "@types/ws": "^8.18.1",

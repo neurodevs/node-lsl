@@ -1,4 +1,5 @@
-import { randomInt } from 'crypto'
+import { randomInt } from 'node:crypto'
+
 import { test, assert } from '@neurodevs/node-tdd'
 
 import { StreamInletOptions } from '../../impl/LslStreamInlet.js'
