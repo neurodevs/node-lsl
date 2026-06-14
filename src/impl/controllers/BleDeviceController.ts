@@ -23,15 +23,22 @@ export default class BleDeviceController implements BleController {
     protected connected = false
     protected log = console
 
-    private deviceUuid: string
+    private deviceUuid?: string
+    private deviceNamePrefix?: string
     private deviceName?: string
     private onConnected?: (peripheral: NativePeripheral) => void
 
     protected constructor(options: BleControllerOptions) {
-        const { deviceUuid, charCallbacks, onConnected, rssiIntervalMs } =
-            options
+        const {
+            deviceUuid,
+            deviceNamePrefix,
+            charCallbacks,
+            onConnected,
+            rssiIntervalMs,
+        } = options
 
         this.deviceUuid = deviceUuid
+        this.deviceNamePrefix = deviceNamePrefix
         this.charCallbacks = charCallbacks
         this.onConnected = onConnected
         this.rssiIntervalMs = rssiIntervalMs
@@ -42,6 +49,10 @@ export default class BleDeviceController implements BleController {
     }
 
     public async connect() {
+        if (!this.deviceUuid) {
+            await this.discoverUuid()
+        }
+
         this.createBleBackend()
         this.startBleBackend()
 
@@ -49,6 +60,32 @@ export default class BleDeviceController implements BleController {
         await this.waitToDiscoverServices()
 
         this.setBleRssiInterval()
+    }
+
+    private async discoverUuid() {
+        const { status, error } = this.ndx.discoverBleUuid({
+            namePrefix: this.deviceNamePrefix as string,
+            onDiscovered: (uuid: string) => {
+                this.deviceUuid = uuid
+            },
+        })
+
+        this.throwIfError(status, error)
+
+        await this.waitForDiscoveredUuid()
+    }
+
+    private async waitForDiscoveredUuid() {
+        await new Promise<void>((resolve) => {
+            const checkDiscovered = () => {
+                if (this.deviceUuid) {
+                    resolve()
+                } else {
+                    BleDeviceController.setTimeout(checkDiscovered, 100)
+                }
+            }
+            checkDiscovered()
+        })
     }
 
     private createBleBackend() {
@@ -138,7 +175,7 @@ export default class BleDeviceController implements BleController {
     }
 
     public get uuid() {
-        return this.deviceUuid
+        return this.deviceUuid ?? ''
     }
 
     public get name() {
@@ -164,12 +201,14 @@ export interface BleController {
     disconnect(): Promise<void>
 }
 
-export interface BleControllerOptions {
-    deviceUuid: string
+export type BleControllerOptions = {
     charCallbacks: CharacteristicCallbacks
     onConnected?: (peripheral: NativePeripheral) => void
     rssiIntervalMs?: number
-}
+} & (
+    | { deviceUuid: string; deviceNamePrefix?: string }
+    | { deviceUuid?: string; deviceNamePrefix: string }
+)
 
 export type BleControllerConstructor = new (
     options: BleControllerOptions

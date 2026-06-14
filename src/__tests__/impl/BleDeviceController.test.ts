@@ -13,6 +13,8 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyBleController
 
     private static readonly uuid = this.generateId()
+    private static readonly namePrefix = this.generateId()
+    private static readonly discoveredUuid = this.generateId()
     private static readonly charUuid = this.generateId()
     private static readonly charValueToWrite = this.generateId()
     private static readonly rssiIntervalMs = randomInt(1, 5)
@@ -80,6 +82,78 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
                 deviceUuid: this.uuid,
             },
             'Did not call createBleBackend!'
+        )
+    }
+
+    @test()
+    protected static async discoversUuidWhenDeviceUuidNotProvided() {
+        const instance = await this.BleControllerWithPrefix()
+
+        await this.connectWithDiscovery(instance)
+
+        const call = FakeLibndx.callsToDiscoverBleUuid[0]
+
+        assert.isEqual(
+            call?.namePrefix,
+            this.namePrefix,
+            'Did not call discoverBleUuid with deviceNamePrefix!'
+        )
+
+        assert.isFunction(
+            call?.onDiscovered,
+            'Did not pass an onDiscovered callback to discoverBleUuid!'
+        )
+    }
+
+    @test()
+    protected static async doesNotDiscoverUuidWhenDeviceUuidProvided() {
+        await this.connect()
+
+        assert.isEqual(
+            FakeLibndx.callsToDiscoverBleUuid.length,
+            0,
+            'Should not call discoverBleUuid when deviceUuid is provided!'
+        )
+    }
+
+    @test()
+    protected static async usesDiscoveredUuidToCreateBleBackend() {
+        const instance = await this.BleControllerWithPrefix()
+
+        await this.connectWithDiscovery(instance)
+
+        assert.isEqualDeep(
+            FakeLibndx.callsToCreateBleBackend[0],
+            {
+                deviceUuid: this.discoveredUuid,
+            },
+            'Did not create BLE backend with the discovered uuid!'
+        )
+    }
+
+    @test()
+    protected static async usesDiscoveredUuidToStartBleBackend() {
+        const instance = await this.BleControllerWithPrefix()
+
+        await this.connectWithDiscovery(instance)
+
+        assert.isEqual(
+            FakeLibndx.callsToStartBleBackend[0]?.deviceUuid,
+            this.discoveredUuid,
+            'Did not start BLE backend with the discovered uuid!'
+        )
+    }
+
+    @test()
+    protected static async exposesDiscoveredUuid() {
+        const instance = await this.BleControllerWithPrefix()
+
+        await this.connectWithDiscovery(instance)
+
+        assert.isEqual(
+            instance.uuid,
+            this.discoveredUuid,
+            'Did not expose the discovered uuid!'
         )
     }
 
@@ -339,6 +413,31 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await promise
     }
 
+    private static async connectWithDiscovery(instance: SpyBleController) {
+        const promise = instance.connect()
+
+        FakeLibndx.callsToDiscoverBleUuid[0]?.onDiscovered(this.discoveredUuid)
+
+        await this.waitForCall(() => FakeLibndx.callsToStartBleBackend[0])
+
+        FakeLibndx.callsToStartBleBackend[0]?.onConnected(this.nativePeripheral)
+
+        await promise
+    }
+
+    private static async waitForCall<T>(getCall: () => T) {
+        await new Promise<void>((resolve) => {
+            const check = () => {
+                if (getCall()) {
+                    resolve()
+                } else {
+                    setTimeout(check, 10)
+                }
+            }
+            check()
+        })
+    }
+
     private static async writeCharacteristic() {
         await this.instance.writeCharacteristic(
             this.charUuid,
@@ -380,5 +479,14 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
             rssiIntervalMs: this.rssiIntervalMs,
             ...options,
         })) as SpyBleController
+    }
+
+    private static async BleControllerWithPrefix() {
+        return (await BleDeviceController.Create({
+            deviceNamePrefix: this.namePrefix,
+            charCallbacks: this.charCallbacks,
+            onConnected: this.onConnected,
+            rssiIntervalMs: this.rssiIntervalMs,
+        } as unknown as BleControllerOptions)) as SpyBleController
     }
 }
