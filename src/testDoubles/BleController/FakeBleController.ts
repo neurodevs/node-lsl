@@ -17,6 +17,7 @@ export default class FakeBleController implements BleController {
     public static numCallsToDisconnect = 0
 
     public static fakeCharacteristics: Record<string, unknown> = {}
+    public static fakeName = `fake-${generateId()}`
 
     private _uuid: string
     private _name: string
@@ -25,7 +26,7 @@ export default class FakeBleController implements BleController {
         const { deviceUuid } = options ?? {}
 
         this._uuid = deviceUuid ?? generateId()
-        this._name = `fake-${generateId()}`
+        this._name = FakeBleController.fakeName
 
         FakeBleController.callsToConstructor.push(options)
     }
