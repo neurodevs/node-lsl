@@ -24,9 +24,9 @@ const charCallbacks = Object.entries(MUSE_CHARACTERISTIC_UUIDS).map(
         return {
             charUuid: uuid,
             charName: name,
-            onData: (data: Buffer, length: number, timestamp: number) => {
+            onData: (data: Buffer, length: number, timestampSec: number) => {
                 const bytes = koffi.decode(data, 'uint8', length) as number[]
-                console.info(`[${timestamp}] length=${length}`, bytes)
+                console.info(`[${timestampSec}] length=${length}`, bytes)
             },
         }
     }

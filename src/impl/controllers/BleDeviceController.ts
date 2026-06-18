@@ -217,7 +217,7 @@ export type BleControllerConstructor = new (
 export type CharacteristicCallbacks = {
     charUuid: string
     charName?: string
-    onData: (data: Buffer, length: number, timestamp: number) => void
+    onData: (data: Buffer, length: number, timestampSec: number) => void
 }[]
 
 export type CharacteristicUuid = string
