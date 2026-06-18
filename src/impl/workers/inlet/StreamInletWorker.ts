@@ -179,12 +179,12 @@ export default class StreamInletWorker {
     }
 
     private pullSample = () => {
-        const timestamp = this.doPullsample()
+        const timestampSec = this.doPullsample()
 
-        if (timestamp > 0) {
+        if (timestampSec > 0) {
             return {
                 samples: this.readSamplesFromBuffer(),
-                timestamps: [timestamp],
+                timestamps: [timestampSec],
             }
         }
         return { samples: undefined, timestamps: undefined }
@@ -210,9 +210,9 @@ export default class StreamInletWorker {
     }
 
     private pullChunk = () => {
-        const firstTimestamp = this.doPullChunk()
+        const firstTimestampSec = this.doPullChunk()
 
-        if (firstTimestamp > 0) {
+        if (firstTimestampSec > 0) {
             return {
                 samples: this.readSamplesFromBuffer(),
                 timestamps: this.readTimestampsFromBuffer(),

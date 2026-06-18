@@ -84,7 +84,7 @@ export function pushSample(msg: {
     payload: PushSamplePayload
 }) {
     const { payload } = msg
-    const { sample, timestamp = lsl.localClock() } = payload
+    const { sample, timestampSec = lsl.localClock() } = payload
 
     if (!handle || !pushMethod) {
         throw new Error('Outlet not initialized')
@@ -93,7 +93,7 @@ export function pushSample(msg: {
     const errorCode = pushMethod({
         outletHandle: handle,
         sample,
-        timestamp,
+        timestampSec,
     })
 
     try {
@@ -140,5 +140,5 @@ export interface CreateOutletPayload {
 
 export interface PushSamplePayload {
     sample: unknown
-    timestamp?: number
+    timestampSec?: number
 }

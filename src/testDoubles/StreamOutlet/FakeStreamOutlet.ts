@@ -13,7 +13,7 @@ export default class FakeStreamOutlet implements StreamOutlet {
 
     public static callsToPushSample: {
         sample: LslSample
-        timestamp?: number
+        timestampSec?: number
     }[] = []
 
     public static numCallsToDestroy = 0
@@ -29,8 +29,11 @@ export default class FakeStreamOutlet implements StreamOutlet {
         FakeStreamOutlet.numCallsToDestroy++
     }
 
-    public pushSample(sample: LslSample, timestamp?: number) {
-        FakeStreamOutlet.callsToPushSample.push({ sample, timestamp })
+    public pushSample(sample: LslSample, timestampSec?: number) {
+        FakeStreamOutlet.callsToPushSample.push({
+            sample,
+            timestampSec,
+        })
     }
 
     public get name() {

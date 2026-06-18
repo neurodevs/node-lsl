@@ -128,7 +128,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
             maxBufferedMs: this.randomOutletOptions.maxBufferedMs,
         })
         assert.isNumber(
-            this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.timestamp
+            this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.timestampSec
         )
     }
 
@@ -148,7 +148,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
             sample
         )
         assert.isNumber(
-            this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestamp
+            this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestampSec
         )
     }
 
@@ -159,13 +159,13 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 
         outlet.pushSample(sample)
         const t1 =
-            this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestamp
+            this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestampSec
 
         await this.wait(10)
 
         outlet.pushSample(sample)
         const t2 =
-            this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestamp
+            this.fakeLiblsl.lastPushSampleStringTimestampOptions?.timestampSec
 
         assert.isNotEqual(t1, t2)
         assert.isEqual(this.fakeLiblsl.localClockHitCount, 2)
@@ -227,13 +227,13 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     @test()
     protected static async pushSampleAcceptsOptionalPreciseTimestamp() {
         const outlet = await this.FloatOutlet()
-        const fakeTimestamp = Math.random() * 1000
+        const timestampSec = Math.random() * 10000
 
-        outlet.pushSample([1.0], fakeTimestamp)
+        outlet.pushSample([1.0], timestampSec)
 
         assert.isEqual(
-            this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.timestamp,
-            fakeTimestamp
+            this.fakeLiblsl.lastPushSampleFloatTimestampOptions?.timestampSec,
+            timestampSec
         )
     }
 
