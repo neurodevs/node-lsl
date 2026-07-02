@@ -8,8 +8,7 @@ import FakeWebSocketServer from '../WebSockets/FakeWebSocketServer.js'
 
 export default class FakeWebSocketBridge implements WebSocketBridge {
     public static callsToConstructor: (
-        | WebSocketBridgeConstructorOptions
-        | undefined
+        WebSocketBridgeConstructorOptions | undefined
     )[] = []
 
     public static numCallsToActivate = 0
