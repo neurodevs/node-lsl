@@ -34,6 +34,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static async beforeEach() {
         await super.beforeEach()
+
+        this.setImmediateTimeouts()
     }
 
     protected static setFakeLiblsl() {
@@ -42,6 +44,39 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         FakeLiblsl.fakeErrorCode = 0
         FakeLiblsl.fakeInfoHandles = [{} as InfoHandle]
+    }
+
+    protected static callsToSetTimeout: number[] = []
+
+    protected static setImmediateTimeouts() {
+        this.callsToSetTimeout = []
+
+        BleDeviceController.setTimeout = ((
+            callback: (...args: unknown[]) => void,
+            delayMs?: number,
+            ...args: unknown[]
+        ) => {
+            this.callsToSetTimeout.push(delayMs ?? 0)
+            return setTimeout(callback, 0, ...args)
+        }) as unknown as typeof setTimeout
+
+        LslStreamOutlet.setTimeout = ((
+            callback: (...args: unknown[]) => void,
+            delayMs?: number,
+            ...args: unknown[]
+        ) => {
+            this.callsToSetTimeout.push(delayMs ?? 0)
+            return setTimeout(callback, 0, ...args)
+        }) as unknown as typeof setTimeout
+
+        LslStreamInlet.setTimeout = ((
+            callback: (...args: unknown[]) => void,
+            delayMs?: number,
+            ...args: unknown[]
+        ) => {
+            this.callsToSetTimeout.push(delayMs ?? 0)
+            return setTimeout(callback, 0, ...args)
+        }) as unknown as typeof setTimeout
     }
 
     protected static setFakeLibndx() {

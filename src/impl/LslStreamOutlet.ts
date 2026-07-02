@@ -13,6 +13,7 @@ import {
 export default class LslStreamOutlet implements StreamOutlet {
     public static Class?: StreamOutletConstructor
     public static Worker = Worker
+    public static setTimeout = setTimeout
 
     public readonly name: string
     public readonly type: string
@@ -153,7 +154,7 @@ export default class LslStreamOutlet implements StreamOutlet {
 
     private static async waitForSetup(waitAfterConstructionMs: number) {
         await new Promise((resolve) =>
-            setTimeout(resolve, waitAfterConstructionMs)
+            LslStreamOutlet.setTimeout(resolve, waitAfterConstructionMs)
         )
     }
 }

@@ -4,6 +4,7 @@ export default class LslStreamInlet implements StreamInlet {
     public static Class?: StreamInletConstructor
     public static Worker = Worker
     public static waitAfterOpenStreamMs = 100
+    public static setTimeout = setTimeout
 
     private sourceId: string
     private chunkSize: number
@@ -91,7 +92,9 @@ export default class LslStreamInlet implements StreamInlet {
             this.postCreate()
 
             while (!this.workerReady) {
-                await new Promise((resolve) => setTimeout(resolve, 10))
+                await new Promise((resolve) =>
+                    LslStreamInlet.setTimeout(resolve, 10)
+                )
             }
 
             this.postStartPulling()

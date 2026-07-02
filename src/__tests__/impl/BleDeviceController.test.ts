@@ -262,13 +262,10 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         const waitAfterMs = 20
         BleDeviceController.waitAfterMs = waitAfterMs
 
-        const t0 = Date.now()
         await this.connect()
-        const t1 = Date.now()
 
-        assert.isAbove(
-            t1 - t0,
-            100 + waitAfterMs * 0.8,
+        assert.isTruthy(
+            this.callsToSetTimeout.includes(waitAfterMs),
             'Did not wait after on connected!'
         )
     }
@@ -431,7 +428,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
                 if (getCall()) {
                     resolve()
                 } else {
-                    setTimeout(check, 10)
+                    setTimeout(check, 0)
                 }
             }
             check()

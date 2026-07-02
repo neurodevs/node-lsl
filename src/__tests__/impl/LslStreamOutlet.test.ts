@@ -265,11 +265,12 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 
     @test()
     protected static async waitsForTenMsAfterConstructionBeforeReturning() {
-        const startMs = Date.now()
-        await this.LslStreamOutlet({ waitAfterConstructionMs: 10 })
-        const endMs = Date.now()
+        await this.LslStreamOutlet()
 
-        assert.isAbove(endMs - startMs, 8)
+        assert.isTruthy(
+            this.callsToSetTimeout.includes(10),
+            'Did not wait for 10ms after construction!'
+        )
     }
 
     @test()
