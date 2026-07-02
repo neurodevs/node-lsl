@@ -1,3 +1,11 @@
+// ClockRegressor
+
+export { default as WindowedClockRegressor } from './impl/WindowedClockRegressor.js'
+export * from './impl/WindowedClockRegressor.js'
+
+export { default as FakeClockRegressor } from './testDoubles/ClockRegressor/FakeClockRegressor.js'
+export * from './testDoubles/ClockRegressor/FakeClockRegressor.js'
+
 // DeviceController
 
 export { default as BleDeviceController } from './impl/controllers/BleDeviceController.js'
