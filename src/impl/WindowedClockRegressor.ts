@@ -2,6 +2,12 @@ export default class WindowedClockRegressor implements ClockRegressor {
     public static Class?: ClockRegressorConstructor
 
     private readonly nominalHz: number
+    private readonly history: {
+        deviceTime: number
+        earliestLslTime: number
+    }[] = []
+
+    private slope = 1 // lsl-host-seconds per device-second
 
     protected constructor(nominalHz: number) {
         this.nominalHz = nominalHz
@@ -12,18 +18,61 @@ export default class WindowedClockRegressor implements ClockRegressor {
     }
 
     public deriveTimestamps(
-        _deviceTime: number,
+        deviceTime: number,
         earliestLslTime: number,
         chunkSize: number
     ) {
+        this.history.push({ deviceTime, earliestLslTime })
+        this.refitSlope()
+
         const timestamps = Array(chunkSize).fill(0)
 
-        for (let i = 0; i < chunkSize; i++) {
-            const interpolatedTime = (chunkSize - 1 - i) / this.nominalHz
-            timestamps[i] = earliestLslTime - interpolatedTime
+        for (let i = 0; i <= chunkSize - 1; i++) {
+            const stepsFromLast = chunkSize - 1 - i
+            const deviceTimeOffset = -stepsFromLast / this.nominalHz
+            const lslTimeOffset = deviceTimeOffset * this.slope
+
+            timestamps[i] = earliestLslTime + lslTimeOffset
         }
 
         return timestamps
+    }
+
+    private refitSlope() {
+        if (this.history.length < 2) {
+            return
+        }
+
+        const xMean = this.currentMeanDeviceTime
+        const yMean = this.currentMeanLslTime
+
+        let numerator = 0
+        let denominator = 0
+
+        for (const { deviceTime, earliestLslTime } of this.history) {
+            const xCentered = deviceTime - xMean
+
+            numerator += xCentered * (earliestLslTime - yMean)
+            denominator += xCentered * xCentered
+        }
+
+        this.slope = numerator / denominator
+    }
+
+    private get currentMeanDeviceTime() {
+        const totalDeviceTime = this.history.reduce(
+            (sum, { deviceTime }) => sum + deviceTime,
+            0
+        )
+        return totalDeviceTime / this.history.length
+    }
+
+    private get currentMeanLslTime() {
+        const totalLslTime = this.history.reduce(
+            (sum, { earliestLslTime }) => sum + earliestLslTime,
+            0
+        )
+        return totalLslTime / this.history.length
     }
 }
 

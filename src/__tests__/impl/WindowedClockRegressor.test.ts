@@ -24,7 +24,7 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async deriveTimestampsReturnsChunkSizeEntries() {
+    protected static async deriveReturnsChunkSizeEntries() {
         const timestamps = this.deriveTimestamps()
 
         assert.isEqual(
@@ -46,7 +46,7 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async deriveTimestampsSpacesEntriesByNominalHz() {
+    protected static async deriveSpacesEntriesByNominalHz() {
         const timestamps = this.deriveTimestamps()
 
         const expected = Array(this.chunkSize)
@@ -63,6 +63,49 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
             expected,
             'Entries should be spaced 1/nominalHz apart, working backward from earliestLslTime!'
         )
+    }
+
+    @test()
+    protected static async deriveUsesFittedSlopeOnceHistoryAccumulates() {
+        const trueSlope = 2
+        const nominalStep = this.chunkSize / this.nominalHz
+        const lslStep = nominalStep * trueSlope
+
+        let deviceTime = this.deviceTime
+        let earliestLslTime = this.earliestLslTime
+
+        for (let i = 0; i < 50; i++) {
+            deviceTime += nominalStep
+            earliestLslTime += lslStep
+
+            this.instance.deriveTimestamps(
+                deviceTime,
+                earliestLslTime,
+                this.chunkSize
+            )
+        }
+
+        deviceTime += nominalStep
+        earliestLslTime += lslStep
+
+        const timestamps = this.instance.deriveTimestamps(
+            deviceTime,
+            earliestLslTime,
+            this.chunkSize
+        )
+
+        const expectedSpacing = trueSlope / this.nominalHz
+
+        for (let i = 1; i < timestamps.length; i++) {
+            const actualSpacing = timestamps[i] - timestamps[i - 1]
+
+            assert.isBetweenInclusive(
+                actualSpacing,
+                expectedSpacing * 0.99,
+                expectedSpacing * 1.01,
+                `Spacing at index ${i} should reflect the fitted slope once history has accumulated!`
+            )
+        }
     }
 
     private static deriveTimestamps() {
