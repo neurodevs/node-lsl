@@ -24,16 +24,31 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
 
     @test()
     protected static async deriveTimestampsReturnsChunkSizeEntries() {
-        const result = this.instance.deriveTimestamps(
+        const timestamps = this.deriveTimestamps()
+
+        assert.isEqual(
+            timestamps.length,
+            this.chunkSize,
+            'Should return an array with chunkSize entries!'
+        )
+    }
+
+    @test()
+    protected static async deriveSetsLastTimestampToEarliestLslTime() {
+        const timestamps = this.deriveTimestamps()
+
+        assert.isEqual(
+            timestamps[timestamps.length - 1],
+            this.earliestLslTime,
+            'Last entry should be earliestLslTime!'
+        )
+    }
+
+    private static deriveTimestamps() {
+        return this.instance.deriveTimestamps(
             this.deviceTime,
             this.earliestLslTime,
             this.chunkSize
-        )
-
-        assert.isEqual(
-            result.length,
-            this.chunkSize,
-            'Should return an array with chunkSize entries!'
         )
     }
 

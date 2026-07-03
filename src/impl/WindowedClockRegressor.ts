@@ -9,10 +9,12 @@ export default class WindowedClockRegressor implements ClockRegressor {
 
     public deriveTimestamps(
         _deviceTime: number,
-        _earliestLslTime: number,
+        earliestLslTime: number,
         chunkSize: number
     ) {
-        return Array(chunkSize).fill(0)
+        const timestamps = Array(chunkSize).fill(0)
+        timestamps[chunkSize - 1] = earliestLslTime
+        return timestamps
     }
 }
 
