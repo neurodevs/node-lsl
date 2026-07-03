@@ -1,15 +1,18 @@
 import { ClockRegressor } from '../../impl/WindowedClockRegressor.js'
 
 export default class FakeClockRegressor implements ClockRegressor {
-    public static numCallsToConstructor = 0
+    public static callsToConstructor: { nominalHz: number }[] = []
     public static callsToDeriveTimestamps: {
         deviceTime: number
         earliestLslTime: number
         chunkSize: number
     }[] = []
 
-    public constructor() {
-        FakeClockRegressor.numCallsToConstructor++
+    public readonly nominalHz: number
+
+    public constructor(nominalHz: number) {
+        FakeClockRegressor.callsToConstructor.push({ nominalHz })
+        this.nominalHz = nominalHz
     }
 
     public deriveTimestamps(
@@ -26,7 +29,7 @@ export default class FakeClockRegressor implements ClockRegressor {
     }
 
     public static resetTestDouble() {
-        FakeClockRegressor.numCallsToConstructor = 0
+        FakeClockRegressor.callsToConstructor = []
         FakeClockRegressor.callsToDeriveTimestamps = []
     }
 }

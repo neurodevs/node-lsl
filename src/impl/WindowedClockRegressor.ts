@@ -1,10 +1,14 @@
 export default class WindowedClockRegressor implements ClockRegressor {
     public static Class?: ClockRegressorConstructor
 
-    protected constructor() {}
+    private readonly nominalHz: number
 
-    public static Create() {
-        return new (this.Class ?? this)()
+    protected constructor(nominalHz: number) {
+        this.nominalHz = nominalHz
+    }
+
+    public static Create(nominalHz: number) {
+        return new (this.Class ?? this)(nominalHz)
     }
 
     public deriveTimestamps(
@@ -13,7 +17,12 @@ export default class WindowedClockRegressor implements ClockRegressor {
         chunkSize: number
     ) {
         const timestamps = Array(chunkSize).fill(0)
-        timestamps[chunkSize - 1] = earliestLslTime
+
+        for (let i = 0; i < chunkSize; i++) {
+            const interpolatedTime = (chunkSize - 1 - i) / this.nominalHz
+            timestamps[i] = earliestLslTime - interpolatedTime
+        }
+
         return timestamps
     }
 }
@@ -26,4 +35,6 @@ export interface ClockRegressor {
     ): number[]
 }
 
-export type ClockRegressorConstructor = new () => ClockRegressor
+export type ClockRegressorConstructor = new (
+    nominalHz: number
+) => ClockRegressor

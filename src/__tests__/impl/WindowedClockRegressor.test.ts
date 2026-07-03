@@ -8,6 +8,7 @@ import AbstractPackageTest from '../AbstractPackageTest.js'
 export default class WindowedClockRegressorTest extends AbstractPackageTest {
     private static instance: ClockRegressor
 
+    private static readonly nominalHz = Math.random() * 100
     private static readonly deviceTime = Math.random()
     private static readonly earliestLslTime = Math.random()
 
@@ -44,6 +45,26 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async deriveTimestampsSpacesEntriesByNominalHz() {
+        const timestamps = this.deriveTimestamps()
+
+        const expected = Array(this.chunkSize)
+            .fill(0)
+            .map((_, i) => {
+                return (
+                    this.earliestLslTime -
+                    (this.chunkSize - 1 - i) / this.nominalHz
+                )
+            })
+
+        assert.isEqualDeep(
+            timestamps,
+            expected,
+            'Entries should be spaced 1/nominalHz apart, working backward from earliestLslTime!'
+        )
+    }
+
     private static deriveTimestamps() {
         return this.instance.deriveTimestamps(
             this.deviceTime,
@@ -53,6 +74,6 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
     }
 
     private static WindowedClockRegressor() {
-        return WindowedClockRegressor.Create()
+        return WindowedClockRegressor.Create(this.nominalHz)
     }
 }
