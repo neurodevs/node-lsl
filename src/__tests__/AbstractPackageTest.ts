@@ -1,3 +1,6 @@
+import { randomInt } from 'node:crypto'
+
+import WebSocket, { Server } from 'ws'
 import {
     FakeLiblsl,
     FakeLibndx,
@@ -6,7 +9,6 @@ import {
     LibndxAdapter,
 } from '@neurodevs/ndx-native'
 import AbstractModuleTest from '@neurodevs/node-tdd'
-import WebSocket, { Server } from 'ws'
 
 import SpyEventMarkerEmitter from '../testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
 import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo.js'
@@ -17,7 +19,6 @@ import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
 import SpyLslWebSocketBridge from '../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
 import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
-
 import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
 import BleDeviceController from '../impl/controllers/BleDeviceController.js'
 import LslEventMarkerEmitter from '../impl/LslEventMarkerEmitter.js'
@@ -31,6 +32,25 @@ import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
     protected static fakeLibndx: FakeLibndx
+
+    protected static readonly fakeStreamInfo = new FakeStreamInfo()
+
+    protected static readonly name_ = this.generateId()
+    protected static readonly type = this.generateId()
+    protected static readonly sourceId = this.generateId()
+    protected static readonly units = this.generateId()
+
+    protected static readonly channelNames = [
+        this.generateId(),
+        this.generateId(),
+        this.generateId(),
+    ]
+
+    protected static readonly channelCount = this.channelNames.length
+
+    protected static readonly chunkSize = randomInt(2, 100)
+    protected static readonly sampleRateHz = Math.floor(Math.random() * 100)
+    protected static readonly maxBufferedMs = Math.floor(Math.random() * 1000)
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -130,25 +150,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LslWebSocketBridge.WSS = FakeWebSocketServer as unknown as typeof Server
         FakeWebSocketServer.resetTestDouble()
     }
-
-    protected static readonly fakeStreamInfo = new FakeStreamInfo()
-
-    protected static readonly name_ = this.generateId()
-    protected static readonly type = this.generateId()
-    protected static readonly sourceId = this.generateId()
-    protected static readonly units = this.generateId()
-
-    protected static readonly channelNames = [
-        this.generateId(),
-        this.generateId(),
-        this.generateId(),
-    ]
-
-    protected static readonly channelCount = this.channelNames.length
-
-    protected static readonly chunkSize = 2
-    protected static readonly sampleRateHz = Math.floor(Math.random() * 100)
-    protected static readonly maxBufferedMs = Math.floor(Math.random() * 1000)
 
     protected static async LslStreamInlet(
         options: Partial<StreamInletOptions>,
