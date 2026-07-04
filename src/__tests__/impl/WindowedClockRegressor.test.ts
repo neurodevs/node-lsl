@@ -78,21 +78,13 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
             deviceTime += nominalStep
             earliestLslTime += lslStep
 
-            this.instance.deriveTimestamps(
-                deviceTime,
-                earliestLslTime,
-                this.chunkSize
-            )
+            this.deriveTimestamps(deviceTime, earliestLslTime)
         }
 
         deviceTime += nominalStep
         earliestLslTime += lslStep
 
-        const timestamps = this.instance.deriveTimestamps(
-            deviceTime,
-            earliestLslTime,
-            this.chunkSize
-        )
+        const timestamps = this.deriveTimestamps(deviceTime, earliestLslTime)
 
         const expectedSpacing = trueSlope / this.nominalHz
 
@@ -108,10 +100,27 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
         }
     }
 
-    private static deriveTimestamps() {
+    @test()
+    protected static async deriveThrowsWhenDeviceTimeDoesNotIncreaseMonotonically() {
+        this.deriveTimestamps()
+
+        assert.doesThrow(
+            () =>
+                this.deriveTimestamps(
+                    this.deviceTime,
+                    this.earliestLslTime + Math.random()
+                ),
+            `\nDevice time (${this.deviceTime}) did not increase from the previous device time (${this.deviceTime})! Device time is expected to always increase between calls, so this likely indicates a bug in the calling code.\n`
+        )
+    }
+
+    private static deriveTimestamps(
+        deviceTime = this.deviceTime,
+        earliestLslTime = this.earliestLslTime
+    ) {
         return this.instance.deriveTimestamps(
-            this.deviceTime,
-            this.earliestLslTime,
+            deviceTime,
+            earliestLslTime,
             this.chunkSize
         )
     }

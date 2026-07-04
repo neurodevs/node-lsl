@@ -22,6 +22,8 @@ export default class WindowedClockRegressor implements ClockRegressor {
         earliestLslTime: number,
         chunkSize: number
     ) {
+        this.throwIfDeviceTimeDoesNotIncrease(deviceTime)
+
         this.history.push({ deviceTime, earliestLslTime })
         this.refitSlope()
 
@@ -36,6 +38,16 @@ export default class WindowedClockRegressor implements ClockRegressor {
         }
 
         return timestamps
+    }
+
+    private throwIfDeviceTimeDoesNotIncrease(deviceTime: number) {
+        const last = this.history[this.history.length - 1]
+
+        if (last && deviceTime <= last.deviceTime) {
+            throw new Error(
+                `\nDevice time (${deviceTime}) did not increase from the previous device time (${last.deviceTime})! Device time is expected to always increase between calls, so this likely indicates a bug in the calling code.\n`
+            )
+        }
     }
 
     private refitSlope() {
