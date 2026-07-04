@@ -39,14 +39,36 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async deriveSetsLastTimestampToEarliestLslTime() {
-        const timestamps = this.deriveTimestamps()
+    protected static async deriveAnchorsLastTimestampOnRegressionLine() {
+        const nominalChunkStep = this.chunkSize / this.nominalHz
 
-        assert.isEqual(
-            timestamps[timestamps.length - 1],
-            this.earliestLslTime,
-            'Last entry should be earliestLslTime!'
-        )
+        let deviceTime = this.deviceTime
+        let lslTime = this.earliestLslTime
+
+        for (let i = 0; i < 100; i++) {
+            deviceTime += nominalChunkStep
+            lslTime += nominalChunkStep
+            this.deriveTimestamps(deviceTime, lslTime)
+        }
+
+        deviceTime += nominalChunkStep
+        lslTime += nominalChunkStep
+
+        const jitter = nominalChunkStep * Math.random()
+
+        const timestamps = this.deriveTimestamps(deviceTime, lslTime + jitter)
+
+        for (let i = 0; i < timestamps.length; i++) {
+            const stepsFromLast = timestamps.length - 1 - i
+            const expected = lslTime - stepsFromLast / this.nominalHz
+
+            assert.isBetweenInclusive(
+                timestamps[i],
+                expected - jitter * 0.1,
+                expected + jitter * 0.1,
+                `Timestamp at index ${i} should be anchored on the fitted regression line, not the jittery arrival time!`
+            )
+        }
     }
 
     @test()

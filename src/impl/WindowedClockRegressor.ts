@@ -39,6 +39,8 @@ export default class WindowedClockRegressor implements ClockRegressor {
         this.pruneHistoryOutsideWindow()
         this.refitSlope()
 
+        const anchor = this.anchorTimeFor(deviceTime)
+
         const timestamps = Array(chunkSize).fill(0)
 
         for (let i = 0; i <= chunkSize - 1; i++) {
@@ -46,10 +48,17 @@ export default class WindowedClockRegressor implements ClockRegressor {
             const deviceTimeOffset = -stepsFromLast / this.nominalHz
             const lslTimeOffset = deviceTimeOffset * this.slope
 
-            timestamps[i] = earliestLslTime + lslTimeOffset
+            timestamps[i] = anchor + lslTimeOffset
         }
 
         return timestamps
+    }
+
+    private anchorTimeFor(deviceTime: number) {
+        const xMean = this.currentMeanDeviceTime
+        const yMean = this.currentMeanLslTime
+
+        return yMean + this.slope * (deviceTime - xMean)
     }
 
     private throwIfDeviceTimeDoesNotIncrease(deviceTime: number) {
