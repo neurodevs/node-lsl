@@ -2,7 +2,8 @@ export default class WindowedClockRegressor implements ClockRegressor {
     public static Class?: ClockRegressorConstructor
 
     private readonly nominalHz: number
-    private readonly windowLenSec = 30
+    private readonly windowLenSec: number
+    private readonly defaultWindowLenSec = 30
     private readonly history: {
         deviceTime: number
         earliestLslTime: number
@@ -10,12 +11,21 @@ export default class WindowedClockRegressor implements ClockRegressor {
 
     private slope = 1 // lsl-host-seconds per device-second
 
-    protected constructor(nominalHz: number) {
+    protected constructor(
+        nominalHz: number,
+        options?: WindowedClockRegressorOptions
+    ) {
+        const { windowLenSec = this.defaultWindowLenSec } = options ?? {}
+
         this.nominalHz = nominalHz
+        this.windowLenSec = windowLenSec
     }
 
-    public static Create(nominalHz: number) {
-        return new (this.Class ?? this)(nominalHz)
+    public static Create(
+        nominalHz: number,
+        options?: WindowedClockRegressorOptions
+    ) {
+        return new (this.Class ?? this)(nominalHz, options)
     }
 
     public deriveTimestamps(
@@ -108,5 +118,10 @@ export interface ClockRegressor {
 }
 
 export type ClockRegressorConstructor = new (
-    nominalHz: number
+    nominalHz: number,
+    options?: WindowedClockRegressorOptions
 ) => ClockRegressor
+
+export interface WindowedClockRegressorOptions {
+    windowLenSec?: number
+}

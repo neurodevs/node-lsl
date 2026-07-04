@@ -1,7 +1,13 @@
-import { ClockRegressor } from '../../impl/WindowedClockRegressor.js'
+import {
+    ClockRegressor,
+    WindowedClockRegressorOptions,
+} from '../../impl/WindowedClockRegressor.js'
 
 export default class FakeClockRegressor implements ClockRegressor {
-    public static callsToConstructor: { nominalHz: number }[] = []
+    public static callsToConstructor: {
+        nominalHz: number
+        options?: WindowedClockRegressorOptions
+    }[] = []
     public static callsToDeriveTimestamps: {
         deviceTime: number
         earliestLslTime: number
@@ -10,8 +16,11 @@ export default class FakeClockRegressor implements ClockRegressor {
 
     public readonly nominalHz: number
 
-    public constructor(nominalHz: number) {
-        FakeClockRegressor.callsToConstructor.push({ nominalHz })
+    public constructor(
+        nominalHz: number,
+        options?: WindowedClockRegressorOptions
+    ) {
+        FakeClockRegressor.callsToConstructor.push({ nominalHz, options })
         this.nominalHz = nominalHz
     }
 

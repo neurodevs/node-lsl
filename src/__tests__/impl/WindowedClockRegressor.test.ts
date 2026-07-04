@@ -164,6 +164,65 @@ export default class WindowedClockRegressorTest extends AbstractPackageTest {
         }
     }
 
+    @test()
+    protected static async deriveAllowsOverridingWindowLenSec() {
+        const nominalChunkStep = this.chunkSize / this.nominalHz
+        const customWindowLenSec = 5
+
+        // With nominalChunkStep in [0.1, 0.4), 150 iterations always spans at
+        // least 15 device-seconds — more than 2x the 5s customWindowLenSec,
+        // but well short of 2x the 30s default, so this only passes if the
+        // override actually takes effect.
+        const phaseCount = 150
+
+        const instance = WindowedClockRegressor.Create(this.nominalHz, {
+            windowLenSec: customWindowLenSec,
+        })
+
+        let deviceTime = this.deviceTime
+        let earliestLslTime = this.earliestLslTime
+
+        const oldSlope = 2
+
+        for (let i = 0; i < phaseCount; i++) {
+            deviceTime += nominalChunkStep
+            earliestLslTime += nominalChunkStep * oldSlope
+
+            instance.deriveTimestamps(
+                deviceTime,
+                earliestLslTime,
+                this.chunkSize
+            )
+        }
+
+        const newSlope = 5
+        let timestamps: number[] = []
+
+        for (let i = 0; i < phaseCount; i++) {
+            deviceTime += nominalChunkStep
+            earliestLslTime += nominalChunkStep * newSlope
+
+            timestamps = instance.deriveTimestamps(
+                deviceTime,
+                earliestLslTime,
+                this.chunkSize
+            )
+        }
+
+        const expectedSpacing = newSlope / this.nominalHz
+
+        for (let i = 1; i < timestamps.length; i++) {
+            const actualSpacing = timestamps[i] - timestamps[i - 1]
+
+            assert.isBetweenInclusive(
+                actualSpacing,
+                expectedSpacing * 0.99,
+                expectedSpacing * 1.01,
+                `Spacing at index ${i} should reflect the new slope once old history falls outside the custom windowLenSec!`
+            )
+        }
+    }
+
     private static deriveTimestamps(
         deviceTime = this.deviceTime,
         earliestLslTime = this.earliestLslTime
