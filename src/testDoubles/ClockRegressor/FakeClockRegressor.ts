@@ -14,6 +14,8 @@ export default class FakeClockRegressor implements ClockRegressor {
         chunkSize: number
     }[] = []
 
+    public static fakeResultValue = 0
+
     public readonly nominalHz: number
 
     public constructor(
@@ -34,7 +36,7 @@ export default class FakeClockRegressor implements ClockRegressor {
             earliestLslTime,
             chunkSize,
         })
-        return Array(chunkSize).fill(0)
+        return Array(chunkSize).fill(FakeClockRegressor.fakeResultValue)
     }
 
     public static resetTestDouble() {
