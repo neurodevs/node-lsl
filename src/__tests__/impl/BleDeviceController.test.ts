@@ -35,6 +35,14 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         },
     ]
 
+    private static readonly extraCharCallbacks = [
+        {
+            charUuid: this.generateId(),
+            charName: this.generateId(),
+            onData: async () => {},
+        },
+    ]
+
     private static onConnected = (_peripheral: NativePeripheral) => {
         this.wasConnected = true
     }
@@ -308,6 +316,42 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async subscribeCharacteristicsCallsLibndxBinding() {
+        await this.subscribeCharacteristics()
+
+        assert.isEqualDeep(
+            FakeLibndx.callsToAddBleCharCallbacks[0],
+            {
+                deviceUuid: this.uuid,
+                charCallbacks: this.extraCharCallbacks,
+            },
+            'Did not call addBleCharCallbacks as expected!'
+        )
+    }
+
+    @test()
+    protected static async subscribeCharacteristicsMergesIntoCharCallbacks() {
+        await this.subscribeCharacteristics()
+
+        assert.isEqualDeep(
+            this.instance.getCharacteristicCallbacks(),
+            [...this.charCallbacks, ...this.extraCharCallbacks],
+            'Did not merge the newly subscribed callbacks into charCallbacks!'
+        )
+    }
+
+    @test()
+    protected static async subscribeCharacteristicsThrowsOn400() {
+        this.setFake400Error()
+
+        await assert.doesThrowAsync(
+            async () => await this.subscribeCharacteristics(),
+            this.fake400Error,
+            'Did not throw error!'
+        )
+    }
+
+    @test()
     protected static async callsSetBleRssiInterval() {
         await this.connect()
 
@@ -440,6 +484,10 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
             this.charUuid,
             this.charValueToWrite
         )
+    }
+
+    private static async subscribeCharacteristics() {
+        await this.instance.subscribeCharacteristics(this.extraCharCallbacks)
     }
 
     private static async disconnect() {

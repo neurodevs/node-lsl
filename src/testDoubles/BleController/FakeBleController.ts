@@ -2,6 +2,7 @@ import generateId from '@neurodevs/generate-id'
 import {
     BleController,
     BleControllerOptions,
+    CharacteristicCallbacks,
 } from '../../impl/controllers/BleDeviceController.js'
 
 export default class FakeBleController implements BleController {
@@ -13,6 +14,8 @@ export default class FakeBleController implements BleController {
         characteristicUuid: string
         value: string
     }[] = []
+
+    public static callsToSubscribeCharacteristics: CharacteristicCallbacks[] = []
 
     public static numCallsToDisconnect = 0
 
@@ -45,6 +48,12 @@ export default class FakeBleController implements BleController {
         })
     }
 
+    public async subscribeCharacteristics(
+        charCallbacks: CharacteristicCallbacks
+    ) {
+        FakeBleController.callsToSubscribeCharacteristics.push(charCallbacks)
+    }
+
     public async disconnect() {
         FakeBleController.numCallsToDisconnect++
     }
@@ -61,6 +70,7 @@ export default class FakeBleController implements BleController {
         this.callsToConstructor = []
         this.numCallsToConnect = 0
         this.callsToWriteCharacteristic = []
+        this.callsToSubscribeCharacteristics = []
         this.numCallsToDisconnect = 0
     }
 }

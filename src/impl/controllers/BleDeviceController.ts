@@ -165,6 +165,19 @@ export default class BleDeviceController implements BleController {
         this.throwIfError(status, error)
     }
 
+    public async subscribeCharacteristics(
+        charCallbacks: CharacteristicCallbacks
+    ) {
+        const { status, error } = this.ndx.addBleCharCallbacks({
+            deviceUuid: this.uuid,
+            charCallbacks,
+        })
+
+        this.throwIfError(status, error)
+
+        this.charCallbacks = [...this.charCallbacks, ...charCallbacks]
+    }
+
     public async disconnect() {
         const { status, error } = this.ndx.stopBleBackend({
             deviceUuid: this.uuid,
@@ -192,6 +205,10 @@ export interface BleController {
     name: string
 
     connect(): Promise<void>
+
+    subscribeCharacteristics(
+        charCallbacks: CharacteristicCallbacks
+    ): Promise<void>
 
     writeCharacteristic(
         charUuid: CharacteristicUuid,
