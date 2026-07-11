@@ -58,6 +58,14 @@ export * from './impl/LslStreamOutlet.js'
 export { default as FakeStreamOutlet } from './testDoubles/StreamOutlet/FakeStreamOutlet.js'
 export * from './testDoubles/StreamOutlet/FakeStreamOutlet.js'
 
+// UsbController
+
+export { default as UsbDeviceController } from './impl/UsbDeviceController.js'
+export * from './impl/UsbDeviceController.js'
+
+export { default as FakeUsbController } from './testDoubles/UsbController/FakeUsbController.js'
+export * from './testDoubles/UsbController/FakeUsbController.js'
+
 // WebSocketBridge
 
 export { default as LslWebSocketBridge } from './impl/LslWebSocketBridge.js'
