@@ -18,7 +18,14 @@ export default class UsbDeviceController implements UsbController {
     }
 
     public async connect() {
-        this.ndx.createUsbBackend({ serialNumber: this.serialNumber })
+        this.ndx.createUsbBackend(this.usbControllerOptions)
+        this.ndx.startUsbBackend(this.usbControllerOptions)
+    }
+
+    public get usbControllerOptions() {
+        return {
+            serialNumber: this.serialNumber,
+        }
     }
 }
 
