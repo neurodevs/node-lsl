@@ -66,8 +66,6 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await super.beforeEach()
 
         BleDeviceController.waitAfterMs = 0
-
-        this.setFakeLibndx()
         BleDeviceController.Class = SpyBleController
 
         this.wasConnected = false

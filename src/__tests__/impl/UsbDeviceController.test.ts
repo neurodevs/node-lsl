@@ -4,9 +4,12 @@ import UsbDeviceController, {
     UsbController,
 } from '../../impl/UsbDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
+import { FakeLibndx } from '@neurodevs/ndx-native'
 
 export default class UsbDeviceControllerTest extends AbstractPackageTest {
     private static instance: UsbController
+
+    private static readonly serialNumber = this.generateId()
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -19,7 +22,26 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
         assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
+    @test()
+    protected static async connectCallsLibndxCreateUsbBackend() {
+        await this.connect()
+
+        assert.isEqualDeep(
+            FakeLibndx.callsToCreateUsbBackend[0],
+            {
+                serialNumber: this.serialNumber,
+            },
+            'Did not call create_usb_backend!'
+        )
+    }
+
+    private static async connect() {
+        await this.instance.connect()
+    }
+
     private static UsbDeviceController() {
-        return UsbDeviceController.Create()
+        return UsbDeviceController.Create({
+            serialNumber: this.serialNumber,
+        })
     }
 }
