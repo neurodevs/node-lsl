@@ -22,15 +22,20 @@ export default class UsbDeviceController implements UsbController {
         this.ndx.startUsbBackend(this.usbControllerOptions)
     }
 
-    public get usbControllerOptions() {
+    public get usbControllerOptions(): UsbControllerOptions {
         return {
             serialNumber: this.serialNumber,
         }
+    }
+
+    public async disconnect() {
+        this.ndx.stopUsbBackend(this.usbControllerOptions)
     }
 }
 
 export interface UsbController {
     connect(): Promise<void>
+    disconnect(): Promise<void>
 }
 
 export interface UsbControllerOptions {

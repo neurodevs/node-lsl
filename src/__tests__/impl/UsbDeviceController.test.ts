@@ -48,8 +48,26 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async disconnectCallsLibndxStopUsbBackend() {
+        await this.connect()
+        await this.disconnect()
+
+        assert.isEqualDeep(
+            FakeLibndx.callsToStopUsbBackend[0],
+            {
+                serialNumber: this.serialNumber,
+            },
+            'Did not call stop_usb_backend!'
+        )
+    }
+
     private static async connect() {
         await this.instance.connect()
+    }
+
+    private static async disconnect() {
+        await this.instance.disconnect()
     }
 
     private static UsbDeviceController() {
