@@ -22,7 +22,7 @@ export default class UsbDeviceController implements UsbController {
         this.ndx.startUsbBackend(this.startUsbControllerOptions)
     }
 
-    private get usbControllerOptions(): UsbControllerOptions {
+    private get usbControllerOptions() {
         return {
             serialNumber: this.serialNumber,
         }
@@ -58,7 +58,7 @@ export interface UsbController {
 }
 
 export interface UsbControllerOptions {
-    serialNumber: string
+    serialNumber?: string
 }
 
 export type UsbControllerConstructor = new (
