@@ -39,6 +39,13 @@ export default class UsbDeviceController implements UsbController {
         console.info(timestampSec, data, length)
     }
 
+    public async writeUsb(value: string) {
+        this.ndx.writeUsbBackend({
+            ...this.usbControllerOptions,
+            value,
+        })
+    }
+
     public async disconnect() {
         this.ndx.stopUsbBackend(this.usbControllerOptions)
     }
@@ -46,6 +53,7 @@ export default class UsbDeviceController implements UsbController {
 
 export interface UsbController {
     connect(): Promise<void>
+    writeUsb(value: string): Promise<void>
     disconnect(): Promise<void>
 }
 

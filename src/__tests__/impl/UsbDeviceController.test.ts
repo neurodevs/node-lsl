@@ -9,6 +9,7 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyUsbController
 
     private static readonly serialNumber = this.generateId()
+    private static readonly valueToWrite = this.generateId()
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -61,6 +62,20 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
                 serialNumber: this.serialNumber,
             },
             'Did not call stop_usb_backend!'
+        )
+    }
+
+    @test()
+    protected static async writeUsbCallsLibndxWriteUsbBackend() {
+        await this.instance.writeUsb(this.valueToWrite)
+
+        assert.isEqualDeep(
+            FakeLibndx.callsToWriteUsbBackend[0],
+            {
+                serialNumber: this.serialNumber,
+                value: this.valueToWrite,
+            },
+            'Did not call write_usb_backend!'
         )
     }
 
