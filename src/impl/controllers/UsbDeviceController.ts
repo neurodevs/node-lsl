@@ -3,17 +3,19 @@ import { LibndxAdapter } from '@neurodevs/ndx-native'
 export default class UsbDeviceController implements UsbController {
     public static Class?: UsbControllerConstructor
 
+    private onData: (data: Buffer, length: number, timestampSec: number) => void
     private serialNumber: string
 
     private ndx = LibndxAdapter.getInstance()
 
-    protected constructor(options?: UsbControllerOptions) {
-        const { serialNumber } = options ?? {}
+    protected constructor(options: UsbControllerOptions) {
+        const { onData, serialNumber } = options ?? {}
 
+        this.onData = onData
         this.serialNumber = serialNumber ?? ''
     }
 
-    public static Create(options?: UsbControllerOptions) {
+    public static Create(options: UsbControllerOptions) {
         return new (this.Class ?? this)(options)
     }
 
@@ -35,10 +37,6 @@ export default class UsbDeviceController implements UsbController {
         }
     }
 
-    protected onData = (data: Buffer, length: number, timestampSec: number) => {
-        console.info(timestampSec, data, length)
-    }
-
     public async writeUsb(value: string) {
         this.ndx.writeUsbBackend({
             ...this.usbControllerOptions,
@@ -58,6 +56,7 @@ export interface UsbController {
 }
 
 export interface UsbControllerOptions {
+    onData: (data: Buffer, length: number, timestampSec: number) => void
     serialNumber?: string
 }
 

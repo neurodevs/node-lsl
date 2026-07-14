@@ -2,7 +2,12 @@ import UsbDeviceController from '../impl/controllers/UsbDeviceController.js'
 
 console.info('\nCreating UsbDeviceController...')
 
-const controller = UsbDeviceController.Create({ serialNumber: 'DP04WG8J' })
+const controller = UsbDeviceController.Create({
+    serialNumber: 'DP04WG8J',
+    onData: (_data: Buffer, length: number, timestampSec: number) => {
+        console.info(`[${timestampSec}] Buffer length: ${length}`)
+    },
+})
 
 console.info('Connecting to UsbDeviceController...')
 
