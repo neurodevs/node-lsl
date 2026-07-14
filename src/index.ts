@@ -60,8 +60,8 @@ export * from './testDoubles/StreamOutlet/FakeStreamOutlet.js'
 
 // UsbController
 
-export { default as UsbDeviceController } from './impl/UsbDeviceController.js'
-export * from './impl/UsbDeviceController.js'
+export { default as UsbDeviceController } from './impl/controllers/UsbDeviceController.js'
+export * from './impl/controllers/UsbDeviceController.js'
 
 export { default as FakeUsbController } from './testDoubles/UsbController/FakeUsbController.js'
 export * from './testDoubles/UsbController/FakeUsbController.js'

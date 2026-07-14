@@ -1,4 +1,4 @@
-import UsbDeviceController from '../impl/UsbDeviceController.js'
+import UsbDeviceController from '../impl/controllers/UsbDeviceController.js'
 
 console.info('\nCreating UsbDeviceController...')
 

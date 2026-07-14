@@ -1,6 +1,6 @@
 import UsbDeviceController, {
     UsbControllerOptions,
-} from '../../impl/UsbDeviceController.js'
+} from '../../impl/controllers/UsbDeviceController.js'
 
 export default class SpyUsbController extends UsbDeviceController {
     public constructor(options?: UsbControllerOptions) {

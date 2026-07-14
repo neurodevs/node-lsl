@@ -1,4 +1,4 @@
-import { UsbController } from '../../impl/UsbDeviceController.js'
+import { UsbController } from '../../impl/controllers/UsbDeviceController.js'
 
 export default class FakeUsbController implements UsbController {
     public static numCallsToConstructor = 0

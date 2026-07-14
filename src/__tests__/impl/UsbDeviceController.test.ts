@@ -1,6 +1,6 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import UsbDeviceController from '../../impl/UsbDeviceController.js'
+import UsbDeviceController from '../../impl/controllers/UsbDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { FakeLibndx } from '@neurodevs/ndx-native'
 import SpyUsbController from '../../testDoubles/UsbController/SpyUsbController.js'
