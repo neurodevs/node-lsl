@@ -19,13 +19,24 @@ export default class UsbDeviceController implements UsbController {
 
     public async connect() {
         this.ndx.createUsbBackend(this.usbControllerOptions)
-        this.ndx.startUsbBackend(this.usbControllerOptions)
+        this.ndx.startUsbBackend(this.startUsbControllerOptions)
     }
 
-    public get usbControllerOptions(): UsbControllerOptions {
+    private get usbControllerOptions(): UsbControllerOptions {
         return {
             serialNumber: this.serialNumber,
         }
+    }
+
+    private get startUsbControllerOptions() {
+        return {
+            ...this.usbControllerOptions,
+            onData: this.onData,
+        }
+    }
+
+    protected onData = (data: Buffer, length: number, timestampSec: number) => {
+        console.info(timestampSec, data, length)
     }
 
     public async disconnect() {

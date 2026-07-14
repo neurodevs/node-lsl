@@ -1,18 +1,19 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import UsbDeviceController, {
-    UsbController,
-} from '../../impl/UsbDeviceController.js'
+import UsbDeviceController from '../../impl/UsbDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { FakeLibndx } from '@neurodevs/ndx-native'
+import SpyUsbController from '../../testDoubles/UsbController/SpyUsbController.js'
 
 export default class UsbDeviceControllerTest extends AbstractPackageTest {
-    private static instance: UsbController
+    private static instance: SpyUsbController
 
     private static readonly serialNumber = this.generateId()
 
     protected static async beforeEach() {
         await super.beforeEach()
+
+        UsbDeviceController.Class = SpyUsbController
 
         this.instance = this.UsbDeviceController()
     }
@@ -43,6 +44,7 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
             FakeLibndx.callsToStartUsbBackend[0],
             {
                 serialNumber: this.serialNumber,
+                onData: this.instance.getOnData(),
             },
             'Did not call start_usb_backend!'
         )
@@ -73,6 +75,6 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
     private static UsbDeviceController() {
         return UsbDeviceController.Create({
             serialNumber: this.serialNumber,
-        })
+        }) as SpyUsbController
     }
 }
