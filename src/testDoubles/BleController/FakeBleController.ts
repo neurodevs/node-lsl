@@ -15,7 +15,8 @@ export default class FakeBleController implements BleController {
         value: string
     }[] = []
 
-    public static callsToSubscribeCharacteristics: CharacteristicCallbacks[] = []
+    public static callsToSubscribeCharacteristics: CharacteristicCallbacks[] =
+        []
 
     public static numCallsToDisconnect = 0
 
