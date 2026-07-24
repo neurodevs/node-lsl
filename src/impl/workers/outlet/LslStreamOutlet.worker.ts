@@ -8,10 +8,7 @@ import {
     LslErrorCode,
 } from '@neurodevs/ndx-native'
 
-import LslStreamInfo, {
-    StreamInfo,
-    StreamInfoOptions,
-} from '../../LslStreamInfo.js'
+import LslStreamInfo, { LslInfo, LslInfoOptions } from '../../LslStreamInfo.js'
 
 let lsl = LiblslAdapter.getInstance()
 
@@ -26,7 +23,7 @@ export function setOutletHandleLslError(fn: typeof handleLslError) {
     handleLslErrorFn = fn
 }
 
-let info: StreamInfo
+let info: LslInfo
 let handle: OutletHandle
 let pushMethod: (opts: unknown) => LslErrorCode
 
@@ -132,7 +129,7 @@ export type OutletMessage =
       }
 
 export interface CreateOutletPayload {
-    infoOptions: StreamInfoOptions
+    infoOptions: LslInfoOptions
     chunkSize: number
     maxBufferedMs: number
     pushMethod: 'pushSampleFloatTimestamp' | 'pushSampleStringTimestamp'

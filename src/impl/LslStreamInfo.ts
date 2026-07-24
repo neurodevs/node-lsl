@@ -6,8 +6,8 @@ import {
     CHANNEL_FORMATS_MAP,
 } from '@neurodevs/ndx-native'
 
-export default class LslStreamInfo implements StreamInfo {
-    public static Class?: StreamInfoConstructor
+export default class LslStreamInfo implements LslInfo {
+    public static Class?: LslInfoConstructor
 
     public readonly name: string
     public readonly type: string
@@ -22,7 +22,7 @@ export default class LslStreamInfo implements StreamInfo {
 
     private lsl = LiblslAdapter.getInstance()
 
-    protected constructor(options: StreamInfoOptions) {
+    protected constructor(options: LslInfoOptions) {
         const {
             name = `lsl-stream-info-${generateId()}`,
             type = generateId(),
@@ -46,7 +46,7 @@ export default class LslStreamInfo implements StreamInfo {
         this.appendChannelsToStreamInfo()
     }
 
-    public static Create(options: StreamInfoOptions) {
+    public static Create(options: LslInfoOptions) {
         return new (this.Class ?? this)(options)
     }
 
@@ -81,7 +81,7 @@ export default class LslStreamInfo implements StreamInfo {
     }
 }
 
-export interface StreamInfo {
+export interface LslInfo {
     destroy(): void
     readonly name: string
     readonly type: string
@@ -94,11 +94,9 @@ export interface StreamInfo {
     readonly infoHandle: InfoHandle
 }
 
-export type StreamInfoConstructor = new (
-    options: StreamInfoOptions
-) => StreamInfo
+export type LslInfoConstructor = new (options: LslInfoOptions) => LslInfo
 
-export interface StreamInfoOptions {
+export interface LslInfoOptions {
     channelNames: string[]
     channelFormat: ChannelFormat
     sampleRateHz: number

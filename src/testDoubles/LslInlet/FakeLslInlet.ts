@@ -1,12 +1,12 @@
 import {
     OnDataCallback,
-    StreamInlet,
-    StreamInletOptions,
+    LslInlet,
+    LslInletOptions,
 } from '../../impl/LslStreamInlet.js'
 
-export default class FakeStreamInlet implements StreamInlet {
+export default class FakeLslInlet implements LslInlet {
     public static callsToConstructor: {
-        options?: StreamInletOptions
+        options?: LslInletOptions
         onData?: OnDataCallback
     }[] = []
 
@@ -19,37 +19,37 @@ export default class FakeStreamInlet implements StreamInlet {
 
     protected onData!: OnDataCallback
 
-    public constructor(options?: StreamInletOptions, onData?: OnDataCallback) {
+    public constructor(options?: LslInletOptions, onData?: OnDataCallback) {
         this.onData = onData ?? (() => {})
 
-        FakeStreamInlet.callsToConstructor.push({
+        FakeLslInlet.callsToConstructor.push({
             options,
             onData: this.onData,
         })
     }
 
     public async startPulling() {
-        FakeStreamInlet.numCallsToStartPulling++
+        FakeLslInlet.numCallsToStartPulling++
         this.isRunning = true
     }
 
     public stopPulling() {
-        FakeStreamInlet.numCallsToStopPulling++
+        FakeLslInlet.numCallsToStopPulling++
         this.isRunning = false
     }
 
     public flushInlet() {
-        FakeStreamInlet.numCallsToFlushInlet++
+        FakeLslInlet.numCallsToFlushInlet++
     }
 
     public destroy() {
-        FakeStreamInlet.numCallsToDestroy++
+        FakeLslInlet.numCallsToDestroy++
     }
 
     public static resetTestDouble() {
-        FakeStreamInlet.callsToConstructor = []
-        FakeStreamInlet.numCallsToStartPulling = 0
-        FakeStreamInlet.numCallsToFlushInlet = 0
-        FakeStreamInlet.numCallsToDestroy = 0
+        FakeLslInlet.callsToConstructor = []
+        FakeLslInlet.numCallsToStartPulling = 0
+        FakeLslInlet.numCallsToFlushInlet = 0
+        FakeLslInlet.numCallsToDestroy = 0
     }
 }

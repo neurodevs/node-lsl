@@ -10,8 +10,8 @@ import {
     assertValidSampleRateHz,
 } from '../assertions.js'
 
-export default class LslStreamOutlet implements StreamOutlet {
-    public static Class?: StreamOutletConstructor
+export default class LslStreamOutlet implements LslOutlet {
+    public static Class?: LslOutletConstructor
     public static Worker = Worker
     public static setTimeout = setTimeout
 
@@ -29,7 +29,7 @@ export default class LslStreamOutlet implements StreamOutlet {
 
     private worker!: Worker
 
-    protected constructor(options: StreamOutletOptions) {
+    protected constructor(options: LslOutletOptions) {
         const {
             name,
             type,
@@ -60,7 +60,7 @@ export default class LslStreamOutlet implements StreamOutlet {
         this.createStreamOutlet()
     }
 
-    public static async Create(options: StreamOutletOptions) {
+    public static async Create(options: LslOutletOptions) {
         const { waitAfterConstructionMs = 10 } = options ?? {}
 
         const instance = new (this.Class ?? this)(options)
@@ -159,7 +159,7 @@ export default class LslStreamOutlet implements StreamOutlet {
     }
 }
 
-export interface StreamOutlet {
+export interface LslOutlet {
     pushSample(sample: LslSample, timestampSec?: number): void
     destroy(): void
     readonly name: string
@@ -175,15 +175,13 @@ export interface StreamOutlet {
     readonly manufacturer: string
 }
 
-export type StreamOutletConstructor = new (
-    options: StreamOutletOptions
-) => StreamOutlet
+export type LslOutletConstructor = new (options: LslOutletOptions) => LslOutlet
 
-export interface StreamOutletOptions extends StreamOutletConstructorOptions {
+export interface LslOutletOptions extends LslOutletConstructorOptions {
     waitAfterConstructionMs?: number
 }
 
-export interface StreamOutletConstructorOptions {
+export interface LslOutletConstructorOptions {
     name: string
     type: string
     sourceId: string

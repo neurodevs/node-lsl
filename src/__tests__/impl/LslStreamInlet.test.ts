@@ -11,16 +11,14 @@ import {
     unwrapPointer,
 } from 'ffi-rs'
 
-import LslStreamInlet, {
-    StreamInletOptions,
-} from '../../impl/LslStreamInlet.js'
+import LslStreamInlet, { LslInletOptions } from '../../impl/LslStreamInlet.js'
 import StreamInletWorker from '../../impl/workers/inlet/StreamInletWorker.js'
-import { SpyStreamInlet } from '../../testDoubles/StreamInlet/SpyStreamInlet.js'
+import { SpyLslInlet } from '../../testDoubles/LslInlet/SpyLslInlet.js'
 import FakeWorker from '../../testDoubles/WorkerThreads/FakeWorker.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamInletTest extends AbstractPackageTest {
-    private static instance: SpyStreamInlet
+    private static instance: SpyLslInlet
 
     private static callsToOnData: {
         samples: number[]
@@ -60,8 +58,8 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         await super.beforeEach()
 
         this.setFakeLiblsl()
-        this.setFakeStreamInfo()
-        this.setSpyStreamInlet()
+        this.setFakeLslInfo()
+        this.setSpyLslInlet()
 
         this.callsToOnData = []
 
@@ -508,21 +506,21 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     }
 
     private static async runInletWithOptions(
-        options?: Partial<StreamInletOptions>
+        options?: Partial<LslInletOptions>
     ) {
         const inlet = await this.LslStreamInlet(options)
         await this.startThenStop(inlet)
         return inlet
     }
 
-    private static async startThenStop(inlet?: SpyStreamInlet) {
+    private static async startThenStop(inlet?: SpyLslInlet) {
         const instance = inlet || this.instance
         await this.startPulling(instance)
         await this.wait(10)
         instance.stopPulling()
     }
 
-    private static async startPulling(instance?: SpyStreamInlet) {
+    private static async startPulling(instance?: SpyLslInlet) {
         const inst = instance || this.instance
         const startPullingPromise = inst.startPulling()
 
@@ -552,7 +550,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         return this.getFakeWorker()['inletWorker']['inletHandle']
     }
 
-    private static getFakeWorker(instance?: SpyStreamInlet) {
+    private static getFakeWorker(instance?: SpyLslInlet) {
         const inst = instance || this.instance
         return inst['worker'] as unknown as FakeWorker
     }
@@ -561,14 +559,12 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         this.callsToOnData.push({ samples, timestamps })
     }
 
-    protected static async LslStreamInlet(
-        options?: Partial<StreamInletOptions>
-    ) {
+    protected static async LslStreamInlet(options?: Partial<LslInletOptions>) {
         return (await AbstractPackageTest.LslStreamInlet(
             {
                 ...options,
             },
             this.onData
-        )) as SpyStreamInlet
+        )) as SpyLslInlet
     }
 }

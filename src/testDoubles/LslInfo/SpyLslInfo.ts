@@ -1,11 +1,11 @@
-import LslStreamInfo, { StreamInfoOptions } from '../../impl/LslStreamInfo.js'
+import LslStreamInfo, { LslInfoOptions } from '../../impl/LslStreamInfo.js'
 
-export default class SpyStreamInfo extends LslStreamInfo {
+export default class SpyLslInfo extends LslStreamInfo {
     public static numCallsToConstructor = 0
 
-    public constructor(options: StreamInfoOptions) {
+    public constructor(options: LslInfoOptions) {
         super(options)
-        SpyStreamInfo.numCallsToConstructor++
+        SpyLslInfo.numCallsToConstructor++
     }
 
     public getName() {
@@ -25,6 +25,6 @@ export default class SpyStreamInfo extends LslStreamInfo {
     }
 
     public static resetTestDouble() {
-        SpyStreamInfo.numCallsToConstructor = 0
+        SpyLslInfo.numCallsToConstructor = 0
     }
 }

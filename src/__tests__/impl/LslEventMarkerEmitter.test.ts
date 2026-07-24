@@ -3,23 +3,23 @@ import { randomInt } from 'node:crypto'
 import { assert, test } from '@neurodevs/node-tdd'
 
 import LslEventMarkerEmitter, {
-    EventMarkerOptions,
+    EmitOptions,
 } from '../../impl/LslEventMarkerEmitter.js'
-import { StreamOutletOptions } from '../../impl/LslStreamOutlet.js'
-import SpyEventMarkerEmitter from '../../testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
+import { LslOutletOptions } from '../../impl/LslStreamOutlet.js'
+import SpyLslEmitter from '../../testDoubles/LslEmitter/SpyLslEmitter.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
-import FakeStreamOutlet from '../../testDoubles/StreamOutlet/FakeStreamOutlet.js'
+import FakeLslOutlet from '../../testDoubles/LslOutlet/FakeLslOutlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class EventMarkerEmitterTest extends AbstractPackageTest {
-    private static instance: SpyEventMarkerEmitter
+    private static instance: SpyLslEmitter
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeLiblsl()
-        this.setFakeStreamOutlet()
-        this.setSpyEventMarkerEmitter()
+        this.setFakeLslOutlet()
+        this.setSpyLslEmitter()
 
         this.instance = await this.LslEventMarkerEmitter()
     }
@@ -35,7 +35,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     protected static async loadsWithEventMarkerSpecificOptions() {
         assert.isEqualDeep(
             {
-                ...FakeStreamOutlet.callsToConstructor[0],
+                ...FakeLslOutlet.callsToConstructor[0],
                 name: undefined,
                 sourceId: undefined,
             },
@@ -51,14 +51,14 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         )
 
         assert.isTrue(
-            FakeStreamOutlet.callsToConstructor[0]?.sourceId.startsWith(
+            FakeLslOutlet.callsToConstructor[0]?.sourceId.startsWith(
                 'event-markers-'
             ),
             'Source ID was not generated uniquely!'
         )
 
         assert.isTrue(
-            FakeStreamOutlet.callsToConstructor[0]?.name.startsWith(
+            FakeLslOutlet.callsToConstructor[0]?.name.startsWith(
                 'Event markers ('
             ),
             'Name was not generated uniquely!'
@@ -70,7 +70,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         const options = generateRandomOutletOptions()
         await this.LslEventMarkerEmitter(options)
 
-        assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[1], options)
+        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[1], options)
     }
 
     @test()
@@ -81,7 +81,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         const marker = markers[0]
 
         assert.isEqual(
-            FakeStreamOutlet.callsToPushSample[0]?.sample[0],
+            FakeLslOutlet.callsToPushSample[0]?.sample[0],
             marker.name,
             'Pushed the wrong marker!'
         )
@@ -93,7 +93,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     protected static async emittingTwoMarkersIncrementsHitCountAndWaitTimeTwice() {
         const markers = await this.emitManyFor(2)
 
-        assert.isEqual(FakeStreamOutlet.callsToPushSample.length, 2)
+        assert.isEqual(FakeLslOutlet.callsToPushSample.length, 2)
 
         assert.isEqual(
             this.instance.totalwaitAfterMs,
@@ -162,7 +162,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         await this.emit(markerName)
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample[0]?.sample,
+            FakeLslOutlet.callsToPushSample[0]?.sample,
             [markerName],
             'Pushed the wrong sample!'
         )
@@ -170,7 +170,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async emitWaitsForMsIfPassed() {
-        SpyEventMarkerEmitter.shouldCallWaitOnSuper = true
+        SpyLslEmitter.shouldCallWaitOnSuper = true
 
         const waitAfterMs = 10
 
@@ -190,7 +190,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         this.destroy()
 
         assert.isEqual(
-            FakeStreamOutlet.numCallsToDestroy,
+            FakeLslOutlet.numCallsToDestroy,
             1,
             'Did not call destroy on outlet!'
         )
@@ -268,10 +268,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         await this.emit(this.markerName)
     }
 
-    private static async emit(
-        markerName: string,
-        options?: EventMarkerOptions
-    ) {
+    private static async emit(markerName: string, options?: EmitOptions) {
         return this.instance.emit(markerName, options)
     }
 
@@ -314,10 +311,8 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     }
 
     private static async LslEventMarkerEmitter(
-        options?: Partial<StreamOutletOptions>
+        options?: Partial<LslOutletOptions>
     ) {
-        return (await LslEventMarkerEmitter.Create(
-            options
-        )) as SpyEventMarkerEmitter
+        return (await LslEventMarkerEmitter.Create(options)) as SpyLslEmitter
     }
 }

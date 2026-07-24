@@ -17,46 +17,54 @@ export * from './testDoubles/BleController/FakeBleController.js'
 export { default as SpyBleController } from './testDoubles/BleController/SpyBleController.js'
 export * from './testDoubles/BleController/SpyBleController.js'
 
-// EventMarkerEmitter
+// LslBridge
+
+export { default as LslWebSocketBridge } from './impl/LslWebSocketBridge.js'
+export * from './impl/LslWebSocketBridge.js'
+
+export { default as FakeLslBridge } from './testDoubles/LslBridge/FakeLslBridge.js'
+export * from './testDoubles/LslBridge/FakeLslBridge.js'
+
+// LslEmitter
 
 export { default as LslEventMarkerEmitter } from './impl/LslEventMarkerEmitter.js'
 export * from './impl/LslEventMarkerEmitter.js'
 
-export { default as FakeEventMarkerEmitter } from './testDoubles/EventMarkerEmitter/FakeEventMarkerEmitter.js'
-export * from './testDoubles/EventMarkerEmitter/FakeEventMarkerEmitter.js'
+export { default as FakeLslEmitter } from './testDoubles/LslEmitter/FakeLslEmitter.js'
+export * from './testDoubles/LslEmitter/FakeLslEmitter.js'
 
-export { default as SpyEventMarkerEmitter } from './testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
-export * from './testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
+export { default as SpyLslEmitter } from './testDoubles/LslEmitter/SpyLslEmitter.js'
+export * from './testDoubles/LslEmitter/SpyLslEmitter.js'
 
-export { default as ThrowingEventMarkerEmitter } from './testDoubles/EventMarkerEmitter/ThrowingEventMarkerEmitter.js'
-export * from './testDoubles/EventMarkerEmitter/ThrowingEventMarkerEmitter.js'
+export { default as ThrowingLslEmitter } from './testDoubles/LslEmitter/ThrowingLslEmitter.js'
+export * from './testDoubles/LslEmitter/ThrowingLslEmitter.js'
 
-// StreamInfo
+// LslInfo
 
 export { default as LslStreamInfo } from './impl/LslStreamInfo.js'
 export * from './impl/LslStreamInfo.js'
 
-export { default as SpyStreamInfo } from './testDoubles/StreamInfo/SpyStreamInfo.js'
-export * from './testDoubles/StreamInfo/SpyStreamInfo.js'
+export { default as SpyLslInfo } from './testDoubles/LslInfo/SpyLslInfo.js'
+export * from './testDoubles/LslInfo/SpyLslInfo.js'
 
-export { default as FakeStreamInfo } from './testDoubles/StreamInfo/FakeStreamInfo.js'
-export * from './testDoubles/StreamInfo/FakeStreamInfo.js'
+export { default as FakeLslInfo } from './testDoubles/LslInfo/FakeLslInfo.js'
+export * from './testDoubles/LslInfo/FakeLslInfo.js'
 
-// StreamInlet
+// LslInlet
 
 export { default as LslStreamInlet } from './impl/LslStreamInlet.js'
 export * from './impl/LslStreamInlet.js'
 
-export { default as FakeStreamInlet } from './testDoubles/StreamInlet/FakeStreamInlet.js'
-export * from './testDoubles/StreamInlet/FakeStreamInlet.js'
+export { default as FakeLslInlet } from './testDoubles/LslInlet/FakeLslInlet.js'
+export * from './testDoubles/LslInlet/FakeLslInlet.js'
 
-// StreamOutlet
+// LslOutlet
 
 export { default as LslStreamOutlet } from './impl/LslStreamOutlet.js'
 export * from './impl/LslStreamOutlet.js'
 
-export { default as FakeStreamOutlet } from './testDoubles/StreamOutlet/FakeStreamOutlet.js'
-export * from './testDoubles/StreamOutlet/FakeStreamOutlet.js'
+export { default as FakeLslOutlet } from './testDoubles/LslOutlet/FakeLslOutlet.js'
+export * from './testDoubles/LslOutlet/FakeLslOutlet.js'
 
 // UsbController
 
@@ -65,14 +73,6 @@ export * from './impl/controllers/UsbDeviceController.js'
 
 export { default as FakeUsbController } from './testDoubles/UsbController/FakeUsbController.js'
 export * from './testDoubles/UsbController/FakeUsbController.js'
-
-// WebSocketBridge
-
-export { default as LslWebSocketBridge } from './impl/LslWebSocketBridge.js'
-export * from './impl/LslWebSocketBridge.js'
-
-export { default as FakeWebSocketBridge } from './testDoubles/WebSocketBridge/FakeWebSocketBridge.js'
-export * from './testDoubles/WebSocketBridge/FakeWebSocketBridge.js'
 
 // Utils
 

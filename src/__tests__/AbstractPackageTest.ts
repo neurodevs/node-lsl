@@ -10,13 +10,13 @@ import {
 } from '@neurodevs/ndx-native'
 import AbstractModuleTest from '@neurodevs/node-tdd'
 
-import SpyEventMarkerEmitter from '../testDoubles/EventMarkerEmitter/SpyEventMarkerEmitter.js'
-import FakeStreamInfo from '../testDoubles/StreamInfo/FakeStreamInfo.js'
-import SpyStreamInfo from '../testDoubles/StreamInfo/SpyStreamInfo.js'
-import FakeStreamInlet from '../testDoubles/StreamInlet/FakeStreamInlet.js'
-import { SpyStreamInlet } from '../testDoubles/StreamInlet/SpyStreamInlet.js'
-import FakeStreamOutlet from '../testDoubles/StreamOutlet/FakeStreamOutlet.js'
-import SpyLslWebSocketBridge from '../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
+import SpyLslEmitter from '../testDoubles/LslEmitter/SpyLslEmitter.js'
+import FakeLslInfo from '../testDoubles/LslInfo/FakeLslInfo.js'
+import SpyLslInfo from '../testDoubles/LslInfo/SpyLslInfo.js'
+import FakeLslInlet from '../testDoubles/LslInlet/FakeLslInlet.js'
+import { SpyLslInlet } from '../testDoubles/LslInlet/SpyLslInlet.js'
+import FakeLslOutlet from '../testDoubles/LslOutlet/FakeLslOutlet.js'
+import SpyLslWebSocketBridge from '../testDoubles/LslBridge/SpyLslBridge.js'
 import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
 import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
@@ -25,7 +25,7 @@ import LslEventMarkerEmitter from '../impl/LslEventMarkerEmitter.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
 import LslStreamInlet, {
     OnDataCallback,
-    StreamInletOptions,
+    LslInletOptions,
 } from '../impl/LslStreamInlet.js'
 import LslStreamOutlet from '../impl/LslStreamOutlet.js'
 
@@ -33,7 +33,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
     protected static fakeLibndx: FakeLibndx
 
-    protected static readonly fakeStreamInfo = new FakeStreamInfo()
+    protected static readonly fakeLslInfo = new FakeLslInfo()
 
     protected static readonly name_ = this.generateId()
     protected static readonly type = this.generateId()
@@ -111,35 +111,35 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         BleDeviceController.ndx = this.fakeLibndx
     }
 
-    protected static setSpyStreamInfo() {
-        LslStreamInfo.Class = SpyStreamInfo
-        SpyStreamInfo.resetTestDouble()
+    protected static setSpyLslInfo() {
+        LslStreamInfo.Class = SpyLslInfo
+        SpyLslInfo.resetTestDouble()
     }
 
-    protected static setFakeStreamInfo() {
-        LslStreamInfo.Class = FakeStreamInfo
-        FakeStreamInfo.resetTestDouble()
+    protected static setFakeLslInfo() {
+        LslStreamInfo.Class = FakeLslInfo
+        FakeLslInfo.resetTestDouble()
     }
 
-    protected static setSpyStreamInlet() {
-        LslStreamInlet.Class = SpyStreamInlet
+    protected static setSpyLslInlet() {
+        LslStreamInlet.Class = SpyLslInlet
     }
 
-    protected static setFakeStreamInlet() {
-        LslStreamInlet.Class = FakeStreamInlet
-        FakeStreamInlet.resetTestDouble()
+    protected static setFakeLslInlet() {
+        LslStreamInlet.Class = FakeLslInlet
+        FakeLslInlet.resetTestDouble()
     }
 
-    protected static setFakeStreamOutlet() {
-        LslStreamOutlet.Class = FakeStreamOutlet
-        FakeStreamOutlet.resetTestDouble()
+    protected static setFakeLslOutlet() {
+        LslStreamOutlet.Class = FakeLslOutlet
+        FakeLslOutlet.resetTestDouble()
     }
 
-    protected static setSpyEventMarkerEmitter() {
-        LslEventMarkerEmitter.Class = SpyEventMarkerEmitter
+    protected static setSpyLslEmitter() {
+        LslEventMarkerEmitter.Class = SpyLslEmitter
     }
 
-    protected static setSpyLslWebSocketBridge() {
+    protected static setSpyLslBridge() {
         LslWebSocketBridge.Class = SpyLslWebSocketBridge
     }
 
@@ -154,10 +154,10 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     }
 
     protected static async LslStreamInlet(
-        options: Partial<StreamInletOptions>,
+        options: Partial<LslInletOptions>,
         onData: OnDataCallback
     ) {
-        const defaultOptions: StreamInletOptions = {
+        const defaultOptions: LslInletOptions = {
             sourceId: this.sourceId,
             chunkSize: this.chunkSize,
             maxBufferedMs: this.maxBufferedMs,

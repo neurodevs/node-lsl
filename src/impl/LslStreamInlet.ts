@@ -1,7 +1,7 @@
 import { Worker } from 'node:worker_threads'
 
-export default class LslStreamInlet implements StreamInlet {
-    public static Class?: StreamInletConstructor
+export default class LslStreamInlet implements LslInlet {
+    public static Class?: LslInletConstructor
     public static Worker = Worker
     public static waitAfterOpenStreamMs = 100
     public static setTimeout = setTimeout
@@ -24,7 +24,7 @@ export default class LslStreamInlet implements StreamInlet {
 
     public isRunning = false
 
-    protected constructor(options: StreamInletOptions, onData: OnDataCallback) {
+    protected constructor(options: LslInletOptions, onData: OnDataCallback) {
         const {
             sourceId,
             chunkSize,
@@ -50,7 +50,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 
     public static async Create(
-        options: StreamInletOptions,
+        options: LslInletOptions,
         onData: OnDataCallback
     ) {
         return new (this.Class ?? this)(options, onData)
@@ -148,7 +148,7 @@ export default class LslStreamInlet implements StreamInlet {
     }
 }
 
-export interface StreamInlet {
+export interface LslInlet {
     startPulling(): Promise<void>
     stopPulling(): void
     flushInlet(): void
@@ -156,12 +156,12 @@ export interface StreamInlet {
     readonly isRunning: boolean
 }
 
-export type StreamInletConstructor = new (
-    options: StreamInletOptions,
+export type LslInletConstructor = new (
+    options: LslInletOptions,
     onData: OnDataCallback
-) => StreamInlet
+) => LslInlet
 
-export interface StreamInletOptions {
+export interface LslInletOptions {
     sourceId: string
     chunkSize: number
     maxBufferedMs?: number

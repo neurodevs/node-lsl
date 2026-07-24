@@ -4,7 +4,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 
 import { CHANNEL_FORMATS } from '../../consts.js'
 import LslStreamOutlet, {
-    StreamOutletOptions,
+    LslOutletOptions,
 } from '../../impl/LslStreamOutlet.js'
 import {
     setOutletHandleLslError,
@@ -16,12 +16,12 @@ import {
     TestChannelFormat,
 } from '../../testDoubles/consts.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
-import FakeStreamInfo from '../../testDoubles/StreamInfo/FakeStreamInfo.js'
+import FakeLslInfo from '../../testDoubles/LslInfo/FakeLslInfo.js'
 import FakeWorker from '../../testDoubles/WorkerThreads/FakeWorker.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamOutletTest extends AbstractPackageTest {
-    private static randomOutletOptions: StreamOutletOptions
+    private static randomOutletOptions: LslOutletOptions
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -31,7 +31,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         this.randomOutletOptions = generateRandomOutletOptions()
 
         this.setFakeLiblsl()
-        this.setFakeStreamInfo()
+        this.setFakeLslInfo()
 
         LslStreamOutlet.Worker = FakeWorker as unknown as typeof Worker
         FakeWorker.resetTestDoubles()
@@ -175,7 +175,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     protected static async constructionCreatesStreamInfo() {
         await this.LslStreamOutlet()
 
-        assert.isEqualDeep(FakeStreamInfo.callsToConstructor[0], {
+        assert.isEqualDeep(FakeLslInfo.callsToConstructor[0], {
             channelNames: this.randomOutletOptions.channelNames,
             channelFormat: this.randomOutletOptions.channelFormat,
             sampleRateHz: this.randomOutletOptions.sampleRateHz,
@@ -346,7 +346,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     private static async createAndAssertThrows(
-        option: keyof StreamOutletOptions,
+        option: keyof LslOutletOptions,
         value: number | string[] | ChannelFormat,
         expectedMessage: string
     ) {
@@ -368,9 +368,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
         return await this.LslStreamOutlet({ channelFormat: 'float32' })
     }
 
-    private static async LslStreamOutlet(
-        options?: Partial<StreamOutletOptions>
-    ) {
+    private static async LslStreamOutlet(options?: Partial<LslOutletOptions>) {
         return await LslStreamOutlet.Create({
             ...this.randomOutletOptions,
             ...options,
@@ -379,7 +377,7 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 }
 
 class CheckingOutlet extends LslStreamOutlet {
-    public constructor(options: StreamOutletOptions) {
+    public constructor(options: LslOutletOptions) {
         super(options)
     }
 }

@@ -1,22 +1,19 @@
 import WebSocket, { WebSocketServer } from 'ws'
 
-import LslStreamInlet, {
-    StreamInlet,
-    StreamInletOptions,
-} from './LslStreamInlet.js'
+import LslStreamInlet, { LslInlet, LslInletOptions } from './LslStreamInlet.js'
 
-export default class LslWebSocketBridge implements WebSocketBridge {
-    public static Class?: WebSocketBridgeConstructor
+export default class LslWebSocketBridge implements LslBridge {
+    public static Class?: LslBridgeConstructor
     public static WS = WebSocket
     public static WSS = WebSocketServer
 
-    private inlet: StreamInlet
+    private inlet: LslInlet
     private localServer?: WebSocketServer
     private remoteSockets?: WebSocket[]
 
     private isDestroyed = false
 
-    protected constructor(options: WebSocketBridgeConstructorOptions) {
+    protected constructor(options: LslBridgeConstructorOptions) {
         const { inlet, localServer, remoteSockets } = options
 
         this.inlet = inlet
@@ -26,9 +23,9 @@ export default class LslWebSocketBridge implements WebSocketBridge {
         this.throwIfNoLocalServerOrRemoteSockets()
     }
 
-    public static async Create(options: WebSocketBridgeOptions) {
+    public static async Create(options: LslBridgeOptions) {
         const { listenPort, connectUrls, ...rest } = options
-        const inletOptions: StreamInletOptions = rest
+        const inletOptions: LslInletOptions = rest
 
         const localServer = this.WebSocketServer(listenPort)
         const remoteSockets = this.createSocketsFrom(connectUrls)
@@ -155,7 +152,7 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     }
 
     private static async LslStreamInlet(
-        options: StreamInletOptions,
+        options: LslInletOptions,
         localServer?: WebSocketServer,
         remoteSockets?: WebSocket[]
     ) {
@@ -164,25 +161,25 @@ export default class LslWebSocketBridge implements WebSocketBridge {
     }
 }
 
-export interface WebSocketBridge {
+export interface LslBridge {
     activate(): Promise<void>
     deactivate(): void
     destroy(): void
 }
 
-export type WebSocketBridgeConstructor = new (
-    options: WebSocketBridgeConstructorOptions
-) => WebSocketBridge
+export type LslBridgeConstructor = new (
+    options: LslBridgeConstructorOptions
+) => LslBridge
 
-export interface WebSocketBridgeOptions {
+export interface LslBridgeOptions {
     sourceId: string
     chunkSize: number
     listenPort?: number
     connectUrls?: string | string[]
 }
 
-export interface WebSocketBridgeConstructorOptions extends WebSocketBridgeOptions {
-    inlet: StreamInlet
+export interface LslBridgeConstructorOptions extends LslBridgeOptions {
+    inlet: LslInlet
     localServer?: WebSocketServer
     remoteSockets?: WebSocket[]
 }

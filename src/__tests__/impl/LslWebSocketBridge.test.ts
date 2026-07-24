@@ -2,12 +2,12 @@ import { randomInt } from 'node:crypto'
 
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { StreamInletOptions } from '../../impl/LslStreamInlet.js'
+import { LslInletOptions } from '../../impl/LslStreamInlet.js'
 import LslWebSocketBridge, {
-    WebSocketBridgeOptions,
+    LslBridgeOptions,
 } from '../../impl/LslWebSocketBridge.js'
-import FakeStreamInlet from '../../testDoubles/StreamInlet/FakeStreamInlet.js'
-import SpyLslWebSocketBridge from '../../testDoubles/WebSocketBridge/SpyLslWebSocketBridge.js'
+import FakeLslInlet from '../../testDoubles/LslInlet/FakeLslInlet.js'
+import SpyLslWebSocketBridge from '../../testDoubles/LslBridge/SpyLslBridge.js'
 import FakeWebSocket from '../../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../../testDoubles/WebSockets/FakeWebSocketServer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
@@ -19,10 +19,10 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         await super.beforeEach()
 
         this.setFakeLiblsl()
-        this.setFakeStreamInlet()
+        this.setFakeLslInlet()
         this.setFakeWebSocket()
         this.setFakeWebSocketServer()
-        this.setSpyLslWebSocketBridge()
+        this.setSpyLslBridge()
 
         this.instance =
             (await this.LslWebSocketBridge()) as SpyLslWebSocketBridge
@@ -35,7 +35,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     @test()
     protected static async createsLslStreamInlet() {
-        const call = FakeStreamInlet.callsToConstructor[0]
+        const call = FakeLslInlet.callsToConstructor[0]
 
         const sourceId = call.options!.sourceId
         const chunkSize = call.options!.chunkSize
@@ -54,7 +54,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         await this.activate()
 
         assert.isEqual(
-            FakeStreamInlet.numCallsToStartPulling,
+            FakeLslInlet.numCallsToStartPulling,
             1,
             'Did not call startPulling on inlet!'
         )
@@ -66,7 +66,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         this.deactivate()
 
         assert.isEqual(
-            FakeStreamInlet.numCallsToStopPulling,
+            FakeLslInlet.numCallsToStopPulling,
             1,
             'Did not call stopPulling on inlet!'
         )
@@ -77,7 +77,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         this.destroy()
 
         assert.isEqual(
-            FakeStreamInlet.numCallsToDestroy,
+            FakeLslInlet.numCallsToDestroy,
             1,
             'Did not call destroy on inlet!'
         )
@@ -270,7 +270,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         const samples = [...new Float32Array([1, 2, 3, 4, 5, 6])]
         const timestamps = [...new Float64Array([7, 8])]
 
-        FakeStreamInlet.callsToConstructor[0]?.onData!(samples, timestamps)
+        FakeLslInlet.callsToConstructor[0]?.onData!(samples, timestamps)
         return { samples, timestamps }
     }
 
@@ -278,7 +278,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
 
     private static readonly connectUrls = [this.generateId(), this.generateId()]
 
-    private static readonly inletOptions: StreamInletOptions = {
+    private static readonly inletOptions: LslInletOptions = {
         sourceId: this.sourceId,
         chunkSize: randomInt(1, 100),
     }
@@ -289,9 +289,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         connectUrls: this.connectUrls,
     }
 
-    private static LslWebSocketBridge(
-        options?: Partial<WebSocketBridgeOptions>
-    ) {
+    private static LslWebSocketBridge(options?: Partial<LslBridgeOptions>) {
         return LslWebSocketBridge.Create({ ...this.baseOptions, ...options })
     }
 }

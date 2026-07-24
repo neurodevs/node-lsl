@@ -3,13 +3,10 @@ import { randomInt } from 'node:crypto'
 import generateId from '@neurodevs/generate-id'
 import { LslSample } from '@neurodevs/ndx-native'
 
-import {
-    StreamOutlet,
-    StreamOutletOptions,
-} from '../../impl/LslStreamOutlet.js'
+import { LslOutlet, LslOutletOptions } from '../../impl/LslStreamOutlet.js'
 
-export default class FakeStreamOutlet implements StreamOutlet {
-    public static callsToConstructor: (StreamOutletOptions | undefined)[] = []
+export default class FakeLslOutlet implements LslOutlet {
+    public static callsToConstructor: (LslOutletOptions | undefined)[] = []
 
     public static callsToPushSample: {
         sample: LslSample
@@ -18,19 +15,19 @@ export default class FakeStreamOutlet implements StreamOutlet {
 
     public static numCallsToDestroy = 0
 
-    public options?: StreamOutletOptions
+    public options?: LslOutletOptions
 
-    public constructor(options?: StreamOutletOptions) {
-        FakeStreamOutlet.callsToConstructor.push(options)
+    public constructor(options?: LslOutletOptions) {
+        FakeLslOutlet.callsToConstructor.push(options)
         this.options = options
     }
 
     public destroy() {
-        FakeStreamOutlet.numCallsToDestroy++
+        FakeLslOutlet.numCallsToDestroy++
     }
 
     public pushSample(sample: LslSample, timestampSec?: number) {
-        FakeStreamOutlet.callsToPushSample.push({
+        FakeLslOutlet.callsToPushSample.push({
             sample,
             timestampSec,
         })
@@ -81,8 +78,8 @@ export default class FakeStreamOutlet implements StreamOutlet {
     }
 
     public static resetTestDouble() {
-        FakeStreamOutlet.callsToConstructor = []
-        FakeStreamOutlet.callsToPushSample = []
-        FakeStreamOutlet.numCallsToDestroy = 0
+        FakeLslOutlet.callsToConstructor = []
+        FakeLslOutlet.callsToPushSample = []
+        FakeLslOutlet.numCallsToDestroy = 0
     }
 }

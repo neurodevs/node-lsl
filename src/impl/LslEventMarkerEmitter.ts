@@ -1,28 +1,28 @@
 import { generateShortId } from '@neurodevs/generate-id'
 
 import LslStreamOutlet, {
-    StreamOutletOptions,
-    StreamOutlet,
+    LslOutletOptions,
+    LslOutlet,
 } from './LslStreamOutlet.js'
 
-export default class LslEventMarkerEmitter implements EventMarkerEmitter {
-    public static Class?: EventMarkerEmitterConstructor
+export default class LslEventMarkerEmitter implements LslEmitter {
+    public static Class?: LslEmitterConstructor
 
-    protected outlet: StreamOutlet
+    protected outlet: LslOutlet
     private isRunning = false
     private waitResolve?: () => void
     private timeout?: any
 
-    protected constructor(outlet: StreamOutlet) {
+    protected constructor(outlet: LslOutlet) {
         this.outlet = outlet
     }
 
-    public static async Create(options?: EventMarkerEmitterOptions) {
+    public static async Create(options?: LslEmitterOptions) {
         const outlet = await this.LslStreamOutlet(options)
         return new (this.Class ?? this)(outlet)
     }
 
-    public async emit(markerName: string, options?: EventMarkerOptions) {
+    public async emit(markerName: string, options?: EmitOptions) {
         this.throwIfAlreadyRunning('emit')
         this.isRunning = true
 
@@ -99,10 +99,10 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
             channelFormat: 'string',
             sampleRateHz: 0,
             chunkSize: 1,
-        } as StreamOutletOptions
+        } as LslOutletOptions
     }
 
-    private static LslStreamOutlet(options?: Partial<StreamOutletOptions>) {
+    private static LslStreamOutlet(options?: Partial<LslOutletOptions>) {
         return LslStreamOutlet.Create({
             ...this.generateDefaultOutletOptions(),
             ...options,
@@ -110,20 +110,18 @@ export default class LslEventMarkerEmitter implements EventMarkerEmitter {
     }
 }
 
-export interface EventMarkerEmitter {
-    emit(markerName: string, options?: EventMarkerOptions): Promise<void>
+export interface LslEmitter {
+    emit(markerName: string, options?: EmitOptions): Promise<void>
     emitMany(markers: TimedEventMarker[]): Promise<void>
     interrupt(): void
     destroy(): void
 }
 
-export type EventMarkerEmitterOptions = Partial<StreamOutletOptions>
+export type LslEmitterOptions = Partial<LslOutletOptions>
 
-export type EventMarkerEmitterConstructor = new (
-    outlet: StreamOutlet
-) => EventMarkerEmitter
+export type LslEmitterConstructor = new (outlet: LslOutlet) => LslEmitter
 
-export interface EventMarkerOptions {
+export interface EmitOptions {
     waitAfterMs?: number
 }
 

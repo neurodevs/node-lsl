@@ -1,10 +1,10 @@
 import generateId from '@neurodevs/generate-id'
 import { InfoHandle } from '@neurodevs/ndx-native'
 
-import { StreamInfo, StreamInfoOptions } from '../../impl/LslStreamInfo.js'
+import { LslInfo, LslInfoOptions } from '../../impl/LslStreamInfo.js'
 
-export default class FakeStreamInfo implements StreamInfo {
-    public static callsToConstructor: (StreamInfoOptions | undefined)[] = []
+export default class FakeLslInfo implements LslInfo {
+    public static callsToConstructor: (LslInfoOptions | undefined)[] = []
     public static numCallsToDestroy = 0
 
     public static infoHandle = {} as InfoHandle
@@ -17,12 +17,12 @@ export default class FakeStreamInfo implements StreamInfo {
     public sampleRateHz = 0
     public units = 'N/A'
 
-    public constructor(options?: StreamInfoOptions) {
-        FakeStreamInfo.callsToConstructor.push(options)
+    public constructor(options?: LslInfoOptions) {
+        FakeLslInfo.callsToConstructor.push(options)
     }
 
     public destroy() {
-        FakeStreamInfo.numCallsToDestroy++
+        FakeLslInfo.numCallsToDestroy++
     }
 
     public get channelCount() {
@@ -30,11 +30,11 @@ export default class FakeStreamInfo implements StreamInfo {
     }
 
     public get infoHandle() {
-        return FakeStreamInfo.infoHandle
+        return FakeLslInfo.infoHandle
     }
 
     public static resetTestDouble() {
-        FakeStreamInfo.callsToConstructor = []
-        FakeStreamInfo.numCallsToDestroy = 0
+        FakeLslInfo.callsToConstructor = []
+        FakeLslInfo.numCallsToDestroy = 0
     }
 }

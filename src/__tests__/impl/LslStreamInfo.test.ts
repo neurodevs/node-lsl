@@ -1,18 +1,18 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
 import { CHANNEL_FORMATS } from '../../consts.js'
-import LslStreamInfo, { StreamInfoOptions } from '../../impl/LslStreamInfo.js'
-import SpyStreamInfo from '../../testDoubles/StreamInfo/SpyStreamInfo.js'
+import LslStreamInfo, { LslInfoOptions } from '../../impl/LslStreamInfo.js'
+import SpyLslInfo from '../../testDoubles/LslInfo/SpyLslInfo.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamInfoTest extends AbstractPackageTest {
-    private static instance: SpyStreamInfo
+    private static instance: SpyLslInfo
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeLiblsl()
-        this.setSpyStreamInfo()
+        this.setSpyLslInfo()
 
         this.instance = this.LslStreamInfo()
     }
@@ -225,12 +225,12 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
         channelNames: this.channelNames,
         channelFormat: 'float32',
         sampleRateHz: 100 * Math.random(),
-    } as StreamInfoOptions
+    } as LslInfoOptions
 
-    private static LslStreamInfo(options?: Partial<StreamInfoOptions>) {
+    private static LslStreamInfo(options?: Partial<LslInfoOptions>) {
         return LslStreamInfo.Create({
             ...this.defaultOptions,
             ...options,
-        }) as SpyStreamInfo
+        }) as SpyLslInfo
     }
 }
