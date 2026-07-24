@@ -90,15 +90,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
             this.callsToSetTimeout.push(delayMs ?? 0)
             return setTimeout(callback, 0, ...args)
         }) as unknown as typeof setTimeout
-
-        LslStreamInlet.setTimeout = ((
-            callback: (...args: unknown[]) => void,
-            delayMs?: number,
-            ...args: unknown[]
-        ) => {
-            this.callsToSetTimeout.push(delayMs ?? 0)
-            return setTimeout(callback, 0, ...args)
-        }) as unknown as typeof setTimeout
     }
 
     protected static setFakeLibndx() {

@@ -1,10 +1,26 @@
-import { Worker } from 'node:worker_threads'
+import {
+    handleLslError,
+    InfoHandle,
+    InletHandle,
+    LiblslAdapter,
+} from '@neurodevs/ndx-native'
+import {
+    JsExternal,
+    unwrapPointer,
+    createPointer,
+    DataType,
+    freePointer,
+    PointerType,
+} from 'ffi-rs'
 
 export default class LslStreamInlet implements LslInlet {
     public static Class?: LslInletConstructor
-    public static Worker = Worker
     public static waitAfterOpenStreamMs = 100
-    public static setTimeout = setTimeout
+    public static lsl = LiblslAdapter.getInstance()
+    public static handleLslError = handleLslError
+    public static freePointer = freePointer
+
+    public isRunning = false
 
     private sourceId: string
     private chunkSize: number
@@ -16,13 +32,37 @@ export default class LslStreamInlet implements LslInlet {
     private flushInletOnStop: boolean
     private onData: OnDataCallback
 
-    private worker!: Worker
-    private workerReady = false
+    private infoHandle!: InfoHandle
+    private inletHandle!: InletHandle
+    private channelCount!: number
+
+    private pullMethod!: () => {
+        samples: number[] | undefined
+        timestamps: number[] | undefined
+    }
+
+    private sampleBuffer!: Buffer<ArrayBuffer>
+    private sampleBufferRef!: JsExternal[]
+    private sampleBufferPtr!: JsExternal
+
+    private timestampBuffer!: Buffer<ArrayBuffer>
+    private timestampBufferRef!: JsExternal[]
+    private timestampBufferPtr!: JsExternal
+
+    private pullErrorBuffer!: Buffer<ArrayBuffer>
+    private pullErrorBufferRef!: JsExternal[]
+    private pullErrorBufferPtr!: JsExternal
+
+    private openStreamErrorBuffer!: Buffer<ArrayBuffer>
+    private openStreamErrorBufferRef!: JsExternal[]
+    private openStreamErrorBufferPtr!: JsExternal
 
     private readonly sixMinutesInMs = 360 * 1000
     private readonly aboutOneYearInMs = 32000000 * 1000
 
-    public isRunning = false
+    private readonly bytesPerFloat = 4
+    private readonly bytesPerDouble = 8
+    private readonly bytesPerI32 = 4
 
     protected constructor(options: LslInletOptions, onData: OnDataCallback) {
         const {
@@ -45,8 +85,6 @@ export default class LslStreamInlet implements LslInlet {
         this.waitBetweenPullsMs = waitBetweenPullsMs ?? 1
         this.flushInletOnStop = flushInletOnStop ?? true
         this.onData = onData
-
-        this.createWorkerThread()
     }
 
     public static async Create(
@@ -56,95 +94,294 @@ export default class LslStreamInlet implements LslInlet {
         return new (this.Class ?? this)(options, onData)
     }
 
-    private createWorkerThread() {
-        this.worker = new this.Worker(
-            new URL('./workers/inlet/LslStreamInlet.worker.js', import.meta.url)
-        )
+    public async startPulling() {
+        if (this.isRunning) {
+            console.warn('Skipping startPulling: inlet is already running!')
+            return
+        }
 
-        this.worker.on('message', (msg) => {
-            const { type } = msg
+        this.isRunning = true
 
-            switch (type) {
-                case 'ready': {
-                    this.workerReady = true
-                    break
-                }
-                case 'data': {
-                    const { payload } = msg
-                    const { samples, timestamps } = payload
+        await this.createInlet()
+        void this.pullLoop()
+    }
 
-                    this.onData(samples, timestamps)
-                    break
-                }
-                case 'error': {
-                    const { error } = msg
-                    throw new Error(error)
-                }
-                default:
-                    throw new Error(`Unknown message type: ${type}`)
-            }
+    private async createInlet() {
+        this.infoHandle = this.resolveInfoHandle()
+        this.inletHandle = this.doCreateInlet()
+        this.channelCount = this.getChannelCount()
+
+        this.allocateWritableBuffers()
+        this.setPullMethod()
+
+        this.openStream()
+        await this.waitForSetup()
+    }
+
+    private resolveInfoHandle() {
+        const handles = this.resolveByProp()
+
+        if (handles.length === 0) {
+            this.throwNoStreamFound()
+        } else if (handles.length > 1) {
+            this.warnMultipleStreamsFound()
+        }
+        return handles[0]
+    }
+
+    private resolveByProp() {
+        return this.lsl.resolveByProp({
+            prop: 'source_id',
+            value: this.sourceId,
         })
     }
 
-    public async startPulling() {
-        if (!this.isRunning) {
-            this.isRunning = true
-            this.postCreate()
+    private throwNoStreamFound() {
+        throw new Error(`No stream info for sourceId "${this.sourceId}"`)
+    }
 
-            while (!this.workerReady) {
-                await new Promise((resolve) =>
-                    LslStreamInlet.setTimeout(resolve, 10)
-                )
+    private warnMultipleStreamsFound() {
+        console.warn(
+            `Multiple stream infos for sourceId "${this.sourceId}", using the first one.`
+        )
+    }
+
+    private doCreateInlet() {
+        return this.lsl.createInlet({
+            infoHandle: this.infoHandle,
+            maxBufferedMs: this.maxBufferedMs,
+        })
+    }
+
+    private getChannelCount() {
+        return this.lsl.getChannelCount({ infoHandle: this.infoHandle })
+    }
+
+    private allocateWritableBuffers() {
+        this.allocateDataBuffer()
+        this.allocateTimestampBuffer()
+        this.allocatePullErrorBuffer()
+        this.allocateOpenStreamErrorBuffer()
+    }
+
+    private allocateDataBuffer() {
+        this.sampleBuffer = Buffer.alloc(
+            this.channelCount * this.chunkSize * this.bytesPerFloat
+        )
+
+        this.sampleBufferRef = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.sampleBuffer],
+        })
+
+        this.sampleBufferPtr = unwrapPointer(this.sampleBufferRef)[0]
+    }
+
+    private allocateTimestampBuffer() {
+        this.timestampBuffer = Buffer.alloc(
+            this.chunkSize * this.bytesPerDouble
+        )
+
+        this.timestampBufferRef = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.timestampBuffer],
+        })
+
+        this.timestampBufferPtr = unwrapPointer(this.timestampBufferRef)[0]
+    }
+
+    private allocatePullErrorBuffer() {
+        this.pullErrorBuffer = Buffer.alloc(this.bytesPerI32)
+
+        this.pullErrorBufferRef = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.pullErrorBuffer],
+        })
+
+        this.pullErrorBufferPtr = unwrapPointer(this.pullErrorBufferRef)[0]
+    }
+
+    private allocateOpenStreamErrorBuffer() {
+        this.openStreamErrorBuffer = Buffer.alloc(this.bytesPerI32)
+
+        this.openStreamErrorBufferRef = createPointer({
+            paramsType: [DataType.U8Array],
+            paramsValue: [this.openStreamErrorBuffer],
+        })
+
+        this.openStreamErrorBufferPtr = unwrapPointer(
+            this.openStreamErrorBufferRef
+        )[0]
+    }
+
+    private setPullMethod() {
+        this.pullMethod =
+            this.chunkSize === 1 ? this.pullSample : this.pullChunk
+    }
+
+    private pullSample = () => {
+        const timestampSec = this.doPullsample()
+
+        if (timestampSec > 0) {
+            return {
+                samples: this.readSamplesFromBuffer(),
+                timestamps: [timestampSec],
             }
+        }
+        return { samples: undefined, timestamps: undefined }
+    }
 
-            this.postStartPulling()
-        } else {
-            console.warn('Skipping startPulling: inlet is already running!')
+    private doPullsample() {
+        return this.lsl.pullSample({
+            inletHandle: this.inletHandle,
+            sampleBufferPtr: this.sampleBufferPtr,
+            sampleBufferElements: this.channelCount,
+            timeoutMs: this.pullTimeoutMs,
+            errorCodePtr: this.pullErrorBufferPtr,
+        })
+    }
+
+    private readSamplesFromBuffer() {
+        const floats = new Float32Array(
+            this.sampleBuffer.buffer,
+            this.sampleBuffer.byteOffset,
+            this.chunkSize * this.channelCount
+        )
+        return Array.from(floats)
+    }
+
+    private pullChunk = () => {
+        const firstTimestampSec = this.doPullChunk()
+
+        if (firstTimestampSec > 0) {
+            return {
+                samples: this.readSamplesFromBuffer(),
+                timestamps: this.readTimestampsFromBuffer(),
+            }
+        }
+        return { samples: undefined, timestamps: undefined }
+    }
+
+    private doPullChunk() {
+        return this.lsl.pullChunk({
+            inletHandle: this.inletHandle,
+            sampleBufferPtr: this.sampleBufferPtr,
+            sampleBufferElements: this.chunkSize * this.channelCount,
+            timestampBufferPtr: this.timestampBufferPtr,
+            timestampBufferElements: this.chunkSize,
+            timeoutMs: this.pullTimeoutMs,
+            errorCodePtr: this.pullErrorBufferPtr,
+        })
+    }
+
+    private readTimestampsFromBuffer() {
+        const doubles = new Float64Array(
+            this.timestampBuffer.buffer,
+            this.timestampBuffer.byteOffset,
+            this.chunkSize
+        )
+        return Array.from(doubles)
+    }
+
+    private openStream() {
+        this.lsl.openStream({
+            inletHandle: this.inletHandle,
+            timeoutMs: this.openStreamTimeoutMs,
+            errorCodePtr: this.openStreamErrorBufferPtr,
+        })
+    }
+
+    private async waitForSetup() {
+        return new Promise((r) => setTimeout(r, this.waitAfterOpenStreamMs))
+    }
+
+    private async pullLoop() {
+        while (this.isRunning) {
+            await this.pullDataOnce()
+            await this.waitBetweenPulls()
         }
     }
 
-    private postCreate() {
-        this.worker.postMessage({
-            type: 'createInlet',
-            payload: {
-                sourceId: this.sourceId,
-                chunkSize: this.chunkSize,
-                maxBufferedMs: this.maxBufferedMs,
-                openStreamTimeoutMs: this.openStreamTimeoutMs,
-                waitAfterOpenStreamMs: this.waitAfterOpenStreamMs,
-                pullTimeoutMs: this.pullTimeoutMs,
-                waitBetweenPullsMs: this.waitBetweenPullsMs,
-                flushInletOnStop: this.flushInletOnStop,
-            },
-        })
+    private async pullDataOnce() {
+        const { samples, timestamps } = this.pullMethod()
+        this.handleLslErrorIfPresent()
+
+        if (samples && timestamps) {
+            this.onData(samples, timestamps)
+        }
     }
 
-    private postStartPulling() {
-        this.worker.postMessage({ type: 'startPulling' })
+    private handleLslErrorIfPresent() {
+        const errorCode = this.pullErrorBuffer.readInt32LE()
+        this.handleLslError(errorCode)
+    }
+
+    private async waitBetweenPulls() {
+        await new Promise((r) => setTimeout(r, this.waitBetweenPullsMs))
+    }
+
+    public flushInlet() {
+        this.lsl.flushInlet({ inletHandle: this.inletHandle })
     }
 
     public stopPulling() {
         this.isRunning = false
-        this.worker.postMessage({ type: 'stopPulling' })
+        this.closeStream()
+
+        if (this.flushInletOnStop) {
+            this.flushInlet()
+        }
     }
 
-    public flushInlet() {
-        this.worker.postMessage({ type: 'flushInlet' })
+    private closeStream() {
+        this.lsl.closeStream({ inletHandle: this.inletHandle })
     }
 
     public destroy() {
         if (this.isRunning) {
             this.stopPulling()
         }
-        this.worker.postMessage({ type: 'destroyInlet' })
+
+        this.doDestroyInlet()
+        this.freeNativePointers()
+    }
+
+    private doDestroyInlet() {
+        this.lsl.destroyInlet({ inletHandle: this.inletHandle })
+    }
+
+    private freeNativePointers() {
+        this.freePointer({
+            paramsType: [
+                DataType.U8Array,
+                DataType.U8Array,
+                DataType.U8Array,
+                DataType.U8Array,
+            ],
+            paramsValue: [
+                this.openStreamErrorBufferPtr,
+                this.sampleBufferPtr,
+                this.timestampBufferPtr,
+                this.pullErrorBufferPtr,
+            ],
+            pointerType: PointerType.CPointer,
+        })
     }
 
     private get defaultWaitMs() {
         return LslStreamInlet.waitAfterOpenStreamMs
     }
 
-    private get Worker() {
-        return LslStreamInlet.Worker
+    private get lsl() {
+        return LslStreamInlet.lsl
+    }
+
+    private get handleLslError() {
+        return LslStreamInlet.handleLslError
+    }
+
+    private get freePointer() {
+        return LslStreamInlet.freePointer
     }
 }
 
