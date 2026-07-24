@@ -1,4 +1,3 @@
-import { Worker } from 'node:worker_threads'
 import { ChannelFormat, LslSample, FakeLiblsl } from '@neurodevs/ndx-native'
 import { test, assert } from '@neurodevs/node-tdd'
 
@@ -13,7 +12,6 @@ import {
 } from '../../testDoubles/consts.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
 import FakeLslInfo from '../../testDoubles/LslInfo/FakeLslInfo.js'
-import FakeWorker from '../../testDoubles/WorkerThreads/FakeWorker.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamOutletTest extends AbstractPackageTest {
@@ -28,9 +26,6 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 
         this.setFakeLiblsl()
         this.setFakeLslInfo()
-
-        LslStreamOutlet.Worker = FakeWorker as unknown as typeof Worker
-        FakeWorker.resetTestDoubles()
 
         LslStreamOutlet.lsl = this.fakeLiblsl
     }
