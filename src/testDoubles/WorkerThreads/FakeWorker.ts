@@ -2,11 +2,6 @@ import { WorkerOptions } from 'node:worker_threads'
 
 import { OnDataCallback } from '../../impl/LslStreamInlet.js'
 import StreamInletWorker from '../../impl/workers/inlet/StreamInletWorker.js'
-import {
-    createOutlet,
-    destroyOutlet,
-    pushSample,
-} from '../../impl/workers/outlet/LslStreamOutlet.worker.js'
 
 export default class FakeWorker {
     public static callsToConstructor: {
@@ -36,18 +31,6 @@ export default class FakeWorker {
         const { type } = msg
 
         switch (type) {
-            case 'createOutlet': {
-                createOutlet(msg as any)
-                break
-            }
-            case 'pushSample': {
-                pushSample(msg as any)
-                break
-            }
-            case 'destroyOutlet': {
-                destroyOutlet()
-                break
-            }
             case 'createInlet': {
                 const { payload } = msg
                 this.createInletPromise = this.inletWorker.createInlet(

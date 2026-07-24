@@ -1,6 +1,11 @@
-import { Worker } from 'node:worker_threads'
-
-import { ChannelFormat, Liblsl, LslSample } from '@neurodevs/ndx-native'
+import {
+    ChannelFormat,
+    LiblslAdapter,
+    LslErrorCode,
+    LslSample,
+    OutletHandle,
+    handleLslError,
+} from '@neurodevs/ndx-native'
 
 import {
     assertValidChannelCount,
@@ -9,11 +14,13 @@ import {
     assertValidMaxBufferedMs,
     assertValidSampleRateHz,
 } from '../assertions.js'
+import LslStreamInfo, { LslInfo } from './LslStreamInfo.js'
 
 export default class LslStreamOutlet implements LslOutlet {
     public static Class?: LslOutletConstructor
-    public static Worker = Worker
     public static setTimeout = setTimeout
+    public static lsl = LiblslAdapter.getInstance()
+    public static handleLslError = handleLslError
 
     public readonly name: string
     public readonly type: string
@@ -27,7 +34,9 @@ export default class LslStreamOutlet implements LslOutlet {
     public readonly manufacturer: string = 'N/A'
     public readonly units: string = 'N/A'
 
-    private worker!: Worker
+    private info!: LslInfo
+    private handle!: OutletHandle
+    private pushSampleToLsl!: (opts: unknown) => LslErrorCode
 
     protected constructor(options: LslOutletOptions) {
         const {
@@ -56,7 +65,6 @@ export default class LslStreamOutlet implements LslOutlet {
         this.units = units ?? this.units
 
         this.validateOptions()
-        this.createWorkerThread()
         this.createStreamOutlet()
     }
 
@@ -94,62 +102,57 @@ export default class LslStreamOutlet implements LslOutlet {
         )
     }
 
-    private createWorkerThread() {
-        this.worker = new this.Worker(
-            new URL(
-                './workers/outlet/LslStreamOutlet.worker.js',
-                import.meta.url
-            )
-        )
+    private createStreamOutlet() {
+        this.info = LslStreamInfo.Create({
+            name: this.name,
+            type: this.type,
+            sourceId: this.sourceId,
+            channelNames: this.channelNames,
+            channelFormat: this.channelFormat,
+            sampleRateHz: this.sampleRateHz,
+            units: this.units,
+        })
+
+        this.handle = this.lsl.createOutlet({
+            infoHandle: this.info.infoHandle,
+            chunkSize: this.chunkSize,
+            maxBufferedMs: this.maxBufferedMs,
+        })
+
+        this.pushSampleToLsl = (
+            this.lsl[this.pushMethod] as (opts: unknown) => LslErrorCode
+        ).bind(this.lsl)
     }
 
-    private createStreamOutlet() {
-        this.worker.postMessage({
-            type: 'createOutlet',
-            payload: {
-                infoOptions: {
-                    name: this.name,
-                    type: this.type,
-                    sourceId: this.sourceId,
-                    channelNames: this.channelNames,
-                    channelFormat: this.channelFormat,
-                    sampleRateHz: this.sampleRateHz,
-                    units: this.units,
-                },
-                chunkSize: this.chunkSize,
-                maxBufferedMs: this.maxBufferedMs,
-                pushMethod: this.pushMethod,
-            },
-        })
+    private get lsl() {
+        return LslStreamOutlet.lsl
     }
 
     private get pushMethod() {
         return this.methodMap[this.channelFormat]
     }
 
-    private readonly methodMap: Record<string, keyof Liblsl> = {
+    private readonly methodMap: Record<
+        string,
+        'pushSampleFloatTimestamp' | 'pushSampleStringTimestamp'
+    > = {
         float32: 'pushSampleFloatTimestamp',
         string: 'pushSampleStringTimestamp',
     }
 
-    public pushSample(sample: LslSample, timestampSec?: number) {
-        this.worker.postMessage({
-            type: 'pushSample',
-            payload: {
-                sample,
-                timestampSec,
-            },
+    public pushSample(sample: LslSample, timestampSec = this.lsl.localClock()) {
+        const errorCode = this.pushSampleToLsl({
+            outletHandle: this.handle,
+            sample,
+            timestampSec,
         })
+
+        LslStreamOutlet.handleLslError(errorCode)
     }
 
     public destroy() {
-        this.worker.postMessage({
-            type: 'destroyOutlet',
-        })
-    }
-
-    private get Worker() {
-        return LslStreamOutlet.Worker
+        this.lsl.destroyOutlet({ outletHandle: this.handle })
+        this.lsl.destroyStreamInfo({ infoHandle: this.info.infoHandle })
     }
 
     private static async waitForSetup(waitAfterConstructionMs: number) {
