@@ -27,7 +27,6 @@ export default class LslStreamInlet implements LslInlet {
     private maxBufferedMs: number
     private pullTimeoutMs: number
     private openStreamTimeoutMs: number
-    private waitAfterOpenStreamMs: number
     private waitBetweenPullsMs: number
     private flushInletOnStop: boolean
     private onData: OnDataCallback
@@ -71,7 +70,6 @@ export default class LslStreamInlet implements LslInlet {
             maxBufferedMs,
             pullTimeoutMs,
             openStreamTimeoutMs,
-            waitAfterOpenStreamMs,
             waitBetweenPullsMs,
             flushInletOnStop,
         } = options ?? {}
@@ -81,7 +79,6 @@ export default class LslStreamInlet implements LslInlet {
         this.maxBufferedMs = maxBufferedMs ?? this.sixMinutesInMs
         this.pullTimeoutMs = pullTimeoutMs ?? 0
         this.openStreamTimeoutMs = openStreamTimeoutMs ?? this.aboutOneYearInMs
-        this.waitAfterOpenStreamMs = waitAfterOpenStreamMs ?? this.defaultWaitMs
         this.waitBetweenPullsMs = waitBetweenPullsMs ?? 1
         this.flushInletOnStop = flushInletOnStop ?? true
         this.onData = onData
@@ -115,7 +112,6 @@ export default class LslStreamInlet implements LslInlet {
         this.setPullMethod()
 
         this.openStream()
-        await this.waitForSetup()
     }
 
     private resolveInfoHandle() {
@@ -291,10 +287,6 @@ export default class LslStreamInlet implements LslInlet {
         })
     }
 
-    private async waitForSetup() {
-        return new Promise((r) => setTimeout(r, this.waitAfterOpenStreamMs))
-    }
-
     private async pullLoop() {
         while (this.isRunning) {
             await this.pullDataOnce()
@@ -368,10 +360,6 @@ export default class LslStreamInlet implements LslInlet {
         })
     }
 
-    private get defaultWaitMs() {
-        return LslStreamInlet.waitAfterOpenStreamMs
-    }
-
     private get lsl() {
         return LslStreamInlet.lsl
     }
@@ -403,7 +391,6 @@ export interface LslInletOptions {
     chunkSize: number
     maxBufferedMs?: number
     openStreamTimeoutMs?: number
-    waitAfterOpenStreamMs?: number
     pullTimeoutMs?: number
     waitBetweenPullsMs?: number
     flushInletOnStop?: boolean
