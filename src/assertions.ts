@@ -1,6 +1,5 @@
-import { ChannelFormat } from '@neurodevs/ndx-native'
+import { CHANNEL_FORMATS, ChannelFormat } from '@neurodevs/ndx-native'
 
-import { CHANNEL_FORMATS } from './consts.js'
 import {
     isGreaterThanOrEqualToZero,
     isPositiveInteger,

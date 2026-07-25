@@ -1,7 +1,11 @@
-import { ChannelFormat, LslSample, FakeLiblsl } from '@neurodevs/ndx-native'
+import {
+    ChannelFormat,
+    LslSample,
+    FakeLiblsl,
+    CHANNEL_FORMATS,
+} from '@neurodevs/ndx-native'
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { CHANNEL_FORMATS } from '../../consts.js'
 import LslStreamOutlet, {
     LslOutletOptions,
 } from '../../impl/LslStreamOutlet.js'

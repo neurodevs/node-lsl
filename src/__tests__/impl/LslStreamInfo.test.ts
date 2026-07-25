@@ -1,9 +1,9 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { CHANNEL_FORMATS } from '../../consts.js'
 import LslStreamInfo, { LslInfoOptions } from '../../impl/LslStreamInfo.js'
 import SpyLslInfo from '../../testDoubles/LslInfo/SpyLslInfo.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
+import { CHANNEL_FORMATS } from '@neurodevs/ndx-native'
 
 export default class LslStreamInfoTest extends AbstractPackageTest {
     private static instance: SpyLslInfo
