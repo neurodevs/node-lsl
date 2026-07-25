@@ -47,9 +47,10 @@ export default class FakeLslInlet implements LslInlet {
     }
 
     public static resetTestDouble() {
-        FakeLslInlet.callsToConstructor = []
-        FakeLslInlet.numCallsToStartPulling = 0
-        FakeLslInlet.numCallsToFlushInlet = 0
-        FakeLslInlet.numCallsToDestroy = 0
+        this.callsToConstructor = []
+        this.numCallsToStartPulling = 0
+        this.numCallsToStopPulling = 0
+        this.numCallsToFlushInlet = 0
+        this.numCallsToDestroy = 0
     }
 }
