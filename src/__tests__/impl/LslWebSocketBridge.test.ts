@@ -7,13 +7,13 @@ import LslWebSocketBridge, {
     LslBridgeOptions,
 } from '../../impl/LslWebSocketBridge.js'
 import FakeLslInlet from '../../testDoubles/LslInlet/FakeLslInlet.js'
-import SpyLslWebSocketBridge from '../../testDoubles/LslBridge/SpyLslBridge.js'
+import SpyLslBridge from '../../testDoubles/LslBridge/SpyLslBridge.js'
 import FakeWebSocket from '../../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../../testDoubles/WebSockets/FakeWebSocketServer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslWebSocketBridgeTest extends AbstractPackageTest {
-    private static instance: SpyLslWebSocketBridge
+    private static instance: SpyLslBridge
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -24,8 +24,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         this.setFakeWebSocketServer()
         this.setSpyLslBridge()
 
-        this.instance =
-            (await this.LslWebSocketBridge()) as SpyLslWebSocketBridge
+        this.instance = (await this.LslWebSocketBridge()) as SpyLslBridge
     }
 
     @test()

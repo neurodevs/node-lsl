@@ -10,7 +10,7 @@ import {
 } from 'ffi-rs'
 
 import LslStreamInlet, { LslInletOptions } from '../../impl/LslStreamInlet.js'
-import { SpyLslInlet } from '../../testDoubles/LslInlet/SpyLslInlet.js'
+import SpyLslInlet from '../../testDoubles/LslInlet/SpyLslInlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslStreamInletTest extends AbstractPackageTest {
