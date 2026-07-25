@@ -130,7 +130,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LslEventMarkerEmitter.Class = SpyLslEmitter
     }
 
-    protected static setSpyLslBridge() {
+    protected static setSpyLslWsBridge() {
         LslWebSocketBridge.Class = SpyLslWsBridge
     }
 

@@ -22,7 +22,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         this.setFakeLslInlet()
         this.setFakeWebSocket()
         this.setFakeWebSocketServer()
-        this.setSpyLslBridge()
+        this.setSpyLslWsBridge()
 
         this.instance = (await this.LslWebSocketBridge()) as SpyLslWsBridge
     }
