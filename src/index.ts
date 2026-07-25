@@ -17,16 +17,16 @@ export * from './testDoubles/BleController/SpyBleController.js'
 export { default as FakeBleController } from './testDoubles/BleController/FakeBleController.js'
 export * from './testDoubles/BleController/FakeBleController.js'
 
-// LslBridge
+// LslWsBridge
 
 export { default as LslWebSocketBridge } from './impl/LslWebSocketBridge.js'
 export * from './impl/LslWebSocketBridge.js'
 
-export { default as SpyLslBridge } from './testDoubles/LslBridge/SpyLslBridge.js'
-export * from './testDoubles/LslBridge/SpyLslBridge.js'
+export { default as SpyLslWsBridge } from './testDoubles/LslWsBridge/SpyLslWsBridge.js'
+export * from './testDoubles/LslWsBridge/SpyLslWsBridge.js'
 
-export { default as FakeLslBridge } from './testDoubles/LslBridge/FakeLslBridge.js'
-export * from './testDoubles/LslBridge/FakeLslBridge.js'
+export { default as FakeLslWsBridge } from './testDoubles/LslWsBridge/FakeLslWsBridge.js'
+export * from './testDoubles/LslWsBridge/FakeLslWsBridge.js'
 
 // LslEmitter
 

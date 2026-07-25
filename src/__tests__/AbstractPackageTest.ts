@@ -16,7 +16,7 @@ import SpyLslInfo from '../testDoubles/LslInfo/SpyLslInfo.js'
 import FakeLslInlet from '../testDoubles/LslInlet/FakeLslInlet.js'
 import SpyLslInlet from '../testDoubles/LslInlet/SpyLslInlet.js'
 import FakeLslOutlet from '../testDoubles/LslOutlet/FakeLslOutlet.js'
-import SpyLslBridge from '../testDoubles/LslBridge/SpyLslBridge.js'
+import SpyLslWsBridge from '../testDoubles/LslWsBridge/SpyLslWsBridge.js'
 import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
 import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
@@ -131,7 +131,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     }
 
     protected static setSpyLslBridge() {
-        LslWebSocketBridge.Class = SpyLslBridge
+        LslWebSocketBridge.Class = SpyLslWsBridge
     }
 
     protected static setFakeWebSocket() {

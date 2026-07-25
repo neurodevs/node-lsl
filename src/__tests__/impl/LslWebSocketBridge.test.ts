@@ -4,16 +4,16 @@ import { test, assert } from '@neurodevs/node-tdd'
 
 import { LslInletOptions } from '../../impl/LslStreamInlet.js'
 import LslWebSocketBridge, {
-    LslBridgeOptions,
+    LslWsBridgeOptions,
 } from '../../impl/LslWebSocketBridge.js'
 import FakeLslInlet from '../../testDoubles/LslInlet/FakeLslInlet.js'
-import SpyLslBridge from '../../testDoubles/LslBridge/SpyLslBridge.js'
+import SpyLslWsBridge from '../../testDoubles/LslWsBridge/SpyLslWsBridge.js'
 import FakeWebSocket from '../../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../../testDoubles/WebSockets/FakeWebSocketServer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class LslWebSocketBridgeTest extends AbstractPackageTest {
-    private static instance: SpyLslBridge
+    private static instance: SpyLslWsBridge
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -24,7 +24,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         this.setFakeWebSocketServer()
         this.setSpyLslBridge()
 
-        this.instance = (await this.LslWebSocketBridge()) as SpyLslBridge
+        this.instance = (await this.LslWebSocketBridge()) as SpyLslWsBridge
     }
 
     @test()
@@ -288,7 +288,7 @@ export default class LslWebSocketBridgeTest extends AbstractPackageTest {
         connectUrls: this.connectUrls,
     }
 
-    private static LslWebSocketBridge(options?: Partial<LslBridgeOptions>) {
+    private static LslWebSocketBridge(options?: Partial<LslWsBridgeOptions>) {
         return LslWebSocketBridge.Create({ ...this.baseOptions, ...options })
     }
 }

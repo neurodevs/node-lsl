@@ -2,8 +2,8 @@ import WebSocket, { WebSocketServer } from 'ws'
 
 import LslStreamInlet, { LslInlet, LslInletOptions } from './LslStreamInlet.js'
 
-export default class LslWebSocketBridge implements LslBridge {
-    public static Class?: LslBridgeConstructor
+export default class LslWebSocketBridge implements LslWsBridge {
+    public static Class?: LslWsBridgeConstructor
     public static WS = WebSocket
     public static WSS = WebSocketServer
 
@@ -13,7 +13,7 @@ export default class LslWebSocketBridge implements LslBridge {
 
     private isDestroyed = false
 
-    protected constructor(options: LslBridgeConstructorOptions) {
+    protected constructor(options: LslWsBridgeConstructorOptions) {
         const { inlet, localServer, remoteSockets } = options
 
         this.inlet = inlet
@@ -23,7 +23,7 @@ export default class LslWebSocketBridge implements LslBridge {
         this.throwIfNoLocalServerOrRemoteSockets()
     }
 
-    public static async Create(options: LslBridgeOptions) {
+    public static async Create(options: LslWsBridgeOptions) {
         const { listenPort, connectUrls, ...rest } = options
         const inletOptions: LslInletOptions = rest
 
@@ -161,24 +161,24 @@ export default class LslWebSocketBridge implements LslBridge {
     }
 }
 
-export interface LslBridge {
+export interface LslWsBridge {
     activate(): Promise<void>
     deactivate(): void
     destroy(): void
 }
 
-export type LslBridgeConstructor = new (
-    options: LslBridgeConstructorOptions
-) => LslBridge
+export type LslWsBridgeConstructor = new (
+    options: LslWsBridgeConstructorOptions
+) => LslWsBridge
 
-export interface LslBridgeOptions {
+export interface LslWsBridgeOptions {
     sourceId: string
     chunkSize: number
     listenPort?: number
     connectUrls?: string | string[]
 }
 
-export interface LslBridgeConstructorOptions extends LslBridgeOptions {
+export interface LslWsBridgeConstructorOptions extends LslWsBridgeOptions {
     inlet: LslInlet
     localServer?: WebSocketServer
     remoteSockets?: WebSocket[]
