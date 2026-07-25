@@ -44,7 +44,7 @@ export default class BleDeviceController implements BleController {
         this.rssiIntervalMs = rssiIntervalMs
     }
 
-    public static async Create(options: BleControllerOptions) {
+    public static Create(options: BleControllerOptions) {
         return new (this.Class ?? this)(options)
     }
 

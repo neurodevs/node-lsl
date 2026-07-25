@@ -70,7 +70,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         this.wasConnected = false
 
-        this.instance = await this.BleController()
+        this.instance = this.BleDeviceController()
     }
 
     @test()
@@ -512,24 +512,22 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         }
     }
 
-    private static async BleController(
+    private static BleDeviceController(
         options?: Partial<BleControllerOptions>
     ) {
-        return (await BleDeviceController.Create({
+        return BleDeviceController.Create({
             deviceUuid: this.uuid,
             charCallbacks: this.charCallbacks,
             onConnected: this.onConnected,
             rssiIntervalMs: this.rssiIntervalMs,
             ...options,
-        })) as SpyBleController
+        }) as SpyBleController
     }
 
-    private static async BleControllerWithPrefix() {
-        return (await BleDeviceController.Create({
+    private static BleControllerWithPrefix() {
+        return this.BleDeviceController({
             deviceNamePrefix: this.namePrefix,
-            charCallbacks: this.charCallbacks,
-            onConnected: this.onConnected,
-            rssiIntervalMs: this.rssiIntervalMs,
-        } as unknown as BleControllerOptions)) as SpyBleController
+            deviceUuid: undefined,
+        })
     }
 }
