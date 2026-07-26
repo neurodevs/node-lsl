@@ -1,7 +1,7 @@
 import {
     ClockRegressor,
     WindowedClockRegressorOptions,
-} from '../../impl/WindowedClockRegressor.js'
+} from '../../impl/clocks/WindowedClockRegressor.js'
 
 export default class FakeClockRegressor implements ClockRegressor {
     public static callsToConstructor: {

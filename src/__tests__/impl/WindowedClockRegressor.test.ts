@@ -4,7 +4,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 
 import WindowedClockRegressor, {
     ClockRegressor,
-} from '../../impl/WindowedClockRegressor.js'
+} from '../../impl/clocks/WindowedClockRegressor.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class WindowedClockRegressorTest extends AbstractPackageTest {

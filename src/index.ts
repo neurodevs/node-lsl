@@ -1,7 +1,7 @@
 // ClockRegressor
 
-export { default as WindowedClockRegressor } from './impl/WindowedClockRegressor.js'
-export * from './impl/WindowedClockRegressor.js'
+export { default as WindowedClockRegressor } from './impl/clocks/WindowedClockRegressor.js'
+export * from './impl/clocks/WindowedClockRegressor.js'
 
 export { default as FakeClockRegressor } from './testDoubles/ClockRegressor/FakeClockRegressor.js'
 export * from './testDoubles/ClockRegressor/FakeClockRegressor.js'
