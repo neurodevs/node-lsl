@@ -48,11 +48,11 @@
   },
   "devDependencies": {
     "@neurodevs/eslint-config-ndx": "^1.0.2",
-    "@neurodevs/node-tdd": "^3.0.1",
+    "@neurodevs/node-tdd": "^3.0.2",
     "@neurodevs/prettier-config-ndx": "^1.0.2",
     "@types/ws": "^8.18.1",
     "koffi": "^3.1.2",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.6",
     "typescript": "^5.9.3"
   },
   "resolutions": {
