@@ -28,7 +28,6 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
 
         this.randomOutletOptions = generateRandomOutletOptions()
 
-        this.setFakeLiblsl()
         this.setFakeLslInfo()
 
         LslStreamOutlet.lsl = this.fakeLiblsl

@@ -53,7 +53,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setFakeLiblsl()
         this.setFakeLslInfo()
         this.setSpyLslInlet()
 

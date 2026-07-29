@@ -17,6 +17,14 @@ export * from './testDoubles/BleController/SpyBleController.js'
 export { default as FakeBleController } from './testDoubles/BleController/FakeBleController.js'
 export * from './testDoubles/BleController/FakeBleController.js'
 
+// JsonOutlet
+
+export { default as LslJsonOutlet } from './impl/LslJsonOutlet.js'
+export * from './impl/LslJsonOutlet.js'
+
+export { default as FakeJsonOutlet } from './testDoubles/JsonOutlet/FakeJsonOutlet.js'
+export * from './testDoubles/JsonOutlet/FakeJsonOutlet.js'
+
 // LslWsBridge
 
 export { default as LslWebSocketBridge } from './impl/LslWebSocketBridge.js'

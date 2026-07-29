@@ -180,11 +180,7 @@ export interface LslOutlet {
 
 export type LslOutletConstructor = new (options: LslOutletOptions) => LslOutlet
 
-export interface LslOutletOptions extends LslOutletConstructorOptions {
-    waitAfterConstructionMs?: number
-}
-
-export interface LslOutletConstructorOptions {
+export interface LslOutletOptions {
     name: string
     type: string
     sourceId: string
@@ -195,4 +191,10 @@ export interface LslOutletConstructorOptions {
     maxBufferedMs?: number
     manufacturer?: string
     units?: string
+    waitAfterConstructionMs?: number
 }
+
+export type LslOutletConstructorOptions = Omit<
+    LslOutletOptions,
+    'waitAfterConstructionMs'
+>

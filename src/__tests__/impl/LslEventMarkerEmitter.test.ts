@@ -17,7 +17,6 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setFakeLiblsl()
         this.setFakeLslOutlet()
         this.setSpyLslEmitter()
 

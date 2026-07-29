@@ -57,6 +57,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         this.setImmediateTimeouts()
 
+        this.setFakeLiblsl()
         this.setFakeLibndx()
     }
 
