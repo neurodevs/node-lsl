@@ -2,25 +2,25 @@ import { randomInt } from 'node:crypto'
 
 import { assert, test } from '@neurodevs/node-tdd'
 
-import LslEventMarkerEmitter, {
+import LslEventMarkerOutlet, {
     EmitOptions,
-} from '../../impl/LslEventMarkerEmitter.js'
+} from '../../impl/LslEventMarkerOutlet.js'
 import { LslOutletOptions } from '../../impl/LslStreamOutlet.js'
-import SpyLslEmitter from '../../testDoubles/LslEmitter/SpyLslEmitter.js'
+import SpyEventMarkerOutlet from '../../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
 import generateRandomOutletOptions from '../../testDoubles/generateRandomOutletOptions.js'
 import FakeLslOutlet from '../../testDoubles/LslOutlet/FakeLslOutlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
-export default class EventMarkerEmitterTest extends AbstractPackageTest {
-    private static instance: SpyLslEmitter
+export default class EventMarkerOutletTest extends AbstractPackageTest {
+    private static instance: SpyEventMarkerOutlet
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeLslOutlet()
-        this.setSpyLslEmitter()
+        this.setSpyEventMarkerOutlet()
 
-        this.instance = await this.LslEventMarkerEmitter()
+        this.instance = await this.LslEventMarkerOutlet()
     }
 
     private static readonly markerName = this.generateId()
@@ -67,7 +67,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     @test()
     protected static async canOverrideDefaultOptions() {
         const options = generateRandomOutletOptions()
-        await this.LslEventMarkerEmitter(options)
+        await this.LslEventMarkerOutlet(options)
 
         assert.isEqualDeep(FakeLslOutlet.callsToConstructor[1], options)
     }
@@ -85,7 +85,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
             'Pushed the wrong marker!'
         )
 
-        assert.isEqual(this.instance.totalwaitAfterMs, marker.waitAfterMs)
+        assert.isEqual(this.instance.totalWaitAfterMs, marker.waitAfterMs)
     }
 
     @test()
@@ -95,7 +95,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
         assert.isEqual(FakeLslOutlet.callsToPushSample.length, 2)
 
         assert.isEqual(
-            this.instance.totalwaitAfterMs,
+            this.instance.totalWaitAfterMs,
             markers[0].waitAfterMs + markers[1].waitAfterMs
         )
     }
@@ -103,7 +103,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     @test('interrupts on first marker', 1)
     @test('interrupts on second marker', 2)
     @test('interrupts on third marker', 3)
-    protected static async emitterIsInterruptable(bailIdx: number) {
+    protected static async outletIsInterruptable(bailIdx: number) {
         let hitCount = 0
 
         this.streamOutlet.pushSample = () => {
@@ -169,7 +169,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async emitWaitsForMsIfPassed() {
-        SpyLslEmitter.shouldCallWaitOnSuper = true
+        SpyEventMarkerOutlet.shouldCallWaitOnSuper = true
 
         const waitAfterMs = 10
 
@@ -216,7 +216,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async sourceIdIsUniqueAcrossInstances() {
-        const instance = await this.LslEventMarkerEmitter()
+        const instance = await this.LslEventMarkerOutlet()
 
         assert.isNotEqual(
             instance['outlet'].sourceId,
@@ -236,7 +236,7 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
 
     @test()
     protected static async emitManyThrowsIfCalledWhileAlreadyRunning() {
-        void EventMarkerEmitterTest.emitManyOnce()
+        void EventMarkerOutletTest.emitManyOnce()
 
         await assert.doesThrowAsync(async () => {
             await this.emitManyFor(5, 1)
@@ -305,13 +305,15 @@ export default class EventMarkerEmitterTest extends AbstractPackageTest {
     }
 
     private static async setupOutlet() {
-        LslEventMarkerEmitter.Class = LslEventMarkerEmitter as any
-        this.instance = await this.LslEventMarkerEmitter()
+        LslEventMarkerOutlet.Class = LslEventMarkerOutlet as any
+        this.instance = await this.LslEventMarkerOutlet()
     }
 
-    private static async LslEventMarkerEmitter(
+    private static async LslEventMarkerOutlet(
         options?: Partial<LslOutletOptions>
     ) {
-        return (await LslEventMarkerEmitter.Create(options)) as SpyLslEmitter
+        return (await LslEventMarkerOutlet.Create(
+            options
+        )) as SpyEventMarkerOutlet
     }
 }

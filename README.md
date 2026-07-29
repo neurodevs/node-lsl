@@ -8,7 +8,7 @@ Lab Streaming Layer (LSL) for synchronized streaming of multi-modal, time-series
 - [Installation](#installation)
 - [Usage](#usage)
   - [LslStreamOutlet](#lslstreamoutlet)
-  - [LslEventMarkerEmitter](#LslEventMarkerEmitter)
+  - [LslEventMarkerOutlet](#lsleventmarkeroutlet)
 - [Test Doubles](#test-doubles)
 
 ## Overview
@@ -59,21 +59,21 @@ const outlet = await LslStreamOutlet.Create({
 outlet.pushSample([1, 2, 3, 4, 5])
 ```
 
-### LslEventMarkerEmitter
+### LslEventMarkerOutlet
 
 LSL is also often used to push event markers that mark different phases of an experiment or session. The `emitMany` method pushes an event marker, waits for a specified duration, then pushes the next marker. From experience, each event marker should have a `waitAfterMs` of at least 100 ms or so to ensure LSL receives the event markers in the right order.
 
 ```typescript
-import { LslEventMarkerEmitter } from '@neurodevs/node-lsl'
+import { LslEventMarkerOutlet } from '@neurodevs/node-lsl'
 
-const emitter = await LslEventMarkerEmitter.Create()
+const outlet = await LslEventMarkerOutlet.Create()
 
 const markers = [
   { name: 'phase-1-begin', waitAfterMs: 5000 },
   { name: 'phase-1-end', waitAfterMs: 100 },
 ]
 
-const promise = emitter.emitMany(markers)
+const promise = outlet.emitMany(markers)
 
-emitter.interrupt()
+outlet.interrupt()
 ```

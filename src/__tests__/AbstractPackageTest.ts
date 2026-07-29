@@ -10,7 +10,7 @@ import {
 } from '@neurodevs/ndx-native'
 import AbstractModuleTest from '@neurodevs/node-tdd'
 
-import SpyLslEmitter from '../testDoubles/LslEmitter/SpyLslEmitter.js'
+import SpyEventMarkerOutlet from '../testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
 import FakeLslInfo from '../testDoubles/LslInfo/FakeLslInfo.js'
 import SpyLslInfo from '../testDoubles/LslInfo/SpyLslInfo.js'
 import FakeLslInlet from '../testDoubles/LslInlet/FakeLslInlet.js'
@@ -21,7 +21,7 @@ import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
 import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
 import BleDeviceController from '../impl/controllers/BleDeviceController.js'
-import LslEventMarkerEmitter from '../impl/LslEventMarkerEmitter.js'
+import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
 import LslStreamInlet, {
     OnDataCallback,
@@ -127,8 +127,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeLslOutlet.resetTestDouble()
     }
 
-    protected static setSpyLslEmitter() {
-        LslEventMarkerEmitter.Class = SpyLslEmitter
+    protected static setSpyEventMarkerOutlet() {
+        LslEventMarkerOutlet.Class = SpyEventMarkerOutlet
     }
 
     protected static setSpyLslWsBridge() {

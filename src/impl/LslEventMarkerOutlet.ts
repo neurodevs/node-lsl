@@ -5,8 +5,8 @@ import LslStreamOutlet, {
     LslOutlet,
 } from './LslStreamOutlet.js'
 
-export default class LslEventMarkerEmitter implements LslEmitter {
-    public static Class?: LslEmitterConstructor
+export default class LslEventMarkerOutlet implements EventMarkerOutlet {
+    public static Class?: EventMarkerOutletConstructor
 
     protected outlet: LslOutlet
     private isRunning = false
@@ -17,7 +17,7 @@ export default class LslEventMarkerEmitter implements LslEmitter {
         this.outlet = outlet
     }
 
-    public static async Create(options?: LslEmitterOptions) {
+    public static async Create(options?: EventMarkerOutletOptions) {
         const outlet = await this.LslStreamOutlet(options)
         return new (this.Class ?? this)(outlet)
     }
@@ -110,16 +110,18 @@ export default class LslEventMarkerEmitter implements LslEmitter {
     }
 }
 
-export interface LslEmitter {
+export interface EventMarkerOutlet {
     emit(markerName: string, options?: EmitOptions): Promise<void>
     emitMany(markers: TimedEventMarker[]): Promise<void>
     interrupt(): void
     destroy(): void
 }
 
-export type LslEmitterOptions = Partial<LslOutletOptions>
+export type EventMarkerOutletOptions = Partial<LslOutletOptions>
 
-export type LslEmitterConstructor = new (outlet: LslOutlet) => LslEmitter
+export type EventMarkerOutletConstructor = new (
+    outlet: LslOutlet
+) => EventMarkerOutlet
 
 export interface EmitOptions {
     waitAfterMs?: number

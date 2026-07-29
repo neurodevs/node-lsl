@@ -1,10 +1,10 @@
 import {
-    LslEmitter,
+    EventMarkerOutlet,
     EmitOptions,
     TimedEventMarker,
-} from '../../impl/LslEventMarkerEmitter.js'
+} from '../../impl/LslEventMarkerOutlet.js'
 
-export default class ThrowingLslEmitter implements LslEmitter {
+export default class ThrowingEventMarkerOutlet implements EventMarkerOutlet {
     private errorMsg = 'Intentional throwing: '
 
     public constructor() {

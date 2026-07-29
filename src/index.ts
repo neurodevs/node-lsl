@@ -17,6 +17,20 @@ export * from './testDoubles/BleController/SpyBleController.js'
 export { default as FakeBleController } from './testDoubles/BleController/FakeBleController.js'
 export * from './testDoubles/BleController/FakeBleController.js'
 
+// EventMarkerOutlet
+
+export { default as LslEventMarkerOutlet } from './impl/LslEventMarkerOutlet.js'
+export * from './impl/LslEventMarkerOutlet.js'
+
+export { default as SpyEventMarkerOutlet } from './testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
+export * from './testDoubles/EventMarkerOutlet/SpyEventMarkerOutlet.js'
+
+export { default as FakeEventMarkerOutlet } from './testDoubles/EventMarkerOutlet/FakeEventMarkerOutlet.js'
+export * from './testDoubles/EventMarkerOutlet/FakeEventMarkerOutlet.js'
+
+export { default as ThrowingEventMarkerOutlet } from './testDoubles/EventMarkerOutlet/ThrowingEventMarkerOutlet.js'
+export * from './testDoubles/EventMarkerOutlet/ThrowingEventMarkerOutlet.js'
+
 // JsonOutlet
 
 export { default as LslJsonOutlet } from './impl/LslJsonOutlet.js'
@@ -35,20 +49,6 @@ export * from './testDoubles/LslWsBridge/SpyLslWsBridge.js'
 
 export { default as FakeLslWsBridge } from './testDoubles/LslWsBridge/FakeLslWsBridge.js'
 export * from './testDoubles/LslWsBridge/FakeLslWsBridge.js'
-
-// LslEmitter
-
-export { default as LslEventMarkerEmitter } from './impl/LslEventMarkerEmitter.js'
-export * from './impl/LslEventMarkerEmitter.js'
-
-export { default as SpyLslEmitter } from './testDoubles/LslEmitter/SpyLslEmitter.js'
-export * from './testDoubles/LslEmitter/SpyLslEmitter.js'
-
-export { default as FakeLslEmitter } from './testDoubles/LslEmitter/FakeLslEmitter.js'
-export * from './testDoubles/LslEmitter/FakeLslEmitter.js'
-
-export { default as ThrowingLslEmitter } from './testDoubles/LslEmitter/ThrowingLslEmitter.js'
-export * from './testDoubles/LslEmitter/ThrowingLslEmitter.js'
 
 // LslInfo
 

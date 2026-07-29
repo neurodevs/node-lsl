@@ -1,21 +1,21 @@
-import LslEventMarkerEmitter from '../../impl/LslEventMarkerEmitter.js'
+import LslEventMarkerOutlet from '../../impl/LslEventMarkerOutlet.js'
 import { LslOutlet } from '../../impl/LslStreamOutlet.js'
 
-export default class SpyLslEmitter extends LslEventMarkerEmitter {
+export default class SpyEventMarkerOutlet extends LslEventMarkerOutlet {
     public static shouldCallWaitOnSuper = false
 
-    public totalwaitAfterMs: number
+    public totalWaitAfterMs: number
 
     public constructor(outlet: LslOutlet) {
         super(outlet)
 
-        this.totalwaitAfterMs = 0
+        this.totalWaitAfterMs = 0
     }
 
     public async wait(waitAfterMs: number) {
-        this.totalwaitAfterMs += waitAfterMs
+        this.totalWaitAfterMs += waitAfterMs
 
-        if (SpyLslEmitter.shouldCallWaitOnSuper) {
+        if (SpyEventMarkerOutlet.shouldCallWaitOnSuper) {
             return super.wait(waitAfterMs)
         }
         return Promise.resolve()
@@ -26,6 +26,6 @@ export default class SpyLslEmitter extends LslEventMarkerEmitter {
     }
 
     public resetTestDouble() {
-        this.totalwaitAfterMs = 0
+        this.totalWaitAfterMs = 0
     }
 }

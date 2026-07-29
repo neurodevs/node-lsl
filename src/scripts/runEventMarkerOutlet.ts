@@ -1,6 +1,6 @@
-import LslEventMarkerEmitter from '../impl/LslEventMarkerEmitter.js'
+import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
 
-const emitter = await LslEventMarkerEmitter.Create()
+const outlet = await LslEventMarkerOutlet.Create()
 
 const markers = [
     { name: 'phase-1-begin', waitAfterMs: 100 },
@@ -8,9 +8,9 @@ const markers = [
     { name: 'never-reached-marker', waitAfterMs: 100 },
 ]
 
-void emitter.emitMany(markers)
+void outlet.emitMany(markers)
 
 await new Promise((resolve) => setTimeout(resolve, 250))
 
-emitter.interrupt()
-emitter.destroy()
+outlet.interrupt()
+outlet.destroy()
