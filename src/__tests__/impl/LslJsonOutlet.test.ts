@@ -12,6 +12,8 @@ export default class LslJsonOutletTest extends AbstractPackageTest {
 
         this.setFakeLslOutlet()
 
+        LslJsonOutlet.backupIdCounter = 0
+
         this.instance = await this.LslJsonOutlet()
     }
 
@@ -26,6 +28,21 @@ export default class LslJsonOutletTest extends AbstractPackageTest {
             name: `JSON (json-1)`,
             type: 'JSON',
             sourceId: 'json-1',
+            channelNames: ['JSON'],
+            channelFormat: 'string',
+            sampleRateHz: 0,
+            chunkSize: 1,
+        })
+    }
+
+    @test()
+    protected static async loadsWithJsonSpecificOptionsTwice() {
+        await this.LslJsonOutlet()
+
+        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[1], {
+            name: `JSON (json-2)`,
+            type: 'JSON',
+            sourceId: 'json-2',
             channelNames: ['JSON'],
             channelFormat: 'string',
             sampleRateHz: 0,

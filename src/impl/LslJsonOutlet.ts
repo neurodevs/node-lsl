@@ -2,6 +2,7 @@ import LslStreamOutlet from './LslStreamOutlet.js'
 
 export default class LslJsonOutlet implements JsonOutlet {
     public static Class?: JsonOutletConstructor
+    public static backupIdCounter = 0
 
     protected constructor(_options?: JsonOutletOptions) {}
 
@@ -11,10 +12,12 @@ export default class LslJsonOutlet implements JsonOutlet {
     }
 
     private static LslStreamOutlet(options?: JsonOutletOptions) {
+        this.backupIdCounter++
+
         return LslStreamOutlet.Create({
-            name: `JSON (json-1)`,
+            name: `JSON (json-${this.backupIdCounter})`,
             type: 'JSON',
-            sourceId: 'json-1',
+            sourceId: `json-${this.backupIdCounter}`,
             channelNames: ['JSON'],
             channelFormat: 'string',
             sampleRateHz: 0,
