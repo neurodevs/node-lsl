@@ -1,6 +1,9 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import LslJsonOutlet, { JsonOutlet } from '../../impl/LslJsonOutlet.js'
+import LslJsonOutlet, {
+    JsonOutlet,
+    JsonOutletOptions,
+} from '../../impl/LslJsonOutlet.js'
 import FakeLslOutlet from '../../testDoubles/LslOutlet/FakeLslOutlet.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
@@ -50,7 +53,31 @@ export default class LslJsonOutletTest extends AbstractPackageTest {
         })
     }
 
-    private static LslJsonOutlet() {
-        return LslJsonOutlet.Create()
+    @test()
+    protected static async canOverrideDefaultOptions() {
+        const channelName = this.generateId()
+
+        await this.LslJsonOutlet({
+            name: this.name_,
+            type: this.type,
+            sourceId: this.sourceId,
+            channelName,
+            sampleRateHz: this.sampleRateHz,
+            chunkSize: this.chunkSize,
+        })
+
+        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[1], {
+            name: this.name_,
+            type: this.type,
+            sourceId: this.sourceId,
+            channelNames: [channelName],
+            channelFormat: 'string',
+            sampleRateHz: this.sampleRateHz,
+            chunkSize: this.chunkSize,
+        })
+    }
+
+    private static LslJsonOutlet(options?: JsonOutletOptions) {
+        return LslJsonOutlet.Create(options)
     }
 }

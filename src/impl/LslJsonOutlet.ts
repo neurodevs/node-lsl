@@ -14,15 +14,17 @@ export default class LslJsonOutlet implements JsonOutlet {
     private static LslStreamOutlet(options?: JsonOutletOptions) {
         this.backupIdCounter++
 
+        const { channelName, ...rest } = options ?? {}
+
         return LslStreamOutlet.Create({
             name: `JSON (json-${this.backupIdCounter})`,
             type: 'JSON',
             sourceId: `json-${this.backupIdCounter}`,
-            channelNames: ['JSON'],
+            channelNames: [channelName ?? 'JSON'],
             channelFormat: 'string',
             sampleRateHz: 0,
             chunkSize: 1,
-            ...options,
+            ...rest,
         })
     }
 }
