@@ -19,9 +19,11 @@ export default class LslJsonOutlet implements JsonOutlet {
     }
 
     private throwIfPayloadTooLarge(json: string) {
-        if (this.maxBytesPerSample && json.length > this.maxBytesPerSample) {
+        const totalBytes = Buffer.byteLength(json)
+
+        if (this.maxBytesPerSample && totalBytes > this.maxBytesPerSample) {
             throw new Error(
-                `Payload of ${json.length} bytes exceeds maxBytesPerSample of ${this.maxBytesPerSample}!`
+                `Payload of ${totalBytes} bytes exceeds maxBytesPerSample of ${this.maxBytesPerSample}!`
             )
         }
     }

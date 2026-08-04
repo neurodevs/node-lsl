@@ -112,6 +112,23 @@ export default class LslJsonOutletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async countsUtf8BytesNotCharacters() {
+        const data = { emoji: '😀😀😀' }
+
+        const json = JSON.stringify(data)
+        const totalBytes = Buffer.byteLength(json)
+
+        const maxBytesPerSample = json.length
+
+        const instance = await this.LslJsonOutlet({ maxBytesPerSample })
+
+        assert.doesThrow(
+            () => instance.pushJson(data),
+            `Payload of ${totalBytes} bytes exceeds maxBytesPerSample of ${maxBytesPerSample}!`
+        )
+    }
+
     private static LslJsonOutlet(options?: JsonOutletOptions) {
         return LslJsonOutlet.Create(options)
     }
