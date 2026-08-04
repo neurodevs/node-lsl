@@ -12,6 +12,11 @@ export default class LslJsonOutlet implements JsonOutlet {
         this.maxBytesPerSample = maxBytesPerSample
     }
 
+    public static async Create(options?: JsonOutletOptions) {
+        const outlet = await this.LslStreamOutlet(options)
+        return new (this.Class ?? this)(outlet, options?.maxBytesPerSample)
+    }
+
     public pushJson(data: Json) {
         const json = JSON.stringify(data)
         this.throwIfPayloadTooLarge(json)
@@ -30,11 +35,6 @@ export default class LslJsonOutlet implements JsonOutlet {
 
     public destroy() {
         this.outlet.destroy()
-    }
-
-    public static async Create(options?: JsonOutletOptions) {
-        const outlet = await this.LslStreamOutlet(options)
-        return new (this.Class ?? this)(outlet, options?.maxBytesPerSample)
     }
 
     private static LslStreamOutlet(options?: JsonOutletOptions) {
