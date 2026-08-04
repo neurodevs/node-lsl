@@ -14,6 +14,10 @@ export default class LslJsonOutlet implements JsonOutlet {
         this.outlet.pushSample([JSON.stringify(data)])
     }
 
+    public destroy() {
+        this.outlet.destroy()
+    }
+
     public static async Create(options?: JsonOutletOptions) {
         const outlet = await this.LslStreamOutlet(options)
         return new (this.Class ?? this)(outlet)
@@ -39,6 +43,7 @@ export default class LslJsonOutlet implements JsonOutlet {
 
 export interface JsonOutlet {
     pushJson(data: Json): void
+    destroy(): void
 }
 
 export type Json = Record<string, unknown>

@@ -88,6 +88,17 @@ export default class LslJsonOutletTest extends AbstractPackageTest {
         ])
     }
 
+    @test()
+    protected static async destroyCallsDestroyOnLslOutlet() {
+        this.instance.destroy()
+
+        assert.isEqual(
+            FakeLslOutlet.numCallsToDestroy,
+            1,
+            'Did not call destroy on outlet!'
+        )
+    }
+
     private static LslJsonOutlet(options?: JsonOutletOptions) {
         return LslJsonOutlet.Create(options)
     }
