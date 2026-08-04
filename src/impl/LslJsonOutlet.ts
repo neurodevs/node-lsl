@@ -1,14 +1,22 @@
-import LslStreamOutlet from './LslStreamOutlet.js'
+import LslStreamOutlet, { LslOutlet } from './LslStreamOutlet.js'
 
 export default class LslJsonOutlet implements JsonOutlet {
     public static Class?: JsonOutletConstructor
     public static backupIdCounter = 0
 
-    protected constructor(_options?: JsonOutletOptions) {}
+    protected outlet: LslOutlet
+
+    protected constructor(outlet: LslOutlet) {
+        this.outlet = outlet
+    }
+
+    public pushJson(data: Json) {
+        this.outlet.pushSample([JSON.stringify(data)])
+    }
 
     public static async Create(options?: JsonOutletOptions) {
-        await this.LslStreamOutlet(options)
-        return new (this.Class ?? this)(options)
+        const outlet = await this.LslStreamOutlet(options)
+        return new (this.Class ?? this)(outlet)
     }
 
     private static LslStreamOutlet(options?: JsonOutletOptions) {
@@ -29,11 +37,13 @@ export default class LslJsonOutlet implements JsonOutlet {
     }
 }
 
-export interface JsonOutlet {}
+export interface JsonOutlet {
+    pushJson(data: Json): void
+}
 
-export type JsonOutletConstructor = new (
-    options?: JsonOutletOptions
-) => JsonOutlet
+export type Json = Record<string, unknown>
+
+export type JsonOutletConstructor = new (outlet: LslOutlet) => JsonOutlet
 
 export interface JsonOutletOptions {
     name?: string

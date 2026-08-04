@@ -77,6 +77,17 @@ export default class LslJsonOutletTest extends AbstractPackageTest {
         })
     }
 
+    @test()
+    protected static async pushJsonSerializesAndPushesToLslOutlet() {
+        const data = { [this.generateId()]: this.generateId() }
+
+        this.instance.pushJson(data)
+
+        assert.isEqualDeep(FakeLslOutlet.callsToPushSample[0]?.sample, [
+            JSON.stringify(data),
+        ])
+    }
+
     private static LslJsonOutlet(options?: JsonOutletOptions) {
         return LslJsonOutlet.Create(options)
     }
