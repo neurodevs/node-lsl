@@ -4,14 +4,26 @@ export default class LslJsonOutlet implements JsonOutlet {
     public static Class?: JsonOutletConstructor
     public static backupIdCounter = 0
 
-    protected outlet: LslOutlet
+    private outlet: LslOutlet
+    private maxBytesPerSample?: number
 
-    protected constructor(outlet: LslOutlet) {
+    protected constructor(outlet: LslOutlet, maxBytesPerSample?: number) {
         this.outlet = outlet
+        this.maxBytesPerSample = maxBytesPerSample
     }
 
     public pushJson(data: Json) {
-        this.outlet.pushSample([JSON.stringify(data)])
+        const json = JSON.stringify(data)
+        this.throwIfPayloadTooLarge(json)
+        this.outlet.pushSample([json])
+    }
+
+    private throwIfPayloadTooLarge(json: string) {
+        if (this.maxBytesPerSample && json.length > this.maxBytesPerSample) {
+            throw new Error(
+                `Payload of ${json.length} bytes exceeds maxBytesPerSample of ${this.maxBytesPerSample}!`
+            )
+        }
     }
 
     public destroy() {
@@ -20,13 +32,13 @@ export default class LslJsonOutlet implements JsonOutlet {
 
     public static async Create(options?: JsonOutletOptions) {
         const outlet = await this.LslStreamOutlet(options)
-        return new (this.Class ?? this)(outlet)
+        return new (this.Class ?? this)(outlet, options?.maxBytesPerSample)
     }
 
     private static LslStreamOutlet(options?: JsonOutletOptions) {
         this.backupIdCounter++
 
-        const { channelName, ...rest } = options ?? {}
+        const { channelName, maxBytesPerSample: _, ...rest } = options ?? {}
 
         return LslStreamOutlet.Create({
             name: `JSON (json-${this.backupIdCounter})`,
@@ -48,7 +60,10 @@ export interface JsonOutlet {
 
 export type Json = Record<string, unknown>
 
-export type JsonOutletConstructor = new (outlet: LslOutlet) => JsonOutlet
+export type JsonOutletConstructor = new (
+    outlet: LslOutlet,
+    maxBytesPerSample?: number
+) => JsonOutlet
 
 export interface JsonOutletOptions {
     name?: string

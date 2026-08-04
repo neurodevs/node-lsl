@@ -99,6 +99,19 @@ export default class LslJsonOutletTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async pushJsonThrowsIfPayloadExceedsMaxBytesPerSample() {
+        const maxBytesPerSample = 10
+
+        const instance = await this.LslJsonOutlet({ maxBytesPerSample })
+        const data = { [this.generateId()]: this.generateId() }
+
+        assert.doesThrow(
+            () => instance.pushJson(data),
+            `Payload of ${JSON.stringify(data).length} bytes exceeds maxBytesPerSample of ${maxBytesPerSample}!`
+        )
+    }
+
     private static LslJsonOutlet(options?: JsonOutletOptions) {
         return LslJsonOutlet.Create(options)
     }
