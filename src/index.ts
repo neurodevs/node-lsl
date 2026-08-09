@@ -1,3 +1,11 @@
+// BleObserver
+
+export { default as BleObserverController } from './impl/BleObserverController.js'
+export * from './impl/BleObserverController.js'
+
+export { default as FakeBleObserver } from './testDoubles/BleObserver/FakeBleObserver.js'
+export * from './testDoubles/BleObserver/FakeBleObserver.js'
+
 // ClockRegressor
 
 export { default as WindowedClockRegressor } from './impl/clocks/WindowedClockRegressor.js'
