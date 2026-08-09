@@ -24,13 +24,15 @@ export default class BleObserverController implements BleObserver {
     }
 
     private createBleObserverBackend() {
-        this.ndx.createBleObserverBackend({
+        const { status, error } = this.ndx.createBleObserverBackend({
             deviceUuid: this.deviceUuid,
         })
+
+        this.throwIfError(status, error)
     }
 
     private startBleObserverBackend() {
-        this.ndx.startBleObserverBackend({
+        const { status, error } = this.ndx.startBleObserverBackend({
             deviceUuid: this.deviceUuid,
             onAdvertisement: (
                 data: Buffer,
@@ -40,6 +42,8 @@ export default class BleObserverController implements BleObserver {
                 this.onAdvertisement?.(data, length, timestampSec)
             },
         })
+
+        this.throwIfError(status, error)
     }
 
     public async stopObserving() {
@@ -47,9 +51,17 @@ export default class BleObserverController implements BleObserver {
     }
 
     private stopBleObserverBackend() {
-        this.ndx.stopBleObserverBackend({
+        const { status, error } = this.ndx.stopBleObserverBackend({
             deviceUuid: this.deviceUuid,
         })
+
+        this.throwIfError(status, error)
+    }
+
+    private throwIfError(status: number, error: string | undefined) {
+        if (status !== 200) {
+            throw new Error(`${status} error: ${error ?? 'Unknown error'}`)
+        }
     }
 }
 export interface BleObserver {

@@ -10,6 +10,8 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
     private static instance: BleObserver
     private static passedAdvertisements: PassedAdvertisement[]
 
+    private static readonly fakeError = this.generateId()
+
     private static readonly data = Buffer.from([0x01, 0x02, 0x03])
     private static readonly length = 3
     private static readonly timestampSec = 1234.5
@@ -82,6 +84,49 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
         assert.isEqualDeep(FakeLibndx.callsToStopBleObserver[0], {
             deviceUuid: this.deviceUuid,
         })
+    }
+
+    @test()
+    protected static async createBleObserverBackendThrowsOnError() {
+        this.setFakeErrorResult()
+
+        //@ts-ignore
+        this.instance.startBleObserverBackend = () => {}
+
+        await assert.doesThrowAsync(
+            async () => await this.startObserving(),
+            this.fakeError,
+            'Did not throw error!'
+        )
+    }
+
+    @test()
+    protected static async startObservingThrowsOnError() {
+        this.setFakeErrorResult()
+
+        await assert.doesThrowAsync(
+            async () => await this.startObserving(),
+            this.fakeError,
+            'Did not throw error!'
+        )
+    }
+
+    @test()
+    protected static async stopObservingThrowsOnError() {
+        this.setFakeErrorResult()
+
+        await assert.doesThrowAsync(
+            async () => await this.stopObserving(),
+            this.fakeError,
+            'Did not throw error!'
+        )
+    }
+
+    private static setFakeErrorResult() {
+        FakeLibndx.fakeResult = {
+            status: 400,
+            error: this.fakeError,
+        }
     }
 
     private static async startObserving() {
