@@ -83,11 +83,11 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.connect()
 
         assert.isEqualDeep(
-            FakeLibndx.callsToCreateBleBackend[0],
+            FakeLibndx.callsToCreateBleGattBackend[0],
             {
                 deviceUuid: this.uuid,
             },
-            'Did not call createBleBackend!'
+            'Did not call createBleGattBackend!'
         )
     }
 
@@ -129,7 +129,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.connectWithDiscovery(instance)
 
         assert.isEqualDeep(
-            FakeLibndx.callsToCreateBleBackend[0],
+            FakeLibndx.callsToCreateBleGattBackend[0],
             {
                 deviceUuid: this.discoveredUuid,
             },
@@ -144,7 +144,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.connectWithDiscovery(instance)
 
         assert.isEqual(
-            FakeLibndx.callsToStartBleBackend[0]?.deviceUuid,
+            FakeLibndx.callsToStartBleGattBackend[0]?.deviceUuid,
             this.discoveredUuid,
             'Did not start BLE backend with the discovered uuid!'
         )
@@ -189,18 +189,18 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     protected static async connectCallsLibndxStartBleBackend() {
         await this.connect()
 
-        const call = FakeLibndx.callsToStartBleBackend[0]
+        const call = FakeLibndx.callsToStartBleGattBackend[0]
 
         assert.isEqual(
             call.deviceUuid,
             this.uuid,
-            'Did not call startBleBackend with correct deviceUuid!'
+            'Did not call startBleGattBackend with correct deviceUuid!'
         )
 
         assert.isEqual(
             call.charCallbacks.length,
             2,
-            'Did not call startBleBackend with charCallbacks!'
+            'Did not call startBleGattBackend with charCallbacks!'
         )
 
         let i = 0
@@ -228,7 +228,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     @test()
     protected static async startBleBackendThrowsOn400() {
         //@ts-ignore
-        this.instance.createBleBackend = () => {}
+        this.instance.createBleGattBackend = () => {}
 
         this.setFake400Error()
 
@@ -242,7 +242,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     @test()
     protected static async startBleBackendThrowsOn500() {
         //@ts-ignore
-        this.instance.createBleBackend = () => {}
+        this.instance.createBleGattBackend = () => {}
 
         this.setFake500Error()
 
@@ -281,13 +281,13 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.writeCharacteristic()
 
         assert.isEqualDeep(
-            FakeLibndx.callsToWriteBleCharacteristic[0],
+            FakeLibndx.callsToWriteBleGattChar[0],
             {
                 deviceUuid: this.uuid,
                 charUuid: this.charUuid,
                 value: this.charValueToWrite,
             },
-            'Did not call writeBleCharacteristic as expected!'
+            'Did not call writeBleGattChar as expected!'
         )
     }
 
@@ -318,12 +318,12 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.subscribeCharacteristics()
 
         assert.isEqualDeep(
-            FakeLibndx.callsToAddBleCharCallbacks[0],
+            FakeLibndx.callsToRegisterBleGattCharCallbacks[0],
             {
                 deviceUuid: this.uuid,
                 charCallbacks: this.extraCharCallbacks,
             },
-            'Did not call addBleCharCallbacks as expected!'
+            'Did not call registerBleGattCharCallbacks as expected!'
         )
     }
 
@@ -354,7 +354,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.connect()
 
         const { deviceUuid, intervalMs } =
-            FakeLibndx.callsToSetBleRssiInterval[0]
+            FakeLibndx.callsToStartBleGattRssiPolling[0]
 
         assert.isEqualDeep(
             { deviceUuid, intervalMs },
@@ -362,7 +362,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
                 deviceUuid: this.uuid,
                 intervalMs: this.rssiIntervalMs,
             },
-            'Did not call setBleRssiInterval as expected!'
+            'Did not call startBleGattRssiPolling as expected!'
         )
     }
 
@@ -371,11 +371,11 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await this.disconnect()
 
         assert.isEqualDeep(
-            FakeLibndx.callsToStopBleBackend[0],
+            FakeLibndx.callsToStopBleGattBackend[0],
             {
                 deviceUuid: this.uuid,
             },
-            'Did not call stopBleBackend!'
+            'Did not call stopBleGattBackend!'
         )
     }
 
@@ -446,7 +446,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     private static async connect() {
         const promise = this.instance.connect()
 
-        const startCall = FakeLibndx.callsToStartBleBackend[0]
+        const startCall = FakeLibndx.callsToStartBleGattBackend[0]
         startCall?.onConnected(this.nativePeripheral)
 
         await promise
@@ -457,9 +457,9 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
         FakeLibndx.callsToDiscoverBleUuid[0]?.onDiscovered(this.discoveredUuid)
 
-        await this.waitForCall(() => FakeLibndx.callsToStartBleBackend[0])
+        await this.waitForCall(() => FakeLibndx.callsToStartBleGattBackend[0])
 
-        FakeLibndx.callsToStartBleBackend[0]?.onConnected(this.nativePeripheral)
+        FakeLibndx.callsToStartBleGattBackend[0]?.onConnected(this.nativePeripheral)
 
         await promise
     }

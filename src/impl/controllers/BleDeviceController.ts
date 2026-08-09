@@ -53,13 +53,13 @@ export default class BleDeviceController implements BleController {
             await this.discoverUuid()
         }
 
-        this.createBleBackend()
-        this.startBleBackend()
+        this.createBleGattBackend()
+        this.startBleGattBackend()
 
         await this.waitForOnConnected()
         await this.waitToDiscoverServices()
 
-        this.setBleRssiInterval()
+        this.startBleGattRssiPolling()
     }
 
     private async discoverUuid() {
@@ -88,8 +88,8 @@ export default class BleDeviceController implements BleController {
         })
     }
 
-    private createBleBackend() {
-        const { status, error } = this.ndx.createBleBackend({
+    private createBleGattBackend() {
+        const { status, error } = this.ndx.createBleGattBackend({
             deviceUuid: this.uuid,
         })
 
@@ -102,9 +102,9 @@ export default class BleDeviceController implements BleController {
         }
     }
 
-    private setBleRssiInterval() {
+    private startBleGattRssiPolling() {
         if (this.rssiIntervalMs) {
-            this.ndx.setBleRssiInterval({
+            this.ndx.startBleGattRssiPolling({
                 deviceUuid: this.uuid,
                 intervalMs: this.rssiIntervalMs,
                 onRssi: (rssi: number) => {
@@ -114,8 +114,8 @@ export default class BleDeviceController implements BleController {
         }
     }
 
-    private startBleBackend() {
-        const { status, error } = this.ndx.startBleBackend({
+    private startBleGattBackend() {
+        const { status, error } = this.ndx.startBleGattBackend({
             deviceUuid: this.uuid,
             onConnected: (peripheral: NativePeripheral) => {
                 const { name } = peripheral
@@ -156,7 +156,7 @@ export default class BleDeviceController implements BleController {
         charUuid: CharacteristicUuid,
         value: string
     ) {
-        const { status, error } = this.ndx.writeBleCharacteristic({
+        const { status, error } = this.ndx.writeBleGattChar({
             deviceUuid: this.uuid,
             charUuid,
             value,
@@ -168,7 +168,7 @@ export default class BleDeviceController implements BleController {
     public async subscribeCharacteristics(
         charCallbacks: CharacteristicCallbacks
     ) {
-        const { status, error } = this.ndx.addBleCharCallbacks({
+        const { status, error } = this.ndx.registerBleGattCharCallbacks({
             deviceUuid: this.uuid,
             charCallbacks,
         })
@@ -179,7 +179,7 @@ export default class BleDeviceController implements BleController {
     }
 
     public async disconnect() {
-        const { status, error } = this.ndx.stopBleBackend({
+        const { status, error } = this.ndx.stopBleGattBackend({
             deviceUuid: this.uuid,
         })
 
