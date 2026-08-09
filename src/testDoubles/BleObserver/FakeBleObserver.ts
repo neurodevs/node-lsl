@@ -1,13 +1,22 @@
-import { BleObserver } from '../../impl/BleObserverController.js'
+import {
+    BleObserver,
+    BleObserverOptions,
+} from '../../impl/controllers/BleObserverController.js'
 
 export default class FakeBleObserver implements BleObserver {
-    public static numCallsToConstructor = 0
+    public static callsToConstructor: BleObserverOptions[] = []
+    public static numCallsToStartObserving = 0
 
-    public constructor() {
-        FakeBleObserver.numCallsToConstructor++
+    public constructor(options: BleObserverOptions) {
+        FakeBleObserver.callsToConstructor.push(options)
+    }
+
+    public async startObserving() {
+        FakeBleObserver.numCallsToStartObserving++
     }
 
     public static resetTestDouble() {
-        FakeBleObserver.numCallsToConstructor = 0
+        FakeBleObserver.callsToConstructor = []
+        FakeBleObserver.numCallsToStartObserving = 0
     }
 }

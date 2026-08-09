@@ -35,6 +35,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static readonly fakeLslInfo = new FakeLslInfo()
 
+    protected static readonly deviceUuid = this.generateId()
     protected static readonly name_ = this.generateId()
     protected static readonly type = this.generateId()
     protected static readonly sourceId = this.generateId()
