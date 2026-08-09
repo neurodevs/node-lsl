@@ -47,8 +47,21 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async stopObservingStopsBleObserverBackend() {
+        await this.stopObserving()
+
+        assert.isEqualDeep(FakeLibndx.callsToStopBleObserver[0], {
+            deviceUuid: this.deviceUuid,
+        })
+    }
+
     private static async startObserving() {
         await this.instance.startObserving()
+    }
+
+    private static async stopObserving() {
+        await this.instance.stopObserving()
     }
 
     private static BleObserverController() {

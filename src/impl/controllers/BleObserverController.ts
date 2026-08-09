@@ -37,9 +37,20 @@ export default class BleObserverController implements BleObserver {
             ) => {},
         })
     }
+
+    public async stopObserving() {
+        this.stopBleObserverBackend()
+    }
+
+    private stopBleObserverBackend() {
+        this.ndx.stopBleObserverBackend({
+            deviceUuid: this.deviceUuid,
+        })
+    }
 }
 export interface BleObserver {
     startObserving(): Promise<void>
+    stopObserving(): Promise<void>
 }
 
 export type BleObserverConstructor = new (
