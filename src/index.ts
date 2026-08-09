@@ -6,16 +6,16 @@ export * from './impl/clocks/WindowedClockRegressor.js'
 export { default as FakeClockRegressor } from './testDoubles/ClockRegressor/FakeClockRegressor.js'
 export * from './testDoubles/ClockRegressor/FakeClockRegressor.js'
 
-// DeviceController
+// BleGatt
 
-export { default as BleDeviceController } from './impl/controllers/BleDeviceController.js'
-export * from './impl/controllers/BleDeviceController.js'
+export { default as BleGattController } from './impl/controllers/BleGattController.js'
+export * from './impl/controllers/BleGattController.js'
 
-export { default as SpyBleController } from './testDoubles/BleController/SpyBleController.js'
-export * from './testDoubles/BleController/SpyBleController.js'
+export { default as SpyBleGatt } from './testDoubles/BleGatt/SpyBleGatt.js'
+export * from './testDoubles/BleGatt/SpyBleGatt.js'
 
-export { default as FakeBleController } from './testDoubles/BleController/FakeBleController.js'
-export * from './testDoubles/BleController/FakeBleController.js'
+export { default as FakeBleGatt } from './testDoubles/BleGatt/FakeBleGatt.js'
+export * from './testDoubles/BleGatt/FakeBleGatt.js'
 
 // EventMarkerOutlet
 
@@ -82,13 +82,13 @@ export * from './testDoubles/LslOutlet/FakeLslOutlet.js'
 
 export { default as generateRandomOutletOptions } from './testDoubles/generateRandomOutletOptions.js'
 
-// UsbController
+// UsbDevice
 
 export { default as UsbDeviceController } from './impl/controllers/UsbDeviceController.js'
 export * from './impl/controllers/UsbDeviceController.js'
 
-export { default as FakeUsbController } from './testDoubles/UsbController/FakeUsbController.js'
-export * from './testDoubles/UsbController/FakeUsbController.js'
+export { default as FakeUsbDevice } from './testDoubles/UsbDevice/FakeUsbDevice.js'
+export * from './testDoubles/UsbDevice/FakeUsbDevice.js'
 
 // WebSockets
 

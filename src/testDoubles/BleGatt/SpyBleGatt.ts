@@ -1,13 +1,13 @@
-import BleDeviceController, {
-    BleControllerOptions,
-} from '../../impl/controllers/BleDeviceController.js'
+import BleGattController, {
+    BleGattOptions,
+} from '../../impl/controllers/BleGattController.js'
 
-export default class SpyBleController extends BleDeviceController {
+export default class SpyBleGatt extends BleGattController {
     public infoLogs: string[] = []
     public warnLogs: string[] = []
     public errorLogs: string[] = []
 
-    public constructor(options: BleControllerOptions) {
+    public constructor(options: BleGattOptions) {
         super(options)
     }
 

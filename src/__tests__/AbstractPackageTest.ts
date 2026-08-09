@@ -20,7 +20,7 @@ import SpyLslWsBridge from '../testDoubles/LslWsBridge/SpyLslWsBridge.js'
 import FakeWebSocket from '../testDoubles/WebSockets/FakeWebSocket.js'
 import FakeWebSocketServer from '../testDoubles/WebSockets/FakeWebSocketServer.js'
 import LslWebSocketBridge from '../impl/LslWebSocketBridge.js'
-import BleDeviceController from '../impl/controllers/BleDeviceController.js'
+import BleGattController from '../impl/controllers/BleGattController.js'
 import LslEventMarkerOutlet from '../impl/LslEventMarkerOutlet.js'
 import LslStreamInfo from '../impl/LslStreamInfo.js'
 import LslStreamInlet, {
@@ -74,7 +74,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setImmediateTimeouts() {
         this.callsToSetTimeout = []
 
-        BleDeviceController.setTimeout = ((
+        BleGattController.setTimeout = ((
             callback: (...args: unknown[]) => void,
             delayMs?: number,
             ...args: unknown[]
@@ -100,7 +100,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeLibndx.resetTestDouble()
         FakeLibndx.fakeResult = { status: 200 }
 
-        BleDeviceController.ndx = this.fakeLibndx
+        BleGattController.ndx = this.fakeLibndx
     }
 
     protected static setSpyLslInfo() {

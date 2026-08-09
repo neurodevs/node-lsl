@@ -1,6 +1,6 @@
 import koffi from 'koffi'
 
-import BleDeviceController from '../impl/controllers/BleDeviceController.js'
+import BleGattController from '../impl/controllers/BleGattController.js'
 
 const MUSE_CHARACTERISTIC_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
@@ -32,7 +32,7 @@ const charCallbacks = Object.entries(MUSE_CHARACTERISTIC_UUIDS).map(
     }
 )
 
-const muse = BleDeviceController.Create({
+const muse = BleGattController.Create({
     deviceUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
     charCallbacks,
     rssiIntervalMs: 1000,

@@ -1,13 +1,13 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
 import UsbDeviceController, {
-    UsbController,
+    UsbDevice,
 } from '../../impl/controllers/UsbDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { FakeLibndx } from '@neurodevs/ndx-native'
 
 export default class UsbDeviceControllerTest extends AbstractPackageTest {
-    private static instance: UsbController
+    private static instance: UsbDevice
 
     private static readonly serialNumber = this.generateId()
     private static readonly valueToWrite = this.generateId()

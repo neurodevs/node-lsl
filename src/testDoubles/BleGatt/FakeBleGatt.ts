@@ -1,12 +1,12 @@
 import generateId from '@neurodevs/generate-id'
 import {
-    BleController,
-    BleControllerOptions,
+    BleGatt,
+    BleGattOptions,
     CharacteristicCallbacks,
-} from '../../impl/controllers/BleDeviceController.js'
+} from '../../impl/controllers/BleGattController.js'
 
-export default class FakeBleController implements BleController {
-    public static callsToConstructor: (BleControllerOptions | undefined)[] = []
+export default class FakeBleGatt implements BleGatt {
+    public static callsToConstructor: (BleGattOptions | undefined)[] = []
 
     public static numCallsToConnect = 0
 
@@ -26,24 +26,24 @@ export default class FakeBleController implements BleController {
     private _uuid: string
     private _name: string
 
-    public constructor(options?: BleControllerOptions) {
+    public constructor(options?: BleGattOptions) {
         const { deviceUuid } = options ?? {}
 
         this._uuid = deviceUuid ?? generateId()
-        this._name = FakeBleController.fakeName
+        this._name = FakeBleGatt.fakeName
 
-        FakeBleController.callsToConstructor.push(options)
+        FakeBleGatt.callsToConstructor.push(options)
     }
 
     public async connect() {
-        FakeBleController.numCallsToConnect++
+        FakeBleGatt.numCallsToConnect++
     }
 
     public async writeCharacteristic(
         characteristicUuid: string,
         value: string
     ) {
-        FakeBleController.callsToWriteCharacteristic.push({
+        FakeBleGatt.callsToWriteCharacteristic.push({
             characteristicUuid,
             value,
         })
@@ -52,11 +52,11 @@ export default class FakeBleController implements BleController {
     public async subscribeCharacteristics(
         charCallbacks: CharacteristicCallbacks
     ) {
-        FakeBleController.callsToSubscribeCharacteristics.push(charCallbacks)
+        FakeBleGatt.callsToSubscribeCharacteristics.push(charCallbacks)
     }
 
     public async disconnect() {
-        FakeBleController.numCallsToDisconnect++
+        FakeBleGatt.numCallsToDisconnect++
     }
 
     public get uuid() {
@@ -76,6 +76,6 @@ export default class FakeBleController implements BleController {
     }
 }
 
-export interface CallToBleControllerConstructor {
-    options: BleControllerOptions
+export interface CallToBleGattConstructor {
+    options: BleGattOptions
 }

@@ -1,65 +1,63 @@
 import { LibndxAdapter } from '@neurodevs/ndx-native'
 
-export default class UsbDeviceController implements UsbController {
-    public static Class?: UsbControllerConstructor
+export default class UsbDeviceController implements UsbDevice {
+    public static Class?: UsbDeviceConstructor
 
     private onData: (data: Buffer, length: number, timestampSec: number) => void
     private serialNumber: string
 
     private ndx = LibndxAdapter.getInstance()
 
-    protected constructor(options: UsbControllerOptions) {
+    protected constructor(options: UsbDeviceOptions) {
         const { onData, serialNumber } = options ?? {}
 
         this.onData = onData
         this.serialNumber = serialNumber ?? ''
     }
 
-    public static Create(options: UsbControllerOptions) {
+    public static Create(options: UsbDeviceOptions) {
         return new (this.Class ?? this)(options)
     }
 
     public async connect() {
-        this.ndx.createUsbBackend(this.usbControllerOptions)
-        this.ndx.startUsbBackend(this.startUsbControllerOptions)
+        this.ndx.createUsbBackend(this.usbDeviceOptions)
+        this.ndx.startUsbBackend(this.startUsbDeviceOptions)
     }
 
-    private get usbControllerOptions() {
+    private get usbDeviceOptions() {
         return {
             serialNumber: this.serialNumber,
         }
     }
 
-    private get startUsbControllerOptions() {
+    private get startUsbDeviceOptions() {
         return {
-            ...this.usbControllerOptions,
+            ...this.usbDeviceOptions,
             onData: this.onData,
         }
     }
 
     public async writeUsb(value: string) {
         this.ndx.writeUsbBackend({
-            ...this.usbControllerOptions,
+            ...this.usbDeviceOptions,
             value,
         })
     }
 
     public async disconnect() {
-        this.ndx.stopUsbBackend(this.usbControllerOptions)
+        this.ndx.stopUsbBackend(this.usbDeviceOptions)
     }
 }
 
-export interface UsbController {
+export interface UsbDevice {
     connect(): Promise<void>
     writeUsb(value: string): Promise<void>
     disconnect(): Promise<void>
 }
 
-export interface UsbControllerOptions {
+export interface UsbDeviceOptions {
     onData: (data: Buffer, length: number, timestampSec: number) => void
     serialNumber?: string
 }
 
-export type UsbControllerConstructor = new (
-    options?: UsbControllerOptions
-) => UsbController
+export type UsbDeviceConstructor = new (options?: UsbDeviceOptions) => UsbDevice

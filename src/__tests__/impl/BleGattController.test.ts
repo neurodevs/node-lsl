@@ -3,14 +3,14 @@ import { randomInt } from 'node:crypto'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeLibndx, NativePeripheral } from '@neurodevs/ndx-native'
 
-import SpyBleController from '../../testDoubles/BleController/SpyBleController.js'
+import SpyBleGatt from '../../testDoubles/BleGatt/SpyBleGatt.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
-import BleDeviceController, {
-    BleControllerOptions,
-} from '../../impl/controllers/BleDeviceController.js'
+import BleGattController, {
+    BleGattOptions,
+} from '../../impl/controllers/BleGattController.js'
 
-export default class BleDeviceControllerTest extends AbstractPackageTest {
-    private static instance: SpyBleController
+export default class BleGattControllerTest extends AbstractPackageTest {
+    private static instance: SpyBleGatt
 
     private static readonly uuid = this.generateId()
     private static readonly namePrefix = this.generateId()
@@ -56,7 +56,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     protected static async beforeAll() {
         assert.isEqual(
-            BleDeviceController.waitAfterMs,
+            BleGattController.waitAfterMs,
             1000,
             'Set incorrect waitAfterMs!'
         )
@@ -65,12 +65,12 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        BleDeviceController.waitAfterMs = 0
-        BleDeviceController.Class = SpyBleController
+        BleGattController.waitAfterMs = 0
+        BleGattController.Class = SpyBleGatt
 
         this.wasConnected = false
 
-        this.instance = this.BleDeviceController()
+        this.instance = this.BleGattController()
     }
 
     @test()
@@ -93,7 +93,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async discoversUuidWhenDeviceUuidNotProvided() {
-        const instance = await this.BleControllerWithPrefix()
+        const instance = await this.BleGattControllerWithPrefix()
 
         await this.connectWithDiscovery(instance)
 
@@ -124,7 +124,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async usesDiscoveredUuidToCreateBleBackend() {
-        const instance = await this.BleControllerWithPrefix()
+        const instance = await this.BleGattControllerWithPrefix()
 
         await this.connectWithDiscovery(instance)
 
@@ -139,7 +139,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async usesDiscoveredUuidToStartBleBackend() {
-        const instance = await this.BleControllerWithPrefix()
+        const instance = await this.BleGattControllerWithPrefix()
 
         await this.connectWithDiscovery(instance)
 
@@ -152,7 +152,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async exposesDiscoveredUuid() {
-        const instance = await this.BleControllerWithPrefix()
+        const instance = await this.BleGattControllerWithPrefix()
 
         await this.connectWithDiscovery(instance)
 
@@ -266,7 +266,7 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
     @test()
     protected static async waitsAfterOnConnectedToDiscoverServices() {
         const waitAfterMs = 20
-        BleDeviceController.waitAfterMs = waitAfterMs
+        BleGattController.waitAfterMs = waitAfterMs
 
         await this.connect()
 
@@ -452,14 +452,16 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         await promise
     }
 
-    private static async connectWithDiscovery(instance: SpyBleController) {
+    private static async connectWithDiscovery(instance: SpyBleGatt) {
         const promise = instance.connect()
 
         FakeLibndx.callsToDiscoverBleUuid[0]?.onDiscovered(this.discoveredUuid)
 
         await this.waitForCall(() => FakeLibndx.callsToStartBleGattBackend[0])
 
-        FakeLibndx.callsToStartBleGattBackend[0]?.onConnected(this.nativePeripheral)
+        FakeLibndx.callsToStartBleGattBackend[0]?.onConnected(
+            this.nativePeripheral
+        )
 
         await promise
     }
@@ -512,20 +514,18 @@ export default class BleDeviceControllerTest extends AbstractPackageTest {
         }
     }
 
-    private static BleDeviceController(
-        options?: Partial<BleControllerOptions>
-    ) {
-        return BleDeviceController.Create({
+    private static BleGattController(options?: Partial<BleGattOptions>) {
+        return BleGattController.Create({
             deviceUuid: this.uuid,
             charCallbacks: this.charCallbacks,
             onConnected: this.onConnected,
             rssiIntervalMs: this.rssiIntervalMs,
             ...options,
-        }) as SpyBleController
+        }) as SpyBleGatt
     }
 
-    private static BleControllerWithPrefix() {
-        return this.BleDeviceController({
+    private static BleGattControllerWithPrefix() {
+        return this.BleGattController({
             deviceNamePrefix: this.namePrefix,
             deviceUuid: undefined,
         })

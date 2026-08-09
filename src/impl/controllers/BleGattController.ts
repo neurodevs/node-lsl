@@ -1,7 +1,7 @@
 import { LibndxAdapter, Libndx, NativePeripheral } from '@neurodevs/ndx-native'
 
-export default class BleDeviceController implements BleController {
-    public static Class?: BleControllerConstructor
+export default class BleGattController implements BleGatt {
+    public static Class?: BleGattConstructor
     public static setTimeout = setTimeout
     public static waitAfterMs = 1000
 
@@ -28,7 +28,7 @@ export default class BleDeviceController implements BleController {
     private deviceName?: string
     private onConnected?: (peripheral: NativePeripheral) => void
 
-    protected constructor(options: BleControllerOptions) {
+    protected constructor(options: BleGattOptions) {
         const {
             deviceUuid,
             deviceNamePrefix,
@@ -44,7 +44,7 @@ export default class BleDeviceController implements BleController {
         this.rssiIntervalMs = rssiIntervalMs
     }
 
-    public static Create(options: BleControllerOptions) {
+    public static Create(options: BleGattOptions) {
         return new (this.Class ?? this)(options)
     }
 
@@ -81,7 +81,7 @@ export default class BleDeviceController implements BleController {
                 if (this.deviceUuid) {
                     resolve()
                 } else {
-                    BleDeviceController.setTimeout(checkDiscovered, 100)
+                    BleGattController.setTimeout(checkDiscovered, 100)
                 }
             }
             checkDiscovered()
@@ -136,7 +136,7 @@ export default class BleDeviceController implements BleController {
                 if (this.connected) {
                     resolve()
                 } else {
-                    BleDeviceController.setTimeout(checkConnected, 100)
+                    BleGattController.setTimeout(checkConnected, 100)
                 }
             }
             checkConnected()
@@ -145,10 +145,7 @@ export default class BleDeviceController implements BleController {
 
     private async waitToDiscoverServices() {
         await new Promise<void>((resolve) =>
-            BleDeviceController.setTimeout(
-                resolve,
-                BleDeviceController.waitAfterMs
-            )
+            BleGattController.setTimeout(resolve, BleGattController.waitAfterMs)
         )
     }
 
@@ -196,11 +193,11 @@ export default class BleDeviceController implements BleController {
     }
 
     private get ndx() {
-        return BleDeviceController.ndx
+        return BleGattController.ndx
     }
 }
 
-export interface BleController {
+export interface BleGatt {
     uuid: string
     name: string
 
@@ -218,7 +215,7 @@ export interface BleController {
     disconnect(): Promise<void>
 }
 
-export type BleControllerOptions = {
+export type BleGattOptions = {
     charCallbacks: CharacteristicCallbacks
     onConnected?: (peripheral: NativePeripheral) => void
     rssiIntervalMs?: number
@@ -227,9 +224,7 @@ export type BleControllerOptions = {
     | { deviceUuid?: string; deviceNamePrefix: string }
 )
 
-export type BleControllerConstructor = new (
-    options: BleControllerOptions
-) => BleController
+export type BleGattConstructor = new (options: BleGattOptions) => BleGatt
 
 export type CharacteristicCallbacks = {
     charUuid: string
