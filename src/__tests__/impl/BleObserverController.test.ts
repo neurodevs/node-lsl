@@ -22,11 +22,33 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async startObservingCreatesBleObserverBackend() {
-        await this.instance.startObserving()
+        await this.startObserving()
 
         assert.isEqualDeep(FakeLibndx.callsToCreateBleObserver[0], {
             deviceUuid: this.deviceUuid,
         })
+    }
+
+    @test()
+    protected static async startObservingStartsBleObserverBackend() {
+        await this.startObserving()
+
+        const { deviceUuid, onAdvertisement } =
+            FakeLibndx.callsToStartBleObserver[0]
+
+        assert.isEqual(
+            deviceUuid,
+            this.deviceUuid,
+            'Did not pass deviceUuid to startBleObserverBackend!'
+        )
+        assert.isFunction(
+            onAdvertisement,
+            'Did not pass onAdvertisement to startBleObserverBackend!'
+        )
+    }
+
+    private static async startObserving() {
+        await this.instance.startObserving()
     }
 
     private static BleObserverController() {

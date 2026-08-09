@@ -18,11 +18,23 @@ export default class BleObserverController implements BleObserver {
 
     public async startObserving() {
         this.createBleObserverBackend()
+        this.startBleObserverBackend()
     }
 
     private createBleObserverBackend() {
         this.ndx.createBleObserverBackend({
             deviceUuid: this.deviceUuid,
+        })
+    }
+
+    private startBleObserverBackend() {
+        this.ndx.startBleObserverBackend({
+            deviceUuid: this.deviceUuid,
+            onAdvertisement: (
+                _data: Buffer,
+                _length: number,
+                _timestampSec: number
+            ) => {},
         })
     }
 }
