@@ -4,12 +4,14 @@ export default class BleObserverController implements BleObserver {
     public static Class?: BleObserverConstructor
 
     private readonly deviceUuid: string
+    private readonly onAdvertisement?: OnAdvertisement
     private readonly ndx = LibndxAdapter.getInstance()
 
     protected constructor(options: BleObserverOptions) {
-        const { deviceUuid } = options
+        const { deviceUuid, onAdvertisement } = options
 
         this.deviceUuid = deviceUuid ?? ''
+        this.onAdvertisement = onAdvertisement
     }
 
     public static Create(options: BleObserverOptions) {
@@ -31,10 +33,12 @@ export default class BleObserverController implements BleObserver {
         this.ndx.startBleObserverBackend({
             deviceUuid: this.deviceUuid,
             onAdvertisement: (
-                _data: Buffer,
-                _length: number,
-                _timestampSec: number
-            ) => {},
+                data: Buffer,
+                length: number,
+                timestampSec: number
+            ) => {
+                this.onAdvertisement?.(data, length, timestampSec)
+            },
         })
     }
 
@@ -59,4 +63,11 @@ export type BleObserverConstructor = new (
 
 export type BleObserverOptions = {
     deviceUuid: string
+    onAdvertisement?: OnAdvertisement
 }
+
+export type OnAdvertisement = (
+    data: Buffer,
+    length: number,
+    timestampSec: number
+) => void

@@ -8,9 +8,16 @@ import { FakeLibndx } from '@neurodevs/ndx-native'
 
 export default class BleObserverControllerTest extends AbstractPackageTest {
     private static instance: BleObserver
+    private static passedAdvertisements: PassedAdvertisement[]
+
+    private static readonly data = Buffer.from([0x01, 0x02, 0x03])
+    private static readonly length = 3
+    private static readonly timestampSec = 1234.5
 
     protected static async beforeEach() {
         await super.beforeEach()
+
+        this.passedAdvertisements = []
 
         this.instance = this.BleObserverController()
     }
@@ -48,6 +55,27 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async passesExpectedArgsToOnAdvertisement() {
+        await this.startObserving()
+
+        FakeLibndx.callsToStartBleObserver[0]?.onAdvertisement(
+            this.data,
+            this.length,
+            this.timestampSec
+        )
+
+        assert.isEqualDeep(
+            this.passedAdvertisements[0],
+            {
+                data: this.data,
+                length: this.length,
+                timestampSec: this.timestampSec,
+            },
+            'Did not pass expected args to onAdvertisement!'
+        )
+    }
+
+    @test()
     protected static async stopObservingStopsBleObserverBackend() {
         await this.stopObserving()
 
@@ -67,6 +95,19 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
     private static BleObserverController() {
         return BleObserverController.Create({
             deviceUuid: this.deviceUuid,
+            onAdvertisement: (
+                data: Buffer,
+                length: number,
+                timestampSec: number
+            ) => {
+                this.passedAdvertisements.push({ data, length, timestampSec })
+            },
         })
     }
+}
+
+type PassedAdvertisement = {
+    data: Buffer
+    length: number
+    timestampSec: number
 }
