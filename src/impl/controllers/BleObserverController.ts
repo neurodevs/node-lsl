@@ -74,4 +74,6 @@ export type BleObserverOptions = {
     onAdvertisement?: OnAdvertisement
 }
 
-export type OnAdvertisement = (advertisement: NativeAdvertisement) => void
+export type BleAdvertisement = NativeAdvertisement
+
+export type OnAdvertisement = (advertisement: BleAdvertisement) => void
