@@ -1,20 +1,30 @@
+import { randomInt } from 'node:crypto'
+
+import { FakeLibndx, NativeAdvertisement } from '@neurodevs/ndx-native'
 import { test, assert } from '@neurodevs/node-tdd'
 
+import AbstractPackageTest from '../AbstractPackageTest.js'
 import BleObserverController, {
     BleObserver,
 } from '../../impl/controllers/BleObserverController.js'
-import AbstractPackageTest from '../AbstractPackageTest.js'
-import { FakeLibndx } from '@neurodevs/ndx-native'
 
 export default class BleObserverControllerTest extends AbstractPackageTest {
     private static instance: BleObserver
-    private static passedAdvertisements: PassedAdvertisement[]
+    private static passedAdvertisements: NativeAdvertisement[]
 
     private static readonly fakeError = this.generateId()
 
-    private static readonly data = Buffer.from([0x01, 0x02, 0x03])
-    private static readonly length = 3
-    private static readonly timestampSec = 1234.5
+    private static readonly advertisement: NativeAdvertisement = {
+        localName: this.generateId(),
+        companyId: randomInt(0, 65535),
+        manufacturerData: this.generateId().slice(0, 8),
+        serviceUuids: [],
+        serviceData: {},
+        rssi: null,
+        txPowerLevel: null,
+        isConnectable: true,
+        timestampSec: 1234.5,
+    }
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -61,18 +71,12 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
         await this.startObserving()
 
         FakeLibndx.callsToStartBleObserver[0]?.onAdvertisement(
-            this.data,
-            this.length,
-            this.timestampSec
+            this.advertisement
         )
 
         assert.isEqualDeep(
             this.passedAdvertisements[0],
-            {
-                data: this.data,
-                length: this.length,
-                timestampSec: this.timestampSec,
-            },
+            this.advertisement,
             'Did not pass expected args to onAdvertisement!'
         )
     }
@@ -140,19 +144,9 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
     private static BleObserverController() {
         return BleObserverController.Create({
             deviceUuid: this.deviceUuid,
-            onAdvertisement: (
-                data: Buffer,
-                length: number,
-                timestampSec: number
-            ) => {
-                this.passedAdvertisements.push({ data, length, timestampSec })
+            onAdvertisement: (advertisement: NativeAdvertisement) => {
+                this.passedAdvertisements.push(advertisement)
             },
         })
     }
-}
-
-type PassedAdvertisement = {
-    data: Buffer
-    length: number
-    timestampSec: number
 }

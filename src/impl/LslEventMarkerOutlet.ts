@@ -99,7 +99,7 @@ export default class LslEventMarkerOutlet implements EventMarkerOutlet {
             channelFormat: 'string',
             sampleRateHz: 0,
             chunkSize: 1,
-        } as LslOutletOptions
+        } satisfies LslOutletOptions
     }
 
     private static LslStreamOutlet(options?: Partial<LslOutletOptions>) {

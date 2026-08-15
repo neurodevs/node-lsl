@@ -1,4 +1,4 @@
-import { LibndxAdapter } from '@neurodevs/ndx-native'
+import { LibndxAdapter, NativeAdvertisement } from '@neurodevs/ndx-native'
 
 export default class BleObserverController implements BleObserver {
     public static Class?: BleObserverConstructor
@@ -34,12 +34,8 @@ export default class BleObserverController implements BleObserver {
     private startBleObserverBackend() {
         const { status, error } = this.ndx.startBleObserverBackend({
             deviceUuid: this.deviceUuid,
-            onAdvertisement: (
-                data: Buffer,
-                length: number,
-                timestampSec: number
-            ) => {
-                this.onAdvertisement?.(data, length, timestampSec)
+            onAdvertisement: (advertisement: NativeAdvertisement) => {
+                this.onAdvertisement?.(advertisement)
             },
         })
 
@@ -78,8 +74,4 @@ export type BleObserverOptions = {
     onAdvertisement?: OnAdvertisement
 }
 
-export type OnAdvertisement = (
-    data: Buffer,
-    length: number,
-    timestampSec: number
-) => void
+export type OnAdvertisement = (advertisement: NativeAdvertisement) => void
