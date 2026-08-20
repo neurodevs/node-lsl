@@ -12,7 +12,7 @@ export default class LslStreamInfo implements LslInfo {
     public readonly name: string
     public readonly type: string
     public readonly sourceId: string
-    public readonly channelNames: string[]
+    public readonly channelNames: readonly string[]
     public readonly channelCount: number
     public readonly channelFormat: ChannelFormat
     public readonly sampleRateHz: number
@@ -87,7 +87,7 @@ export interface LslInfo {
     readonly type: string
     readonly sourceId: string
     readonly units: string
-    readonly channelNames: string[]
+    readonly channelNames: readonly string[]
     readonly channelCount: number
     readonly channelFormat: ChannelFormat
     readonly sampleRateHz: number
@@ -97,7 +97,7 @@ export interface LslInfo {
 export type LslInfoConstructor = new (options: LslInfoOptions) => LslInfo
 
 export interface LslInfoOptions {
-    channelNames: string[]
+    channelNames: readonly string[]
     channelFormat: ChannelFormat
     sampleRateHz: number
     name?: string

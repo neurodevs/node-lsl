@@ -25,7 +25,7 @@ export default class LslStreamOutlet implements LslOutlet {
     public readonly name: string
     public readonly type: string
     public readonly sourceId: string
-    public readonly channelNames: string[]
+    public readonly channelNames: readonly string[]
     public readonly channelFormat: ChannelFormat
     public readonly channelCount: number
     public readonly sampleRateHz: number
@@ -168,7 +168,7 @@ export interface LslOutlet {
     readonly name: string
     readonly type: string
     readonly sourceId: string
-    readonly channelNames: string[]
+    readonly channelNames: readonly string[]
     readonly channelCount: number
     readonly channelFormat: ChannelFormat
     readonly sampleRateHz: number
@@ -184,7 +184,7 @@ export interface LslOutletOptions {
     name: string
     type: string
     sourceId: string
-    channelNames: string[]
+    channelNames: readonly string[]
     channelFormat: ChannelFormat
     sampleRateHz: number
     chunkSize: number

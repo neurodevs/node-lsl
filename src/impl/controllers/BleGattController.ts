@@ -112,7 +112,7 @@ export default class BleGattController implements BleGatt {
                 this.log.info(`Connected to device ${this.uuid}!`)
                 this.onConnected?.(peripheral)
             },
-            charCallbacks: this.charCallbacks,
+            charCallbacks: [...this.charCallbacks],
         })
 
         this.throwIfError(status, error)
@@ -155,7 +155,7 @@ export default class BleGattController implements BleGatt {
     ) {
         const { status, error } = this.ndx.registerBleGattCharCallbacks({
             deviceUuid: this.requireUuid(),
-            charCallbacks,
+            charCallbacks: [...charCallbacks],
         })
 
         this.throwIfError(status, error)
@@ -224,7 +224,7 @@ export type BleGattState =
     | { status: 'connecting'; uuid: string; name?: string }
     | { status: 'connected'; uuid: string; name: string }
 
-export type CharacteristicCallbacks = {
+export type CharacteristicCallbacks = readonly {
     charUuid: string
     charName?: string
     onData: (data: Buffer, length: number, timestampSec: number) => void
