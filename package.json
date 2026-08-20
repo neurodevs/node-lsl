@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "23.1.0",
+  "version": "23.1.1",
   "description": "Lab Streaming Layer (LSL) bindings for Node",
   "type": "module",
   "keywords": [
@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@neurodevs/generate-id": "^1.1.3",
-    "@neurodevs/ndx-native": "^9.0.0",
+    "@neurodevs/ndx-native": "^9.0.1",
     "ffi-rs": "^1.3.1",
     "ws": "^8.18.3"
   },
