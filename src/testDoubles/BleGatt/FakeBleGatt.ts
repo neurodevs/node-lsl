@@ -22,21 +22,24 @@ export default class FakeBleGatt implements BleGatt {
 
     public static fakeCharacteristics: Record<string, unknown> = {}
     public static fakeName = `fake-${generateId()}`
+    public static fakeDiscoveredUuid = `fake-uuid-${generateId()}`
 
-    private _uuid: string
-    private _name: string
+    private _uuid?: string
+    private _name?: string
 
     public constructor(options?: BleGattOptions) {
         const { deviceUuid } = options ?? {}
 
-        this._uuid = deviceUuid ?? generateId()
-        this._name = FakeBleGatt.fakeName
+        this._uuid = deviceUuid
 
         FakeBleGatt.callsToConstructor.push(options)
     }
 
     public async connect() {
         FakeBleGatt.numCallsToConnect++
+
+        this._uuid = this._uuid ?? FakeBleGatt.fakeDiscoveredUuid
+        this._name = FakeBleGatt.fakeName
     }
 
     public async writeCharacteristic(
@@ -60,11 +63,11 @@ export default class FakeBleGatt implements BleGatt {
     }
 
     public get uuid() {
-        return this._uuid
+        return this._uuid ?? ''
     }
 
     public get name() {
-        return this._name
+        return this._name ?? 'N/A'
     }
 
     public static resetTestDouble() {

@@ -21,6 +21,8 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     private static readonly fakeError = this.generateId()
     private static readonly fake400Error = `400 error: ${this.fakeError}`
     private static readonly fake500Error = `500 error: ${this.fakeError}`
+    private static readonly uuidNotResolvedError =
+        'Device uuid is not resolved yet! Must either pass as option to Create or call connect() first.'
 
     private static readonly charCallbacks = [
         {
@@ -93,7 +95,7 @@ export default class BleGattControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async discoversUuidWhenDeviceUuidNotProvided() {
-        const instance = await this.BleGattControllerWithPrefix()
+        const instance = this.BleGattControllerWithPrefix()
 
         await this.connectWithDiscovery(instance)
 
@@ -124,7 +126,7 @@ export default class BleGattControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async usesDiscoveredUuidToCreateBleBackend() {
-        const instance = await this.BleGattControllerWithPrefix()
+        const instance = this.BleGattControllerWithPrefix()
 
         await this.connectWithDiscovery(instance)
 
@@ -139,7 +141,7 @@ export default class BleGattControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async usesDiscoveredUuidToStartBleBackend() {
-        const instance = await this.BleGattControllerWithPrefix()
+        const instance = this.BleGattControllerWithPrefix()
 
         await this.connectWithDiscovery(instance)
 
@@ -152,7 +154,7 @@ export default class BleGattControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async exposesDiscoveredUuid() {
-        const instance = await this.BleGattControllerWithPrefix()
+        const instance = this.BleGattControllerWithPrefix()
 
         await this.connectWithDiscovery(instance)
 
@@ -406,8 +408,8 @@ export default class BleGattControllerTest extends AbstractPackageTest {
         await this.connect()
         await this.disconnect()
 
-        assert.isFalse(
-            this.instance.getConnected(),
+        assert.isTrue(
+            this.instance.getState().status === 'disconnected',
             'Did not reset connected flag on disconnect!'
         )
     }
@@ -429,6 +431,46 @@ export default class BleGattControllerTest extends AbstractPackageTest {
             this.instance.name,
             'N/A',
             'Did not set default name to N/A!'
+        )
+    }
+
+    @test()
+    protected static async writeCharacteristicThrowsIfUuidNotResolved() {
+        const instance = this.BleGattControllerWithPrefix()
+
+        await assert.doesThrowAsync(
+            async () =>
+                await instance.writeCharacteristic(
+                    this.charUuid,
+                    this.charValueToWrite
+                ),
+            this.uuidNotResolvedError,
+            'Should not write to a device whose uuid is not resolved!'
+        )
+    }
+
+    @test()
+    protected static async subscribeCharacteristicsThrowsIfUuidNotResolved() {
+        const instance = this.BleGattControllerWithPrefix()
+
+        await assert.doesThrowAsync(
+            async () =>
+                await instance.subscribeCharacteristics(
+                    this.extraCharCallbacks
+                ),
+            this.uuidNotResolvedError,
+            'Should not subscribe to a device whose uuid is not resolved!'
+        )
+    }
+
+    @test()
+    protected static async disconnectThrowsIfUuidNotResolved() {
+        const instance = this.BleGattControllerWithPrefix()
+
+        await assert.doesThrowAsync(
+            async () => await instance.disconnect(),
+            this.uuidNotResolvedError,
+            'Should not disconnect a device whose uuid is not resolved!'
         )
     }
 

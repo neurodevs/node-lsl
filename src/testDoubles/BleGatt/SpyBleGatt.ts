@@ -19,8 +19,8 @@ export default class SpyBleGatt extends BleGattController {
         return this.rssiIntervalMs
     }
 
-    public getConnected() {
-        return this.connected
+    public getState() {
+        return this.state
     }
 
     public setLogInfoSpy() {

@@ -7,11 +7,9 @@ export default class BleGattController implements BleGatt {
 
     protected charCallbacks: CharacteristicCallbacks
     protected rssiIntervalMs?: number
-    protected connected = false
+    protected state: BleGattState = { status: 'disconnected' }
     protected log = console
 
-    private deviceUuid?: string
-    private deviceName?: string
     private deviceNamePrefix?: string
     private onConnected?: (peripheral: NativePeripheral) => void
 
@@ -26,7 +24,7 @@ export default class BleGattController implements BleGatt {
             rssiIntervalMs,
         } = options
 
-        this.deviceUuid = deviceUuid
+        this.state = { status: 'disconnected', uuid: deviceUuid }
         this.deviceNamePrefix = deviceNamePrefix
         this.charCallbacks = charCallbacks
         this.onConnected = onConnected
@@ -38,9 +36,11 @@ export default class BleGattController implements BleGatt {
     }
 
     public async connect() {
-        if (!this.deviceUuid) {
+        if (!this.state.uuid) {
             await this.discoverUuid()
         }
+
+        this.state = { status: 'connecting', uuid: this.uuid }
 
         this.createBleGattBackend()
         this.startBleGattBackend()
@@ -55,7 +55,7 @@ export default class BleGattController implements BleGatt {
         const { status, error } = this.ndx.discoverBleUuid({
             namePrefix: this.deviceNamePrefix as string,
             onDiscovered: (uuid: string) => {
-                this.deviceUuid = uuid
+                this.state = { status: 'disconnected', uuid }
             },
         })
 
@@ -67,7 +67,7 @@ export default class BleGattController implements BleGatt {
     private async waitForDiscoveredUuid() {
         await new Promise<void>((resolve) => {
             const checkDiscovered = () => {
-                if (this.deviceUuid) {
+                if (this.uuid) {
                     resolve()
                 } else {
                     BleGattController.setTimeout(checkDiscovered, 100)
@@ -108,8 +108,7 @@ export default class BleGattController implements BleGatt {
             deviceUuid: this.uuid,
             onConnected: (peripheral: NativePeripheral) => {
                 const { name } = peripheral
-                this.deviceName = name
-                this.connected = true
+                this.state = { status: 'connected', uuid: this.uuid, name }
                 this.log.info(`Connected to device ${this.uuid}!`)
                 this.onConnected?.(peripheral)
             },
@@ -122,7 +121,7 @@ export default class BleGattController implements BleGatt {
     private async waitForOnConnected() {
         await new Promise<void>((resolve) => {
             const checkConnected = () => {
-                if (this.connected) {
+                if (this.state.status === 'connected') {
                     resolve()
                 } else {
                     BleGattController.setTimeout(checkConnected, 100)
@@ -143,7 +142,7 @@ export default class BleGattController implements BleGatt {
         value: string
     ) {
         const { status, error } = this.ndx.writeBleGattChar({
-            deviceUuid: this.uuid,
+            deviceUuid: this.requireUuid(),
             charUuid,
             value,
         })
@@ -155,7 +154,7 @@ export default class BleGattController implements BleGatt {
         charCallbacks: CharacteristicCallbacks
     ) {
         const { status, error } = this.ndx.registerBleGattCharCallbacks({
-            deviceUuid: this.uuid,
+            deviceUuid: this.requireUuid(),
             charCallbacks,
         })
 
@@ -166,19 +165,28 @@ export default class BleGattController implements BleGatt {
 
     public async disconnect() {
         const { status, error } = this.ndx.stopBleGattBackend({
-            deviceUuid: this.uuid,
+            deviceUuid: this.requireUuid(),
         })
 
         this.throwIfError(status, error)
-        this.connected = false
+        this.state = { status: 'disconnected', uuid: this.state.uuid }
     }
 
     public get uuid() {
-        return this.deviceUuid ?? ''
+        return this.state.uuid ?? ''
     }
 
     public get name() {
-        return this.deviceName ?? 'N/A'
+        return this.state.name ?? 'N/A'
+    }
+
+    private requireUuid() {
+        if (!this.uuid) {
+            throw new Error(
+                'Device uuid is not resolved yet! Must either pass as option to Create or call connect() first.'
+            )
+        }
+        return this.uuid
     }
 }
 
@@ -210,6 +218,11 @@ export type BleGattOptions = {
 )
 
 export type BleGattConstructor = new (options: BleGattOptions) => BleGatt
+
+export type BleGattState =
+    | { status: 'disconnected'; uuid?: string; name?: string }
+    | { status: 'connecting'; uuid: string; name?: string }
+    | { status: 'connected'; uuid: string; name: string }
 
 export type CharacteristicCallbacks = {
     charUuid: string
