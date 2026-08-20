@@ -1,22 +1,9 @@
-import { LibndxAdapter, Libndx, NativePeripheral } from '@neurodevs/ndx-native'
+import { LibndxAdapter, NativePeripheral } from '@neurodevs/ndx-native'
 
 export default class BleGattController implements BleGatt {
     public static Class?: BleGattConstructor
     public static setTimeout = setTimeout
     public static waitAfterMs = 1000
-
-    private static _ndx?: Libndx
-
-    public static get ndx() {
-        if (!this._ndx) {
-            this._ndx = LibndxAdapter.getInstance()
-        }
-        return this._ndx
-    }
-
-    public static set ndx(value: Libndx) {
-        this._ndx = value
-    }
 
     protected charCallbacks: CharacteristicCallbacks
     protected rssiIntervalMs?: number
@@ -24,9 +11,11 @@ export default class BleGattController implements BleGatt {
     protected log = console
 
     private deviceUuid?: string
-    private deviceNamePrefix?: string
     private deviceName?: string
+    private deviceNamePrefix?: string
     private onConnected?: (peripheral: NativePeripheral) => void
+
+    private readonly ndx = LibndxAdapter.getInstance()
 
     protected constructor(options: BleGattOptions) {
         const {
@@ -190,10 +179,6 @@ export default class BleGattController implements BleGatt {
 
     public get name() {
         return this.deviceName ?? 'N/A'
-    }
-
-    private get ndx() {
-        return BleGattController.ndx
     }
 }
 

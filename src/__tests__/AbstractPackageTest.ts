@@ -100,8 +100,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         FakeLibndx.resetTestDouble()
         FakeLibndx.fakeResult = { status: 200 }
-
-        BleGattController.ndx = this.fakeLibndx
     }
 
     protected static setSpyLslInfo() {
