@@ -191,8 +191,8 @@ export default class BleGattController implements BleGatt {
 }
 
 export interface BleGatt {
-    uuid: string
-    name: string
+    readonly uuid: string
+    readonly name: string
 
     connect(): Promise<void>
 

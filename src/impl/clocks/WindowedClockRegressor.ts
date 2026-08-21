@@ -41,7 +41,7 @@ export default class WindowedClockRegressor implements ClockRegressor {
 
         const anchor = this.anchorTimeFor(deviceTime)
 
-        const timestamps = Array(chunkSize).fill(0)
+        const timestamps: number[] = Array(chunkSize).fill(0)
 
         for (let i = 0; i <= chunkSize - 1; i++) {
             const stepsFromLast = chunkSize - 1 - i
