@@ -824,10 +824,10 @@
   dependencies:
     "@tybys/wasm-util" "^0.10.2"
 
-"@neurodevs/eslint-config-ndx@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@neurodevs/eslint-config-ndx/-/eslint-config-ndx-2.0.2.tgz#1aaa39ada4a8c53a94e5cbc9d006ea66d59a0c75"
-  integrity sha512-XaYk29g7VK7KvFf+E088SgN9fB55er0Oe/R0j/WevOAtRK278l3R7AZxlni4UTR36+MPrzSPMadiH2HL92nOhQ==
+"@neurodevs/eslint-config-ndx@2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@neurodevs/eslint-config-ndx/-/eslint-config-ndx-2.0.3.tgz#fa7e768e5550698b4703484be6f2dd153590b688"
+  integrity sha512-7q3wpVdJkGFWIo8I0wUqZS1edgnjPFUlY79QYBdXG25bYivRnlnINRLsljzRB8F+ZwJtiOKcEqxaTLyqDGw9Lw==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^8.56.0"
     "@typescript-eslint/parser" "^8.56.0"
