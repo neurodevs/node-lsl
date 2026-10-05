@@ -13,6 +13,8 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
     private static passedAdvertisements: NativeAdvertisement[]
 
     private static readonly fakeError = this.generateId()
+    private static readonly namePrefix = this.generateId()
+    private static readonly discoveredUuid = this.generateId()
 
     private static readonly advertisement: NativeAdvertisement = {
         localName: this.generateId(),
@@ -91,6 +93,93 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async discoversUuidByNamePrefixWhenUuidNotProvided() {
+        const observer = this.BleObserverWithNamePrefix()
+        void observer.startObserving()
+
+        assert.isEqual(
+            FakeLibndx.callsToDiscoverBleUuid[0]?.namePrefix,
+            this.namePrefix,
+            'Did not discover uuid by name prefix!'
+        )
+    }
+
+    @test()
+    protected static async doesNotDiscoverUuidWhenUuidProvided() {
+        await this.startObserving()
+
+        assert.isLength(
+            FakeLibndx.callsToDiscoverBleUuid,
+            0,
+            'Should not discover uuid when uuid is provided!'
+        )
+    }
+
+    @test()
+    protected static async throwsWhenBothUuidAndNamePrefixProvided() {
+        assert.doesThrow(
+            () =>
+                BleObserverController.Create({
+                    deviceUuid: this.deviceUuid,
+                    deviceNamePrefix: this.namePrefix,
+                }),
+            'Cannot pass both deviceUuid and deviceNamePrefix!',
+            'Did not throw when both uuid and name prefix were provided!'
+        )
+    }
+
+    @test()
+    protected static async waitsForDiscoveredUuidBeforeCreatingBackend() {
+        const observer = this.BleObserverWithNamePrefix()
+        void observer.startObserving()
+
+        await this.wait(1)
+
+        assert.isLength(
+            FakeLibndx.callsToCreateBleObserver,
+            0,
+            'Created backend before uuid was discovered!'
+        )
+    }
+
+    @test()
+    protected static async observesDeviceWithDiscoveredUuid() {
+        await this.startObservingWithDiscovery()
+
+        assert.isEqualDeep(
+            {
+                created: FakeLibndx.callsToCreateBleObserver[0]?.deviceUuid,
+                started: FakeLibndx.callsToStartBleObserver[0]?.deviceUuid,
+            },
+            { created: this.discoveredUuid, started: this.discoveredUuid },
+            'Did not observe device with discovered uuid!'
+        )
+    }
+
+    @test()
+    protected static async stopsObservingDeviceWithDiscoveredUuid() {
+        const observer = await this.startObservingWithDiscovery()
+        await observer.stopObserving()
+
+        assert.isEqualDeep(
+            FakeLibndx.callsToStopBleObserver[0],
+            { deviceUuid: this.discoveredUuid },
+            'Did not stop observing device with discovered uuid!'
+        )
+    }
+
+    @test()
+    protected static async startObservingThrowsWhenDiscoveryFails() {
+        this.setFakeErrorResult()
+
+        await assert.doesThrowAsync(
+            async () => await this.BleObserverWithNamePrefix().startObserving(),
+            this.fakeError,
+            'Did not throw when discovery failed!'
+        )
+    }
+
+    @test()
     protected static async createBleObserverBackendThrowsOnError() {
         this.setFakeErrorResult()
 
@@ -126,6 +215,24 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
         )
     }
 
+    private static async startObserving() {
+        await this.instance.startObserving()
+    }
+
+    private static async stopObserving() {
+        await this.instance.stopObserving()
+    }
+
+    private static async startObservingWithDiscovery() {
+        const observer = this.BleObserverWithNamePrefix()
+        const promise = observer.startObserving()
+
+        FakeLibndx.callsToDiscoverBleUuid[0]?.onDiscovered(this.discoveredUuid)
+        await promise
+
+        return observer
+    }
+
     private static setFakeErrorResult() {
         FakeLibndx.fakeResult = {
             status: 400,
@@ -133,12 +240,10 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
         }
     }
 
-    private static async startObserving() {
-        await this.instance.startObserving()
-    }
-
-    private static async stopObserving() {
-        await this.instance.stopObserving()
+    private static BleObserverWithNamePrefix() {
+        return BleObserverController.Create({
+            deviceNamePrefix: this.namePrefix,
+        })
     }
 
     private static BleObserverController() {

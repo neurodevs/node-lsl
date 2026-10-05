@@ -3,14 +3,21 @@ import { LibndxAdapter, NativeAdvertisement } from '@neurodevs/ndx-native'
 export default class BleObserverController implements BleObserver {
     public static Class?: BleObserverConstructor
 
-    private readonly deviceUuid: string
+    private readonly deviceNamePrefix?: string
     private readonly onAdvertisement?: OnAdvertisement
     private readonly ndx = LibndxAdapter.getInstance()
 
+    private deviceUuid: string
+
     protected constructor(options: BleObserverOptions) {
-        const { deviceUuid, onAdvertisement } = options
+        const { deviceUuid, deviceNamePrefix, onAdvertisement } = options
+
+        if (deviceUuid && deviceNamePrefix) {
+            this.throwTooManyParams()
+        }
 
         this.deviceUuid = deviceUuid ?? ''
+        this.deviceNamePrefix = deviceNamePrefix
         this.onAdvertisement = onAdvertisement
     }
 
@@ -18,9 +25,33 @@ export default class BleObserverController implements BleObserver {
         return new (this.Class ?? this)(options)
     }
 
+    private throwTooManyParams() {
+        throw new Error(
+            'Cannot pass both deviceUuid and deviceNamePrefix! Please pass only one.'
+        )
+    }
+
     public async startObserving() {
+        if (!this.deviceUuid && this.deviceNamePrefix) {
+            await this.discoverUuid(this.deviceNamePrefix)
+        }
+
         this.createBleObserverBackend()
         this.startBleObserverBackend()
+    }
+
+    private discoverUuid(namePrefix: string) {
+        return new Promise<void>((resolve) => {
+            const { status, error } = this.ndx.discoverBleUuid({
+                namePrefix,
+                onDiscovered: (uuid: string) => {
+                    this.deviceUuid = uuid
+                    resolve()
+                },
+            })
+
+            this.throwIfError(status, error)
+        })
     }
 
     private createBleObserverBackend() {
@@ -70,9 +101,11 @@ export type BleObserverConstructor = new (
 ) => BleObserver
 
 export type BleObserverOptions = {
-    deviceUuid: string
     onAdvertisement?: OnAdvertisement
-}
+} & (
+    | { deviceUuid: string; deviceNamePrefix?: string }
+    | { deviceUuid?: string; deviceNamePrefix: string }
+)
 
 export type BleAdvertisement = NativeAdvertisement
 
