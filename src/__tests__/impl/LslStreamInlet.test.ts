@@ -1,13 +1,5 @@
 import { FakeLiblsl } from '@neurodevs/ndx-native'
 import { test, assert } from '@neurodevs/node-tdd'
-import {
-    createPointer,
-    DataType,
-    FieldType,
-    JsExternal,
-    PointerType,
-    unwrapPointer,
-} from 'ffi-rs'
 
 import LslStreamInlet, { LslInletOptions } from '../../impl/LslStreamInlet.js'
 import SpyLslInlet from '../../testDoubles/LslInlet/SpyLslInlet.js'
@@ -20,27 +12,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
         samples: number[]
         timestamps: number[]
     }[]
-
-    private static readonly sampleBufferPtr = unwrapPointer(
-        createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [new Float32Array(this.channelCount * this.chunkSize)],
-        })
-    )[0]
-
-    private static readonly timestampBufferPtr = unwrapPointer(
-        createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [new Float64Array(this.chunkSize)],
-        })
-    )[0]
-
-    private static readonly errorCodePtr = unwrapPointer(
-        createPointer({
-            paramsType: [DataType.U8Array],
-            paramsValue: [new Int32Array(1)],
-        })
-    )[0]
 
     protected static async beforeAll() {
         assert.isEqual(
@@ -60,7 +31,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         LslStreamInlet.waitAfterOpenStreamMs = 0
         LslStreamInlet.lsl = this.fakeLiblsl
-        LslStreamInlet.freePointer = () => {}
 
         this.instance = await this.LslStreamInlet()
     }
@@ -81,6 +51,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 infoHandle: this.inletHandle,
                 maxBufferedMs: this.maxBufferedMs,
+                chunkSize: this.chunkSize,
             },
             'Should have called createInlet!'
         )
@@ -101,46 +72,39 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
     @test()
     protected static async destroyCallsLslBinding() {
-        await this.startPullingThenDestroy()
+        await this.startPulling()
+        const inletHandle = this.inletHandle
 
-        assert.isEqualDeep(
-            this.fakeLiblsl.lastDestroyInletOptions,
-            { inletHandle: this.inletHandle },
+        this.destroy()
+
+        assert.isTrue(
+            inletHandle !== undefined &&
+                this.fakeLiblsl.lastDestroyInletOptions?.inletHandle ===
+                    inletHandle,
             'Did not destroy inlet!'
         )
     }
 
     @test()
-    protected static async destroyFreesAllPointers() {
-        interface FreePointerParams {
-            paramsType: FieldType[]
-            paramsValue: JsExternal[]
-            pointerType: PointerType
-        }
+    protected static async destroyDoesNotDestroyInletThatWasNeverCreated() {
+        this.destroy()
 
-        let calls: FreePointerParams[] = []
+        assert.isEqual(
+            this.fakeLiblsl.destroyInletHitCount,
+            0,
+            'Should not have destroyed an inlet that was never created!'
+        )
+    }
 
-        LslStreamInlet.freePointer = (params: FreePointerParams) => {
-            calls.push(params)
-        }
-
+    @test()
+    protected static async destroyingTwiceDestroysInletOnce() {
         await this.startPullingThenDestroy()
+        this.destroy()
 
-        const { paramsType, pointerType } = calls[0]
-
-        assert.isEqualDeep(
-            { paramsType, pointerType },
-            {
-                paramsType: [
-                    DataType.U8Array,
-                    DataType.U8Array,
-                    DataType.U8Array,
-                    DataType.U8Array,
-                ],
-                pointerType: PointerType.CPointer,
-            },
-
-            'Destroy did not free all pointers!'
+        assert.isEqual(
+            this.fakeLiblsl.destroyInletHitCount,
+            1,
+            'Should have destroyed inlet only once!'
         )
     }
 
@@ -207,7 +171,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 inletHandle: this.inletHandle,
                 timeoutMs: aboutOneYearInMs,
-                errorCodePtr: this.errorCodePtr,
             },
             'Did not open inlet stream!'
         )
@@ -230,7 +193,6 @@ export default class LslStreamInletTest extends AbstractPackageTest {
             {
                 inletHandle: instance['inletHandle'],
                 timeoutMs: openStreamTimeoutMs,
-                errorCodePtr: this.errorCodePtr,
             },
             'Did not open inlet stream with passed timeout!'
         )
@@ -316,13 +278,7 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastPullSampleOptions,
-            {
-                inletHandle: this.inletHandle,
-                sampleBufferPtr: this.sampleBufferPtr,
-                sampleBufferElements: this.channelCount,
-                timeoutMs: 0,
-                errorCodePtr: this.errorCodePtr,
-            },
+            { inletHandle: this.inletHandle, timeoutMs: 0 },
             'Should have called pullSample!'
         )
     }
@@ -333,33 +289,36 @@ export default class LslStreamInletTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.fakeLiblsl.lastPullChunkOptions,
-            {
-                inletHandle: this.inletHandle,
-                sampleBufferPtr: this.sampleBufferPtr,
-                timestampBufferPtr: this.timestampBufferPtr,
-                sampleBufferElements: this.chunkSize * this.channelCount,
-                timestampBufferElements: this.chunkSize,
-                timeoutMs: 0,
-                errorCodePtr: this.errorCodePtr,
-            },
+            { inletHandle: this.inletHandle, timeoutMs: 0 },
             'Should have called pullChunk!'
         )
     }
 
     @test()
-    protected static async pushSampleHandlesErrorCode() {
-        let passedErrorCode: number | undefined
+    protected static async passesEachPulledSampleToOnData() {
+        await this.runChunkSizeOne()
 
-        LslStreamInlet.handleLslError = (errorCode: number) => {
-            passedErrorCode = errorCode
-        }
+        assert.isEqualDeep(
+            this.callsToOnData,
+            FakeLiblsl.fakeSamples.map((sample) => ({
+                samples: Array.from(sample),
+                timestamps: [FakeLiblsl.fakeSampleTimestampSec],
+            })),
+            'Did not pass each pulled sample to onData!'
+        )
+    }
 
+    @test()
+    protected static async passesEachPulledChunkToOnData() {
         await this.startThenStop()
 
         assert.isEqualDeep(
-            passedErrorCode,
-            FakeLiblsl.fakeErrorCode,
-            'Did not pass the expected error code to handleLslError!'
+            this.callsToOnData,
+            FakeLiblsl.fakeChunks.map((chunk, i) => ({
+                samples: Array.from(chunk),
+                timestamps: Array.from(FakeLiblsl.fakeTimestamps[i]),
+            })),
+            'Did not pass each pulled chunk to onData!'
         )
     }
 
