@@ -125,6 +125,19 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async throwsWhenBothUuidAndNamePrefixProvided() {
+        assert.doesThrow(
+            () =>
+                this.BleGattController({
+                    deviceUuid: this.uuid,
+                    deviceNamePrefix: this.namePrefix,
+                }),
+            this.tooManyParamsError,
+            'Did not throw when both uuid and name prefix were provided!'
+        )
+    }
+
+    @test()
     protected static async usesDiscoveredUuidToCreateBleBackend() {
         const instance = this.BleGattControllerWithPrefix()
 

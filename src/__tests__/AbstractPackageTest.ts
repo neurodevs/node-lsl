@@ -53,6 +53,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static readonly sampleRateHz = Math.floor(Math.random() * 100)
     protected static readonly maxBufferedMs = Math.floor(Math.random() * 1000)
 
+    protected static readonly tooManyParamsError = `Cannot pass both deviceUuid and deviceNamePrefix! Please pass only one.`
+
     protected static async beforeEach() {
         await super.beforeEach()
 

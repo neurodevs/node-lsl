@@ -24,6 +24,10 @@ export default class BleGattController implements BleGatt {
             rssiIntervalMs,
         } = options
 
+        if (deviceUuid && deviceNamePrefix) {
+            this.throwTooManyParams()
+        }
+
         this.state = { status: 'disconnected', uuid: deviceUuid }
         this.deviceNamePrefix = deviceNamePrefix
         this.charCallbacks = charCallbacks
@@ -33,6 +37,12 @@ export default class BleGattController implements BleGatt {
 
     public static Create(options: BleGattOptions) {
         return new (this.Class ?? this)(options)
+    }
+
+    private throwTooManyParams() {
+        throw new Error(
+            'Cannot pass both deviceUuid and deviceNamePrefix! Please pass only one.'
+        )
     }
 
     public async connect() {

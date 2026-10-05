@@ -123,7 +123,7 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
                     deviceUuid: this.deviceUuid,
                     deviceNamePrefix: this.namePrefix,
                 }),
-            'Cannot pass both deviceUuid and deviceNamePrefix!',
+            this.tooManyParamsError,
             'Did not throw when both uuid and name prefix were provided!'
         )
     }
