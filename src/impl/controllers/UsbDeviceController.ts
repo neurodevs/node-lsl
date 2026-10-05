@@ -20,8 +20,30 @@ export default class UsbDeviceController implements UsbDevice {
     }
 
     public async connect() {
-        this.ndx.createUsbBackend(this.usbDeviceOptions)
-        this.ndx.startUsbBackend(this.startUsbDeviceOptions)
+        this.createUsbBackend()
+        this.startUsbBackend()
+    }
+
+    private createUsbBackend() {
+        const { status, error } = this.ndx.createUsbBackend(
+            this.usbDeviceOptions
+        )
+
+        this.throwIfError(status, error)
+    }
+
+    private throwIfError(status: number, error: string | undefined) {
+        if (status !== 200) {
+            throw new Error(`${status} error: ${error ?? 'Unknown error'}`)
+        }
+    }
+
+    private startUsbBackend() {
+        const { status, error } = this.ndx.startUsbBackend(
+            this.startUsbDeviceOptions
+        )
+
+        this.throwIfError(status, error)
     }
 
     private get usbDeviceOptions() {
@@ -38,14 +60,18 @@ export default class UsbDeviceController implements UsbDevice {
     }
 
     public async writeUsb(value: string) {
-        this.ndx.writeUsbBackend({
+        const { status, error } = this.ndx.writeUsbBackend({
             ...this.usbDeviceOptions,
             value,
         })
+
+        this.throwIfError(status, error)
     }
 
     public async disconnect() {
-        this.ndx.stopUsbBackend(this.usbDeviceOptions)
+        const { status, error } = this.ndx.stopUsbBackend(this.usbDeviceOptions)
+
+        this.throwIfError(status, error)
     }
 }
 

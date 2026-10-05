@@ -92,6 +92,73 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async connectThrowsWhenUsbBackendCannotBeCreated() {
+        this.setFakeErrorResult()
+
+        await assert.doesThrowAsync(
+            async () => await this.connect(),
+            `400 error: ${this.fakeError}`,
+            'Did not throw when USB backend could not be created!'
+        )
+    }
+
+    @test()
+    protected static async doesNotStartUsbBackendThatCouldNotBeCreated() {
+        this.setFakeErrorResult()
+
+        await assert.doesThrowAsync(async () => await this.connect())
+
+        assert.isLength(
+            FakeLibndx.callsToStartUsbBackend,
+            0,
+            'Started a USB backend that could not be created!'
+        )
+    }
+
+    @test()
+    protected static async connectThrowsWhenUsbBackendCannotBeStarted() {
+        this.setFakeErrorResult()
+
+        //@ts-ignore
+        this.instance.createUsbBackend = () => {}
+
+        await assert.doesThrowAsync(
+            async () => await this.connect(),
+            `400 error: ${this.fakeError}`,
+            'Did not throw when USB backend could not be started!'
+        )
+    }
+
+    @test()
+    protected static async writeUsbThrowsOnError() {
+        this.setFakeErrorResult()
+
+        await assert.doesThrowAsync(
+            async () => await this.instance.writeUsb(this.valueToWrite),
+            `400 error: ${this.fakeError}`,
+            'Did not throw when writing failed!'
+        )
+    }
+
+    @test()
+    protected static async disconnectThrowsOnError() {
+        await this.connect()
+        this.setFakeErrorResult()
+
+        await assert.doesThrowAsync(
+            async () => await this.disconnect(),
+            `400 error: ${this.fakeError}`,
+            'Did not throw when stopping failed!'
+        )
+    }
+
+    private static readonly fakeError = this.generateId()
+
+    private static setFakeErrorResult() {
+        FakeLibndx.fakeResult = { status: 400, error: this.fakeError }
+    }
+
     private static async connect() {
         await this.instance.connect()
     }
