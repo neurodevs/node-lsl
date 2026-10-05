@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "23.1.2",
+  "version": "23.2.0",
   "description": "Lab Streaming Layer (LSL) bindings for Node",
   "type": "module",
   "keywords": [
