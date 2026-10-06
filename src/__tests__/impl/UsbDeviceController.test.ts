@@ -93,6 +93,148 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async connectPassesPortSettingsToCreateUsbBackend() {
+        const usb = UsbDeviceController.Create({
+            onData: this.onData,
+            serialNumber: this.serialNumber,
+            baudRate: 1000000,
+            usesRtsCts: true,
+        })
+
+        await usb.connect()
+
+        assert.isEqualDeep(
+            FakeLibndx.callsToCreateUsbBackend[0],
+            {
+                serialNumber: this.serialNumber,
+                baudRate: 1000000,
+                usesRtsCts: true,
+            },
+            'Did not pass port settings to create_usb_backend!'
+        )
+    }
+
+    @test()
+    protected static async passesPortSettingsOnlyWhenCreatingUsbBackend() {
+        const usb = UsbDeviceController.Create({
+            onData: this.onData,
+            serialNumber: this.serialNumber,
+            baudRate: 1000000,
+            usesRtsCts: true,
+        })
+
+        await usb.connect()
+        await usb.disconnect()
+
+        assert.isEqualDeep(
+            [
+                FakeLibndx.callsToStartUsbBackend[0],
+                FakeLibndx.callsToStopUsbBackend[0],
+            ],
+            [
+                { serialNumber: this.serialNumber, onData: this.onData },
+                { serialNumber: this.serialNumber },
+            ],
+            'Passed port settings to more than create_usb_backend!'
+        )
+    }
+
+    @test()
+    protected static async doesNotDiscoverSerialNumberWhenGiven() {
+        await this.connect()
+
+        assert.isEqual(
+            FakeLibndx.numCallsToDiscoverUsbSerialNumbers,
+            0,
+            'Should not discover serial number when one is given!'
+        )
+    }
+
+    @test()
+    protected static async usesDiscoveredSerialNumberWhenNoneGiven() {
+        FakeLibndx.fakeUsbSerialNumbers = [this.discoveredSerialNumber]
+
+        const usb = this.UsbDeviceWithoutSerialNumber()
+
+        await usb.connect()
+        await usb.writeUsb(this.valueToWrite)
+        await usb.disconnect()
+
+        assert.isEqualDeep(
+            [
+                FakeLibndx.callsToCreateUsbBackend[0]?.serialNumber,
+                FakeLibndx.callsToStartUsbBackend[0]?.serialNumber,
+                FakeLibndx.callsToWriteUsbBackend[0]?.serialNumber,
+                FakeLibndx.callsToStopUsbBackend[0]?.serialNumber,
+            ],
+            Array(4).fill(this.discoveredSerialNumber),
+            'Did not use discovered serial number when none was given!'
+        )
+    }
+
+    @test()
+    protected static async discoversSerialNumberOnlyOnce() {
+        FakeLibndx.fakeUsbSerialNumbers = [this.discoveredSerialNumber]
+
+        const usb = this.UsbDeviceWithoutSerialNumber()
+
+        await usb.connect()
+        await usb.disconnect()
+        await usb.connect()
+
+        assert.isEqual(
+            FakeLibndx.numCallsToDiscoverUsbSerialNumbers,
+            1,
+            'Should have discovered serial number only once!'
+        )
+    }
+
+    @test()
+    protected static async connectThrowsWhenNoUsbSerialDeviceIsFound() {
+        FakeLibndx.fakeUsbSerialNumbers = []
+
+        await assert.doesThrowAsync(
+            async () => await this.UsbDeviceWithoutSerialNumber().connect(),
+            'No USB serial device found!'
+        )
+    }
+
+    @test()
+    protected static async connectThrowsNamingEachDeviceWhenSeveralAreFound() {
+        FakeLibndx.fakeUsbSerialNumbers = ['AAAA1111', 'ZZZZ9999']
+
+        await assert.doesThrowAsync(
+            async () => await this.UsbDeviceWithoutSerialNumber().connect(),
+            'Found 2 USB serial devices (AAAA1111, ZZZZ9999)!'
+        )
+    }
+
+    @test()
+    protected static async doesNotCreateUsbBackendWhenDiscoveryFindsSeveral() {
+        FakeLibndx.fakeUsbSerialNumbers = ['AAAA1111', 'ZZZZ9999']
+
+        await assert.doesThrowAsync(
+            async () => await this.UsbDeviceWithoutSerialNumber().connect()
+        )
+
+        assert.isLength(
+            FakeLibndx.callsToCreateUsbBackend,
+            0,
+            'Created a USB backend without knowing which device to use!'
+        )
+    }
+
+    @test()
+    protected static async connectThrowsWhenDiscoveryFails() {
+        this.setFakeErrorResult()
+
+        await assert.doesThrowAsync(
+            async () => await this.UsbDeviceWithoutSerialNumber().connect(),
+            `400 error: ${this.fakeError}`
+        )
+    }
+
+    @test()
     protected static async connectThrowsWhenUsbBackendCannotBeCreated() {
         this.setFakeErrorResult()
 
@@ -151,6 +293,12 @@ export default class UsbDeviceControllerTest extends AbstractPackageTest {
             `400 error: ${this.fakeError}`,
             'Did not throw when stopping failed!'
         )
+    }
+
+    private static readonly discoveredSerialNumber = this.generateId()
+
+    private static UsbDeviceWithoutSerialNumber() {
+        return UsbDeviceController.Create({ onData: this.onData })
     }
 
     private static readonly fakeError = this.generateId()

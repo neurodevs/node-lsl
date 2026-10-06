@@ -842,10 +842,10 @@
   resolved "https://registry.yarnpkg.com/@neurodevs/generate-id/-/generate-id-1.1.3.tgz#c6ff626c9b32a25bf40eba8f11c48adf1435f35d"
   integrity sha512-l5eHQ2Z8KyRVZ+Abbif0DiUkP1yb7/b42OGFaoz1GesJk4hADR7ykbmidA8t8lI40w4RxzlsiQ02S6kjn4Y1xA==
 
-"@neurodevs/ndx-native@^10.0.0":
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/@neurodevs/ndx-native/-/ndx-native-10.0.0.tgz#a245d2757c04140a12dec195d2c5f059da1992ef"
-  integrity sha512-+OhImdAeJQQVkp+6eQoLkZQruGsQp9Wxpd6XyJCs7w+UwFfsoDUv4frSpuGyTFz/Ijp7q6VJ1VrvuvfdnmUg3g==
+"@neurodevs/ndx-native@^10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/ndx-native/-/ndx-native-10.1.0.tgz#38016b70cdbf1c18531c88e0f63034b9511ebb5c"
+  integrity sha512-xRIGd3lNqjFUI+dd97YIVSQiZaL3LsBV5JN0aJPFqrv9B5G2dIKYwmlFZpqe0vZZmqNKvVOXkSeCZKppwcyd1Q==
   dependencies:
     "@neurodevs/node-mangled-names" "^1.0.1"
     ffi-rs "^1.3.2"
