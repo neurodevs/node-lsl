@@ -169,6 +169,17 @@ export default class BleObserverControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async stopObservingDoesNothingIfUuidNotDiscovered() {
+        await this.BleObserverWithNamePrefix().stopObserving()
+
+        assert.isLength(
+            FakeLibndx.callsToStopBleObserver,
+            0,
+            'Should not stop a backend for a device that was never discovered!'
+        )
+    }
+
+    @test()
     protected static async startObservingThrowsWhenDiscoveryFails() {
         this.setFakeErrorResult()
 

@@ -74,7 +74,9 @@ export default class BleObserverController implements BleObserver {
     }
 
     public async stopObserving() {
-        this.stopBleObserverBackend()
+        if (this.deviceUuid) {
+            this.stopBleObserverBackend()
+        }
     }
 
     private stopBleObserverBackend() {

@@ -174,8 +174,12 @@ export default class BleGattController implements BleGatt {
     }
 
     public async disconnect() {
+        if (!this.uuid) {
+            return
+        }
+
         const { status, error } = this.ndx.stopBleGattBackend({
-            deviceUuid: this.requireUuid(),
+            deviceUuid: this.uuid,
         })
 
         this.throwIfError(status, error)

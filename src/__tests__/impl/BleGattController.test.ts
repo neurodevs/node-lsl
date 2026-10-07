@@ -477,13 +477,15 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async disconnectThrowsIfUuidNotResolved() {
+    protected static async disconnectDoesNothingIfUuidNotResolved() {
         const instance = this.BleGattControllerWithPrefix()
 
-        await assert.doesThrowAsync(
-            async () => await instance.disconnect(),
-            this.uuidNotResolvedError,
-            'Should not disconnect a device whose uuid is not resolved!'
+        await instance.disconnect()
+
+        assert.isLength(
+            FakeLibndx.callsToStopBleGattBackend,
+            0,
+            'Should not stop a backend for a device whose uuid is not resolved!'
         )
     }
 
