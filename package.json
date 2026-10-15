@@ -15,7 +15,6 @@
   ],
   "license": "MIT",
   "author": "Eric Yates <hello@ericyates.me>",
-  "homepage": "https://github.com/neurodevs/node-lsl",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/neurodevs/node-lsl.git"
@@ -46,12 +45,12 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
-    "@neurodevs/eslint-config-ndx": "2.0.3",
-    "@neurodevs/node-tdd": "^3.0.3",
+    "@neurodevs/eslint-config-ndx": "^2.0.3",
+    "@neurodevs/node-tdd": "^3.1.0",
     "@neurodevs/prettier-config-ndx": "^1.0.2",
     "@types/ws": "^8.18.1",
     "koffi": "^3.1.2",
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.10",
     "typescript": "^5.9.3"
   },
   "resolutions": {
