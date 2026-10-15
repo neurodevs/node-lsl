@@ -3,6 +3,8 @@ import { LibndxAdapter, NativePeripheral } from '@neurodevs/ndx-native'
 export default class BleGattController implements BleGatt {
     public static Class?: BleGattConstructor
     public static setTimeout = setTimeout
+    public static connectTimeoutMs = 30000
+    public static checkIntervalMs = 100
     public static waitAfterMs = 1000
 
     protected charCallbacks: CharacteristicCallbacks
@@ -75,16 +77,13 @@ export default class BleGattController implements BleGatt {
     }
 
     private async waitForDiscoveredUuid() {
-        await new Promise<void>((resolve) => {
-            const checkDiscovered = () => {
-                if (this.uuid) {
-                    resolve()
-                } else {
-                    BleGattController.setTimeout(checkDiscovered, 100)
-                }
-            }
-            checkDiscovered()
-        })
+        const wasDiscovered = await this.waitUntil(() => Boolean(this.uuid))
+
+        if (!wasDiscovered) {
+            throw new Error(
+                `Could not find a Bluetooth device whose name starts with "${this.deviceNamePrefix}" within ${this.connectTimeoutSeconds} seconds! Please make sure it is on, charged and in range.`
+            )
+        }
     }
 
     private createBleGattBackend() {
@@ -129,16 +128,43 @@ export default class BleGattController implements BleGatt {
     }
 
     private async waitForOnConnected() {
-        await new Promise<void>((resolve) => {
-            const checkConnected = () => {
-                if (this.state.status === 'connected') {
-                    resolve()
-                } else {
-                    BleGattController.setTimeout(checkConnected, 100)
-                }
+        const didConnect = await this.waitUntil(
+            () => this.state.status === 'connected'
+        )
+
+        if (!didConnect) {
+            this.ndx.stopBleGattBackend({ deviceUuid: this.uuid })
+            this.state = { status: 'disconnected', uuid: this.uuid }
+
+            throw new Error(
+                `Could not connect to Bluetooth device ${this.uuid} within ${this.connectTimeoutSeconds} seconds! Please make sure it is on, charged, in range and not connected to another app.`
+            )
+        }
+    }
+
+    private async waitUntil(isDone: () => boolean) {
+        const maxChecks =
+            BleGattController.connectTimeoutMs /
+            BleGattController.checkIntervalMs
+
+        for (let checks = 0; checks < maxChecks; checks++) {
+            if (isDone()) {
+                return true
             }
-            checkConnected()
-        })
+
+            await new Promise((resolve) =>
+                BleGattController.setTimeout(
+                    resolve,
+                    BleGattController.checkIntervalMs
+                )
+            )
+        }
+
+        return isDone()
+    }
+
+    private get connectTimeoutSeconds() {
+        return BleGattController.connectTimeoutMs / 1000
     }
 
     private async waitToDiscoverServices() {

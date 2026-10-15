@@ -62,12 +62,19 @@ export default class BleGattControllerTest extends AbstractPackageTest {
             1000,
             'Set incorrect waitAfterMs!'
         )
+
+        assert.isEqual(
+            BleGattController.connectTimeoutMs,
+            30000,
+            'Set incorrect connectTimeoutMs!'
+        )
     }
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         BleGattController.waitAfterMs = 0
+        BleGattController.connectTimeoutMs = 30000
         BleGattController.Class = SpyBleGatt
 
         this.wasConnected = false
@@ -275,6 +282,40 @@ export default class BleGattControllerTest extends AbstractPackageTest {
         assert.isTruthy(
             this.wasConnected,
             'Did not wait for onConnected event!'
+        )
+    }
+
+    @test()
+    protected static async throwsWhenDeviceIsNotFoundInTime() {
+        BleGattController.connectTimeoutMs = 300
+        const instance = this.BleGattControllerWithPrefix()
+
+        await assert.doesThrowAsync(
+            async () => await instance.connect(),
+            `Could not find a Bluetooth device whose name starts with "${this.namePrefix}" within 0.3 seconds! Please make sure it is on, charged and in range.`
+        )
+    }
+
+    @test()
+    protected static async throwsWhenDeviceDoesNotConnectInTime() {
+        BleGattController.connectTimeoutMs = 300
+
+        await assert.doesThrowAsync(
+            async () => await this.instance.connect(),
+            `Could not connect to Bluetooth device ${this.uuid} within 0.3 seconds! Please make sure it is on, charged, in range and not connected to another app.`
+        )
+    }
+
+    @test()
+    protected static async stopsBackendWhenDeviceDoesNotConnectInTime() {
+        BleGattController.connectTimeoutMs = 300
+
+        await assert.doesThrowAsync(async () => await this.instance.connect())
+
+        assert.isEqualDeep(
+            FakeLibndx.callsToStopBleGattBackend,
+            [{ deviceUuid: this.uuid }],
+            'Did not stop backend when device did not connect in time!'
         )
     }
 
