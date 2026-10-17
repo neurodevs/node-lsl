@@ -14,7 +14,7 @@ import {
     assertValidMaxBufferedMs,
     assertValidSampleRateHz,
 } from '../assertions.js'
-import LslStreamInfo, { LslInfo } from './LslStreamInfo.js'
+import LslStreamInfo, { LslInfo, StreamDescription } from './LslStreamInfo.js'
 
 export default class LslStreamOutlet implements LslOutlet {
     public static Class?: LslOutletConstructor
@@ -25,14 +25,15 @@ export default class LslStreamOutlet implements LslOutlet {
     public readonly name: string
     public readonly type: string
     public readonly sourceId: string
+    public readonly description: StreamDescription
+    public readonly units: string = 'N/A'
+    public readonly manufacturer: string = 'N/A'
     public readonly channelNames: readonly string[]
     public readonly channelFormat: ChannelFormat
     public readonly channelCount: number
     public readonly sampleRateHz: number
     public readonly chunkSize: number
     public readonly maxBufferedMs = 360 * 1000
-    public readonly manufacturer: string = 'N/A'
-    public readonly units: string = 'N/A'
 
     private info!: LslInfo
     private handle!: OutletHandle
@@ -50,6 +51,7 @@ export default class LslStreamOutlet implements LslOutlet {
             maxBufferedMs,
             manufacturer,
             units,
+            description = {},
         } = options
 
         this.name = name
@@ -63,6 +65,10 @@ export default class LslStreamOutlet implements LslOutlet {
         this.maxBufferedMs = maxBufferedMs ?? this.maxBufferedMs
         this.manufacturer = manufacturer ?? this.manufacturer
         this.units = units ?? this.units
+
+        this.description = manufacturer
+            ? { manufacturer, ...description }
+            : description
 
         this.validateOptions()
         this.createStreamOutlet()
@@ -111,6 +117,7 @@ export default class LslStreamOutlet implements LslOutlet {
             channelFormat: this.channelFormat,
             sampleRateHz: this.sampleRateHz,
             units: this.units,
+            description: this.description,
         })
 
         this.handle = this.lsl.createOutlet({
@@ -176,6 +183,7 @@ export interface LslOutlet {
     readonly chunkSize: number
     readonly maxBufferedMs: number
     readonly manufacturer: string
+    readonly description: StreamDescription
 }
 
 export type LslOutletConstructor = new (options: LslOutletOptions) => LslOutlet
@@ -191,6 +199,7 @@ export interface LslOutletOptions {
     maxBufferedMs?: number
     manufacturer?: string
     units?: string
+    description?: StreamDescription
     waitAfterConstructionMs?: number
 }
 

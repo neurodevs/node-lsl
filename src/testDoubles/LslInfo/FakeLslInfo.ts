@@ -16,6 +16,7 @@ export default class FakeLslInfo implements LslInfo {
     public channelFormat = 'float32' as const
     public sampleRateHz = 0
     public units = 'N/A'
+    public description = {}
 
     public constructor(options?: LslInfoOptions) {
         FakeLslInfo.callsToConstructor.push(options)

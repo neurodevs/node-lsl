@@ -207,6 +207,26 @@ export default class LslStreamInfoTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async appendsDescriptionToStreamInfo() {
+        const description = { [this.generateId()]: this.generateId() }
+        const instance = this.LslStreamInfo({ description })
+
+        assert.isEqualDeep(
+            this.fakeLiblsl.lastAppendDescriptionToStreamInfoOptions,
+            { infoHandle: instance.infoHandle, fields: description },
+            'Should have called appendDescriptionToStreamInfo!'
+        )
+    }
+
+    @test()
+    protected static async doesNotAppendDescriptionWhenNoneGiven() {
+        assert.isUndefined(
+            this.fakeLiblsl.lastAppendDescriptionToStreamInfoOptions,
+            'Should not have called appendDescriptionToStreamInfo!'
+        )
+    }
+
+    @test()
     protected static async callsBindingsToDestroyStreamInfo() {
         this.instance.destroy()
 

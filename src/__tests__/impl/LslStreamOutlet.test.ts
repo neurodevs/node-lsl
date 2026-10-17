@@ -177,7 +177,21 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
             type: this.randomOutletOptions.type,
             sourceId: this.randomOutletOptions.sourceId,
             units: this.randomOutletOptions.units,
+            description: {
+                manufacturer: this.randomOutletOptions.manufacturer!,
+                ...this.randomOutletOptions.description,
+            },
         })
+    }
+
+    @test()
+    protected static async leavesManufacturerOutOfDescriptionWhenNotGiven() {
+        await this.LslStreamOutlet({ manufacturer: undefined })
+
+        assert.isEqualDeep(
+            FakeLslInfo.callsToConstructor[0]?.description,
+            this.randomOutletOptions.description
+        )
     }
 
     @test()

@@ -77,6 +77,10 @@ export default class FakeLslOutlet implements LslOutlet {
         return this.options?.units ?? generateId()
     }
 
+    public get description() {
+        return this.options?.description ?? {}
+    }
+
     public static resetTestDouble() {
         FakeLslOutlet.callsToConstructor = []
         FakeLslOutlet.callsToPushSample = []

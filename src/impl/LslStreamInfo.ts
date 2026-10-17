@@ -17,6 +17,7 @@ export default class LslStreamInfo implements LslInfo {
     public readonly channelFormat: ChannelFormat
     public readonly sampleRateHz: number
     public readonly units: string
+    public readonly description: StreamDescription
 
     public readonly infoHandle: InfoHandle
 
@@ -31,6 +32,7 @@ export default class LslStreamInfo implements LslInfo {
             channelFormat,
             sampleRateHz,
             units = 'N/A',
+            description = {},
         } = options
 
         this.name = name
@@ -41,9 +43,11 @@ export default class LslStreamInfo implements LslInfo {
         this.channelFormat = channelFormat
         this.sampleRateHz = sampleRateHz
         this.units = units
+        this.description = description
 
         this.infoHandle = this.createStreamInfo()
         this.appendChannelsToStreamInfo()
+        this.appendDescriptionToStreamInfo()
     }
 
     public static Create(options: LslInfoOptions) {
@@ -76,6 +80,15 @@ export default class LslStreamInfo implements LslInfo {
         })
     }
 
+    private appendDescriptionToStreamInfo() {
+        if (Object.keys(this.description).length > 0) {
+            this.lsl.appendDescriptionToStreamInfo({
+                infoHandle: this.infoHandle,
+                fields: this.description,
+            })
+        }
+    }
+
     public destroy() {
         this.lsl.destroyStreamInfo({ infoHandle: this.infoHandle })
     }
@@ -86,6 +99,7 @@ export interface LslInfo {
     readonly name: string
     readonly type: string
     readonly sourceId: string
+    readonly description: StreamDescription
     readonly units: string
     readonly channelNames: readonly string[]
     readonly channelCount: number
@@ -103,5 +117,8 @@ export interface LslInfoOptions {
     name?: string
     type?: string
     sourceId?: string
+    description?: StreamDescription
     units?: string
 }
+
+export type StreamDescription = Readonly<Record<string, string>>
