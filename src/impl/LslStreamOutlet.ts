@@ -1,5 +1,6 @@
 import {
     ChannelFormat,
+    DescriptionElements,
     LiblslAdapter,
     LslErrorCode,
     LslSample,
@@ -157,6 +158,10 @@ export default class LslStreamOutlet implements LslOutlet {
         LslStreamOutlet.handleLslError(errorCode)
     }
 
+    public get descElements() {
+        return this.lsl.getDescription({ infoHandle: this.info.infoHandle })
+    }
+
     public destroy() {
         this.lsl.destroyOutlet({ outletHandle: this.handle })
         this.lsl.destroyStreamInfo({ infoHandle: this.info.infoHandle })
@@ -184,6 +189,7 @@ export interface LslOutlet {
     readonly maxBufferedMs: number
     readonly manufacturer: string
     readonly description: StreamDescription
+    readonly descElements: DescriptionElements[]
 }
 
 export type LslOutletConstructor = new (options: LslOutletOptions) => LslOutlet

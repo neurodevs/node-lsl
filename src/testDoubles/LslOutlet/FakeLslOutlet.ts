@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto'
 
 import generateId from '@neurodevs/generate-id'
-import { LslSample } from '@neurodevs/ndx-native'
+import { DescriptionElements, LslSample } from '@neurodevs/ndx-native'
 
 import { LslOutlet, LslOutletOptions } from '../../impl/LslStreamOutlet.js'
 
@@ -80,6 +80,12 @@ export default class FakeLslOutlet implements LslOutlet {
     public get description() {
         return this.options?.description ?? {}
     }
+
+    public get descElements() {
+        return FakeLslOutlet.descElements
+    }
+
+    public static descElements: DescriptionElements[] = []
 
     public static resetTestDouble() {
         FakeLslOutlet.callsToConstructor = []

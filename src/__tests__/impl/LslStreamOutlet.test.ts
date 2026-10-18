@@ -195,6 +195,24 @@ export default class LslStreamOutletTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async givesElementsOfItsStreamDesc() {
+        FakeLiblsl.fakeDescription = [{ name: 'nickname', value: 'Alice' }]
+        const outlet = await this.LslStreamOutlet()
+
+        assert.isEqualDeep(
+            {
+                descElements: outlet.descElements,
+                options: this.fakeLiblsl.lastGetDescriptionOptions,
+            },
+            {
+                descElements: [{ name: 'nickname', value: 'Alice' }],
+                options: { infoHandle: FakeLslInfo.infoHandle },
+            },
+            'Did not give elements of its stream desc!'
+        )
+    }
+
+    @test()
     protected static async canOverrideClassInstantiatedInFactory() {
         LslStreamOutlet.Class = CheckingOutlet
         const instance = await this.LslStreamOutlet()
