@@ -50,6 +50,7 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     }
 
     private static wasConnected: boolean
+    private static events: string[]
 
     private static nativePeripheral: NativePeripheral = {
         uuid: this.generateId(),
@@ -78,8 +79,15 @@ export default class BleGattControllerTest extends AbstractPackageTest {
         BleGattController.Class = SpyBleGatt
 
         this.wasConnected = false
+        this.events = []
 
         this.instance = this.BleGattController()
+    }
+
+    protected static async afterEach() {
+        FakeLibndx.fakeResult = { status: 200 }
+        await this.instance.disconnect()
+        await super.afterEach()
     }
 
     @test()
@@ -423,6 +431,117 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async reportsLostConnectionAsSoonAsItIsLost() {
+        await this.loseConnection()
+
+        assert.isEqualDeep(
+            { events: this.events, status: this.instance.getState().status },
+            { events: ['lost'], status: 'connecting' },
+            'Did not report the lost connection as soon as it was lost!'
+        )
+    }
+
+    @test()
+    protected static async ignoresIntentionalDisconnects() {
+        await this.connect()
+
+        this.startCall(0).onDisconnected?.({ isIntentional: true })
+
+        assert.isEqualDeep(
+            this.events,
+            [],
+            'Reported an intentional disconnect as a lost connection!'
+        )
+    }
+
+    @test()
+    protected static async startsReconnectingOnceConnectionIsLost() {
+        await this.loseConnection()
+
+        await this.waitForReconnectAttempt()
+
+        assert.isEqualDeep(
+            {
+                stopped: FakeLibndx.callsToStopBleGattBackend,
+                created: FakeLibndx.callsToCreateBleGattBackend.length,
+                restartedFor: this.startCall(1).deviceUuid,
+            },
+            {
+                stopped: [{ deviceUuid: this.uuid }],
+                created: 2,
+                restartedFor: this.uuid,
+            },
+            'Did not start reconnecting once the connection was lost!'
+        )
+    }
+
+    @test()
+    protected static async keepsTryingToReconnectPastConnectTimeout() {
+        BleGattController.connectTimeoutMs = 300
+        await this.loseConnection()
+        await this.waitForReconnectAttempt()
+
+        await new Promise((resolve) => setTimeout(resolve, 50))
+
+        assert.isEqualDeep(
+            {
+                stopped: FakeLibndx.callsToStopBleGattBackend.length,
+                status: this.instance.getState().status,
+            },
+            { stopped: 1, status: 'connecting' },
+            'Gave up reconnecting at the connect timeout!'
+        )
+    }
+
+    @test()
+    protected static async reportsReconnectedOnceServicesAreDiscovered() {
+        await this.loseConnection()
+        await this.waitForReconnectAttempt()
+
+        this.startCall(1).onConnected(this.nativePeripheral)
+        await this.waitForEvent('reconnected')
+
+        assert.isEqualDeep(
+            { events: this.events, status: this.instance.getState().status },
+            { events: ['lost', 'reconnected'], status: 'connected' },
+            'Did not report reconnected once services were discovered!'
+        )
+    }
+
+    @test()
+    protected static async keepsSubscribedCharacteristicsAcrossReconnect() {
+        await this.connect()
+        await this.subscribeCharacteristics()
+        this.startCall(0).onDisconnected?.({ isIntentional: false })
+
+        await this.waitForReconnectAttempt()
+
+        assert.isEqualDeep(
+            this.startCall(1).charCallbacks.map(({ charUuid }) => charUuid),
+            [...this.charCallbacks, ...this.extraCharCallbacks].map(
+                ({ charUuid }) => charUuid
+            ),
+            'Did not keep subscribed characteristics across the reconnect!'
+        )
+    }
+
+    @test()
+    protected static async stopsReconnectingWhenDisconnected() {
+        await this.loseConnection()
+        await this.waitForReconnectAttempt()
+
+        await this.disconnect()
+        this.startCall(1).onConnected(this.nativePeripheral)
+        await new Promise((resolve) => setTimeout(resolve, 20))
+
+        assert.isEqualDeep(
+            { events: this.events, status: this.instance.getState().status },
+            { events: ['lost'], status: 'disconnected' },
+            'Kept reconnecting after being disconnected!'
+        )
+    }
+
+    @test()
     protected static async disconnectCallsLibndxStopBleBackend() {
         await this.disconnect()
 
@@ -550,6 +669,23 @@ export default class BleGattControllerTest extends AbstractPackageTest {
         await promise
     }
 
+    private static async loseConnection() {
+        await this.connect()
+        this.startCall(0).onDisconnected?.({ isIntentional: false })
+    }
+
+    private static startCall(index: number) {
+        return FakeLibndx.callsToStartBleGattBackend[index]
+    }
+
+    private static async waitForReconnectAttempt() {
+        await this.waitForCall(() => this.startCall(1))
+    }
+
+    private static async waitForEvent(event: string) {
+        await this.waitForCall(() => this.events.includes(event))
+    }
+
     private static async connectWithDiscovery(instance: SpyBleGatt) {
         const promise = instance.connect()
 
@@ -617,6 +753,8 @@ export default class BleGattControllerTest extends AbstractPackageTest {
             deviceUuid: this.uuid,
             charCallbacks: this.charCallbacks,
             onConnected: this.onConnected,
+            onConnectionLost: () => this.events.push('lost'),
+            onReconnected: () => this.events.push('reconnected'),
             rssiIntervalMs: this.rssiIntervalMs,
             ...options,
         }) as SpyBleGatt

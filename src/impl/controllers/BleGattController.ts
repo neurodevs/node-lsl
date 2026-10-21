@@ -1,4 +1,8 @@
-import { LibndxAdapter, NativePeripheral } from '@neurodevs/ndx-native'
+import {
+    LibndxAdapter,
+    NativeDisconnection,
+    NativePeripheral,
+} from '@neurodevs/ndx-native'
 
 export default class BleGattController implements BleGatt {
     public static Class?: BleGattConstructor
@@ -14,6 +18,9 @@ export default class BleGattController implements BleGatt {
 
     private deviceNamePrefix?: string
     private onConnected?: (peripheral: NativePeripheral) => void
+    private onConnectionLost?: () => void
+    private onReconnected?: () => void
+    private isDisconnecting = false
 
     private readonly ndx = LibndxAdapter.getInstance()
 
@@ -23,6 +30,8 @@ export default class BleGattController implements BleGatt {
             deviceNamePrefix,
             charCallbacks,
             onConnected,
+            onConnectionLost,
+            onReconnected,
             rssiIntervalMs,
         } = options
 
@@ -34,6 +43,8 @@ export default class BleGattController implements BleGatt {
         this.deviceNamePrefix = deviceNamePrefix
         this.charCallbacks = charCallbacks
         this.onConnected = onConnected
+        this.onConnectionLost = onConnectionLost
+        this.onReconnected = onReconnected
         this.rssiIntervalMs = rssiIntervalMs
     }
 
@@ -52,6 +63,7 @@ export default class BleGattController implements BleGatt {
             await this.discoverUuid()
         }
 
+        this.isDisconnecting = false
         this.state = { status: 'connecting', uuid: this.uuid }
 
         this.createBleGattBackend()
@@ -76,6 +88,12 @@ export default class BleGattController implements BleGatt {
         await this.waitForDiscoveredUuid()
     }
 
+    private throwIfError(status: number, error: string | undefined) {
+        if (status !== 200) {
+            throw new Error(`${status} error: ${error ?? 'Unknown error'}`)
+        }
+    }
+
     private async waitForDiscoveredUuid() {
         const wasDiscovered = await this.waitUntil(() => Boolean(this.uuid))
 
@@ -94,33 +112,14 @@ export default class BleGattController implements BleGatt {
         this.throwIfError(status, error)
     }
 
-    private throwIfError(status: number, error: string | undefined) {
-        if (status !== 200) {
-            throw new Error(`${status} error: ${error ?? 'Unknown error'}`)
-        }
-    }
-
-    private startBleGattRssiPolling() {
-        if (this.rssiIntervalMs) {
-            this.ndx.startBleGattRssiPolling({
-                deviceUuid: this.uuid,
-                intervalMs: this.rssiIntervalMs,
-                onRssi: (rssi: number) => {
-                    this.log.info(`[RSSI=${rssi}]`)
-                },
-            })
-        }
-    }
-
     private startBleGattBackend() {
         const { status, error } = this.ndx.startBleGattBackend({
             deviceUuid: this.uuid,
             onConnected: (peripheral: NativePeripheral) => {
-                const { name } = peripheral
-                this.state = { status: 'connected', uuid: this.uuid, name }
-                this.log.info(`Connected to device ${this.uuid}!`)
-                this.onConnected?.(peripheral)
+                this.handleConnected(peripheral)
             },
+            onDisconnected: (disconnection: NativeDisconnection) =>
+                this.handleDisconnected(disconnection),
             charCallbacks: [...this.charCallbacks],
         })
 
@@ -173,6 +172,81 @@ export default class BleGattController implements BleGatt {
         )
     }
 
+    private startBleGattRssiPolling() {
+        if (this.rssiIntervalMs) {
+            this.ndx.startBleGattRssiPolling({
+                deviceUuid: this.uuid,
+                intervalMs: this.rssiIntervalMs,
+                onRssi: (rssi: number) => {
+                    this.log.info(`[RSSI=${rssi}]`)
+                },
+            })
+        }
+    }
+
+    private handleConnected(peripheral: NativePeripheral) {
+        if (this.isDisconnecting) {
+            return
+        }
+
+        const { name } = peripheral
+
+        this.state = { status: 'connected', uuid: this.uuid, name }
+        this.log.info(`Connected to device ${this.uuid}!`)
+        this.onConnected?.(peripheral)
+    }
+
+    private handleDisconnected(disconnection: NativeDisconnection) {
+        if (disconnection.isIntentional || this.isDisconnecting) {
+            return
+        }
+
+        if (this.state.status !== 'connected') {
+            return
+        }
+
+        this.log.warn(`Lost connection to device ${this.uuid}! Reconnecting...`)
+        this.state = { status: 'connecting', uuid: this.uuid }
+        this.onConnectionLost?.()
+
+        void this.reconnect()
+    }
+
+    private async reconnect() {
+        this.ndx.stopBleGattBackend({ deviceUuid: this.uuid })
+        this.createBleGattBackend()
+        this.startBleGattBackend()
+
+        const didReconnect = await this.waitUntilConnectedOrDisconnecting()
+
+        if (!didReconnect) {
+            return
+        }
+
+        await this.waitToDiscoverServices()
+        this.startBleGattRssiPolling()
+
+        this.log.info(`Reconnected to device ${this.uuid}!`)
+        this.onReconnected?.()
+    }
+
+    private async waitUntilConnectedOrDisconnecting() {
+        while (!this.isDisconnecting) {
+            if (this.state.status === 'connected') {
+                return true
+            }
+
+            await new Promise((resolve) =>
+                BleGattController.setTimeout(
+                    resolve,
+                    BleGattController.checkIntervalMs
+                )
+            )
+        }
+
+        return false
+    }
+
     public async writeCharacteristic(
         charUuid: CharacteristicUuid,
         value: string
@@ -203,6 +277,8 @@ export default class BleGattController implements BleGatt {
         if (!this.uuid) {
             return
         }
+
+        this.isDisconnecting = true
 
         const { status, error } = this.ndx.stopBleGattBackend({
             deviceUuid: this.uuid,
@@ -251,6 +327,8 @@ export interface BleGatt {
 export type BleGattOptions = {
     charCallbacks: CharacteristicCallbacks
     onConnected?: (peripheral: NativePeripheral) => void
+    onConnectionLost?: () => void
+    onReconnected?: () => void
     rssiIntervalMs?: number
 } & (
     | { deviceUuid: string; deviceNamePrefix?: string }
