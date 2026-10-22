@@ -59,12 +59,6 @@ export default class BleGattControllerTest extends AbstractPackageTest {
 
     protected static async beforeAll() {
         assert.isEqual(
-            BleGattController.waitAfterMs,
-            1000,
-            'Set incorrect waitAfterMs!'
-        )
-
-        assert.isEqual(
             BleGattController.connectTimeoutMs,
             30000,
             'Set incorrect connectTimeoutMs!'
@@ -74,7 +68,6 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        BleGattController.waitAfterMs = 0
         BleGattController.connectTimeoutMs = 30000
         BleGattController.Class = SpyBleGatt
 
@@ -86,7 +79,7 @@ export default class BleGattControllerTest extends AbstractPackageTest {
 
     protected static async afterEach() {
         FakeLibndx.fakeResult = { status: 200 }
-        await this.instance.disconnect()
+        await this.disconnect()
         await super.afterEach()
     }
 
@@ -328,19 +321,6 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async waitsAfterOnConnectedToDiscoverServices() {
-        const waitAfterMs = 20
-        BleGattController.waitAfterMs = waitAfterMs
-
-        await this.connect()
-
-        assert.isTruthy(
-            this.callsToSetTimeout.includes(waitAfterMs),
-            'Did not wait after on connected!'
-        )
-    }
-
-    @test()
     protected static async writeCharacteristicCallsLibndxBinding() {
         await this.writeCharacteristic()
 
@@ -442,102 +422,150 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async ignoresIntentionalDisconnects() {
+    protected static async leavesReconnectingToLibndx() {
+        await this.loseConnection()
+
+        assert.isEqualDeep(
+            {
+                created: FakeLibndx.callsToCreateBleGattBackend.length,
+                stopped: FakeLibndx.callsToStopBleGattBackend.length,
+            },
+            { created: 1, stopped: 0 },
+            'Restarted the backend instead of leaving reconnecting to libndx!'
+        )
+    }
+
+    @test()
+    protected static async reportsReconnectOnceReconnected() {
+        await this.loseConnection()
+
+        this.startCall(0).onReconnect()
+
+        assert.isEqualDeep(
+            {
+                events: this.events,
+                status: this.instance.getState().status,
+                name: this.instance.name,
+            },
+            {
+                events: ['lost', 'reconnect'],
+                status: 'connected',
+                name: this.nativePeripheral.name,
+            },
+            'Did not report the reconnect once reconnected!'
+        )
+    }
+
+    @test()
+    protected static async ignoresReconnectOnceDisconnected() {
+        await this.loseConnection()
+        await this.disconnect()
+
+        this.startCall(0).onReconnect()
+
+        assert.isEqualDeep(
+            { events: this.events, status: this.instance.getState().status },
+            { events: ['lost', 'disconnected'], status: 'disconnected' },
+            'Reported a reconnect after being disconnected!'
+        )
+    }
+
+    @test()
+    protected static async disconnectWaitsUntilDisconnectIsConfirmed() {
+        await this.connect()
+        let isDisconnected = false
+
+        const promise = this.instance.disconnect().then(() => {
+            isDisconnected = true
+        })
+        await new Promise((resolve) => setTimeout(resolve, 10))
+        const wasDisconnectedBeforeConfirmed = isDisconnected
+
+        this.startCall(0).onDisconnected()
+        await promise
+
+        assert.isEqualDeep(
+            { wasDisconnectedBeforeConfirmed, isDisconnected },
+            { wasDisconnectedBeforeConfirmed: false, isDisconnected: true },
+            'Did not wait until the disconnect was confirmed!'
+        )
+    }
+
+    @test()
+    protected static async reportsDisconnectedOnceDisconnectIsConfirmed() {
         await this.connect()
 
-        this.startCall(0).onDisconnected?.({ isIntentional: true })
+        await this.disconnect()
 
         assert.isEqualDeep(
             this.events,
-            [],
-            'Reported an intentional disconnect as a lost connection!'
+            ['disconnected'],
+            'Did not report disconnected once the disconnect was confirmed!'
         )
     }
 
     @test()
-    protected static async startsReconnectingOnceConnectionIsLost() {
-        await this.loseConnection()
-
-        await this.waitForReconnectAttempt()
-
-        assert.isEqualDeep(
-            {
-                stopped: FakeLibndx.callsToStopBleGattBackend,
-                created: FakeLibndx.callsToCreateBleGattBackend.length,
-                restartedFor: this.startCall(1).deviceUuid,
-            },
-            {
-                stopped: [{ deviceUuid: this.uuid }],
-                created: 2,
-                restartedFor: this.uuid,
-            },
-            'Did not start reconnecting once the connection was lost!'
-        )
-    }
-
-    @test()
-    protected static async keepsTryingToReconnectPastConnectTimeout() {
-        BleGattController.connectTimeoutMs = 300
-        await this.loseConnection()
-        await this.waitForReconnectAttempt()
-
-        await new Promise((resolve) => setTimeout(resolve, 50))
-
-        assert.isEqualDeep(
-            {
-                stopped: FakeLibndx.callsToStopBleGattBackend.length,
-                status: this.instance.getState().status,
-            },
-            { stopped: 1, status: 'connecting' },
-            'Gave up reconnecting at the connect timeout!'
-        )
-    }
-
-    @test()
-    protected static async reportsReconnectedOnceServicesAreDiscovered() {
-        await this.loseConnection()
-        await this.waitForReconnectAttempt()
-
-        this.startCall(1).onConnected(this.nativePeripheral)
-        await this.waitForEvent('reconnected')
-
-        assert.isEqualDeep(
-            { events: this.events, status: this.instance.getState().status },
-            { events: ['lost', 'reconnected'], status: 'connected' },
-            'Did not report reconnected once services were discovered!'
-        )
-    }
-
-    @test()
-    protected static async keepsSubscribedCharacteristicsAcrossReconnect() {
+    protected static async setsDisconnectedOnceDisconnectIsConfirmed() {
         await this.connect()
-        await this.subscribeCharacteristics()
-        this.startCall(0).onDisconnected?.({ isIntentional: false })
 
-        await this.waitForReconnectAttempt()
+        this.startCall(0).onDisconnected()
 
-        assert.isEqualDeep(
-            this.startCall(1).charCallbacks.map(({ charUuid }) => charUuid),
-            [...this.charCallbacks, ...this.extraCharCallbacks].map(
-                ({ charUuid }) => charUuid
-            ),
-            'Did not keep subscribed characteristics across the reconnect!'
+        assert.isEqual(
+            this.instance.getState().status,
+            'disconnected',
+            'Did not set disconnected once the disconnect was confirmed!'
         )
     }
 
     @test()
-    protected static async stopsReconnectingWhenDisconnected() {
-        await this.loseConnection()
-        await this.waitForReconnectAttempt()
+    protected static async logsOnceDisconnectIsConfirmed() {
+        await this.connect()
+        this.instance.setLogInfoSpy()
 
         await this.disconnect()
-        this.startCall(1).onConnected(this.nativePeripheral)
-        await new Promise((resolve) => setTimeout(resolve, 20))
 
         assert.isEqualDeep(
-            { events: this.events, status: this.instance.getState().status },
-            { events: ['lost'], status: 'disconnected' },
-            'Kept reconnecting after being disconnected!'
+            this.instance.infoLogs,
+            [`Disconnected from device ${this.uuid}!`],
+            'Did not log once the disconnect was confirmed!'
+        )
+    }
+
+    @test()
+    protected static async worksWithoutOptionalCallbacks() {
+        this.instance = this.BleGattController({
+            onConnected: undefined,
+            onLost: undefined,
+            onReconnect: undefined,
+            onDisconnected: undefined,
+        })
+        await this.connect()
+
+        this.startCall(0).onLost()
+        this.startCall(0).onReconnect()
+        await this.disconnect()
+
+        assert.isEqual(
+            this.instance.getState().status,
+            'disconnected',
+            'Did not work without the optional callbacks!'
+        )
+    }
+
+    @test()
+    protected static async warnsWhenDisconnectIsNotConfirmedInTime() {
+        BleGattController.connectTimeoutMs = 300
+        await this.connect()
+        this.instance.setLogWarnSpy()
+
+        await this.instance.disconnect()
+
+        assert.isEqualDeep(
+            this.instance.warnLogs,
+            [
+                `Could not confirm disconnecting from device ${this.uuid} within 0.3 seconds!`,
+            ],
+            'Did not warn when the disconnect was not confirmed in time!'
         )
     }
 
@@ -671,19 +699,11 @@ export default class BleGattControllerTest extends AbstractPackageTest {
 
     private static async loseConnection() {
         await this.connect()
-        this.startCall(0).onDisconnected?.({ isIntentional: false })
+        this.startCall(0).onLost()
     }
 
     private static startCall(index: number) {
         return FakeLibndx.callsToStartBleGattBackend[index]
-    }
-
-    private static async waitForReconnectAttempt() {
-        await this.waitForCall(() => this.startCall(1))
-    }
-
-    private static async waitForEvent(event: string) {
-        await this.waitForCall(() => this.events.includes(event))
     }
 
     private static async connectWithDiscovery(instance: SpyBleGatt) {
@@ -725,7 +745,9 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     }
 
     private static async disconnect() {
-        await this.instance.disconnect()
+        const promise = this.instance.disconnect()
+        this.startCall(0)?.onDisconnected()
+        await promise
     }
 
     private static setFake400Error() {
@@ -753,8 +775,9 @@ export default class BleGattControllerTest extends AbstractPackageTest {
             deviceUuid: this.uuid,
             charCallbacks: this.charCallbacks,
             onConnected: this.onConnected,
-            onConnectionLost: () => this.events.push('lost'),
-            onReconnected: () => this.events.push('reconnected'),
+            onLost: () => this.events.push('lost'),
+            onReconnect: () => this.events.push('reconnect'),
+            onDisconnected: () => this.events.push('disconnected'),
             rssiIntervalMs: this.rssiIntervalMs,
             ...options,
         }) as SpyBleGatt
