@@ -90,6 +90,14 @@ export * from './testDoubles/LslOutlet/FakeLslOutlet.js'
 
 export { default as generateRandomOutletOptions } from './testDoubles/generateRandomOutletOptions.js'
 
+// RfcommDevice (Classic Bluetooth)
+
+export { default as RfcommDeviceController } from './impl/controllers/RfcommDeviceController.js'
+export * from './impl/controllers/RfcommDeviceController.js'
+
+export { default as FakeRfcommDevice } from './testDoubles/RfcommDevice/FakeRfcommDevice.js'
+export * from './testDoubles/RfcommDevice/FakeRfcommDevice.js'
+
 // UsbDevice
 
 export { default as UsbDeviceController } from './impl/controllers/UsbDeviceController.js'
