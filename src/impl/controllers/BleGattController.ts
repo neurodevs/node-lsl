@@ -18,6 +18,7 @@ export default class BleGattController implements BleGatt {
     private onDisconnected?: () => void
     private isDisconnecting = false
     private wasDisconnectConfirmed = false
+    private isConnectAborted = false
 
     private readonly ndx = LibndxAdapter.getInstance()
 
@@ -58,6 +59,8 @@ export default class BleGattController implements BleGatt {
     }
 
     public async connect() {
+        this.isConnectAborted = false
+
         if (!this.state.uuid) {
             await this.discoverUuid()
         }
@@ -93,7 +96,15 @@ export default class BleGattController implements BleGatt {
     }
 
     private async waitForDiscoveredUuid() {
-        const wasDiscovered = await this.waitUntil(() => Boolean(this.uuid))
+        const wasDiscovered = await this.waitUntil(
+            () => Boolean(this.uuid) || this.isConnectAborted
+        )
+
+        if (this.isConnectAborted) {
+            throw new Error(
+                `Connecting to a Bluetooth device whose name starts with "${this.deviceNamePrefix}" was cancelled!`
+            )
+        }
 
         if (!wasDiscovered) {
             throw new Error(
@@ -167,8 +178,14 @@ export default class BleGattController implements BleGatt {
 
     private async waitForOnConnected() {
         const didConnect = await this.waitUntil(
-            () => this.state.status === 'connected'
+            () => this.state.status === 'connected' || this.isConnectAborted
         )
+
+        if (this.isConnectAborted) {
+            throw new Error(
+                `Connecting to Bluetooth device ${this.uuid} was cancelled!`
+            )
+        }
 
         if (!didConnect) {
             this.ndx.stopBleGattBackend({ deviceUuid: this.uuid })
@@ -244,6 +261,8 @@ export default class BleGattController implements BleGatt {
     }
 
     public async disconnect() {
+        this.isConnectAborted = true
+
         if (!this.uuid) {
             return
         }

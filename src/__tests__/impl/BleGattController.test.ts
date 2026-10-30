@@ -678,6 +678,78 @@ export default class BleGattControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async abortsDiscoveryWhenDisconnectedBeforeUuidIsFound() {
+        BleGattController.connectTimeoutMs = 2000
+        const instance = this.BleGattControllerWithPrefix()
+
+        const connecting = instance.connect()
+        await instance.disconnect()
+
+        await assert.doesThrowAsync(
+            async () => await connecting,
+            `Connecting to a Bluetooth device whose name starts with "${this.namePrefix}" was cancelled!`
+        )
+    }
+
+    @test()
+    protected static async doesNotConnectToUuidDiscoveredAfterDisconnect() {
+        const instance = this.BleGattControllerWithPrefix()
+
+        const connecting = instance.connect()
+        await instance.disconnect()
+
+        FakeLibndx.callsToDiscoverBleUuid[0]?.onDiscovered(this.discoveredUuid)
+
+        await assert.doesThrowAsync(async () => await connecting)
+
+        assert.isLength(
+            FakeLibndx.callsToCreateBleGattBackend,
+            0,
+            'Connected to a uuid discovered after disconnecting!'
+        )
+    }
+
+    @test()
+    protected static async abortsConnectingWhenDisconnectedBeforeConnected() {
+        BleGattController.connectTimeoutMs = 2000
+
+        const connecting = this.instance.connect()
+
+        const cancelled = assert.doesThrowAsync(
+            async () => await connecting,
+            `Connecting to Bluetooth device ${this.uuid} was cancelled!`
+        )
+
+        const disconnecting = this.instance.disconnect()
+        this.startCall(0).onDisconnected()
+        await disconnecting
+
+        await cancelled
+    }
+
+    @test()
+    protected static async connectsAgainAfterAbortedConnect() {
+        const connecting = this.instance.connect()
+        const cancelled = assert.doesThrowAsync(async () => await connecting)
+
+        const disconnecting = this.instance.disconnect()
+        this.startCall(0).onDisconnected()
+        await disconnecting
+
+        await cancelled
+
+        const reconnecting = this.instance.connect()
+        this.startCall(1).onConnected(this.nativePeripheral)
+        await reconnecting
+
+        assert.isEqual(
+            this.instance.getState().status,
+            'connected',
+            'Did not connect again after an aborted connect!'
+        )
+    }
+
+    @test()
     protected static async throwsWithUnknownErrorIfNoError() {
         this.setFake500ErrorWithoutError()
 
