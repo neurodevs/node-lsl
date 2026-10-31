@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-lsl",
-  "version": "23.8.2",
+  "version": "24.0.0",
   "description": "Lab Streaming Layer (LSL) bindings for Node",
   "type": "module",
   "keywords": [
@@ -41,17 +41,20 @@
   },
   "dependencies": {
     "@neurodevs/generate-id": "^1.1.3",
-    "@neurodevs/ndx-native": "^14.0.0",
     "ws": "^8.18.3"
   },
   "devDependencies": {
     "@neurodevs/eslint-config-ndx": "^2.0.3",
+    "@neurodevs/ndx-native": "^14.0.0",
     "@neurodevs/node-tdd": "^3.1.0",
     "@neurodevs/prettier-config-ndx": "^1.0.2",
     "@types/ws": "^8.18.1",
     "koffi": "^3.1.2",
     "prettier": "^3.9.10",
     "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@neurodevs/ndx-native": "^14.0.0"
   },
   "resolutions": {
     "glob": "^13.0.0"
