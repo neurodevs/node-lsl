@@ -203,7 +203,7 @@ export default class RfcommDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async connectThrowsNamingEachDeviceWhenSeveralAreFound() {
+    protected static async connectThrowsNamingEachDeviceInUppercaseWithColonsWhenSeveralAreFound() {
         FakeLibndx.fakeRfcommAddresses = [
             'a0-e6-f8-a5-60-bf',
             'a0-e6-f8-a5-69-9a',
@@ -211,7 +211,7 @@ export default class RfcommDeviceControllerTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.RfcommDeviceWithoutAddress().connect(),
-            'Found 2 paired Bluetooth devices (a0-e6-f8-a5-60-bf, a0-e6-f8-a5-69-9a)!'
+            'Found 2 paired Bluetooth devices (A0:E6:F8:A5:60:BF, A0:E6:F8:A5:69:9A)!'
         )
     }
 

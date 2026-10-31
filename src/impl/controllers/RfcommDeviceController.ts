@@ -59,7 +59,11 @@ export default class RfcommDeviceController implements RfcommDevice {
     }
 
     private severalDevicesFoundMessage(addresses: string[]) {
-        return `Found ${addresses.length} paired Bluetooth devices (${addresses.join(', ')})! Please pass the address of the one to use.`
+        return `Found ${addresses.length} paired Bluetooth devices (${addresses.map(this.uppercaseWithColons).join(', ')})! Please pass the address of the one to use.`
+    }
+
+    private uppercaseWithColons(address: string) {
+        return address.toUpperCase().replace(/-/g, ':')
     }
 
     private createRfcommBackend() {
